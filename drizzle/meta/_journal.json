@@ -1,0 +1,34 @@
+{
+  "version": "7",
+  "dialect": "postgresql",
+  "entries": [
+    {
+      "idx": 0,
+      "version": "7",
+      "when": 1784192197267,
+      "tag": "0000_lively_pretty_boy",
+      "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1784194609748,
+      "tag": "0001_petite_solo",
+      "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1784197150409,
+      "tag": "0002_nappy_tana_nile",
+      "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1784198449775,
+      "tag": "0003_cheerful_human_robot",
+      "breakpoints": true
+    }
+  ]
+}

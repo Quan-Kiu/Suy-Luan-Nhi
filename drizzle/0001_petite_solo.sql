@@ -1,0 +1,1 @@
+CREATE UNIQUE INDEX "mission_sessions_active_unique" ON "mission_sessions" USING btree ("child_profile_id","mission_id","mission_version_id") WHERE "mission_sessions"."status" = 'in_progress';

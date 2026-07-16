@@ -6,10 +6,10 @@ import { useRouter } from "next/navigation";
 import Image from "next/image";
 import { useForm, useWatch } from "react-hook-form";
 import { toast } from "sonner";
-import { createChildProfileSchema, type ChildProfile, type CreateChildProfileInput } from "@/domain/schemas";
-import { saveProfile } from "@/lib/profile-store";
+import { createChildProfileSchema, type CreateChildProfileInput } from "@/domain/schemas";
 import { requestJson } from "@/lib/http";
 import { Button, Card } from "@/components/ui";
+import { contentText, useContent } from "@/content/client";
 
 const ageOptions = [
   { id: "2-3", title: "2–3 tuổi", note: "Nhận biết và ghép đôi" },
@@ -18,6 +18,7 @@ const ageOptions = [
 ] as const;
 
 export function CreateProfileForm() {
+  const content = useContent("profile");
   const router = useRouter();
   const form = useForm<CreateChildProfileInput>({
     resolver: zodResolver(createChildProfileSchema),
@@ -26,9 +27,11 @@ export function CreateProfileForm() {
   const selectedAgeGroup = useWatch({ control: form.control, name: "ageGroup" });
   const mutation = useMutation({
     mutationFn: (input: CreateChildProfileInput) =>
-      requestJson<ChildProfile>("/api/children", { method: "POST", body: JSON.stringify(input) }),
+      requestJson<{ id: string; displayName: string }>("/api/children", {
+        method: "POST",
+        body: JSON.stringify(input),
+      }),
     onSuccess(profile) {
-      saveProfile(profile);
       toast.success(`Hồ sơ của ${profile.displayName} đã sẵn sàng!`);
       router.push("/profiles");
     },
@@ -46,7 +49,7 @@ export function CreateProfileForm() {
         <p className="mb-3 text-sm text-[#806d54]">Không cần dùng tên thật đâu nhé.</p>
         <input
           id="displayName"
-          placeholder="Ví dụ: Bống, Mít..."
+          placeholder={contentText(content, "create.namePlaceholder", "Ví dụ: Bống, Mít...")}
           autoComplete="off"
           className="min-h-14 w-full rounded-2xl border-2 border-[#eadfc9] bg-[#fffdf8] px-4 text-lg outline-none focus:border-[#e9641a]"
           {...form.register("displayName")}
@@ -92,7 +95,9 @@ export function CreateProfileForm() {
           className="size-14 object-contain"
         />
         <div>
-          <p className="font-black text-[#47643a]">Chỉ thu thập điều thật sự cần</p>
+          <p className="font-black text-[#47643a]">
+            {contentText(content, "create.privacyTitle", "Chỉ thu thập điều thật sự cần")}
+          </p>
           <p className="text-sm text-[#5b714c]">
             Không email của bé, không ngày sinh đầy đủ, không quảng cáo và không mua hàng.
           </p>

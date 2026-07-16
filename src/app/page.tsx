@@ -37,7 +37,7 @@ export default function HomePage() {
           </p>
           <div className="mt-7 flex flex-col gap-3 sm:flex-row">
             <Link
-              href="/onboarding"
+              href="/auth/sign-up"
               className="wood-button inline-flex min-h-14 items-center justify-center gap-2 rounded-2xl px-6 font-black text-white"
             >
               Tạo hồ sơ cho bé <ArrowRight size={20} />

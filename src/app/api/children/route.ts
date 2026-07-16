@@ -1,22 +1,23 @@
-import { NextResponse } from "next/server";
-import { createChildProfileSchema } from "@/domain/schemas";
+import { apiJson } from "@/lib/api-response";
+import { requireApiRoles } from "@/auth/api";
+import { createChild, listChildren } from "@/modules/family/family";
+import { createChildSchema } from "@/modules/family/schemas";
+
+export async function GET(request: Request) {
+  const authResult = await requireApiRoles(request, ["parent", "super_admin"]);
+  if ("error" in authResult) return authResult.error;
+  return apiJson(await listChildren(authResult.session.user.id, authResult.session.user.name));
+}
 
 export async function POST(request: Request) {
-  const body = await request.json().catch(() => null);
-  const result = createChildProfileSchema.safeParse(body);
-  if (!result.success) {
-    return NextResponse.json(
-      { message: result.error.issues[0]?.message ?? "Thông tin hồ sơ chưa hợp lệ" },
+  const authResult = await requireApiRoles(request, ["parent", "super_admin"]);
+  if ("error" in authResult) return authResult.error;
+  const input = createChildSchema.safeParse(await request.json().catch(() => null));
+  if (!input.success)
+    return apiJson(
+      { message: input.error.issues[0]?.message, issues: input.error.flatten() },
       { status: 400 },
     );
-  }
-
-  return NextResponse.json({
-    id: crypto.randomUUID(),
-    ...result.data,
-    avatar: "/assets/mascots/mascot-dog-bong-avatar.png",
-    mascot: "Bống",
-    currentRank: "Nhà thám hiểm nhí",
-    createdAt: new Date().toISOString(),
-  });
+  const child = await createChild(authResult.session.user.id, authResult.session.user.name, input.data);
+  return apiJson(child, { status: 201 });
 }

@@ -1,0 +1,360 @@
+import "dotenv/config";
+import { and, eq } from "drizzle-orm";
+import { auth } from "@/auth/auth";
+import { db, pool } from "@/db/client";
+import {
+  ageGroups,
+  badges,
+  childProfiles,
+  contentEntries,
+  conversationSuggestions,
+  hints,
+  missionAgeGroups,
+  missionSecondarySkills,
+  missionVersions,
+  missionWorlds,
+  missions,
+  parentProfiles,
+  parentResources,
+  questionSkills,
+  questions,
+  safetyChecklistEntries,
+  skills,
+  user,
+  worldAgeGroups,
+  worldSkills,
+} from "@/db/schema";
+import { defaultContentEntries } from "@/content/defaults";
+import { badgeSeeds, missionSeeds, skillSeeds, worldSeeds } from "@/content/catalog/game-content";
+import { conversationSuggestionSeeds, parentResourceSeeds } from "@/content/catalog/parent-content";
+import { ageGroupSeeds, safetyChecklistDefinitions } from "@/content/catalog/taxonomy-content";
+
+const seedPassword = process.env.SEED_PASSWORD ?? "LocalDemo-2026!";
+const accountSeeds = [
+  { email: "parent@demo.local", name: "Phụ huynh Demo", role: "parent" },
+  { email: "privacy@demo.local", name: "Phụ huynh Privacy Test", role: "parent" },
+  { email: "content@demo.local", name: "Biên tập viên Demo", role: "content_admin" },
+  { email: "reviewer@demo.local", name: "Reviewer Demo", role: "reviewer" },
+  { email: "admin@demo.local", name: "Super Admin Demo", role: "super_admin" },
+] as const;
+
+async function seedAccounts() {
+  for (const accountSeed of accountSeeds) {
+    let existing = await db.query.user.findFirst({ where: eq(user.email, accountSeed.email) });
+    if (!existing) {
+      await auth.api.signUpEmail({
+        body: { email: accountSeed.email, name: accountSeed.name, password: seedPassword },
+      });
+      existing = await db.query.user.findFirst({ where: eq(user.email, accountSeed.email) });
+    }
+    if (!existing) throw new Error(`Could not seed ${accountSeed.email}`);
+    await db
+      .update(user)
+      .set({ role: accountSeed.role, emailVerified: true, updatedAt: new Date() })
+      .where(eq(user.id, existing.id));
+    if (accountSeed.role !== "parent")
+      await db.delete(parentProfiles).where(eq(parentProfiles.userId, existing.id));
+  }
+
+  const parentUser = await db.query.user.findFirst({ where: eq(user.email, "parent@demo.local") });
+  if (!parentUser) throw new Error("Missing parent demo account");
+  let parentProfile = await db.query.parentProfiles.findFirst({
+    where: eq(parentProfiles.userId, parentUser.id),
+  });
+  if (!parentProfile) {
+    [parentProfile] = await db
+      .insert(parentProfiles)
+      .values({ userId: parentUser.id, displayName: parentUser.name })
+      .returning();
+  }
+  const existingChild = await db.query.childProfiles.findFirst({
+    where: and(eq(childProfiles.parentProfileId, parentProfile.id), eq(childProfiles.displayName, "Bống")),
+  });
+  if (!existingChild) {
+    await db.insert(childProfiles).values({
+      parentProfileId: parentProfile.id,
+      displayName: "Bống",
+      ageGroup: "4-5",
+      avatarUrl: "/assets/mascots/mascot-dog-bong-avatar.png",
+      mascotId: "bong",
+    });
+  }
+}
+
+async function seedTaxonomy() {
+  await db
+    .insert(ageGroups)
+    .values([...ageGroupSeeds])
+    .onConflictDoNothing();
+
+  for (const [slug, title, description, category] of skillSeeds) {
+    await db
+      .insert(skills)
+      .values({ slug, title, description, category })
+      .onConflictDoUpdate({
+        target: skills.slug,
+        set: { title, description, category, updatedAt: new Date() },
+      });
+  }
+}
+
+async function seedSystemContent() {
+  for (const entry of defaultContentEntries) {
+    await db
+      .insert(contentEntries)
+      .values({
+        namespace: entry.namespace,
+        key: entry.key,
+        locale: entry.locale,
+        value: entry.value,
+        description: entry.description,
+      })
+      .onConflictDoNothing();
+  }
+}
+
+async function seedBadges() {
+  const skillRows = await db.select().from(skills);
+  const skillBySlug = new Map(skillRows.map((skill) => [skill.slug, skill]));
+  for (const badge of badgeSeeds) {
+    await db
+      .insert(badges)
+      .values({
+        slug: badge.slug,
+        name: badge.name,
+        description: badge.description,
+        iconUrl: badge.iconUrl,
+        skillId: skillBySlug.get(badge.skillSlug)?.id,
+        unlockRule: badge.unlockRule,
+      })
+      .onConflictDoUpdate({
+        target: badges.slug,
+        set: {
+          name: badge.name,
+          description: badge.description,
+          iconUrl: badge.iconUrl,
+          skillId: skillBySlug.get(badge.skillSlug)?.id,
+          unlockRule: badge.unlockRule,
+        },
+      });
+  }
+}
+
+async function seedWorldsAndMissions() {
+  const skillRows = await db.select().from(skills);
+  const badgeRows = await db.select().from(badges);
+  const skillBySlug = new Map(skillRows.map((skill) => [skill.slug, skill]));
+  const badgeBySlug = new Map(badgeRows.map((badge) => [badge.slug, badge]));
+
+  for (const world of worldSeeds) {
+    const [worldRow] = await db
+      .insert(missionWorlds)
+      .values({
+        slug: world.slug,
+        title: world.title,
+        subtitle: world.subtitle,
+        description: world.description,
+        sortOrder: world.sortOrder,
+        themeColor: world.themeColor,
+        coverUrl: world.coverUrl,
+        status: "published",
+        unlockRule:
+          world.sortOrder === 1
+            ? { type: "always" }
+            : { type: "previous_world_completed", order: world.sortOrder - 1 },
+      })
+      .onConflictDoUpdate({
+        target: missionWorlds.slug,
+        set: {
+          title: world.title,
+          subtitle: world.subtitle,
+          description: world.description,
+          sortOrder: world.sortOrder,
+          themeColor: world.themeColor,
+          coverUrl: world.coverUrl,
+          status: "published",
+          updatedAt: new Date(),
+        },
+      })
+      .returning();
+    await db.delete(worldAgeGroups).where(eq(worldAgeGroups.worldId, worldRow.id));
+    await db.insert(worldAgeGroups).values(
+      ["2-3", "4-5", "6-8"].map((ageGroup) => ({
+        worldId: worldRow.id,
+        ageGroup: ageGroup as "2-3" | "4-5" | "6-8",
+      })),
+    );
+    await db.delete(worldSkills).where(eq(worldSkills.worldId, worldRow.id));
+    await db
+      .insert(worldSkills)
+      .values(world.skillSlugs.map((slug) => ({ worldId: worldRow.id, skillId: skillBySlug.get(slug)!.id })));
+  }
+
+  const worldRows = await db.select().from(missionWorlds);
+  const worldBySlug = new Map(worldRows.map((world) => [world.slug, world]));
+
+  for (const missionSeed of missionSeeds) {
+    const world = worldBySlug.get(missionSeed.worldSlug);
+    const primarySkill = skillBySlug.get(missionSeed.primarySkill);
+    const rewardBadge = badgeBySlug.get(missionSeed.rewardBadge);
+    if (!world || !primarySkill) throw new Error(`Invalid mission seed ${missionSeed.slug}`);
+    const [mission] = await db
+      .insert(missions)
+      .values({
+        worldId: world.id,
+        slug: missionSeed.slug,
+        title: missionSeed.title,
+        subtitle: missionSeed.subtitle,
+        shortDescription: missionSeed.shortDescription,
+        storyIntro: missionSeed.storyIntro,
+        estimatedMinutes: missionSeed.estimatedMinutes,
+        primarySkillId: primarySkill.id,
+        rewardBadgeId: rewardBadge?.id,
+        coverUrl: missionSeed.coverUrl,
+        status: "published",
+        difficulty: missionSeed.difficulty,
+        unlockRule: { type: "previous_mission_completed" },
+        publishedAt: new Date(),
+      })
+      .onConflictDoUpdate({
+        target: missions.slug,
+        set: {
+          worldId: world.id,
+          title: missionSeed.title,
+          subtitle: missionSeed.subtitle,
+          shortDescription: missionSeed.shortDescription,
+          storyIntro: missionSeed.storyIntro,
+          estimatedMinutes: missionSeed.estimatedMinutes,
+          primarySkillId: primarySkill.id,
+          rewardBadgeId: rewardBadge?.id,
+          coverUrl: missionSeed.coverUrl,
+          status: "published",
+          difficulty: missionSeed.difficulty,
+          updatedAt: new Date(),
+        },
+      })
+      .returning();
+
+    await db.delete(missionAgeGroups).where(eq(missionAgeGroups.missionId, mission.id));
+    await db
+      .insert(missionAgeGroups)
+      .values(missionSeed.ageGroups.map((ageGroup) => ({ missionId: mission.id, ageGroup })));
+    await db.delete(missionSecondarySkills).where(eq(missionSecondarySkills.missionId, mission.id));
+    await db.insert(missionSecondarySkills).values(
+      missionSeed.secondarySkills.map((slug) => ({
+        missionId: mission.id,
+        skillId: skillBySlug.get(slug)!.id,
+      })),
+    );
+    await db.delete(questions).where(eq(questions.missionId, mission.id));
+
+    const insertedQuestions = [];
+    for (const questionSeed of missionSeed.questions) {
+      const [question] = await db
+        .insert(questions)
+        .values({
+          missionId: mission.id,
+          sortOrder: questionSeed.order,
+          type: questionSeed.type,
+          prompt: questionSeed.prompt,
+          instruction: questionSeed.instruction,
+          payload: questionSeed.payload,
+          correctAnswer: questionSeed.correctAnswer,
+          difficulty: questionSeed.difficulty,
+          feedbackCorrect: questionSeed.feedbackCorrect,
+          feedbackIncorrect: questionSeed.feedbackIncorrect,
+        })
+        .returning();
+      await db
+        .insert(hints)
+        .values(
+          questionSeed.hints.map((hint) => ({ questionId: question.id, level: hint.level, text: hint.text })),
+        );
+      await db.insert(questionSkills).values([{ questionId: question.id, skillId: primarySkill.id }]);
+      insertedQuestions.push({ ...questionSeed, id: question.id });
+    }
+
+    await db.delete(safetyChecklistEntries).where(eq(safetyChecklistEntries.missionId, mission.id));
+    await db.insert(safetyChecklistEntries).values(
+      safetyChecklistDefinitions.map((item) => ({
+        missionId: mission.id,
+        key: item.key,
+        passed: true,
+        note: item.defaultNote,
+      })),
+    );
+    await db.delete(missionVersions).where(eq(missionVersions.missionId, mission.id));
+    const [version] = await db
+      .insert(missionVersions)
+      .values({
+        missionId: mission.id,
+        versionNumber: 1,
+        status: "published",
+        snapshot: {
+          ...missionSeed,
+          id: mission.id,
+          worldId: world.id,
+          questions: insertedQuestions,
+          safetyChecklist: Object.fromEntries(safetyChecklistDefinitions.map((item) => [item.key, true])),
+        },
+        publishedAt: new Date(),
+      })
+      .returning();
+    await db
+      .update(missions)
+      .set({ publishedVersionId: version.id, currentDraftVersion: 1 })
+      .where(eq(missions.id, mission.id));
+  }
+}
+
+async function seedParentContent() {
+  const missionRows = await db.select().from(missions);
+  const skillRows = await db.select().from(skills);
+  const missionBySlug = new Map(missionRows.map((mission) => [mission.slug, mission]));
+  const skillBySlug = new Map(skillRows.map((skill) => [skill.slug, skill]));
+
+  await db.delete(conversationSuggestions);
+  await db.insert(conversationSuggestions).values(
+    conversationSuggestionSeeds.map((item) => ({
+      title: item.title,
+      questionText: item.questionText,
+      purpose: item.purpose,
+      ageGroup: "ageGroup" in item ? item.ageGroup : undefined,
+      relatedMissionId:
+        "relatedMissionSlug" in item ? missionBySlug.get(item.relatedMissionSlug)?.id : undefined,
+      skillId: skillBySlug.get(item.skillSlug)?.id,
+    })),
+  );
+
+  await db.delete(parentResources);
+  await db.insert(parentResources).values(
+    parentResourceSeeds.map((item) => ({
+      ...item,
+      ageGroups: [...item.ageGroups],
+      status: "published" as const,
+      publishedAt: new Date(),
+    })),
+  );
+}
+
+async function main() {
+  await seedAccounts();
+  await seedTaxonomy();
+  await seedSystemContent();
+  await seedBadges();
+  await seedWorldsAndMissions();
+  await seedParentContent();
+  console.log(
+    `Seeded ${accountSeeds.length} accounts, ${worldSeeds.length} worlds and ${missionSeeds.length} missions.`,
+  );
+  console.log(`Demo password: ${seedPassword}`);
+}
+
+main()
+  .catch((error) => {
+    console.error(error);
+    process.exitCode = 1;
+  })
+  .finally(async () => {
+    await pool.end();
+  });

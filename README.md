@@ -1,70 +1,145 @@
-# Suy Luận Nhí — SLN-GPT
+# Suy Luận Nhí — Production Application
 
-MVP tương tác cho sản phẩm học suy luận an toàn dành cho trẻ em, được dựng từ SPEC, 10 ảnh tham chiếu và bộ assets đi kèm.
+Ứng dụng nhiệm vụ suy luận an toàn cho trẻ, gồm Child App, Parent Workspace và Content Operations CMS. Hệ thống dùng PostgreSQL thật, Better Auth, immutable content versions, transactional Mission Sessions và media storage có lớp kiểm duyệt.
 
 ## Công nghệ
 
-- Next.js 16 App Router, React 19, TypeScript
-- Tailwind CSS 4
-- Zod cho domain validation và API boundaries
-- React Hook Form cho onboarding và CMS
-- TanStack Query cho server-state và mutations
-- Vitest + Testing Library cho unit/component tests
-- Playwright cho end-to-end acceptance tests
+- Next.js App Router, React, TypeScript, Tailwind CSS
+- PostgreSQL 17 và Drizzle ORM migrations
+- Better Auth email/password, session, reset password và email verification
+- Zod, React Hook Form và TanStack Query
+- Local filesystem adapter cho development; S3-compatible storage cho production
+- Vitest, PostgreSQL integration tests và Playwright E2E
+- Docker, health checks và GitHub Actions CI
 
-## Chạy dự án
+## Khởi động local
 
 ```bash
+cp .env.example .env.local
 npm install
+npm run db:bootstrap
 npm run dev
 ```
 
-Mặc định ứng dụng chạy tại `http://localhost:3000`.
+Dịch vụ development:
 
-## Các route chính
+- Web: `http://localhost:3000`
+- PostgreSQL: `localhost:54329`
+- Mailpit UI: `http://localhost:8025`
 
-| Route                           | Chức năng                                  |
-| ------------------------------- | ------------------------------------------ |
-| `/`                             | Landing page và cam kết an toàn            |
-| `/onboarding`                   | Tạo Child Profile tối giản dữ liệu         |
-| `/profiles`                     | Chọn hồ sơ quay lại                        |
-| `/missions`                     | Bản đồ Mission Worlds                      |
-| `/missions/footprint-detective` | Chi tiết nhiệm vụ mẫu                      |
-| `/play`                         | Gameplay, hint, retry và feedback tích cực |
-| `/complete`                     | Hoàn thành và nhận huy hiệu                |
-| `/parent`                       | Parent Gate và dashboard tiến độ           |
-| `/admin/missions`               | CMS chỉnh sửa, preview và gửi duyệt        |
+Tài khoản seed local, cùng mật khẩu `LocalDemo-2026!`:
 
-## Kiểm tra chất lượng
+| Email                 | Role          |
+| --------------------- | ------------- |
+| `parent@demo.local`   | Parent        |
+| `content@demo.local`  | Content Admin |
+| `reviewer@demo.local` | Reviewer      |
+| `admin@demo.local`    | Super Admin   |
+
+Các tài khoản này chỉ dành cho local/test. Không chạy seed demo trong production.
+
+## Chức năng chính
+
+### Child App
+
+- Privacy-minimal Child Profile CRUD và chọn active profile bằng HttpOnly cookie
+- Mission Map theo tuổi, thứ tự và unlock rules
+- 12 mission mẫu, 24 câu hỏi và 5 loại gameplay
+- Hint nhiều cấp, retry tích cực, resume/exit và replay rules
+- Transactional progress, badges, activity summaries và notifications
+- Idempotent answer/completion APIs, unique active-session index
+
+### Parent Workspace
+
+- Parent Gate bằng phép tính hoặc scrypt PIN, lockout khi thử sai nhiều lần
+- Dashboard tuần, lịch sử có bộ lọc, badges và Thinking Habits
+- Conversation suggestions và parent resources
+- Notification center
+- Sound/effects/privacy/notification settings
+- Reset progress, data export download và deletion request workflow
+
+### Content Operations
+
+- Mission CRUD, ordering, duplicate và archive
+- Editor hỗ trợ single choice, pattern, drag/drop, fill answer và sorting
+- Preview dùng cùng Child Renderer với gameplay
+- Safety Checklist và media approval
+- Immutable version submit → reviewer approve/reject → publish/schedule
+- Mission Worlds, age groups, skills, badges, members/roles
+- Media library cho image/audio, local hoặc S3
+- Reports, audit log, system settings và data request processing
+
+## Route quan trọng
+
+```text
+/auth/sign-in
+/profiles
+/missions
+/play/:sessionId
+/complete/:sessionId
+/parent
+/parent/activity
+/parent/suggestions
+/parent/resources
+/parent/settings
+/admin
+/admin/missions
+/admin/reviews
+/admin/media
+/admin/worlds
+/admin/taxonomy
+/admin/members
+/admin/reports
+/admin/audit
+/admin/data-requests
+```
+
+## Database
+
+```bash
+npm run infra:up
+npm run db:generate
+npm run db:migrate
+npm run db:seed
+npm run db:studio
+```
+
+Migrations nằm trong `drizzle/`. Production deploy phải chạy `npm run db:migrate` trước khi đưa image mới vào traffic.
+
+## Quality gates
 
 ```bash
 npm run format:check
 npm run lint
 npm run typecheck
 npm run test
+npm run test:integration
 npm run build
 npm run test:e2e
+npm run verify
 ```
 
-`npm run check` chạy format, lint, typecheck, unit tests và production build. `npm run verify` chạy thêm Playwright E2E.
+- Unit/component tests chạy không cần DB test fixture.
+- Integration test chạy trên PostgreSQL thật và kiểm tra resume, idempotency, completion exactly-once, activity và notification.
+- E2E dùng bốn tài khoản seed để kiểm tra Child, Parent và review/publish workflow.
 
-## Kiến trúc
+## Production deployment
 
-- `src/domain/`: Zod schemas, domain types và nội dung MVP.
-- `src/features/`: các vertical slices onboarding, gameplay, parent và admin.
-- `src/components/question-renderer.tsx`: Child Renderer dùng chung cho gameplay và CMS preview.
-- `src/lib/profile-store.ts`, `src/lib/progress-store.ts`: local-first adapters có validation và recovery.
-- `src/app/api/`: route-handler boundaries để UI không phụ thuộc trực tiếp vào persistence.
-- `CONTEXT.md`, `docs/adr/`: ngôn ngữ domain và quyết định kiến trúc.
-- `.scratch/sln-gpt-mvp/`: spec đã chuẩn hóa và local implementation tickets theo workflow Matt Pocock.
-- `_bmad-output/implementation-artifacts/reviews/`: kết quả review BMAD.
+- Environment template: `.env.production.example`
+- Self-hosted Compose: `docker-compose.production.yml`
+- Runbook: `docs/operations/production-runbook.md`
+- Threat model: `docs/security/threat-model.md`
+- API overview: `docs/api/README.md`
+- Liveness: `/api/health/live`
+- Readiness: `/api/health/ready`
 
-## Dữ liệu MVP
+Production phải dùng secret manager, TLS, SMTP thật, S3-compatible storage và backup PostgreSQL đã kiểm thử restore. Scheduled publishing gọi `POST /api/cron/publish-scheduled` với Bearer `CRON_SECRET`.
 
-Child Profile và tiến độ demo được lưu trong `localStorage`. Đây là lựa chọn local-first có chủ đích; production authentication, database, cloud sync và server-side parent authorization nằm ngoài phạm vi MVP hiện tại.
+## Kiến trúc và workflow agent
 
-## Assets và nguồn tham chiếu
-
-- Assets runtime: `public/assets/`
-- SPEC gốc: `starter/source/SPEC.md`
-- Screenshots gốc: `starter/screenshots/`
+- Domain context: `CONTEXT.md`
+- ADRs: `docs/adr/`
+- Production specification: `.scratch/sln-production/spec.md`
+- Implementation tickets: `.scratch/sln-production/issues/`
+- Matt Pocock skills: `.agents/skills/mattpocock/`
+- Review artifacts: `_bmad-output/implementation-artifacts/reviews/`

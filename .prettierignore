@@ -4,3 +4,5 @@ public/assets
 starter/assets
 test-results
 playwright-report
+
+.agents
