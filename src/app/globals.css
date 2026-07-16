@@ -1,26 +1,63 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --cream: #fffaf0;
+  --paper: #f7eedc;
+  --ink: #3f321f;
+  --muted: #7d6a50;
+  --orange: #e9641a;
+  --green: #5e8f45;
+  --gold: #f5b557;
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+* {
+  box-sizing: border-box;
 }
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+html {
+  scroll-behavior: smooth;
 }
-
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  margin: 0;
+  background: var(--cream);
+  color: var(--ink);
+  font-family: ui-rounded, "Arial Rounded MT Bold", "Trebuchet MS", system-ui, sans-serif;
+}
+button,
+input,
+textarea,
+select {
+  font: inherit;
+}
+button,
+a {
+  -webkit-tap-highlight-color: transparent;
+}
+:focus-visible {
+  outline: 4px solid color-mix(in srgb, var(--gold) 78%, white);
+  outline-offset: 3px;
+}
+::selection {
+  background: #ffd69e;
+}
+
+.paper-texture {
+  background-color: #fffaf0;
+  background-image:
+    radial-gradient(circle at 20% 30%, rgba(219, 185, 126, 0.16) 0 1px, transparent 1.5px),
+    radial-gradient(circle at 72% 64%, rgba(219, 185, 126, 0.14) 0 1px, transparent 1.5px);
+  background-size:
+    24px 24px,
+    31px 31px;
+}
+
+.wood-button {
+  background: linear-gradient(180deg, #f07b2e, #d95312);
+  box-shadow:
+    0 8px 0 #ad3f0b,
+    0 14px 24px rgba(137, 67, 18, 0.22);
+}
+
+.scrollbar-thin {
+  scrollbar-width: thin;
+  scrollbar-color: #d7bd96 transparent;
 }

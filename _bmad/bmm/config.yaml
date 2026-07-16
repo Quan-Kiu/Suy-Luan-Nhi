@@ -1,0 +1,7 @@
+project_name: SLN-GPT
+planning_artifacts: _bmad-output/planning-artifacts
+implementation_artifacts: _bmad-output/implementation-artifacts
+user_name: Quan
+communication_language: Vietnamese
+document_output_language: Vietnamese
+user_skill_level: advanced

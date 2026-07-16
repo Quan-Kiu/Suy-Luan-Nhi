@@ -1,0 +1,1514 @@
+{
+  "brand-logo-detective-head": {
+    "src": "/home/quan-linux-mint/Workspace/Develop/Projects/SLN-V2/assets/input/assets/assets/01_branding_mascots/brand-logo-detective-head.png",
+    "dest": "/mascots/brand-logo-detective-head.png",
+    "category": "mascots",
+    "slug": "brand-logo-detective-head",
+    "bytes": 1771879,
+    "sha256": "dd59eab1ce0b73fb"
+  },
+  "brand-logo-horizontal": {
+    "src": "/home/quan-linux-mint/Workspace/Develop/Projects/SLN-V2/assets/input/assets/assets/01_branding_mascots/brand-logo-horizontal.png",
+    "dest": "/mascots/brand-logo-horizontal.png",
+    "category": "mascots",
+    "slug": "brand-logo-horizontal",
+    "bytes": 844926,
+    "sha256": "f7ebbeeac9e2df6d"
+  },
+  "mascot-detective-boy-celebrate": {
+    "src": "/home/quan-linux-mint/Workspace/Develop/Projects/SLN-V2/assets/input/assets/assets/01_branding_mascots/mascot-detective-boy-celebrate.png",
+    "dest": "/mascots/mascot-detective-boy-celebrate.png",
+    "category": "mascots",
+    "slug": "mascot-detective-boy-celebrate",
+    "bytes": 1564381,
+    "sha256": "ca087b8249cb2416"
+  },
+  "mascot-detective-boy-helper": {
+    "src": "/home/quan-linux-mint/Workspace/Develop/Projects/SLN-V2/assets/input/assets/assets/01_branding_mascots/mascot-detective-boy-helper.png",
+    "dest": "/mascots/mascot-detective-boy-helper.png",
+    "category": "mascots",
+    "slug": "mascot-detective-boy-helper",
+    "bytes": 1213523,
+    "sha256": "f4d617109984fedc"
+  },
+  "mascot-detective-boy-map": {
+    "src": "/home/quan-linux-mint/Workspace/Develop/Projects/SLN-V2/assets/input/assets/assets/01_branding_mascots/mascot-detective-boy-map.png",
+    "dest": "/mascots/mascot-detective-boy-map.png",
+    "category": "mascots",
+    "slug": "mascot-detective-boy-map",
+    "bytes": 1600708,
+    "sha256": "84cbe1a4d322ce1b"
+  },
+  "mascot-detective-boy-standing": {
+    "src": "/home/quan-linux-mint/Workspace/Develop/Projects/SLN-V2/assets/input/assets/assets/01_branding_mascots/mascot-detective-boy-standing.png",
+    "dest": "/mascots/mascot-detective-boy-standing.png",
+    "category": "mascots",
+    "slug": "mascot-detective-boy-standing",
+    "bytes": 1336199,
+    "sha256": "bd9e67e9a56682b5"
+  },
+  "mascot-dog-bong-avatar": {
+    "src": "/home/quan-linux-mint/Workspace/Develop/Projects/SLN-V2/assets/input/assets/assets/01_branding_mascots/mascot-dog-bong-avatar.png",
+    "dest": "/mascots/mascot-dog-bong-avatar.png",
+    "category": "mascots",
+    "slug": "mascot-dog-bong-avatar",
+    "bytes": 2226510,
+    "sha256": "fe531cdd2369da4f"
+  },
+  "mascot-dog-bong-sitting": {
+    "src": "/home/quan-linux-mint/Workspace/Develop/Projects/SLN-V2/assets/input/assets/assets/01_branding_mascots/mascot-dog-bong-sitting.png",
+    "dest": "/mascots/mascot-dog-bong-sitting.png",
+    "category": "mascots",
+    "slug": "mascot-dog-bong-sitting",
+    "bytes": 1339283,
+    "sha256": "60fdf9063068a2fd"
+  },
+  "mascot-dog-detective": {
+    "src": "/home/quan-linux-mint/Workspace/Develop/Projects/SLN-V2/assets/input/assets/assets/01_branding_mascots/mascot-dog-detective.png",
+    "dest": "/mascots/mascot-dog-detective.png",
+    "category": "mascots",
+    "slug": "mascot-dog-detective",
+    "bytes": 1284562,
+    "sha256": "0c2f9ce466c6e70f"
+  },
+  "mascot-hedgehog-map": {
+    "src": "/home/quan-linux-mint/Workspace/Develop/Projects/SLN-V2/assets/input/assets/assets/01_branding_mascots/mascot-hedgehog-map.png",
+    "dest": "/mascots/mascot-hedgehog-map.png",
+    "category": "mascots",
+    "slug": "mascot-hedgehog-map",
+    "bytes": 414143,
+    "sha256": "e3f2fe95bf5dfc19"
+  },
+  "mascot-hedgehog-speaking": {
+    "src": "/home/quan-linux-mint/Workspace/Develop/Projects/SLN-V2/assets/input/assets/assets/01_branding_mascots/mascot-hedgehog-speaking.png",
+    "dest": "/mascots/mascot-hedgehog-speaking.png",
+    "category": "mascots",
+    "slug": "mascot-hedgehog-speaking",
+    "bytes": 408483,
+    "sha256": "24d6465225db21cb"
+  },
+  "mascot-hedgehog-thumbs-up": {
+    "src": "/home/quan-linux-mint/Workspace/Develop/Projects/SLN-V2/assets/input/assets/assets/01_branding_mascots/mascot-hedgehog-thumbs-up.png",
+    "dest": "/mascots/mascot-hedgehog-thumbs-up.png",
+    "category": "mascots",
+    "slug": "mascot-hedgehog-thumbs-up",
+    "bytes": 402954,
+    "sha256": "0fc0adcd4b785054"
+  },
+  "bg-dotted-adventure-map": {
+    "src": "/home/quan-linux-mint/Workspace/Develop/Projects/SLN-V2/assets/input/assets/assets/02_scenes_backgrounds/bg-dotted-adventure-map.png",
+    "dest": "/scenes/bg-dotted-adventure-map.png",
+    "category": "scenes",
+    "slug": "bg-dotted-adventure-map",
+    "bytes": 2497211,
+    "sha256": "1121b1d3a08ad8ee"
+  },
+  "bg-forest-soft": {
+    "src": "/home/quan-linux-mint/Workspace/Develop/Projects/SLN-V2/assets/input/assets/assets/02_scenes_backgrounds/bg-forest-soft.png",
+    "dest": "/scenes/bg-forest-soft.png",
+    "category": "scenes",
+    "slug": "bg-forest-soft",
+    "bytes": 2353386,
+    "sha256": "199f39d1a10fd339"
+  },
+  "bg-parchment-card": {
+    "src": "/home/quan-linux-mint/Workspace/Develop/Projects/SLN-V2/assets/input/assets/assets/02_scenes_backgrounds/bg-parchment-card.png",
+    "dest": "/scenes/bg-parchment-card.png",
+    "category": "scenes",
+    "slug": "bg-parchment-card",
+    "bytes": 1768341,
+    "sha256": "44aab3e6e0e4b7ce"
+  },
+  "bg-warm-paper-texture": {
+    "src": "/home/quan-linux-mint/Workspace/Develop/Projects/SLN-V2/assets/input/assets/assets/02_scenes_backgrounds/bg-warm-paper-texture.png",
+    "dest": "/scenes/bg-warm-paper-texture.png",
+    "category": "scenes",
+    "slug": "bg-warm-paper-texture",
+    "bytes": 2239117,
+    "sha256": "33a4b431b4133498"
+  },
+  "hero-landing-detective-camp": {
+    "src": "/home/quan-linux-mint/Workspace/Develop/Projects/SLN-V2/assets/input/assets/assets/02_scenes_backgrounds/hero-landing-detective-camp.png",
+    "dest": "/scenes/hero-landing-detective-camp.png",
+    "category": "scenes",
+    "slug": "hero-landing-detective-camp",
+    "bytes": 2146632,
+    "sha256": "51b797dd9e6e94a5"
+  },
+  "scene-forest-footprints": {
+    "src": "/home/quan-linux-mint/Workspace/Develop/Projects/SLN-V2/assets/input/assets/assets/02_scenes_backgrounds/scene-forest-footprints.png",
+    "dest": "/scenes/scene-forest-footprints.png",
+    "category": "scenes",
+    "slug": "scene-forest-footprints",
+    "bytes": 2826260,
+    "sha256": "cde0af554b6928b8"
+  },
+  "scene-mission-complete-celebration": {
+    "src": "/home/quan-linux-mint/Workspace/Develop/Projects/SLN-V2/assets/input/assets/assets/02_scenes_backgrounds/scene-mission-complete-celebration.png",
+    "dest": "/scenes/scene-mission-complete-celebration.png",
+    "category": "scenes",
+    "slug": "scene-mission-complete-celebration",
+    "bytes": 2696783,
+    "sha256": "5558b53cb994b23e"
+  },
+  "scene-mission-map-background": {
+    "src": "/home/quan-linux-mint/Workspace/Develop/Projects/SLN-V2/assets/input/assets/assets/02_scenes_backgrounds/scene-mission-map-background.png",
+    "dest": "/scenes/scene-mission-map-background.png",
+    "category": "scenes",
+    "slug": "scene-mission-map-background",
+    "bytes": 2755436,
+    "sha256": "20e8320e7d975741"
+  },
+  "scene-parent-guidance": {
+    "src": "/home/quan-linux-mint/Workspace/Develop/Projects/SLN-V2/assets/input/assets/assets/02_scenes_backgrounds/scene-parent-guidance.png",
+    "dest": "/scenes/scene-parent-guidance.png",
+    "category": "scenes",
+    "slug": "scene-parent-guidance",
+    "bytes": 1685378,
+    "sha256": "67ba2f9bf89918dc"
+  },
+  "scene-profile-dog-treehouse": {
+    "src": "/home/quan-linux-mint/Workspace/Develop/Projects/SLN-V2/assets/input/assets/assets/02_scenes_backgrounds/scene-profile-dog-treehouse.png",
+    "dest": "/scenes/scene-profile-dog-treehouse.png",
+    "category": "scenes",
+    "slug": "scene-profile-dog-treehouse",
+    "bytes": 2952243,
+    "sha256": "e8de80f9ef9e748f"
+  },
+  "admin-preview-phone-scene": {
+    "src": "/home/quan-linux-mint/Workspace/Develop/Projects/SLN-V2/assets/input/assets/assets/03_cards_banners/admin-preview-phone-scene.png",
+    "dest": "/cards/admin-preview-phone-scene.png",
+    "category": "cards",
+    "slug": "admin-preview-phone-scene",
+    "bytes": 1837203,
+    "sha256": "000a9d77f45f7f3e"
+  },
+  "banner-daily-mission-hedgehog": {
+    "src": "/home/quan-linux-mint/Workspace/Develop/Projects/SLN-V2/assets/input/assets/assets/03_cards_banners/banner-daily-mission-hedgehog.png",
+    "dest": "/cards/banner-daily-mission-hedgehog.png",
+    "category": "cards",
+    "slug": "banner-daily-mission-hedgehog",
+    "bytes": 2096562,
+    "sha256": "2155396f1c74f147"
+  },
+  "child-safety-banner": {
+    "src": "/home/quan-linux-mint/Workspace/Develop/Projects/SLN-V2/assets/input/assets/assets/03_cards_banners/child-safety-banner.png",
+    "dest": "/cards/child-safety-banner.png",
+    "category": "cards",
+    "slug": "child-safety-banner",
+    "bytes": 2020664,
+    "sha256": "d0c2d1a05b8259fd"
+  },
+  "mission-thumb-footprint-detective": {
+    "src": "/home/quan-linux-mint/Workspace/Develop/Projects/SLN-V2/assets/input/assets/assets/03_cards_banners/mission-thumb-footprint-detective.png",
+    "dest": "/cards/mission-thumb-footprint-detective.png",
+    "category": "cards",
+    "slug": "mission-thumb-footprint-detective",
+    "bytes": 2859204,
+    "sha256": "c0454ed4c1c15b37"
+  },
+  "parent-learning-banner": {
+    "src": "/home/quan-linux-mint/Workspace/Develop/Projects/SLN-V2/assets/input/assets/assets/03_cards_banners/parent-learning-banner.png",
+    "dest": "/cards/parent-learning-banner.png",
+    "category": "cards",
+    "slug": "parent-learning-banner",
+    "bytes": 1558918,
+    "sha256": "8b3d654ecc0173b1"
+  },
+  "parent-talk-suggestion": {
+    "src": "/home/quan-linux-mint/Workspace/Develop/Projects/SLN-V2/assets/input/assets/assets/03_cards_banners/parent-talk-suggestion.png",
+    "dest": "/cards/parent-talk-suggestion.png",
+    "category": "cards",
+    "slug": "parent-talk-suggestion",
+    "bytes": 2564220,
+    "sha256": "8a0839a43c728a51"
+  },
+  "world-card-cause-train": {
+    "src": "/home/quan-linux-mint/Workspace/Develop/Projects/SLN-V2/assets/input/assets/assets/03_cards_banners/world-card-cause-train.png",
+    "dest": "/cards/world-card-cause-train.png",
+    "category": "cards",
+    "slug": "world-card-cause-train",
+    "bytes": 2040855,
+    "sha256": "3a5dd17e5700b332"
+  },
+  "world-card-detective-rules": {
+    "src": "/home/quan-linux-mint/Workspace/Develop/Projects/SLN-V2/assets/input/assets/assets/03_cards_banners/world-card-detective-rules.png",
+    "dest": "/cards/world-card-detective-rules.png",
+    "category": "cards",
+    "slug": "world-card-detective-rules",
+    "bytes": 2345044,
+    "sha256": "9717f30ac93882a0"
+  },
+  "world-card-logic-clown": {
+    "src": "/home/quan-linux-mint/Workspace/Develop/Projects/SLN-V2/assets/input/assets/assets/03_cards_banners/world-card-logic-clown.png",
+    "dest": "/cards/world-card-logic-clown.png",
+    "category": "cards",
+    "slug": "world-card-logic-clown",
+    "bytes": 2128796,
+    "sha256": "64353fa4ddf95080"
+  },
+  "world-card-space": {
+    "src": "/home/quan-linux-mint/Workspace/Develop/Projects/SLN-V2/assets/input/assets/assets/03_cards_banners/world-card-space.png",
+    "dest": "/cards/world-card-space.png",
+    "category": "cards",
+    "slug": "world-card-space",
+    "bytes": 2463757,
+    "sha256": "3643039fcbcd70d1"
+  },
+  "badge-detective-shield-star": {
+    "src": "/home/quan-linux-mint/Workspace/Develop/Projects/SLN-V2/assets/input/assets/assets/04_rewards_props_decor/badge-detective-shield-star.png",
+    "dest": "/props/badge-detective-shield-star.png",
+    "category": "props",
+    "slug": "badge-detective-shield-star",
+    "bytes": 443489,
+    "sha256": "15c69bcf44fe1d6e"
+  },
+  "badge-dog-name-tag": {
+    "src": "/home/quan-linux-mint/Workspace/Develop/Projects/SLN-V2/assets/input/assets/assets/04_rewards_props_decor/badge-dog-name-tag.png",
+    "dest": "/props/badge-dog-name-tag.png",
+    "category": "props",
+    "slug": "badge-dog-name-tag",
+    "bytes": 405700,
+    "sha256": "106de9a14d39615d"
+  },
+  "badge-privacy-shield-lock": {
+    "src": "/home/quan-linux-mint/Workspace/Develop/Projects/SLN-V2/assets/input/assets/assets/04_rewards_props_decor/badge-privacy-shield-lock.png",
+    "dest": "/props/badge-privacy-shield-lock.png",
+    "category": "props",
+    "slug": "badge-privacy-shield-lock",
+    "bytes": 423973,
+    "sha256": "e31587e4265a4263"
+  },
+  "badge-safe-heart": {
+    "src": "/home/quan-linux-mint/Workspace/Develop/Projects/SLN-V2/assets/input/assets/assets/04_rewards_props_decor/badge-safe-heart.png",
+    "dest": "/props/badge-safe-heart.png",
+    "category": "props",
+    "slug": "badge-safe-heart",
+    "bytes": 412167,
+    "sha256": "646f0413c28310fc"
+  },
+  "badge-sharp-detective": {
+    "src": "/home/quan-linux-mint/Workspace/Develop/Projects/SLN-V2/assets/input/assets/assets/04_rewards_props_decor/badge-sharp-detective.png",
+    "dest": "/props/badge-sharp-detective.png",
+    "category": "props",
+    "slug": "badge-sharp-detective",
+    "bytes": 514411,
+    "sha256": "9e7a6d15a5975177"
+  },
+  "parent-value-family-support": {
+    "src": "/home/quan-linux-mint/Workspace/Develop/Projects/SLN-V2/assets/input/assets/assets/04_rewards_props_decor/parent-value-family-support.png",
+    "dest": "/props/parent-value-family-support.png",
+    "category": "props",
+    "slug": "parent-value-family-support",
+    "bytes": 403041,
+    "sha256": "96ae6165a51282d1"
+  },
+  "parent-value-growth": {
+    "src": "/home/quan-linux-mint/Workspace/Develop/Projects/SLN-V2/assets/input/assets/assets/04_rewards_props_decor/parent-value-growth.png",
+    "dest": "/props/parent-value-growth.png",
+    "category": "props",
+    "slug": "parent-value-growth",
+    "bytes": 362805,
+    "sha256": "8c7002196d70b13f"
+  },
+  "parent-value-privacy": {
+    "src": "/home/quan-linux-mint/Workspace/Develop/Projects/SLN-V2/assets/input/assets/assets/04_rewards_props_decor/parent-value-privacy.png",
+    "dest": "/props/parent-value-privacy.png",
+    "category": "props",
+    "slug": "parent-value-privacy",
+    "bytes": 368726,
+    "sha256": "313f49f36943ba7a"
+  },
+  "prop-backpack": {
+    "src": "/home/quan-linux-mint/Workspace/Develop/Projects/SLN-V2/assets/input/assets/assets/04_rewards_props_decor/prop-backpack.png",
+    "dest": "/props/prop-backpack.png",
+    "category": "props",
+    "slug": "prop-backpack",
+    "bytes": 441514,
+    "sha256": "68921555e4306f8e"
+  },
+  "prop-books-stack": {
+    "src": "/home/quan-linux-mint/Workspace/Develop/Projects/SLN-V2/assets/input/assets/assets/04_rewards_props_decor/prop-books-stack.png",
+    "dest": "/props/prop-books-stack.png",
+    "category": "props",
+    "slug": "prop-books-stack",
+    "bytes": 487370,
+    "sha256": "dd6dec810ce09528"
+  },
+  "prop-compass": {
+    "src": "/home/quan-linux-mint/Workspace/Develop/Projects/SLN-V2/assets/input/assets/assets/04_rewards_props_decor/prop-compass.png",
+    "dest": "/props/prop-compass.png",
+    "category": "props",
+    "slug": "prop-compass",
+    "bytes": 341145,
+    "sha256": "9897327e824abb53"
+  },
+  "prop-lantern": {
+    "src": "/home/quan-linux-mint/Workspace/Develop/Projects/SLN-V2/assets/input/assets/assets/04_rewards_props_decor/prop-lantern.png",
+    "dest": "/props/prop-lantern.png",
+    "category": "props",
+    "slug": "prop-lantern",
+    "bytes": 289125,
+    "sha256": "15a4f9dc243a7465"
+  },
+  "prop-large-wooden-board": {
+    "src": "/home/quan-linux-mint/Workspace/Develop/Projects/SLN-V2/assets/input/assets/assets/04_rewards_props_decor/prop-large-wooden-board.png",
+    "dest": "/props/prop-large-wooden-board.png",
+    "category": "props",
+    "slug": "prop-large-wooden-board",
+    "bytes": 544926,
+    "sha256": "4323d863c33b7ab4"
+  },
+  "prop-magnifier": {
+    "src": "/home/quan-linux-mint/Workspace/Develop/Projects/SLN-V2/assets/input/assets/assets/04_rewards_props_decor/prop-magnifier.png",
+    "dest": "/props/prop-magnifier.png",
+    "category": "props",
+    "slug": "prop-magnifier",
+    "bytes": 328355,
+    "sha256": "98109dfadca239ea"
+  },
+  "prop-plant-pot": {
+    "src": "/home/quan-linux-mint/Workspace/Develop/Projects/SLN-V2/assets/input/assets/assets/04_rewards_props_decor/prop-plant-pot.png",
+    "dest": "/props/prop-plant-pot.png",
+    "category": "props",
+    "slug": "prop-plant-pot",
+    "bytes": 381650,
+    "sha256": "471dde247fd0542c"
+  },
+  "prop-rustic-trail-sign": {
+    "src": "/home/quan-linux-mint/Workspace/Develop/Projects/SLN-V2/assets/input/assets/assets/04_rewards_props_decor/prop-rustic-trail-sign.png",
+    "dest": "/props/prop-rustic-trail-sign.png",
+    "category": "props",
+    "slug": "prop-rustic-trail-sign",
+    "bytes": 441674,
+    "sha256": "aa83ea1949c870b9"
+  },
+  "prop-treasure-map": {
+    "src": "/home/quan-linux-mint/Workspace/Develop/Projects/SLN-V2/assets/input/assets/assets/04_rewards_props_decor/prop-treasure-map.png",
+    "dest": "/props/prop-treasure-map.png",
+    "category": "props",
+    "slug": "prop-treasure-map",
+    "bytes": 400666,
+    "sha256": "39ed2c1689ed18a1"
+  },
+  "prop-treehouse": {
+    "src": "/home/quan-linux-mint/Workspace/Develop/Projects/SLN-V2/assets/input/assets/assets/04_rewards_props_decor/prop-treehouse.png",
+    "dest": "/props/prop-treehouse.png",
+    "category": "props",
+    "slug": "prop-treehouse",
+    "bytes": 563370,
+    "sha256": "747208b8e0c39d38"
+  },
+  "prop-wooden-arrow-signpost": {
+    "src": "/home/quan-linux-mint/Workspace/Develop/Projects/SLN-V2/assets/input/assets/assets/04_rewards_props_decor/prop-wooden-arrow-signpost.png",
+    "dest": "/props/prop-wooden-arrow-signpost.png",
+    "category": "props",
+    "slug": "prop-wooden-arrow-signpost",
+    "bytes": 464989,
+    "sha256": "3f7e3eb7f468068b"
+  },
+  "prop-wooden-paw-sign": {
+    "src": "/home/quan-linux-mint/Workspace/Develop/Projects/SLN-V2/assets/input/assets/assets/04_rewards_props_decor/prop-wooden-paw-sign.png",
+    "dest": "/props/prop-wooden-paw-sign.png",
+    "category": "props",
+    "slug": "prop-wooden-paw-sign",
+    "bytes": 435815,
+    "sha256": "81458c1673766ac0"
+  },
+  "reward-star-coin": {
+    "src": "/home/quan-linux-mint/Workspace/Develop/Projects/SLN-V2/assets/input/assets/assets/04_rewards_props_decor/reward-star-coin.png",
+    "dest": "/props/reward-star-coin.png",
+    "category": "props",
+    "slug": "reward-star-coin",
+    "bytes": 365672,
+    "sha256": "34c9863acd9429c2"
+  },
+  "reward-treasure-chest": {
+    "src": "/home/quan-linux-mint/Workspace/Develop/Projects/SLN-V2/assets/input/assets/assets/04_rewards_props_decor/reward-treasure-chest.png",
+    "dest": "/props/reward-treasure-chest.png",
+    "category": "props",
+    "slug": "reward-treasure-chest",
+    "bytes": 438016,
+    "sha256": "a158766424e34312"
+  },
+  "reward-trophy-star": {
+    "src": "/home/quan-linux-mint/Workspace/Develop/Projects/SLN-V2/assets/input/assets/assets/04_rewards_props_decor/reward-trophy-star.png",
+    "dest": "/props/reward-trophy-star.png",
+    "category": "props",
+    "slug": "reward-trophy-star",
+    "bytes": 427369,
+    "sha256": "f4f4deaf3cf6d474"
+  },
+  "shelf-books-lamp-plant": {
+    "src": "/home/quan-linux-mint/Workspace/Develop/Projects/SLN-V2/assets/input/assets/assets/04_rewards_props_decor/shelf-books-lamp-plant.png",
+    "dest": "/props/shelf-books-lamp-plant.png",
+    "category": "props",
+    "slug": "shelf-books-lamp-plant",
+    "bytes": 1438002,
+    "sha256": "327f5533769ad9bd"
+  },
+  "sticker-map-effect-01": {
+    "src": "/home/quan-linux-mint/Workspace/Develop/Projects/SLN-V2/assets/input/assets/assets/04_rewards_props_decor/stickers_map_effects/sticker-map-effect-01.png",
+    "dest": "/stickers/map-effects/sticker-map-effect-01.png",
+    "category": "stickers/map-effects",
+    "slug": "sticker-map-effect-01",
+    "bytes": 53129,
+    "sha256": "22e1745f03eef2ff"
+  },
+  "sticker-map-effect-02": {
+    "src": "/home/quan-linux-mint/Workspace/Develop/Projects/SLN-V2/assets/input/assets/assets/04_rewards_props_decor/stickers_map_effects/sticker-map-effect-02.png",
+    "dest": "/stickers/map-effects/sticker-map-effect-02.png",
+    "category": "stickers/map-effects",
+    "slug": "sticker-map-effect-02",
+    "bytes": 72980,
+    "sha256": "33187a824caa7f3a"
+  },
+  "sticker-map-effect-03": {
+    "src": "/home/quan-linux-mint/Workspace/Develop/Projects/SLN-V2/assets/input/assets/assets/04_rewards_props_decor/stickers_map_effects/sticker-map-effect-03.png",
+    "dest": "/stickers/map-effects/sticker-map-effect-03.png",
+    "category": "stickers/map-effects",
+    "slug": "sticker-map-effect-03",
+    "bytes": 67286,
+    "sha256": "8cfb2dd7832346ea"
+  },
+  "sticker-map-effect-04": {
+    "src": "/home/quan-linux-mint/Workspace/Develop/Projects/SLN-V2/assets/input/assets/assets/04_rewards_props_decor/stickers_map_effects/sticker-map-effect-04.png",
+    "dest": "/stickers/map-effects/sticker-map-effect-04.png",
+    "category": "stickers/map-effects",
+    "slug": "sticker-map-effect-04",
+    "bytes": 61771,
+    "sha256": "fe56badaf243ccea"
+  },
+  "sticker-map-effect-05": {
+    "src": "/home/quan-linux-mint/Workspace/Develop/Projects/SLN-V2/assets/input/assets/assets/04_rewards_props_decor/stickers_map_effects/sticker-map-effect-05.png",
+    "dest": "/stickers/map-effects/sticker-map-effect-05.png",
+    "category": "stickers/map-effects",
+    "slug": "sticker-map-effect-05",
+    "bytes": 47741,
+    "sha256": "ed1316b14e2d0cb7"
+  },
+  "sticker-map-effect-06": {
+    "src": "/home/quan-linux-mint/Workspace/Develop/Projects/SLN-V2/assets/input/assets/assets/04_rewards_props_decor/stickers_map_effects/sticker-map-effect-06.png",
+    "dest": "/stickers/map-effects/sticker-map-effect-06.png",
+    "category": "stickers/map-effects",
+    "slug": "sticker-map-effect-06",
+    "bytes": 61833,
+    "sha256": "33efcec9e1034384"
+  },
+  "sticker-map-effect-07": {
+    "src": "/home/quan-linux-mint/Workspace/Develop/Projects/SLN-V2/assets/input/assets/assets/04_rewards_props_decor/stickers_map_effects/sticker-map-effect-07.png",
+    "dest": "/stickers/map-effects/sticker-map-effect-07.png",
+    "category": "stickers/map-effects",
+    "slug": "sticker-map-effect-07",
+    "bytes": 41842,
+    "sha256": "158596b43be1c91f"
+  },
+  "sticker-map-effect-08": {
+    "src": "/home/quan-linux-mint/Workspace/Develop/Projects/SLN-V2/assets/input/assets/assets/04_rewards_props_decor/stickers_map_effects/sticker-map-effect-08.png",
+    "dest": "/stickers/map-effects/sticker-map-effect-08.png",
+    "category": "stickers/map-effects",
+    "slug": "sticker-map-effect-08",
+    "bytes": 41902,
+    "sha256": "2ee71f1dd1720805"
+  },
+  "sticker-map-effect-09": {
+    "src": "/home/quan-linux-mint/Workspace/Develop/Projects/SLN-V2/assets/input/assets/assets/04_rewards_props_decor/stickers_map_effects/sticker-map-effect-09.png",
+    "dest": "/stickers/map-effects/sticker-map-effect-09.png",
+    "category": "stickers/map-effects",
+    "slug": "sticker-map-effect-09",
+    "bytes": 17441,
+    "sha256": "547ccaf64c942a3a"
+  },
+  "sticker-map-effect-10": {
+    "src": "/home/quan-linux-mint/Workspace/Develop/Projects/SLN-V2/assets/input/assets/assets/04_rewards_props_decor/stickers_map_effects/sticker-map-effect-10.png",
+    "dest": "/stickers/map-effects/sticker-map-effect-10.png",
+    "category": "stickers/map-effects",
+    "slug": "sticker-map-effect-10",
+    "bytes": 24480,
+    "sha256": "f66452b5b17895c4"
+  },
+  "sticker-map-effect-11": {
+    "src": "/home/quan-linux-mint/Workspace/Develop/Projects/SLN-V2/assets/input/assets/assets/04_rewards_props_decor/stickers_map_effects/sticker-map-effect-11.png",
+    "dest": "/stickers/map-effects/sticker-map-effect-11.png",
+    "category": "stickers/map-effects",
+    "slug": "sticker-map-effect-11",
+    "bytes": 10058,
+    "sha256": "5e36d5a32c28f88c"
+  },
+  "sticker-map-effect-12": {
+    "src": "/home/quan-linux-mint/Workspace/Develop/Projects/SLN-V2/assets/input/assets/assets/04_rewards_props_decor/stickers_map_effects/sticker-map-effect-12.png",
+    "dest": "/stickers/map-effects/sticker-map-effect-12.png",
+    "category": "stickers/map-effects",
+    "slug": "sticker-map-effect-12",
+    "bytes": 6931,
+    "sha256": "b5bbecd2bf2e0cea"
+  },
+  "sticker-map-effect-13": {
+    "src": "/home/quan-linux-mint/Workspace/Develop/Projects/SLN-V2/assets/input/assets/assets/04_rewards_props_decor/stickers_map_effects/sticker-map-effect-13.png",
+    "dest": "/stickers/map-effects/sticker-map-effect-13.png",
+    "category": "stickers/map-effects",
+    "slug": "sticker-map-effect-13",
+    "bytes": 10436,
+    "sha256": "1cc735023192bce2"
+  },
+  "sticker-map-effect-14": {
+    "src": "/home/quan-linux-mint/Workspace/Develop/Projects/SLN-V2/assets/input/assets/assets/04_rewards_props_decor/stickers_map_effects/sticker-map-effect-14.png",
+    "dest": "/stickers/map-effects/sticker-map-effect-14.png",
+    "category": "stickers/map-effects",
+    "slug": "sticker-map-effect-14",
+    "bytes": 6982,
+    "sha256": "12512cf069558d34"
+  },
+  "sticker-map-effect-15": {
+    "src": "/home/quan-linux-mint/Workspace/Develop/Projects/SLN-V2/assets/input/assets/assets/04_rewards_props_decor/stickers_map_effects/sticker-map-effect-15.png",
+    "dest": "/stickers/map-effects/sticker-map-effect-15.png",
+    "category": "stickers/map-effects",
+    "slug": "sticker-map-effect-15",
+    "bytes": 48880,
+    "sha256": "1ec219d51f316361"
+  },
+  "sticker-map-effect-16": {
+    "src": "/home/quan-linux-mint/Workspace/Develop/Projects/SLN-V2/assets/input/assets/assets/04_rewards_props_decor/stickers_map_effects/sticker-map-effect-16.png",
+    "dest": "/stickers/map-effects/sticker-map-effect-16.png",
+    "category": "stickers/map-effects",
+    "slug": "sticker-map-effect-16",
+    "bytes": 76661,
+    "sha256": "ce7ef4f0247a9245"
+  },
+  "sticker-map-effect-17": {
+    "src": "/home/quan-linux-mint/Workspace/Develop/Projects/SLN-V2/assets/input/assets/assets/04_rewards_props_decor/stickers_map_effects/sticker-map-effect-17.png",
+    "dest": "/stickers/map-effects/sticker-map-effect-17.png",
+    "category": "stickers/map-effects",
+    "slug": "sticker-map-effect-17",
+    "bytes": 17648,
+    "sha256": "c8a1019e98482f04"
+  },
+  "sticker-map-effect-18": {
+    "src": "/home/quan-linux-mint/Workspace/Develop/Projects/SLN-V2/assets/input/assets/assets/04_rewards_props_decor/stickers_map_effects/sticker-map-effect-18.png",
+    "dest": "/stickers/map-effects/sticker-map-effect-18.png",
+    "category": "stickers/map-effects",
+    "slug": "sticker-map-effect-18",
+    "bytes": 48002,
+    "sha256": "91f25bb4c324cfdf"
+  },
+  "sticker-map-effect-19": {
+    "src": "/home/quan-linux-mint/Workspace/Develop/Projects/SLN-V2/assets/input/assets/assets/04_rewards_props_decor/stickers_map_effects/sticker-map-effect-19.png",
+    "dest": "/stickers/map-effects/sticker-map-effect-19.png",
+    "category": "stickers/map-effects",
+    "slug": "sticker-map-effect-19",
+    "bytes": 7689,
+    "sha256": "ad1f1234fa3183f0"
+  },
+  "sticker-map-effect-20": {
+    "src": "/home/quan-linux-mint/Workspace/Develop/Projects/SLN-V2/assets/input/assets/assets/04_rewards_props_decor/stickers_map_effects/sticker-map-effect-20.png",
+    "dest": "/stickers/map-effects/sticker-map-effect-20.png",
+    "category": "stickers/map-effects",
+    "slug": "sticker-map-effect-20",
+    "bytes": 1310,
+    "sha256": "cd53dd639946bd20"
+  },
+  "sticker-map-effect-21": {
+    "src": "/home/quan-linux-mint/Workspace/Develop/Projects/SLN-V2/assets/input/assets/assets/04_rewards_props_decor/stickers_map_effects/sticker-map-effect-21.png",
+    "dest": "/stickers/map-effects/sticker-map-effect-21.png",
+    "category": "stickers/map-effects",
+    "slug": "sticker-map-effect-21",
+    "bytes": 13935,
+    "sha256": "83083f5ddf7dc167"
+  },
+  "sticker-map-effect-22": {
+    "src": "/home/quan-linux-mint/Workspace/Develop/Projects/SLN-V2/assets/input/assets/assets/04_rewards_props_decor/stickers_map_effects/sticker-map-effect-22.png",
+    "dest": "/stickers/map-effects/sticker-map-effect-22.png",
+    "category": "stickers/map-effects",
+    "slug": "sticker-map-effect-22",
+    "bytes": 2445,
+    "sha256": "1fd23742bdd626c3"
+  },
+  "sticker-map-effect-23": {
+    "src": "/home/quan-linux-mint/Workspace/Develop/Projects/SLN-V2/assets/input/assets/assets/04_rewards_props_decor/stickers_map_effects/sticker-map-effect-23.png",
+    "dest": "/stickers/map-effects/sticker-map-effect-23.png",
+    "category": "stickers/map-effects",
+    "slug": "sticker-map-effect-23",
+    "bytes": 1749,
+    "sha256": "607a2f0a95e33da4"
+  },
+  "sticker-map-effect-24": {
+    "src": "/home/quan-linux-mint/Workspace/Develop/Projects/SLN-V2/assets/input/assets/assets/04_rewards_props_decor/stickers_map_effects/sticker-map-effect-24.png",
+    "dest": "/stickers/map-effects/sticker-map-effect-24.png",
+    "category": "stickers/map-effects",
+    "slug": "sticker-map-effect-24",
+    "bytes": 20982,
+    "sha256": "9302aa18a1955913"
+  },
+  "sticker-map-effect-25": {
+    "src": "/home/quan-linux-mint/Workspace/Develop/Projects/SLN-V2/assets/input/assets/assets/04_rewards_props_decor/stickers_map_effects/sticker-map-effect-25.png",
+    "dest": "/stickers/map-effects/sticker-map-effect-25.png",
+    "category": "stickers/map-effects",
+    "slug": "sticker-map-effect-25",
+    "bytes": 5112,
+    "sha256": "72d458c5fa79d4b0"
+  },
+  "sticker-map-effect-26": {
+    "src": "/home/quan-linux-mint/Workspace/Develop/Projects/SLN-V2/assets/input/assets/assets/04_rewards_props_decor/stickers_map_effects/sticker-map-effect-26.png",
+    "dest": "/stickers/map-effects/sticker-map-effect-26.png",
+    "category": "stickers/map-effects",
+    "slug": "sticker-map-effect-26",
+    "bytes": 13900,
+    "sha256": "7bb15d4e1a999061"
+  },
+  "sticker-map-effect-27": {
+    "src": "/home/quan-linux-mint/Workspace/Develop/Projects/SLN-V2/assets/input/assets/assets/04_rewards_props_decor/stickers_map_effects/sticker-map-effect-27.png",
+    "dest": "/stickers/map-effects/sticker-map-effect-27.png",
+    "category": "stickers/map-effects",
+    "slug": "sticker-map-effect-27",
+    "bytes": 8866,
+    "sha256": "f7f8a02c338f4134"
+  },
+  "sticker-map-effect-28": {
+    "src": "/home/quan-linux-mint/Workspace/Develop/Projects/SLN-V2/assets/input/assets/assets/04_rewards_props_decor/stickers_map_effects/sticker-map-effect-28.png",
+    "dest": "/stickers/map-effects/sticker-map-effect-28.png",
+    "category": "stickers/map-effects",
+    "slug": "sticker-map-effect-28",
+    "bytes": 3374,
+    "sha256": "513b6287adc28c4f"
+  },
+  "sticker-map-effect-29": {
+    "src": "/home/quan-linux-mint/Workspace/Develop/Projects/SLN-V2/assets/input/assets/assets/04_rewards_props_decor/stickers_map_effects/sticker-map-effect-29.png",
+    "dest": "/stickers/map-effects/sticker-map-effect-29.png",
+    "category": "stickers/map-effects",
+    "slug": "sticker-map-effect-29",
+    "bytes": 2375,
+    "sha256": "d2cd5eef2593f727"
+  },
+  "sticker-map-effect-30": {
+    "src": "/home/quan-linux-mint/Workspace/Develop/Projects/SLN-V2/assets/input/assets/assets/04_rewards_props_decor/stickers_map_effects/sticker-map-effect-30.png",
+    "dest": "/stickers/map-effects/sticker-map-effect-30.png",
+    "category": "stickers/map-effects",
+    "slug": "sticker-map-effect-30",
+    "bytes": 6574,
+    "sha256": "88b43a6f41f9ded2"
+  },
+  "sticker-map-effect-31": {
+    "src": "/home/quan-linux-mint/Workspace/Develop/Projects/SLN-V2/assets/input/assets/assets/04_rewards_props_decor/stickers_map_effects/sticker-map-effect-31.png",
+    "dest": "/stickers/map-effects/sticker-map-effect-31.png",
+    "category": "stickers/map-effects",
+    "slug": "sticker-map-effect-31",
+    "bytes": 7660,
+    "sha256": "b24b1588b7cb8927"
+  },
+  "sticker-map-effect-32": {
+    "src": "/home/quan-linux-mint/Workspace/Develop/Projects/SLN-V2/assets/input/assets/assets/04_rewards_props_decor/stickers_map_effects/sticker-map-effect-32.png",
+    "dest": "/stickers/map-effects/sticker-map-effect-32.png",
+    "category": "stickers/map-effects",
+    "slug": "sticker-map-effect-32",
+    "bytes": 1553,
+    "sha256": "2caf9edae16ad092"
+  },
+  "sticker-map-effect-33": {
+    "src": "/home/quan-linux-mint/Workspace/Develop/Projects/SLN-V2/assets/input/assets/assets/04_rewards_props_decor/stickers_map_effects/sticker-map-effect-33.png",
+    "dest": "/stickers/map-effects/sticker-map-effect-33.png",
+    "category": "stickers/map-effects",
+    "slug": "sticker-map-effect-33",
+    "bytes": 2408,
+    "sha256": "36c027803f3cc554"
+  },
+  "sticker-map-effect-34": {
+    "src": "/home/quan-linux-mint/Workspace/Develop/Projects/SLN-V2/assets/input/assets/assets/04_rewards_props_decor/stickers_map_effects/sticker-map-effect-34.png",
+    "dest": "/stickers/map-effects/sticker-map-effect-34.png",
+    "category": "stickers/map-effects",
+    "slug": "sticker-map-effect-34",
+    "bytes": 1971,
+    "sha256": "00f3a30b6994a788"
+  },
+  "sticker-map-effect-35": {
+    "src": "/home/quan-linux-mint/Workspace/Develop/Projects/SLN-V2/assets/input/assets/assets/04_rewards_props_decor/stickers_map_effects/sticker-map-effect-35.png",
+    "dest": "/stickers/map-effects/sticker-map-effect-35.png",
+    "category": "stickers/map-effects",
+    "slug": "sticker-map-effect-35",
+    "bytes": 1060,
+    "sha256": "abf08f76928c7baf"
+  },
+  "sticker-map-effect-36": {
+    "src": "/home/quan-linux-mint/Workspace/Develop/Projects/SLN-V2/assets/input/assets/assets/04_rewards_props_decor/stickers_map_effects/sticker-map-effect-36.png",
+    "dest": "/stickers/map-effects/sticker-map-effect-36.png",
+    "category": "stickers/map-effects",
+    "slug": "sticker-map-effect-36",
+    "bytes": 25125,
+    "sha256": "ece2e0375f4e07ac"
+  },
+  "sticker-map-effect-37": {
+    "src": "/home/quan-linux-mint/Workspace/Develop/Projects/SLN-V2/assets/input/assets/assets/04_rewards_props_decor/stickers_map_effects/sticker-map-effect-37.png",
+    "dest": "/stickers/map-effects/sticker-map-effect-37.png",
+    "category": "stickers/map-effects",
+    "slug": "sticker-map-effect-37",
+    "bytes": 25650,
+    "sha256": "a9c70fd6a422b7a3"
+  },
+  "sticker-map-effect-38": {
+    "src": "/home/quan-linux-mint/Workspace/Develop/Projects/SLN-V2/assets/input/assets/assets/04_rewards_props_decor/stickers_map_effects/sticker-map-effect-38.png",
+    "dest": "/stickers/map-effects/sticker-map-effect-38.png",
+    "category": "stickers/map-effects",
+    "slug": "sticker-map-effect-38",
+    "bytes": 161829,
+    "sha256": "4c563635036ffc0d"
+  },
+  "sticker-map-effect-39": {
+    "src": "/home/quan-linux-mint/Workspace/Develop/Projects/SLN-V2/assets/input/assets/assets/04_rewards_props_decor/stickers_map_effects/sticker-map-effect-39.png",
+    "dest": "/stickers/map-effects/sticker-map-effect-39.png",
+    "category": "stickers/map-effects",
+    "slug": "sticker-map-effect-39",
+    "bytes": 50438,
+    "sha256": "2d3b8774d007afdb"
+  },
+  "sticker-map-effect-40": {
+    "src": "/home/quan-linux-mint/Workspace/Develop/Projects/SLN-V2/assets/input/assets/assets/04_rewards_props_decor/stickers_map_effects/sticker-map-effect-40.png",
+    "dest": "/stickers/map-effects/sticker-map-effect-40.png",
+    "category": "stickers/map-effects",
+    "slug": "sticker-map-effect-40",
+    "bytes": 69695,
+    "sha256": "35c89ac232cf851b"
+  },
+  "sticker-map-effect-41": {
+    "src": "/home/quan-linux-mint/Workspace/Develop/Projects/SLN-V2/assets/input/assets/assets/04_rewards_props_decor/stickers_map_effects/sticker-map-effect-41.png",
+    "dest": "/stickers/map-effects/sticker-map-effect-41.png",
+    "category": "stickers/map-effects",
+    "slug": "sticker-map-effect-41",
+    "bytes": 64682,
+    "sha256": "0c54b798281fcae2"
+  },
+  "sticker-map-effect-42": {
+    "src": "/home/quan-linux-mint/Workspace/Develop/Projects/SLN-V2/assets/input/assets/assets/04_rewards_props_decor/stickers_map_effects/sticker-map-effect-42.png",
+    "dest": "/stickers/map-effects/sticker-map-effect-42.png",
+    "category": "stickers/map-effects",
+    "slug": "sticker-map-effect-42",
+    "bytes": 35289,
+    "sha256": "03502e55dfca0475"
+  },
+  "sticker-map-effect-43": {
+    "src": "/home/quan-linux-mint/Workspace/Develop/Projects/SLN-V2/assets/input/assets/assets/04_rewards_props_decor/stickers_map_effects/sticker-map-effect-43.png",
+    "dest": "/stickers/map-effects/sticker-map-effect-43.png",
+    "category": "stickers/map-effects",
+    "slug": "sticker-map-effect-43",
+    "bytes": 33551,
+    "sha256": "63cc9963a7ddd770"
+  },
+  "sticker-map-effect-44": {
+    "src": "/home/quan-linux-mint/Workspace/Develop/Projects/SLN-V2/assets/input/assets/assets/04_rewards_props_decor/stickers_map_effects/sticker-map-effect-44.png",
+    "dest": "/stickers/map-effects/sticker-map-effect-44.png",
+    "category": "stickers/map-effects",
+    "slug": "sticker-map-effect-44",
+    "bytes": 26859,
+    "sha256": "61fc322c991ed06f"
+  },
+  "sticker-map-effect-45": {
+    "src": "/home/quan-linux-mint/Workspace/Develop/Projects/SLN-V2/assets/input/assets/assets/04_rewards_props_decor/stickers_map_effects/sticker-map-effect-45.png",
+    "dest": "/stickers/map-effects/sticker-map-effect-45.png",
+    "category": "stickers/map-effects",
+    "slug": "sticker-map-effect-45",
+    "bytes": 32021,
+    "sha256": "f123de6f5bee3365"
+  },
+  "sticker-nature-ground-01": {
+    "src": "/home/quan-linux-mint/Workspace/Develop/Projects/SLN-V2/assets/input/assets/assets/04_rewards_props_decor/stickers_nature_ground/sticker-nature-ground-01.png",
+    "dest": "/stickers/nature-ground/sticker-nature-ground-01.png",
+    "category": "stickers/nature-ground",
+    "slug": "sticker-nature-ground-01",
+    "bytes": 35687,
+    "sha256": "617200cef4956a51"
+  },
+  "sticker-nature-ground-02": {
+    "src": "/home/quan-linux-mint/Workspace/Develop/Projects/SLN-V2/assets/input/assets/assets/04_rewards_props_decor/stickers_nature_ground/sticker-nature-ground-02.png",
+    "dest": "/stickers/nature-ground/sticker-nature-ground-02.png",
+    "category": "stickers/nature-ground",
+    "slug": "sticker-nature-ground-02",
+    "bytes": 38649,
+    "sha256": "053442c98f6ba7a1"
+  },
+  "sticker-nature-ground-03": {
+    "src": "/home/quan-linux-mint/Workspace/Develop/Projects/SLN-V2/assets/input/assets/assets/04_rewards_props_decor/stickers_nature_ground/sticker-nature-ground-03.png",
+    "dest": "/stickers/nature-ground/sticker-nature-ground-03.png",
+    "category": "stickers/nature-ground",
+    "slug": "sticker-nature-ground-03",
+    "bytes": 54994,
+    "sha256": "6cfe97555e4b5efb"
+  },
+  "sticker-nature-ground-04": {
+    "src": "/home/quan-linux-mint/Workspace/Develop/Projects/SLN-V2/assets/input/assets/assets/04_rewards_props_decor/stickers_nature_ground/sticker-nature-ground-04.png",
+    "dest": "/stickers/nature-ground/sticker-nature-ground-04.png",
+    "category": "stickers/nature-ground",
+    "slug": "sticker-nature-ground-04",
+    "bytes": 78586,
+    "sha256": "9c40fa0b0cc87e44"
+  },
+  "sticker-nature-ground-05": {
+    "src": "/home/quan-linux-mint/Workspace/Develop/Projects/SLN-V2/assets/input/assets/assets/04_rewards_props_decor/stickers_nature_ground/sticker-nature-ground-05.png",
+    "dest": "/stickers/nature-ground/sticker-nature-ground-05.png",
+    "category": "stickers/nature-ground",
+    "slug": "sticker-nature-ground-05",
+    "bytes": 38650,
+    "sha256": "353998e133f91a7c"
+  },
+  "sticker-nature-ground-06": {
+    "src": "/home/quan-linux-mint/Workspace/Develop/Projects/SLN-V2/assets/input/assets/assets/04_rewards_props_decor/stickers_nature_ground/sticker-nature-ground-06.png",
+    "dest": "/stickers/nature-ground/sticker-nature-ground-06.png",
+    "category": "stickers/nature-ground",
+    "slug": "sticker-nature-ground-06",
+    "bytes": 39839,
+    "sha256": "9d2f186e4126ee6b"
+  },
+  "sticker-nature-ground-07": {
+    "src": "/home/quan-linux-mint/Workspace/Develop/Projects/SLN-V2/assets/input/assets/assets/04_rewards_props_decor/stickers_nature_ground/sticker-nature-ground-07.png",
+    "dest": "/stickers/nature-ground/sticker-nature-ground-07.png",
+    "category": "stickers/nature-ground",
+    "slug": "sticker-nature-ground-07",
+    "bytes": 49398,
+    "sha256": "05d50c8d33348002"
+  },
+  "sticker-nature-ground-08": {
+    "src": "/home/quan-linux-mint/Workspace/Develop/Projects/SLN-V2/assets/input/assets/assets/04_rewards_props_decor/stickers_nature_ground/sticker-nature-ground-08.png",
+    "dest": "/stickers/nature-ground/sticker-nature-ground-08.png",
+    "category": "stickers/nature-ground",
+    "slug": "sticker-nature-ground-08",
+    "bytes": 19496,
+    "sha256": "5d94d1e848078f0a"
+  },
+  "sticker-nature-ground-09": {
+    "src": "/home/quan-linux-mint/Workspace/Develop/Projects/SLN-V2/assets/input/assets/assets/04_rewards_props_decor/stickers_nature_ground/sticker-nature-ground-09.png",
+    "dest": "/stickers/nature-ground/sticker-nature-ground-09.png",
+    "category": "stickers/nature-ground",
+    "slug": "sticker-nature-ground-09",
+    "bytes": 32364,
+    "sha256": "8e96f003f272d5d3"
+  },
+  "sticker-nature-ground-10": {
+    "src": "/home/quan-linux-mint/Workspace/Develop/Projects/SLN-V2/assets/input/assets/assets/04_rewards_props_decor/stickers_nature_ground/sticker-nature-ground-10.png",
+    "dest": "/stickers/nature-ground/sticker-nature-ground-10.png",
+    "category": "stickers/nature-ground",
+    "slug": "sticker-nature-ground-10",
+    "bytes": 29763,
+    "sha256": "422c453be112cf46"
+  },
+  "sticker-nature-ground-11": {
+    "src": "/home/quan-linux-mint/Workspace/Develop/Projects/SLN-V2/assets/input/assets/assets/04_rewards_props_decor/stickers_nature_ground/sticker-nature-ground-11.png",
+    "dest": "/stickers/nature-ground/sticker-nature-ground-11.png",
+    "category": "stickers/nature-ground",
+    "slug": "sticker-nature-ground-11",
+    "bytes": 30635,
+    "sha256": "e8096d625f44b8d5"
+  },
+  "sticker-nature-ground-12": {
+    "src": "/home/quan-linux-mint/Workspace/Develop/Projects/SLN-V2/assets/input/assets/assets/04_rewards_props_decor/stickers_nature_ground/sticker-nature-ground-12.png",
+    "dest": "/stickers/nature-ground/sticker-nature-ground-12.png",
+    "category": "stickers/nature-ground",
+    "slug": "sticker-nature-ground-12",
+    "bytes": 28714,
+    "sha256": "a458c1f388d2b566"
+  },
+  "sticker-nature-ground-13": {
+    "src": "/home/quan-linux-mint/Workspace/Develop/Projects/SLN-V2/assets/input/assets/assets/04_rewards_props_decor/stickers_nature_ground/sticker-nature-ground-13.png",
+    "dest": "/stickers/nature-ground/sticker-nature-ground-13.png",
+    "category": "stickers/nature-ground",
+    "slug": "sticker-nature-ground-13",
+    "bytes": 28065,
+    "sha256": "8d43a6d1991f3b21"
+  },
+  "sticker-nature-ground-14": {
+    "src": "/home/quan-linux-mint/Workspace/Develop/Projects/SLN-V2/assets/input/assets/assets/04_rewards_props_decor/stickers_nature_ground/sticker-nature-ground-14.png",
+    "dest": "/stickers/nature-ground/sticker-nature-ground-14.png",
+    "category": "stickers/nature-ground",
+    "slug": "sticker-nature-ground-14",
+    "bytes": 33792,
+    "sha256": "d9101a9b7cd9efaf"
+  },
+  "sticker-nature-ground-15": {
+    "src": "/home/quan-linux-mint/Workspace/Develop/Projects/SLN-V2/assets/input/assets/assets/04_rewards_props_decor/stickers_nature_ground/sticker-nature-ground-15.png",
+    "dest": "/stickers/nature-ground/sticker-nature-ground-15.png",
+    "category": "stickers/nature-ground",
+    "slug": "sticker-nature-ground-15",
+    "bytes": 61260,
+    "sha256": "0be0c7e33f83eb63"
+  },
+  "sticker-nature-ground-16": {
+    "src": "/home/quan-linux-mint/Workspace/Develop/Projects/SLN-V2/assets/input/assets/assets/04_rewards_props_decor/stickers_nature_ground/sticker-nature-ground-16.png",
+    "dest": "/stickers/nature-ground/sticker-nature-ground-16.png",
+    "category": "stickers/nature-ground",
+    "slug": "sticker-nature-ground-16",
+    "bytes": 22712,
+    "sha256": "9077d14aa2f6674d"
+  },
+  "sticker-nature-ground-17": {
+    "src": "/home/quan-linux-mint/Workspace/Develop/Projects/SLN-V2/assets/input/assets/assets/04_rewards_props_decor/stickers_nature_ground/sticker-nature-ground-17.png",
+    "dest": "/stickers/nature-ground/sticker-nature-ground-17.png",
+    "category": "stickers/nature-ground",
+    "slug": "sticker-nature-ground-17",
+    "bytes": 11026,
+    "sha256": "2e2d52d2781e428c"
+  },
+  "sticker-nature-ground-18": {
+    "src": "/home/quan-linux-mint/Workspace/Develop/Projects/SLN-V2/assets/input/assets/assets/04_rewards_props_decor/stickers_nature_ground/sticker-nature-ground-18.png",
+    "dest": "/stickers/nature-ground/sticker-nature-ground-18.png",
+    "category": "stickers/nature-ground",
+    "slug": "sticker-nature-ground-18",
+    "bytes": 52047,
+    "sha256": "ad05b309cedda2db"
+  },
+  "sticker-nature-ground-19": {
+    "src": "/home/quan-linux-mint/Workspace/Develop/Projects/SLN-V2/assets/input/assets/assets/04_rewards_props_decor/stickers_nature_ground/sticker-nature-ground-19.png",
+    "dest": "/stickers/nature-ground/sticker-nature-ground-19.png",
+    "category": "stickers/nature-ground",
+    "slug": "sticker-nature-ground-19",
+    "bytes": 66473,
+    "sha256": "e4c70c9c54de5dec"
+  },
+  "sticker-nature-ground-20": {
+    "src": "/home/quan-linux-mint/Workspace/Develop/Projects/SLN-V2/assets/input/assets/assets/04_rewards_props_decor/stickers_nature_ground/sticker-nature-ground-20.png",
+    "dest": "/stickers/nature-ground/sticker-nature-ground-20.png",
+    "category": "stickers/nature-ground",
+    "slug": "sticker-nature-ground-20",
+    "bytes": 61387,
+    "sha256": "ad0d7caf5cec3a00"
+  },
+  "sticker-nature-ground-21": {
+    "src": "/home/quan-linux-mint/Workspace/Develop/Projects/SLN-V2/assets/input/assets/assets/04_rewards_props_decor/stickers_nature_ground/sticker-nature-ground-21.png",
+    "dest": "/stickers/nature-ground/sticker-nature-ground-21.png",
+    "category": "stickers/nature-ground",
+    "slug": "sticker-nature-ground-21",
+    "bytes": 50205,
+    "sha256": "63f37e6b66f69101"
+  },
+  "sticker-nature-ground-22": {
+    "src": "/home/quan-linux-mint/Workspace/Develop/Projects/SLN-V2/assets/input/assets/assets/04_rewards_props_decor/stickers_nature_ground/sticker-nature-ground-22.png",
+    "dest": "/stickers/nature-ground/sticker-nature-ground-22.png",
+    "category": "stickers/nature-ground",
+    "slug": "sticker-nature-ground-22",
+    "bytes": 36518,
+    "sha256": "7291cd0e53ea3d3d"
+  },
+  "sticker-nature-ground-23": {
+    "src": "/home/quan-linux-mint/Workspace/Develop/Projects/SLN-V2/assets/input/assets/assets/04_rewards_props_decor/stickers_nature_ground/sticker-nature-ground-23.png",
+    "dest": "/stickers/nature-ground/sticker-nature-ground-23.png",
+    "category": "stickers/nature-ground",
+    "slug": "sticker-nature-ground-23",
+    "bytes": 37087,
+    "sha256": "2f5effe3d6106474"
+  },
+  "sticker-nature-ground-24": {
+    "src": "/home/quan-linux-mint/Workspace/Develop/Projects/SLN-V2/assets/input/assets/assets/04_rewards_props_decor/stickers_nature_ground/sticker-nature-ground-24.png",
+    "dest": "/stickers/nature-ground/sticker-nature-ground-24.png",
+    "category": "stickers/nature-ground",
+    "slug": "sticker-nature-ground-24",
+    "bytes": 47751,
+    "sha256": "41c60f4335e750df"
+  },
+  "sticker-nature-ground-25": {
+    "src": "/home/quan-linux-mint/Workspace/Develop/Projects/SLN-V2/assets/input/assets/assets/04_rewards_props_decor/stickers_nature_ground/sticker-nature-ground-25.png",
+    "dest": "/stickers/nature-ground/sticker-nature-ground-25.png",
+    "category": "stickers/nature-ground",
+    "slug": "sticker-nature-ground-25",
+    "bytes": 13011,
+    "sha256": "4126801c263b52e5"
+  },
+  "sticker-nature-ground-26": {
+    "src": "/home/quan-linux-mint/Workspace/Develop/Projects/SLN-V2/assets/input/assets/assets/04_rewards_props_decor/stickers_nature_ground/sticker-nature-ground-26.png",
+    "dest": "/stickers/nature-ground/sticker-nature-ground-26.png",
+    "category": "stickers/nature-ground",
+    "slug": "sticker-nature-ground-26",
+    "bytes": 76616,
+    "sha256": "465c2650e66c172d"
+  },
+  "sticker-nature-ground-27": {
+    "src": "/home/quan-linux-mint/Workspace/Develop/Projects/SLN-V2/assets/input/assets/assets/04_rewards_props_decor/stickers_nature_ground/sticker-nature-ground-27.png",
+    "dest": "/stickers/nature-ground/sticker-nature-ground-27.png",
+    "category": "stickers/nature-ground",
+    "slug": "sticker-nature-ground-27",
+    "bytes": 51561,
+    "sha256": "80e0b7ee41394ca8"
+  },
+  "sticker-nature-ground-28": {
+    "src": "/home/quan-linux-mint/Workspace/Develop/Projects/SLN-V2/assets/input/assets/assets/04_rewards_props_decor/stickers_nature_ground/sticker-nature-ground-28.png",
+    "dest": "/stickers/nature-ground/sticker-nature-ground-28.png",
+    "category": "stickers/nature-ground",
+    "slug": "sticker-nature-ground-28",
+    "bytes": 44019,
+    "sha256": "6ef833684124fadb"
+  },
+  "sticker-nature-ground-29": {
+    "src": "/home/quan-linux-mint/Workspace/Develop/Projects/SLN-V2/assets/input/assets/assets/04_rewards_props_decor/stickers_nature_ground/sticker-nature-ground-29.png",
+    "dest": "/stickers/nature-ground/sticker-nature-ground-29.png",
+    "category": "stickers/nature-ground",
+    "slug": "sticker-nature-ground-29",
+    "bytes": 42794,
+    "sha256": "fd551b9aed443e73"
+  },
+  "sticker-nature-ground-30": {
+    "src": "/home/quan-linux-mint/Workspace/Develop/Projects/SLN-V2/assets/input/assets/assets/04_rewards_props_decor/stickers_nature_ground/sticker-nature-ground-30.png",
+    "dest": "/stickers/nature-ground/sticker-nature-ground-30.png",
+    "category": "stickers/nature-ground",
+    "slug": "sticker-nature-ground-30",
+    "bytes": 51891,
+    "sha256": "9d607fc99860e92a"
+  },
+  "sticker-nature-ground-31": {
+    "src": "/home/quan-linux-mint/Workspace/Develop/Projects/SLN-V2/assets/input/assets/assets/04_rewards_props_decor/stickers_nature_ground/sticker-nature-ground-31.png",
+    "dest": "/stickers/nature-ground/sticker-nature-ground-31.png",
+    "category": "stickers/nature-ground",
+    "slug": "sticker-nature-ground-31",
+    "bytes": 7575,
+    "sha256": "d7afbf9f9ac68854"
+  },
+  "sticker-nature-ground-32": {
+    "src": "/home/quan-linux-mint/Workspace/Develop/Projects/SLN-V2/assets/input/assets/assets/04_rewards_props_decor/stickers_nature_ground/sticker-nature-ground-32.png",
+    "dest": "/stickers/nature-ground/sticker-nature-ground-32.png",
+    "category": "stickers/nature-ground",
+    "slug": "sticker-nature-ground-32",
+    "bytes": 48684,
+    "sha256": "8666f2feb953382f"
+  },
+  "sticker-nature-ground-33": {
+    "src": "/home/quan-linux-mint/Workspace/Develop/Projects/SLN-V2/assets/input/assets/assets/04_rewards_props_decor/stickers_nature_ground/sticker-nature-ground-33.png",
+    "dest": "/stickers/nature-ground/sticker-nature-ground-33.png",
+    "category": "stickers/nature-ground",
+    "slug": "sticker-nature-ground-33",
+    "bytes": 39449,
+    "sha256": "15dc9a0bbe5e4496"
+  },
+  "sticker-nature-ground-34": {
+    "src": "/home/quan-linux-mint/Workspace/Develop/Projects/SLN-V2/assets/input/assets/assets/04_rewards_props_decor/stickers_nature_ground/sticker-nature-ground-34.png",
+    "dest": "/stickers/nature-ground/sticker-nature-ground-34.png",
+    "category": "stickers/nature-ground",
+    "slug": "sticker-nature-ground-34",
+    "bytes": 69583,
+    "sha256": "17dd53967cd62692"
+  },
+  "sticker-nature-ground-35": {
+    "src": "/home/quan-linux-mint/Workspace/Develop/Projects/SLN-V2/assets/input/assets/assets/04_rewards_props_decor/stickers_nature_ground/sticker-nature-ground-35.png",
+    "dest": "/stickers/nature-ground/sticker-nature-ground-35.png",
+    "category": "stickers/nature-ground",
+    "slug": "sticker-nature-ground-35",
+    "bytes": 72529,
+    "sha256": "bb177bc19e64b667"
+  },
+  "sticker-nature-ground-36": {
+    "src": "/home/quan-linux-mint/Workspace/Develop/Projects/SLN-V2/assets/input/assets/assets/04_rewards_props_decor/stickers_nature_ground/sticker-nature-ground-36.png",
+    "dest": "/stickers/nature-ground/sticker-nature-ground-36.png",
+    "category": "stickers/nature-ground",
+    "slug": "sticker-nature-ground-36",
+    "bytes": 73390,
+    "sha256": "411d99883577aaad"
+  },
+  "sticker-nature-ground-37": {
+    "src": "/home/quan-linux-mint/Workspace/Develop/Projects/SLN-V2/assets/input/assets/assets/04_rewards_props_decor/stickers_nature_ground/sticker-nature-ground-37.png",
+    "dest": "/stickers/nature-ground/sticker-nature-ground-37.png",
+    "category": "stickers/nature-ground",
+    "slug": "sticker-nature-ground-37",
+    "bytes": 47517,
+    "sha256": "0895cfb97e454f93"
+  },
+  "sticker-nature-ground-38": {
+    "src": "/home/quan-linux-mint/Workspace/Develop/Projects/SLN-V2/assets/input/assets/assets/04_rewards_props_decor/stickers_nature_ground/sticker-nature-ground-38.png",
+    "dest": "/stickers/nature-ground/sticker-nature-ground-38.png",
+    "category": "stickers/nature-ground",
+    "slug": "sticker-nature-ground-38",
+    "bytes": 61953,
+    "sha256": "53aacff0a16b9d51"
+  },
+  "sticker-nature-ground-39": {
+    "src": "/home/quan-linux-mint/Workspace/Develop/Projects/SLN-V2/assets/input/assets/assets/04_rewards_props_decor/stickers_nature_ground/sticker-nature-ground-39.png",
+    "dest": "/stickers/nature-ground/sticker-nature-ground-39.png",
+    "category": "stickers/nature-ground",
+    "slug": "sticker-nature-ground-39",
+    "bytes": 48436,
+    "sha256": "fb8ac4b7ac61f4d4"
+  },
+  "sticker-nature-ground-40": {
+    "src": "/home/quan-linux-mint/Workspace/Develop/Projects/SLN-V2/assets/input/assets/assets/04_rewards_props_decor/stickers_nature_ground/sticker-nature-ground-40.png",
+    "dest": "/stickers/nature-ground/sticker-nature-ground-40.png",
+    "category": "stickers/nature-ground",
+    "slug": "sticker-nature-ground-40",
+    "bytes": 9273,
+    "sha256": "265b1459cf6e1a18"
+  },
+  "sticker-nature-ground-41": {
+    "src": "/home/quan-linux-mint/Workspace/Develop/Projects/SLN-V2/assets/input/assets/assets/04_rewards_props_decor/stickers_nature_ground/sticker-nature-ground-41.png",
+    "dest": "/stickers/nature-ground/sticker-nature-ground-41.png",
+    "category": "stickers/nature-ground",
+    "slug": "sticker-nature-ground-41",
+    "bytes": 59853,
+    "sha256": "5735e8684095c3c0"
+  },
+  "sticker-star-sparkle-01": {
+    "src": "/home/quan-linux-mint/Workspace/Develop/Projects/SLN-V2/assets/input/assets/assets/04_rewards_props_decor/stickers_stars_sparkles/sticker-star-sparkle-01.png",
+    "dest": "/stickers/star-sparkles/sticker-star-sparkle-01.png",
+    "category": "stickers/star-sparkles",
+    "slug": "sticker-star-sparkle-01",
+    "bytes": 88665,
+    "sha256": "d4e5428f9a5dd053"
+  },
+  "sticker-star-sparkle-02": {
+    "src": "/home/quan-linux-mint/Workspace/Develop/Projects/SLN-V2/assets/input/assets/assets/04_rewards_props_decor/stickers_stars_sparkles/sticker-star-sparkle-02.png",
+    "dest": "/stickers/star-sparkles/sticker-star-sparkle-02.png",
+    "category": "stickers/star-sparkles",
+    "slug": "sticker-star-sparkle-02",
+    "bytes": 37314,
+    "sha256": "de245bbb6304e1c4"
+  },
+  "sticker-star-sparkle-03": {
+    "src": "/home/quan-linux-mint/Workspace/Develop/Projects/SLN-V2/assets/input/assets/assets/04_rewards_props_decor/stickers_stars_sparkles/sticker-star-sparkle-03.png",
+    "dest": "/stickers/star-sparkles/sticker-star-sparkle-03.png",
+    "category": "stickers/star-sparkles",
+    "slug": "sticker-star-sparkle-03",
+    "bytes": 22225,
+    "sha256": "6ee20373536790d6"
+  },
+  "sticker-star-sparkle-04": {
+    "src": "/home/quan-linux-mint/Workspace/Develop/Projects/SLN-V2/assets/input/assets/assets/04_rewards_props_decor/stickers_stars_sparkles/sticker-star-sparkle-04.png",
+    "dest": "/stickers/star-sparkles/sticker-star-sparkle-04.png",
+    "category": "stickers/star-sparkles",
+    "slug": "sticker-star-sparkle-04",
+    "bytes": 4918,
+    "sha256": "7aab1deae1300e33"
+  },
+  "sticker-star-sparkle-05": {
+    "src": "/home/quan-linux-mint/Workspace/Develop/Projects/SLN-V2/assets/input/assets/assets/04_rewards_props_decor/stickers_stars_sparkles/sticker-star-sparkle-05.png",
+    "dest": "/stickers/star-sparkles/sticker-star-sparkle-05.png",
+    "category": "stickers/star-sparkles",
+    "slug": "sticker-star-sparkle-05",
+    "bytes": 63230,
+    "sha256": "67faf78a67de826b"
+  },
+  "sticker-star-sparkle-06": {
+    "src": "/home/quan-linux-mint/Workspace/Develop/Projects/SLN-V2/assets/input/assets/assets/04_rewards_props_decor/stickers_stars_sparkles/sticker-star-sparkle-06.png",
+    "dest": "/stickers/star-sparkles/sticker-star-sparkle-06.png",
+    "category": "stickers/star-sparkles",
+    "slug": "sticker-star-sparkle-06",
+    "bytes": 41233,
+    "sha256": "5d38943e21b5be64"
+  },
+  "sticker-star-sparkle-07": {
+    "src": "/home/quan-linux-mint/Workspace/Develop/Projects/SLN-V2/assets/input/assets/assets/04_rewards_props_decor/stickers_stars_sparkles/sticker-star-sparkle-07.png",
+    "dest": "/stickers/star-sparkles/sticker-star-sparkle-07.png",
+    "category": "stickers/star-sparkles",
+    "slug": "sticker-star-sparkle-07",
+    "bytes": 49558,
+    "sha256": "d8a93f2cd4d4ec14"
+  },
+  "sticker-star-sparkle-08": {
+    "src": "/home/quan-linux-mint/Workspace/Develop/Projects/SLN-V2/assets/input/assets/assets/04_rewards_props_decor/stickers_stars_sparkles/sticker-star-sparkle-08.png",
+    "dest": "/stickers/star-sparkles/sticker-star-sparkle-08.png",
+    "category": "stickers/star-sparkles",
+    "slug": "sticker-star-sparkle-08",
+    "bytes": 5680,
+    "sha256": "4fcdeef5749cbcae"
+  },
+  "sticker-star-sparkle-09": {
+    "src": "/home/quan-linux-mint/Workspace/Develop/Projects/SLN-V2/assets/input/assets/assets/04_rewards_props_decor/stickers_stars_sparkles/sticker-star-sparkle-09.png",
+    "dest": "/stickers/star-sparkles/sticker-star-sparkle-09.png",
+    "category": "stickers/star-sparkles",
+    "slug": "sticker-star-sparkle-09",
+    "bytes": 21499,
+    "sha256": "80bd73bd23e9d1ff"
+  },
+  "sticker-star-sparkle-10": {
+    "src": "/home/quan-linux-mint/Workspace/Develop/Projects/SLN-V2/assets/input/assets/assets/04_rewards_props_decor/stickers_stars_sparkles/sticker-star-sparkle-10.png",
+    "dest": "/stickers/star-sparkles/sticker-star-sparkle-10.png",
+    "category": "stickers/star-sparkles",
+    "slug": "sticker-star-sparkle-10",
+    "bytes": 17253,
+    "sha256": "d62aca2611031804"
+  },
+  "sticker-star-sparkle-11": {
+    "src": "/home/quan-linux-mint/Workspace/Develop/Projects/SLN-V2/assets/input/assets/assets/04_rewards_props_decor/stickers_stars_sparkles/sticker-star-sparkle-11.png",
+    "dest": "/stickers/star-sparkles/sticker-star-sparkle-11.png",
+    "category": "stickers/star-sparkles",
+    "slug": "sticker-star-sparkle-11",
+    "bytes": 11505,
+    "sha256": "2b6fe6ea86e2becb"
+  },
+  "sticker-star-sparkle-12": {
+    "src": "/home/quan-linux-mint/Workspace/Develop/Projects/SLN-V2/assets/input/assets/assets/04_rewards_props_decor/stickers_stars_sparkles/sticker-star-sparkle-12.png",
+    "dest": "/stickers/star-sparkles/sticker-star-sparkle-12.png",
+    "category": "stickers/star-sparkles",
+    "slug": "sticker-star-sparkle-12",
+    "bytes": 9736,
+    "sha256": "10eb042111fa48dc"
+  },
+  "sticker-star-sparkle-13": {
+    "src": "/home/quan-linux-mint/Workspace/Develop/Projects/SLN-V2/assets/input/assets/assets/04_rewards_props_decor/stickers_stars_sparkles/sticker-star-sparkle-13.png",
+    "dest": "/stickers/star-sparkles/sticker-star-sparkle-13.png",
+    "category": "stickers/star-sparkles",
+    "slug": "sticker-star-sparkle-13",
+    "bytes": 5162,
+    "sha256": "03323a11cf91d353"
+  },
+  "sticker-star-sparkle-14": {
+    "src": "/home/quan-linux-mint/Workspace/Develop/Projects/SLN-V2/assets/input/assets/assets/04_rewards_props_decor/stickers_stars_sparkles/sticker-star-sparkle-14.png",
+    "dest": "/stickers/star-sparkles/sticker-star-sparkle-14.png",
+    "category": "stickers/star-sparkles",
+    "slug": "sticker-star-sparkle-14",
+    "bytes": 47474,
+    "sha256": "8b0133c97d186949"
+  },
+  "sticker-star-sparkle-15": {
+    "src": "/home/quan-linux-mint/Workspace/Develop/Projects/SLN-V2/assets/input/assets/assets/04_rewards_props_decor/stickers_stars_sparkles/sticker-star-sparkle-15.png",
+    "dest": "/stickers/star-sparkles/sticker-star-sparkle-15.png",
+    "category": "stickers/star-sparkles",
+    "slug": "sticker-star-sparkle-15",
+    "bytes": 35348,
+    "sha256": "a5819a4860fd984b"
+  },
+  "sticker-star-sparkle-16": {
+    "src": "/home/quan-linux-mint/Workspace/Develop/Projects/SLN-V2/assets/input/assets/assets/04_rewards_props_decor/stickers_stars_sparkles/sticker-star-sparkle-16.png",
+    "dest": "/stickers/star-sparkles/sticker-star-sparkle-16.png",
+    "category": "stickers/star-sparkles",
+    "slug": "sticker-star-sparkle-16",
+    "bytes": 28156,
+    "sha256": "fa87a0bee75f6810"
+  },
+  "sticker-star-sparkle-17": {
+    "src": "/home/quan-linux-mint/Workspace/Develop/Projects/SLN-V2/assets/input/assets/assets/04_rewards_props_decor/stickers_stars_sparkles/sticker-star-sparkle-17.png",
+    "dest": "/stickers/star-sparkles/sticker-star-sparkle-17.png",
+    "category": "stickers/star-sparkles",
+    "slug": "sticker-star-sparkle-17",
+    "bytes": 61192,
+    "sha256": "754d3fb9923fcc89"
+  },
+  "sticker-star-sparkle-18": {
+    "src": "/home/quan-linux-mint/Workspace/Develop/Projects/SLN-V2/assets/input/assets/assets/04_rewards_props_decor/stickers_stars_sparkles/sticker-star-sparkle-18.png",
+    "dest": "/stickers/star-sparkles/sticker-star-sparkle-18.png",
+    "category": "stickers/star-sparkles",
+    "slug": "sticker-star-sparkle-18",
+    "bytes": 75601,
+    "sha256": "bcf8bb89851dcfde"
+  },
+  "sticker-star-sparkle-19": {
+    "src": "/home/quan-linux-mint/Workspace/Develop/Projects/SLN-V2/assets/input/assets/assets/04_rewards_props_decor/stickers_stars_sparkles/sticker-star-sparkle-19.png",
+    "dest": "/stickers/star-sparkles/sticker-star-sparkle-19.png",
+    "category": "stickers/star-sparkles",
+    "slug": "sticker-star-sparkle-19",
+    "bytes": 4727,
+    "sha256": "43a31331f5e28d86"
+  },
+  "sticker-star-sparkle-20": {
+    "src": "/home/quan-linux-mint/Workspace/Develop/Projects/SLN-V2/assets/input/assets/assets/04_rewards_props_decor/stickers_stars_sparkles/sticker-star-sparkle-20.png",
+    "dest": "/stickers/star-sparkles/sticker-star-sparkle-20.png",
+    "category": "stickers/star-sparkles",
+    "slug": "sticker-star-sparkle-20",
+    "bytes": 5860,
+    "sha256": "531d1c924f4c435f"
+  },
+  "sticker-star-sparkle-21": {
+    "src": "/home/quan-linux-mint/Workspace/Develop/Projects/SLN-V2/assets/input/assets/assets/04_rewards_props_decor/stickers_stars_sparkles/sticker-star-sparkle-21.png",
+    "dest": "/stickers/star-sparkles/sticker-star-sparkle-21.png",
+    "category": "stickers/star-sparkles",
+    "slug": "sticker-star-sparkle-21",
+    "bytes": 16072,
+    "sha256": "b6aad555013382e7"
+  },
+  "sticker-star-sparkle-22": {
+    "src": "/home/quan-linux-mint/Workspace/Develop/Projects/SLN-V2/assets/input/assets/assets/04_rewards_props_decor/stickers_stars_sparkles/sticker-star-sparkle-22.png",
+    "dest": "/stickers/star-sparkles/sticker-star-sparkle-22.png",
+    "category": "stickers/star-sparkles",
+    "slug": "sticker-star-sparkle-22",
+    "bytes": 5137,
+    "sha256": "9d73854715883356"
+  },
+  "sticker-star-sparkle-23": {
+    "src": "/home/quan-linux-mint/Workspace/Develop/Projects/SLN-V2/assets/input/assets/assets/04_rewards_props_decor/stickers_stars_sparkles/sticker-star-sparkle-23.png",
+    "dest": "/stickers/star-sparkles/sticker-star-sparkle-23.png",
+    "category": "stickers/star-sparkles",
+    "slug": "sticker-star-sparkle-23",
+    "bytes": 59310,
+    "sha256": "f380af3c54757b55"
+  },
+  "sticker-star-sparkle-24": {
+    "src": "/home/quan-linux-mint/Workspace/Develop/Projects/SLN-V2/assets/input/assets/assets/04_rewards_props_decor/stickers_stars_sparkles/sticker-star-sparkle-24.png",
+    "dest": "/stickers/star-sparkles/sticker-star-sparkle-24.png",
+    "category": "stickers/star-sparkles",
+    "slug": "sticker-star-sparkle-24",
+    "bytes": 18864,
+    "sha256": "683896fddfe91202"
+  },
+  "sticker-star-sparkle-25": {
+    "src": "/home/quan-linux-mint/Workspace/Develop/Projects/SLN-V2/assets/input/assets/assets/04_rewards_props_decor/stickers_stars_sparkles/sticker-star-sparkle-25.png",
+    "dest": "/stickers/star-sparkles/sticker-star-sparkle-25.png",
+    "category": "stickers/star-sparkles",
+    "slug": "sticker-star-sparkle-25",
+    "bytes": 24686,
+    "sha256": "3b24e1871903e67c"
+  },
+  "sticker-star-sparkle-26": {
+    "src": "/home/quan-linux-mint/Workspace/Develop/Projects/SLN-V2/assets/input/assets/assets/04_rewards_props_decor/stickers_stars_sparkles/sticker-star-sparkle-26.png",
+    "dest": "/stickers/star-sparkles/sticker-star-sparkle-26.png",
+    "category": "stickers/star-sparkles",
+    "slug": "sticker-star-sparkle-26",
+    "bytes": 36517,
+    "sha256": "3b8559531166ad86"
+  },
+  "sticker-star-sparkle-27": {
+    "src": "/home/quan-linux-mint/Workspace/Develop/Projects/SLN-V2/assets/input/assets/assets/04_rewards_props_decor/stickers_stars_sparkles/sticker-star-sparkle-27.png",
+    "dest": "/stickers/star-sparkles/sticker-star-sparkle-27.png",
+    "category": "stickers/star-sparkles",
+    "slug": "sticker-star-sparkle-27",
+    "bytes": 17242,
+    "sha256": "3d5a9863e0986e66"
+  },
+  "sticker-star-sparkle-28": {
+    "src": "/home/quan-linux-mint/Workspace/Develop/Projects/SLN-V2/assets/input/assets/assets/04_rewards_props_decor/stickers_stars_sparkles/sticker-star-sparkle-28.png",
+    "dest": "/stickers/star-sparkles/sticker-star-sparkle-28.png",
+    "category": "stickers/star-sparkles",
+    "slug": "sticker-star-sparkle-28",
+    "bytes": 24935,
+    "sha256": "7addee8c5b22c809"
+  },
+  "sticker-star-sparkle-29": {
+    "src": "/home/quan-linux-mint/Workspace/Develop/Projects/SLN-V2/assets/input/assets/assets/04_rewards_props_decor/stickers_stars_sparkles/sticker-star-sparkle-29.png",
+    "dest": "/stickers/star-sparkles/sticker-star-sparkle-29.png",
+    "category": "stickers/star-sparkles",
+    "slug": "sticker-star-sparkle-29",
+    "bytes": 8377,
+    "sha256": "dc3021ab5fd31b46"
+  },
+  "sticker-star-sparkle-30": {
+    "src": "/home/quan-linux-mint/Workspace/Develop/Projects/SLN-V2/assets/input/assets/assets/04_rewards_props_decor/stickers_stars_sparkles/sticker-star-sparkle-30.png",
+    "dest": "/stickers/star-sparkles/sticker-star-sparkle-30.png",
+    "category": "stickers/star-sparkles",
+    "slug": "sticker-star-sparkle-30",
+    "bytes": 24989,
+    "sha256": "e77a702d9247667e"
+  },
+  "sticker-star-sparkle-31": {
+    "src": "/home/quan-linux-mint/Workspace/Develop/Projects/SLN-V2/assets/input/assets/assets/04_rewards_props_decor/stickers_stars_sparkles/sticker-star-sparkle-31.png",
+    "dest": "/stickers/star-sparkles/sticker-star-sparkle-31.png",
+    "category": "stickers/star-sparkles",
+    "slug": "sticker-star-sparkle-31",
+    "bytes": 10927,
+    "sha256": "122c33ed1910a9f7"
+  },
+  "sticker-star-sparkle-32": {
+    "src": "/home/quan-linux-mint/Workspace/Develop/Projects/SLN-V2/assets/input/assets/assets/04_rewards_props_decor/stickers_stars_sparkles/sticker-star-sparkle-32.png",
+    "dest": "/stickers/star-sparkles/sticker-star-sparkle-32.png",
+    "category": "stickers/star-sparkles",
+    "slug": "sticker-star-sparkle-32",
+    "bytes": 65819,
+    "sha256": "d56d3b4ba645573f"
+  },
+  "sticker-star-sparkle-33": {
+    "src": "/home/quan-linux-mint/Workspace/Develop/Projects/SLN-V2/assets/input/assets/assets/04_rewards_props_decor/stickers_stars_sparkles/sticker-star-sparkle-33.png",
+    "dest": "/stickers/star-sparkles/sticker-star-sparkle-33.png",
+    "category": "stickers/star-sparkles",
+    "slug": "sticker-star-sparkle-33",
+    "bytes": 31922,
+    "sha256": "96e8787698eb5c85"
+  },
+  "sticker-star-sparkle-34": {
+    "src": "/home/quan-linux-mint/Workspace/Develop/Projects/SLN-V2/assets/input/assets/assets/04_rewards_props_decor/stickers_stars_sparkles/sticker-star-sparkle-34.png",
+    "dest": "/stickers/star-sparkles/sticker-star-sparkle-34.png",
+    "category": "stickers/star-sparkles",
+    "slug": "sticker-star-sparkle-34",
+    "bytes": 39839,
+    "sha256": "cb975a9dd89c5774"
+  },
+  "sticker-star-sparkle-35": {
+    "src": "/home/quan-linux-mint/Workspace/Develop/Projects/SLN-V2/assets/input/assets/assets/04_rewards_props_decor/stickers_stars_sparkles/sticker-star-sparkle-35.png",
+    "dest": "/stickers/star-sparkles/sticker-star-sparkle-35.png",
+    "category": "stickers/star-sparkles",
+    "slug": "sticker-star-sparkle-35",
+    "bytes": 53482,
+    "sha256": "1e8c997569e723df"
+  },
+  "sticker-star-sparkle-36": {
+    "src": "/home/quan-linux-mint/Workspace/Develop/Projects/SLN-V2/assets/input/assets/assets/04_rewards_props_decor/stickers_stars_sparkles/sticker-star-sparkle-36.png",
+    "dest": "/stickers/star-sparkles/sticker-star-sparkle-36.png",
+    "category": "stickers/star-sparkles",
+    "slug": "sticker-star-sparkle-36",
+    "bytes": 11376,
+    "sha256": "fc62d893c402e870"
+  },
+  "sticker-star-sparkle-37": {
+    "src": "/home/quan-linux-mint/Workspace/Develop/Projects/SLN-V2/assets/input/assets/assets/04_rewards_props_decor/stickers_stars_sparkles/sticker-star-sparkle-37.png",
+    "dest": "/stickers/star-sparkles/sticker-star-sparkle-37.png",
+    "category": "stickers/star-sparkles",
+    "slug": "sticker-star-sparkle-37",
+    "bytes": 19055,
+    "sha256": "5e88fecdf7742517"
+  },
+  "admin-avatar-female": {
+    "src": "/home/quan-linux-mint/Workspace/Develop/Projects/SLN-V2/assets/input/assets/assets/05_gameplay_parent_admin/admin-avatar-female.png",
+    "dest": "/gameplay/admin-avatar-female.png",
+    "category": "gameplay",
+    "slug": "admin-avatar-female",
+    "bytes": 1754196,
+    "sha256": "f89c11ae13d3e020"
+  },
+  "parent-profile-dog-avatar-large": {
+    "src": "/home/quan-linux-mint/Workspace/Develop/Projects/SLN-V2/assets/input/assets/assets/05_gameplay_parent_admin/parent-profile-dog-avatar-large.png",
+    "dest": "/gameplay/parent-profile-dog-avatar-large.png",
+    "category": "gameplay",
+    "slug": "parent-profile-dog-avatar-large",
+    "bytes": 1515957,
+    "sha256": "0d8c2853c7912b4f"
+  },
+  "puzzle-item-blue-star": {
+    "src": "/home/quan-linux-mint/Workspace/Develop/Projects/SLN-V2/assets/input/assets/assets/05_gameplay_parent_admin/puzzle-item-blue-star.png",
+    "dest": "/gameplay/puzzle-item-blue-star.png",
+    "category": "gameplay",
+    "slug": "puzzle-item-blue-star",
+    "bytes": 1144788,
+    "sha256": "ccfd177ee3000434"
+  },
+  "puzzle-item-moon": {
+    "src": "/home/quan-linux-mint/Workspace/Develop/Projects/SLN-V2/assets/input/assets/assets/05_gameplay_parent_admin/puzzle-item-moon.png",
+    "dest": "/gameplay/puzzle-item-moon.png",
+    "category": "gameplay",
+    "slug": "puzzle-item-moon",
+    "bytes": 1078258,
+    "sha256": "bbd8e8e0db7fa9b1"
+  },
+  "puzzle-item-sun": {
+    "src": "/home/quan-linux-mint/Workspace/Develop/Projects/SLN-V2/assets/input/assets/assets/05_gameplay_parent_admin/puzzle-item-sun.png",
+    "dest": "/gameplay/puzzle-item-sun.png",
+    "category": "gameplay",
+    "slug": "puzzle-item-sun",
+    "bytes": 1435519,
+    "sha256": "1c706a79eebe7b24"
+  },
+  "puzzle-item-tree": {
+    "src": "/home/quan-linux-mint/Workspace/Develop/Projects/SLN-V2/assets/input/assets/assets/05_gameplay_parent_admin/puzzle-item-tree.png",
+    "dest": "/gameplay/puzzle-item-tree.png",
+    "category": "gameplay",
+    "slug": "puzzle-item-tree",
+    "bytes": 1068437,
+    "sha256": "f6c34ecbb0222c59"
+  },
+  "puzzle-paw-blue": {
+    "src": "/home/quan-linux-mint/Workspace/Develop/Projects/SLN-V2/assets/input/assets/assets/05_gameplay_parent_admin/puzzle-paw-blue.png",
+    "dest": "/gameplay/puzzle-paw-blue.png",
+    "category": "gameplay",
+    "slug": "puzzle-paw-blue",
+    "bytes": 1445981,
+    "sha256": "46ff3e8488b4413b"
+  },
+  "puzzle-paw-green": {
+    "src": "/home/quan-linux-mint/Workspace/Develop/Projects/SLN-V2/assets/input/assets/assets/05_gameplay_parent_admin/puzzle-paw-green.png",
+    "dest": "/gameplay/puzzle-paw-green.png",
+    "category": "gameplay",
+    "slug": "puzzle-paw-green",
+    "bytes": 1438968,
+    "sha256": "9bfc383352e60235"
+  },
+  "puzzle-paw-orange": {
+    "src": "/home/quan-linux-mint/Workspace/Develop/Projects/SLN-V2/assets/input/assets/assets/05_gameplay_parent_admin/puzzle-paw-orange.png",
+    "dest": "/gameplay/puzzle-paw-orange.png",
+    "category": "gameplay",
+    "slug": "puzzle-paw-orange",
+    "bytes": 1398721,
+    "sha256": "46f275932012938c"
+  },
+  "puzzle-paw-purple": {
+    "src": "/home/quan-linux-mint/Workspace/Develop/Projects/SLN-V2/assets/input/assets/assets/05_gameplay_parent_admin/puzzle-paw-purple.png",
+    "dest": "/gameplay/puzzle-paw-purple.png",
+    "category": "gameplay",
+    "slug": "puzzle-paw-purple",
+    "bytes": 1185342,
+    "sha256": "e38df804f7eff195"
+  }
+}
