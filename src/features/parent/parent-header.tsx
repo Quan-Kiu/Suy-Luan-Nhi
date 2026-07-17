@@ -38,7 +38,10 @@ export function ParentHeader({
   }
 
   return (
-    <header data-testid="parent-header" className="relative z-40 border-b border-[#eadfc9] bg-white">
+    <header
+      data-testid="parent-header"
+      className="sticky top-0 z-50 border-b border-[#eadfc9] bg-white/95 backdrop-blur"
+    >
       <div className="mx-auto flex h-16 max-w-6xl items-center gap-3 px-5">
         <Link href="/parent" aria-label="Tổng quan khu vực phụ huynh">
           <Image

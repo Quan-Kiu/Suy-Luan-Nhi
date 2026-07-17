@@ -90,6 +90,11 @@ test("parent gate exposes a clear mobile placeholder", async ({ page }) => {
 
   const parentHeader = page.getByTestId("parent-header");
   await expect(parentHeader).toBeVisible();
+  await expect(parentHeader).toHaveCSS("position", "sticky");
+  await page.evaluate(() => window.scrollTo(0, document.body.scrollHeight));
+  await expect
+    .poll(() => parentHeader.evaluate((element) => Math.round(element.getBoundingClientRect().top)))
+    .toBe(0);
   await expect(parentHeader.getByRole("link", { name: "Tổng quan khu vực phụ huynh" })).toHaveAttribute(
     "href",
     "/parent",

@@ -45,7 +45,7 @@ export function ParentNav({ unread = 0 }: { unread?: number }) {
 
   return (
     <>
-      <nav className="sticky top-0 z-30 hidden border-b border-[#eadfc9] bg-[#fffaf0]/95 px-5 py-3 backdrop-blur sm:block">
+      <nav className="sticky top-16 z-40 hidden border-b border-[#eadfc9] bg-[#fffaf0]/95 px-5 py-3 backdrop-blur sm:block">
         <div className="mx-auto flex max-w-6xl items-center gap-2">
           {links.map(({ href, label, icon: Icon, exact = false }) => (
             <Link
