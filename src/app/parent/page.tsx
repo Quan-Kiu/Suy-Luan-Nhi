@@ -63,9 +63,9 @@ export default async function Page() {
       </h2>
       <div className="mt-3 flex flex-wrap gap-2">
         {data.skills.length ? (
-          data.skills.map(([skill, count]) => (
-            <Pill key={skill}>
-              {skill} · {count}
+          data.skills.map((skill) => (
+            <Pill key={skill.slug}>
+              {skill.title} · {skill.count}
             </Pill>
           ))
         ) : (

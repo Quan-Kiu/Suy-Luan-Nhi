@@ -1,7 +1,8 @@
-import { and, desc, eq, gte, sql } from "drizzle-orm";
+import { and, desc, eq, gte, inArray, sql } from "drizzle-orm";
 import { unstable_cache } from "next/cache";
 import { db } from "@/db/client";
 import { cacheTags } from "@/lib/cache/tags";
+import { buildSkillSummaries } from "@/modules/parent/skill-summary";
 import {
   activitySummaries,
   childBadges,
@@ -12,6 +13,7 @@ import {
   parentProfiles,
   parentResources,
   badges,
+  skills,
 } from "@/db/schema";
 
 async function readParentDashboard(childId: string, parentProfileId: string) {
@@ -38,43 +40,52 @@ async function readParentDashboard(childId: string, parentProfileId: string) {
   for (const day of activity)
     for (const [skill, count] of Object.entries(day.skillStats))
       skillTotals.set(skill, (skillTotals.get(skill) ?? 0) + count);
-  const recentSessions = await db
-    .select({
-      id: missionSessions.id,
-      status: missionSessions.status,
-      startedAt: missionSessions.startedAt,
-      completedAt: missionSessions.completedAt,
-      stars: missionSessions.stars,
-      hints: missionSessions.hintUsedCount,
-      retries: missionSessions.wrongAttemptCount,
-      missionTitle: missions.title,
-      missionCover: missions.coverUrl,
-    })
-    .from(missionSessions)
-    .innerJoin(missions, eq(missionSessions.missionId, missions.id))
-    .where(eq(missionSessions.childProfileId, childId))
-    .orderBy(desc(missionSessions.startedAt))
-    .limit(6);
-  const earnedBadges = await db
-    .select({
-      id: badges.id,
-      name: badges.name,
-      description: badges.description,
-      iconUrl: badges.iconUrl,
-      unlockedAt: childBadges.unlockedAt,
-    })
-    .from(childBadges)
-    .innerJoin(badges, eq(childBadges.badgeId, badges.id))
-    .where(eq(childBadges.childProfileId, childId))
-    .orderBy(desc(childBadges.unlockedAt));
-  const unread = await db
-    .select({ count: sql<number>`count(*)::int` })
-    .from(notifications)
-    .where(and(eq(notifications.parentProfileId, parentProfileId), sql`${notifications.readAt} is null`));
+  const skillSlugs = [...skillTotals.keys()];
+  const [skillDefinitions, recentSessions, earnedBadges, unread] = await Promise.all([
+    skillSlugs.length
+      ? db
+          .select({ slug: skills.slug, title: skills.title })
+          .from(skills)
+          .where(inArray(skills.slug, skillSlugs))
+      : Promise.resolve([]),
+    db
+      .select({
+        id: missionSessions.id,
+        status: missionSessions.status,
+        startedAt: missionSessions.startedAt,
+        completedAt: missionSessions.completedAt,
+        stars: missionSessions.stars,
+        hints: missionSessions.hintUsedCount,
+        retries: missionSessions.wrongAttemptCount,
+        missionTitle: missions.title,
+        missionCover: missions.coverUrl,
+      })
+      .from(missionSessions)
+      .innerJoin(missions, eq(missionSessions.missionId, missions.id))
+      .where(eq(missionSessions.childProfileId, childId))
+      .orderBy(desc(missionSessions.startedAt))
+      .limit(6),
+    db
+      .select({
+        id: badges.id,
+        name: badges.name,
+        description: badges.description,
+        iconUrl: badges.iconUrl,
+        unlockedAt: childBadges.unlockedAt,
+      })
+      .from(childBadges)
+      .innerJoin(badges, eq(childBadges.badgeId, badges.id))
+      .where(eq(childBadges.childProfileId, childId))
+      .orderBy(desc(childBadges.unlockedAt)),
+    db
+      .select({ count: sql<number>`count(*)::int` })
+      .from(notifications)
+      .where(and(eq(notifications.parentProfileId, parentProfileId), sql`${notifications.readAt} is null`)),
+  ]);
   return {
     activity,
     totals,
-    skills: [...skillTotals.entries()].sort((a, b) => b[1] - a[1]),
+    skills: buildSkillSummaries(skillTotals, skillDefinitions),
     recentSessions,
     earnedBadges,
     unreadNotifications: unread[0]?.count ?? 0,
