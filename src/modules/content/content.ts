@@ -1,22 +1,40 @@
 import { and, asc, eq } from "drizzle-orm";
+import { unstable_cache } from "next/cache";
 import { defaultContentEntries, getDefaultContent } from "@/content/defaults";
 import type { ContentDictionary, ContentValue } from "@/content/types";
 import { db } from "@/db/client";
 import { auditLogs, contentEntries } from "@/db/schema";
+import { cacheTags } from "@/lib/cache/tags";
+import { isDatabaseUnavailable } from "@/lib/infrastructure";
 
-export async function getContentNamespace(namespace: string, locale = "vi"): Promise<ContentDictionary> {
+async function readContentNamespace(namespace: string, locale: string): Promise<ContentDictionary> {
   const defaults = getDefaultContent(namespace, locale);
-  const rows = await db.query.contentEntries.findMany({
-    where: and(
-      eq(contentEntries.namespace, namespace),
-      eq(contentEntries.locale, locale),
-      eq(contentEntries.active, true),
-    ),
-    orderBy: [asc(contentEntries.key)],
-  });
-  return { ...defaults, ...Object.fromEntries(rows.map((row) => [row.key, row.value as ContentValue])) };
+  try {
+    const rows = await db.query.contentEntries.findMany({
+      where: and(
+        eq(contentEntries.namespace, namespace),
+        eq(contentEntries.locale, locale),
+        eq(contentEntries.active, true),
+      ),
+      orderBy: [asc(contentEntries.key)],
+    });
+    return { ...defaults, ...Object.fromEntries(rows.map((row) => [row.key, row.value as ContentValue])) };
+  } catch (error) {
+    if (isDatabaseUnavailable(error)) return defaults;
+    throw error;
+  }
 }
-export async function listContentEntries(locale = "vi") {
+
+const getCachedContentNamespace = unstable_cache(readContentNamespace, ["content-namespace"], {
+  tags: [cacheTags.content],
+  revalidate: 3600,
+});
+
+export function getContentNamespace(namespace: string, locale = "vi") {
+  return getCachedContentNamespace(namespace, locale);
+}
+
+async function readContentEntries(locale: string) {
   const stored = await db.query.contentEntries.findMany({
     where: eq(contentEntries.locale, locale),
     orderBy: [asc(contentEntries.namespace), asc(contentEntries.key)],
@@ -37,6 +55,16 @@ export async function listContentEntries(locale = "vi") {
       };
     });
 }
+
+const getCachedContentEntries = unstable_cache(readContentEntries, ["content-entry-list"], {
+  tags: [cacheTags.content],
+  revalidate: 3600,
+});
+
+export function listContentEntries(locale = "vi") {
+  return getCachedContentEntries(locale);
+}
+
 export async function upsertContentEntry(
   actorId: string,
   input: {

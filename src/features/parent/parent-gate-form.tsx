@@ -1,58 +1,66 @@
 "use client";
 
-import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useMutation } from "@tanstack/react-query";
 import { LockKeyhole } from "lucide-react";
-import { toast } from "sonner";
-import { Button, Card } from "@/components/ui";
-import { requestJson } from "@/lib/http";
+import { useRouter } from "next/navigation";
+import { useForm } from "react-hook-form";
+import { z } from "zod";
+import { parentApi } from "@/api/parent";
+import { FormStatus, SubmitButton, TextField } from "@/components/form";
+import { Card } from "@/components/ui";
 import { contentText, useContent } from "@/content/client";
+
+const schema = z.object({ answer: z.string().trim().min(1, "Hãy nhập câu trả lời") });
+
+type FormValues = z.infer<typeof schema>;
 
 export function ParentGateForm({ hasPin }: { hasPin: boolean }) {
   const content = useContent("parent");
   const router = useRouter();
-  const [value, setValue] = useState("");
-  const [pending, setPending] = useState(false);
+  const form = useForm<FormValues>({ resolver: zodResolver(schema), defaultValues: { answer: "" } });
+  const mutation = useMutation({
+    mutationFn: parentApi.unlock,
+    onSuccess: () => router.refresh(),
+  });
 
   return (
     <Card className="mx-auto mt-7 max-w-md p-5">
       <div className="flex items-center gap-3">
         <LockKeyhole className="text-[#6b8d4a]" />
-        <p className="font-black">Ba/mẹ xác nhận giúp Bống nhé</p>
+        <p className="font-black">
+          {contentText(content, "gate.confirmTitle", "Ba/mẹ xác nhận giúp Bống nhé")}
+        </p>
       </div>
       <p className="mt-4 text-center text-2xl font-black">
-        {hasPin ? "Nhập PIN phụ huynh" : contentText(content, "gate.mathQuestion", "17 + 6 = ?")}
+        {hasPin
+          ? contentText(content, "gate.pinPrompt", "Nhập PIN phụ huynh")
+          : contentText(content, "gate.mathQuestion", "17 + 6 = ?")}
       </p>
       <form
         className="mt-4 space-y-3"
-        onSubmit={async (event) => {
-          event.preventDefault();
-          setPending(true);
-          try {
-            await requestJson("/api/parent/unlock", {
-              method: "POST",
-              body: JSON.stringify({ answer: value }),
-            });
-            router.refresh();
-          } catch (error) {
-            toast.error(error instanceof Error ? error.message : "Không thể mở khóa");
-            setPending(false);
-          }
-        }}
+        onSubmit={form.handleSubmit((values) => mutation.mutate(values))}
+        noValidate
       >
-        <input
-          value={value}
-          onChange={(event) => setValue(event.target.value)}
+        <TextField
           inputMode="numeric"
-          aria-label={hasPin ? "PIN phụ huynh" : "Kết quả phép tính"}
+          label={hasPin ? "PIN phụ huynh" : "Kết quả phép tính"}
           placeholder={
-            hasPin ? "Nhập PIN 4–8 chữ số" : contentText(content, "gate.answerPlaceholder", "Nhập kết quả")
+            hasPin
+              ? contentText(content, "gate.pinPlaceholder", "Nhập PIN 4–8 chữ số")
+              : contentText(content, "gate.answerPlaceholder", "Nhập kết quả")
           }
-          className="min-h-14 w-full rounded-2xl border-2 border-[#eadfc9] bg-white px-4 text-center text-xl"
+          registration={form.register("answer")}
+          error={form.formState.errors.answer?.message}
+          className="min-h-14 text-center text-xl"
         />
-        <Button className="w-full" disabled={pending || !value}>
-          {pending ? "Đang kiểm tra..." : "Mở khu vực phụ huynh"}
-        </Button>
+        <FormStatus status={mutation.isError ? "error" : "idle"} message={mutation.error?.message} />
+        <SubmitButton
+          pending={mutation.isPending}
+          pendingLabel={contentText(content, "gate.submitting", "Đang kiểm tra...")}
+        >
+          {contentText(content, "gate.submit", "Mở khu vực phụ huynh")}
+        </SubmitButton>
       </form>
     </Card>
   );

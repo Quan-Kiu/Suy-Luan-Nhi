@@ -1,34 +1,33 @@
 "use client";
-import { useRouter } from "next/navigation";
-import { useState } from "react";
+
+import { useMutation } from "@tanstack/react-query";
 import { Play } from "lucide-react";
-import { toast } from "sonner";
-import { Button } from "@/components/ui";
-import { requestJson } from "@/lib/http";
+import { useRouter } from "next/navigation";
+import { gameplayApi } from "@/api/gameplay";
+import { AsyncButton } from "@/components/async-button";
+import { FormStatus } from "@/components/form";
+import { contentText, useContent } from "@/content/client";
+
 export function StartMissionButton({ childId, missionId }: { childId: string; missionId: string }) {
+  const content = useContent("gameplay");
   const router = useRouter();
-  const [pending, setPending] = useState(false);
+  const mutation = useMutation({
+    mutationFn: () => gameplayApi.startMission(childId, missionId),
+    onSuccess: ({ session }) => router.push(`/play/${session.id}`),
+  });
+
   return (
-    <Button
-      type="button"
-      className="w-full"
-      disabled={pending}
-      onClick={async () => {
-        setPending(true);
-        try {
-          const result = await requestJson<{ session: { id: string } }>(
-            `/api/children/${childId}/missions/${missionId}/start`,
-            { method: "POST" },
-          );
-          router.push(`/play/${result.session.id}`);
-        } catch (e) {
-          toast.error(e instanceof Error ? e.message : "Không thể bắt đầu nhiệm vụ");
-          setPending(false);
-        }
-      }}
-    >
-      <Play size={20} className="mr-2 inline" />
-      {pending ? "Bống đang chuẩn bị..." : "Bắt đầu nhiệm vụ"}
-    </Button>
+    <div className="space-y-3">
+      <AsyncButton
+        pending={mutation.isPending}
+        pendingLabel={contentText(content, "mission.starting", "Bống đang chuẩn bị...")}
+        onClick={() => mutation.mutate()}
+        className="w-full"
+      >
+        <Play size={20} className="mr-2 inline" />
+        {contentText(content, "mission.start", "Bắt đầu nhiệm vụ")}
+      </AsyncButton>
+      <FormStatus status={mutation.isError ? "error" : "idle"} message={mutation.error?.message} />
+    </div>
   );
 }

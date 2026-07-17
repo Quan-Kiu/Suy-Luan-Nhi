@@ -1,8 +1,9 @@
+import { cache } from "react";
 import { cookies } from "next/headers";
 import { requireParent } from "@/auth/session";
 import { getOwnedChild, listChildren } from "@/modules/family/family";
 
-export async function getActiveChild() {
+export const getActiveChild = cache(async () => {
   const session = await requireParent();
   const selectedId = (await cookies()).get("sln_active_child")?.value;
   if (selectedId) {
@@ -16,4 +17,4 @@ export async function getActiveChild() {
     child: first,
     parent: await getOwnedChild(session.user.id, first.id).then((value) => value!.parent),
   };
-}
+});

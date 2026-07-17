@@ -2,6 +2,7 @@ import { z } from "zod";
 import type { ContentValue } from "@/content/types";
 import { requireApiRoles } from "@/auth/api";
 import { apiJson } from "@/lib/api-response";
+import { invalidateContentCache } from "@/lib/cache/invalidation";
 import { listContentEntries, upsertContentEntry } from "@/modules/content/content";
 
 const contentValueSchema: z.ZodType<ContentValue> = z.lazy(() =>
@@ -44,5 +45,7 @@ export async function PATCH(request: Request) {
       { status: 400 },
     );
   }
-  return apiJson(await upsertContentEntry(authResult.session.user.id, input.data));
+  const entry = await upsertContentEntry(authResult.session.user.id, input.data);
+  invalidateContentCache();
+  return apiJson(entry);
 }

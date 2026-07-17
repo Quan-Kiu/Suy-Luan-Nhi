@@ -1,5 +1,7 @@
 import { and, desc, eq, gte, sql } from "drizzle-orm";
+import { unstable_cache } from "next/cache";
 import { db } from "@/db/client";
+import { cacheTags } from "@/lib/cache/tags";
 import {
   activitySummaries,
   childBadges,
@@ -12,7 +14,7 @@ import {
   badges,
 } from "@/db/schema";
 
-export async function getParentDashboard(childId: string, parentProfileId: string) {
+async function readParentDashboard(childId: string, parentProfileId: string) {
   const since = new Date();
   since.setDate(since.getDate() - 7);
   const activity = await db.query.activitySummaries.findMany({
@@ -79,6 +81,17 @@ export async function getParentDashboard(childId: string, parentProfileId: strin
   };
 }
 
+export function getParentDashboard(childId: string, parentProfileId: string) {
+  return unstable_cache(
+    () => readParentDashboard(childId, parentProfileId),
+    ["parent-dashboard", childId, parentProfileId],
+    {
+      tags: [cacheTags.parentDashboard(childId), cacheTags.parentNotifications(parentProfileId)],
+      revalidate: 30,
+    },
+  )();
+}
+
 export async function getActivityHistory(
   childId: string,
   filters: { status?: string; from?: string; to?: string },
@@ -110,7 +123,7 @@ export async function getActivityHistory(
     .orderBy(desc(missionSessions.startedAt));
 }
 
-export async function getSuggestions(ageGroup: "2-3" | "4-5" | "6-8") {
+async function readSuggestions(ageGroup: "2-3" | "4-5" | "6-8") {
   return db.query.conversationSuggestions.findMany({
     where: and(
       eq(conversationSuggestions.active, true),
@@ -120,18 +133,33 @@ export async function getSuggestions(ageGroup: "2-3" | "4-5" | "6-8") {
   });
 }
 
-export async function getResources() {
+export const getSuggestions = unstable_cache(readSuggestions, ["parent-suggestions"], {
+  tags: [cacheTags.parentSuggestions],
+  revalidate: 3600,
+});
+
+async function readResources() {
   return db.query.parentResources.findMany({
     where: eq(parentResources.status, "published"),
     orderBy: [parentResources.sortOrder],
   });
 }
 
-export async function getResource(slug: string) {
+export const getResources = unstable_cache(readResources, ["parent-resources"], {
+  tags: [cacheTags.parentResources],
+  revalidate: 3600,
+});
+
+async function readResource(slug: string) {
   return db.query.parentResources.findFirst({
     where: and(eq(parentResources.status, "published"), eq(parentResources.slug, slug)),
   });
 }
+
+export const getResource = unstable_cache(readResource, ["parent-resource"], {
+  tags: [cacheTags.parentResources],
+  revalidate: 3600,
+});
 
 export async function getParentNotifications(parentProfileId: string) {
   return db.query.notifications.findMany({
@@ -139,6 +167,22 @@ export async function getParentNotifications(parentProfileId: string) {
     orderBy: [desc(notifications.createdAt)],
     limit: 50,
   });
+}
+
+async function readUnreadNotificationCount(parentProfileId: string) {
+  const rows = await db
+    .select({ count: sql<number>`count(*)::int` })
+    .from(notifications)
+    .where(and(eq(notifications.parentProfileId, parentProfileId), sql`${notifications.readAt} is null`));
+  return rows[0]?.count ?? 0;
+}
+
+export function getUnreadNotificationCount(parentProfileId: string) {
+  return unstable_cache(
+    () => readUnreadNotificationCount(parentProfileId),
+    ["parent-unread-notifications", parentProfileId],
+    { tags: [cacheTags.parentNotifications(parentProfileId)], revalidate: 30 },
+  )();
 }
 
 export async function markNotificationRead(parentProfileId: string, notificationId: string) {

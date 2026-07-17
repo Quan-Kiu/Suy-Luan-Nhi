@@ -88,13 +88,7 @@ async function seedTaxonomy() {
     .onConflictDoNothing();
 
   for (const [slug, title, description, category] of skillSeeds) {
-    await db
-      .insert(skills)
-      .values({ slug, title, description, category })
-      .onConflictDoUpdate({
-        target: skills.slug,
-        set: { title, description, category, updatedAt: new Date() },
-      });
+    await db.insert(skills).values({ slug, title, description, category }).onConflictDoNothing();
   }
 }
 
@@ -127,16 +121,7 @@ async function seedBadges() {
         skillId: skillBySlug.get(badge.skillSlug)?.id,
         unlockRule: badge.unlockRule,
       })
-      .onConflictDoUpdate({
-        target: badges.slug,
-        set: {
-          name: badge.name,
-          description: badge.description,
-          iconUrl: badge.iconUrl,
-          skillId: skillBySlug.get(badge.skillSlug)?.id,
-          unlockRule: badge.unlockRule,
-        },
-      });
+      .onConflictDoNothing();
   }
 }
 
@@ -147,7 +132,7 @@ async function seedWorldsAndMissions() {
   const badgeBySlug = new Map(badgeRows.map((badge) => [badge.slug, badge]));
 
   for (const world of worldSeeds) {
-    const [worldRow] = await db
+    const [createdWorld] = await db
       .insert(missionWorlds)
       .values({
         slug: world.slug,
@@ -163,31 +148,25 @@ async function seedWorldsAndMissions() {
             ? { type: "always" }
             : { type: "previous_world_completed", order: world.sortOrder - 1 },
       })
-      .onConflictDoUpdate({
-        target: missionWorlds.slug,
-        set: {
-          title: world.title,
-          subtitle: world.subtitle,
-          description: world.description,
-          sortOrder: world.sortOrder,
-          themeColor: world.themeColor,
-          coverUrl: world.coverUrl,
-          status: "published",
-          updatedAt: new Date(),
-        },
-      })
+      .onConflictDoNothing()
       .returning();
-    await db.delete(worldAgeGroups).where(eq(worldAgeGroups.worldId, worldRow.id));
-    await db.insert(worldAgeGroups).values(
-      ["2-3", "4-5", "6-8"].map((ageGroup) => ({
-        worldId: worldRow.id,
-        ageGroup: ageGroup as "2-3" | "4-5" | "6-8",
-      })),
-    );
-    await db.delete(worldSkills).where(eq(worldSkills.worldId, worldRow.id));
+    const worldRow =
+      createdWorld ?? (await db.query.missionWorlds.findFirst({ where: eq(missionWorlds.slug, world.slug) }));
+    if (!worldRow) throw new Error(`Could not seed world ${world.slug}`);
+
+    await db
+      .insert(worldAgeGroups)
+      .values(
+        ["2-3", "4-5", "6-8"].map((ageGroup) => ({
+          worldId: worldRow.id,
+          ageGroup: ageGroup as "2-3" | "4-5" | "6-8",
+        })),
+      )
+      .onConflictDoNothing();
     await db
       .insert(worldSkills)
-      .values(world.skillSlugs.map((slug) => ({ worldId: worldRow.id, skillId: skillBySlug.get(slug)!.id })));
+      .values(world.skillSlugs.map((slug) => ({ worldId: worldRow.id, skillId: skillBySlug.get(slug)!.id })))
+      .onConflictDoNothing();
   }
 
   const worldRows = await db.select().from(missionWorlds);
@@ -198,6 +177,7 @@ async function seedWorldsAndMissions() {
     const primarySkill = skillBySlug.get(missionSeed.primarySkill);
     const rewardBadge = badgeBySlug.get(missionSeed.rewardBadge);
     if (!world || !primarySkill) throw new Error(`Invalid mission seed ${missionSeed.slug}`);
+
     const [mission] = await db
       .insert(missions)
       .values({
@@ -216,37 +196,26 @@ async function seedWorldsAndMissions() {
         unlockRule: { type: "previous_mission_completed" },
         publishedAt: new Date(),
       })
-      .onConflictDoUpdate({
-        target: missions.slug,
-        set: {
-          worldId: world.id,
-          title: missionSeed.title,
-          subtitle: missionSeed.subtitle,
-          shortDescription: missionSeed.shortDescription,
-          storyIntro: missionSeed.storyIntro,
-          estimatedMinutes: missionSeed.estimatedMinutes,
-          primarySkillId: primarySkill.id,
-          rewardBadgeId: rewardBadge?.id,
-          coverUrl: missionSeed.coverUrl,
-          status: "published",
-          difficulty: missionSeed.difficulty,
-          updatedAt: new Date(),
-        },
-      })
+      .onConflictDoNothing()
       .returning();
 
-    await db.delete(missionAgeGroups).where(eq(missionAgeGroups.missionId, mission.id));
+    // Existing missions may already be referenced by immutable sessions and attempts.
+    // Seed defaults never rewrite or delete those production records.
+    if (!mission) continue;
+
     await db
       .insert(missionAgeGroups)
-      .values(missionSeed.ageGroups.map((ageGroup) => ({ missionId: mission.id, ageGroup })));
-    await db.delete(missionSecondarySkills).where(eq(missionSecondarySkills.missionId, mission.id));
-    await db.insert(missionSecondarySkills).values(
-      missionSeed.secondarySkills.map((slug) => ({
-        missionId: mission.id,
-        skillId: skillBySlug.get(slug)!.id,
-      })),
-    );
-    await db.delete(questions).where(eq(questions.missionId, mission.id));
+      .values(missionSeed.ageGroups.map((ageGroup) => ({ missionId: mission.id, ageGroup })))
+      .onConflictDoNothing();
+    await db
+      .insert(missionSecondarySkills)
+      .values(
+        missionSeed.secondarySkills.map((slug) => ({
+          missionId: mission.id,
+          skillId: skillBySlug.get(slug)!.id,
+        })),
+      )
+      .onConflictDoNothing();
 
     const insertedQuestions = [];
     for (const questionSeed of missionSeed.questions) {
@@ -274,7 +243,6 @@ async function seedWorldsAndMissions() {
       insertedQuestions.push({ ...questionSeed, id: question.id });
     }
 
-    await db.delete(safetyChecklistEntries).where(eq(safetyChecklistEntries.missionId, mission.id));
     await db.insert(safetyChecklistEntries).values(
       safetyChecklistDefinitions.map((item) => ({
         missionId: mission.id,
@@ -283,7 +251,6 @@ async function seedWorldsAndMissions() {
         note: item.defaultNote,
       })),
     );
-    await db.delete(missionVersions).where(eq(missionVersions.missionId, mission.id));
     const [version] = await db
       .insert(missionVersions)
       .values({
@@ -313,28 +280,32 @@ async function seedParentContent() {
   const missionBySlug = new Map(missionRows.map((mission) => [mission.slug, mission]));
   const skillBySlug = new Map(skillRows.map((skill) => [skill.slug, skill]));
 
-  await db.delete(conversationSuggestions);
-  await db.insert(conversationSuggestions).values(
-    conversationSuggestionSeeds.map((item) => ({
-      title: item.title,
-      questionText: item.questionText,
-      purpose: item.purpose,
-      ageGroup: "ageGroup" in item ? item.ageGroup : undefined,
-      relatedMissionId:
-        "relatedMissionSlug" in item ? missionBySlug.get(item.relatedMissionSlug)?.id : undefined,
-      skillId: skillBySlug.get(item.skillSlug)?.id,
-    })),
-  );
+  const existingSuggestion = await db.query.conversationSuggestions.findFirst();
+  if (!existingSuggestion) {
+    await db.insert(conversationSuggestions).values(
+      conversationSuggestionSeeds.map((item) => ({
+        title: item.title,
+        questionText: item.questionText,
+        purpose: item.purpose,
+        ageGroup: "ageGroup" in item ? item.ageGroup : undefined,
+        relatedMissionId:
+          "relatedMissionSlug" in item ? missionBySlug.get(item.relatedMissionSlug)?.id : undefined,
+        skillId: skillBySlug.get(item.skillSlug)?.id,
+      })),
+    );
+  }
 
-  await db.delete(parentResources);
-  await db.insert(parentResources).values(
-    parentResourceSeeds.map((item) => ({
-      ...item,
-      ageGroups: [...item.ageGroups],
-      status: "published" as const,
-      publishedAt: new Date(),
-    })),
-  );
+  for (const item of parentResourceSeeds) {
+    await db
+      .insert(parentResources)
+      .values({
+        ...item,
+        ageGroups: [...item.ageGroups],
+        status: "published" as const,
+        publishedAt: new Date(),
+      })
+      .onConflictDoNothing();
+  }
 }
 
 async function main() {

@@ -1,30 +1,59 @@
 "use client";
+
+import { BarChart3, Bell, BookOpen, Home, Lightbulb, LogOut, Settings } from "lucide-react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { BarChart3, Bell, BookOpen, Home, Lightbulb, LogOut, Settings } from "lucide-react";
 import { signOut } from "@/auth/client";
+import { contentText, useContent } from "@/content/client";
 import { cn } from "@/lib/utils";
+
 const items = [
-  [/parent$/, "/parent", "Tổng quan", Home],
-  [/activity/, "/parent/activity", "Hoạt động", BarChart3],
-  [/suggestions/, "/parent/suggestions", "Gợi ý", Lightbulb],
-  [/resources/, "/parent/resources", "Tài nguyên", BookOpen],
-  [/settings/, "/parent/settings", "Cài đặt", Settings],
+  { href: "/parent", labelKey: "nav.overview", fallback: "Tổng quan", icon: Home, exact: true },
+  {
+    href: "/parent/activity",
+    labelKey: "nav.activity",
+    fallback: "Hoạt động",
+    icon: BarChart3,
+    exact: false,
+  },
+  {
+    href: "/parent/suggestions",
+    labelKey: "nav.suggestions",
+    fallback: "Gợi ý",
+    icon: Lightbulb,
+    exact: false,
+  },
+  {
+    href: "/parent/resources",
+    labelKey: "nav.resources",
+    fallback: "Tài nguyên",
+    icon: BookOpen,
+    exact: false,
+  },
+  { href: "/parent/settings", labelKey: "nav.settings", fallback: "Cài đặt", icon: Settings, exact: false },
 ] as const;
+
+function isActive(pathname: string, href: string, exact: boolean) {
+  return exact ? pathname === href : pathname === href || pathname.startsWith(`${href}/`);
+}
+
 export function ParentNav({ unread = 0 }: { unread?: number }) {
+  const content = useContent("parent");
   const pathname = usePathname();
   const router = useRouter();
+  const links = items.map((item) => ({ ...item, label: contentText(content, item.labelKey, item.fallback) }));
+
   return (
     <>
       <nav className="sticky top-0 z-30 hidden border-b border-[#eadfc9] bg-[#fffaf0]/95 px-5 py-3 backdrop-blur sm:block">
         <div className="mx-auto flex max-w-6xl items-center gap-2">
-          {items.map(([matcher, href, label, Icon]) => (
+          {links.map(({ href, label, icon: Icon, exact = false }) => (
             <Link
               key={href}
               href={href}
               className={cn(
                 "flex items-center gap-2 rounded-xl px-3 py-2 text-sm font-bold",
-                matcher.test(pathname) && "bg-[#fff0df] text-[#d95812]",
+                isActive(pathname, href, exact) && "bg-[#fff0df] text-[#d95812]",
               )}
             >
               <Icon size={18} />
@@ -33,6 +62,7 @@ export function ParentNav({ unread = 0 }: { unread?: number }) {
           ))}
           <Link
             href="/parent/notifications"
+            aria-label={contentText(content, "nav.notifications", "Thông báo")}
             className="relative ml-auto grid size-10 place-items-center rounded-full border"
           >
             <Bell size={18} />
@@ -50,18 +80,21 @@ export function ParentNav({ unread = 0 }: { unread?: number }) {
               router.refresh();
             }}
             className="grid size-10 place-items-center rounded-full border"
-            aria-label="Đăng xuất"
+            aria-label={contentText(content, "nav.logout", "Đăng xuất")}
           >
             <LogOut size={18} />
           </button>
         </div>
       </nav>
       <nav className="fixed inset-x-0 bottom-0 z-40 mx-auto flex h-20 max-w-[520px] items-center justify-around border-t border-[#eadfc9] bg-[#fffaf0]/95 px-2 backdrop-blur sm:hidden">
-        {items.map(([matcher, href, label, Icon]) => (
+        {links.map(({ href, label, icon: Icon, exact = false }) => (
           <Link
             key={href}
             href={href}
-            className={cn("text-center text-[11px] font-bold", matcher.test(pathname) && "text-[#e9641a]")}
+            className={cn(
+              "text-center text-[11px] font-bold",
+              isActive(pathname, href, exact) && "text-[#e9641a]",
+            )}
           >
             <Icon className="mx-auto" size={20} />
             {label}

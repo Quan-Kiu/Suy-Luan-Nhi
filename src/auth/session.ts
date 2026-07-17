@@ -3,11 +3,18 @@ import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 import { auth } from "@/auth/auth";
 import { hasRole, type AppRole } from "@/auth/roles";
+import { isDatabaseUnavailable } from "@/lib/infrastructure";
 
 export const getServerSession = cache(async () => auth.api.getSession({ headers: await headers() }));
 
 export async function requireSession() {
-  const session = await getServerSession();
+  let session;
+  try {
+    session = await getServerSession();
+  } catch (error) {
+    if (isDatabaseUnavailable(error)) redirect("/service-unavailable?service=database");
+    throw error;
+  }
   if (!session) redirect("/auth/sign-in");
   return session;
 }

@@ -1,5 +1,6 @@
 import { apiJson } from "@/lib/api-response";
 import { requireApiRoles } from "@/auth/api";
+import { invalidateParentNotifications } from "@/lib/cache/invalidation";
 import { getOrCreateParentProfile } from "@/modules/family/family";
 import { markNotificationRead } from "@/modules/parent/parent-data";
 export async function POST(request: Request, { params }: { params: Promise<{ notificationId: string }> }) {
@@ -8,5 +9,6 @@ export async function POST(request: Request, { params }: { params: Promise<{ not
   const parent = await getOrCreateParentProfile(authResult.session.user.id, authResult.session.user.name);
   const { notificationId } = await params;
   await markNotificationRead(parent.id, notificationId);
+  invalidateParentNotifications(parent.id);
   return apiJson({ ok: true });
 }

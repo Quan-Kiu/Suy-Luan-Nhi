@@ -1,21 +1,12 @@
 import Image from "next/image";
 import Link from "next/link";
-import { redirect } from "next/navigation";
 import { Card, Pill } from "@/components/ui";
-import { ParentShell } from "@/features/parent/parent-shell";
-import { getActiveChild } from "@/modules/family/active-child";
-import { requireParentWorkspace } from "@/modules/parent/access";
-import { getParentDashboard, getResources } from "@/modules/parent/parent-data";
+import { getResources } from "@/modules/parent/parent-data";
+
 export default async function Page() {
-  const { parent } = await requireParentWorkspace();
-  const active = await getActiveChild();
-  if (!active) redirect("/onboarding");
-  const [items, dashboard] = await Promise.all([
-    getResources(),
-    getParentDashboard(active.child.id, parent.id),
-  ]);
+  const items = await getResources();
   return (
-    <ParentShell childName={active.child.displayName} unread={dashboard.unreadNotifications}>
+    <>
       <h1 className="text-3xl font-black">Tài nguyên cho phụ huynh</h1>
       <p className="mt-2 text-[#806d54]">Hướng dẫn ngắn, thực tế và không tạo áp lực thành tích cho trẻ.</p>
       <div className="mt-5 grid gap-4 md:grid-cols-3">
@@ -40,6 +31,6 @@ export default async function Page() {
           </Link>
         ))}
       </div>
-    </ParentShell>
+    </>
   );
 }

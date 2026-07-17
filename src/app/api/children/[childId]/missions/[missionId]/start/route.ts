@@ -1,5 +1,6 @@
 import { apiJson } from "@/lib/api-response";
 import { requireApiRoles } from "@/auth/api";
+import { invalidateParentDashboard } from "@/lib/cache/invalidation";
 import { startMission } from "@/modules/gameplay/session";
 export async function POST(
   request: Request,
@@ -14,5 +15,6 @@ export async function POST(
       { message: result.error === "locked" ? "Nhiệm vụ chưa được mở khóa" : "Không thể bắt đầu nhiệm vụ" },
       { status: result.error === "locked" ? 409 : 404 },
     );
+  invalidateParentDashboard(childId);
   return apiJson(result, { status: 201 });
 }

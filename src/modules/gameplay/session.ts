@@ -36,6 +36,11 @@ async function getOwnedSession(userId: string, sessionId: string) {
   return rows[0] ?? null;
 }
 
+export async function getSessionCacheContext(userId: string, sessionId: string) {
+  const owned = await getOwnedSession(userId, sessionId);
+  return owned ? { childId: owned.session.childProfileId, parentProfileId: owned.parent.id } : null;
+}
+
 export async function startMission(userId: string, childId: string, missionIdentifier: string) {
   const owned = await getOwnedChild(userId, childId);
   if (!owned) return { error: "not_found" } as const;

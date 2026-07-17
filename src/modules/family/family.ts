@@ -1,4 +1,5 @@
 import { and, desc, eq, isNull } from "drizzle-orm";
+import { cache } from "react";
 import { db } from "@/db/client";
 import {
   activitySummaries,
@@ -15,12 +16,12 @@ import { hashPin } from "@/modules/family/pin";
 import type { z } from "zod";
 import type { createChildSchema, updateChildSchema, updateParentSettingsSchema } from "./schemas";
 
-export async function getOrCreateParentProfile(userId: string, displayName: string) {
+export const getOrCreateParentProfile = cache(async (userId: string, displayName: string) => {
   const existing = await db.query.parentProfiles.findFirst({ where: eq(parentProfiles.userId, userId) });
   if (existing) return existing;
   const [created] = await db.insert(parentProfiles).values({ userId, displayName }).returning();
   return created;
-}
+});
 
 export async function listChildren(userId: string, displayName: string, includeDeleted = false) {
   const parent = await getOrCreateParentProfile(userId, displayName);

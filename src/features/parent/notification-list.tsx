@@ -1,34 +1,62 @@
 "use client";
+
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
-import { requestJson } from "@/lib/http";
-export function NotificationList({
-  items,
-}: {
-  items: Array<{ id: string; title: string; body: string; readAt: Date | null; createdAt: Date }>;
-}) {
+import { parentApi } from "@/api/parent";
+import { FormStatus } from "@/components/form";
+import { queryKeys } from "@/lib/query/keys";
+import { cn } from "@/lib/utils";
+
+type NotificationItem = {
+  id: string;
+  title: string;
+  body: string;
+  readAt: Date | null;
+  createdAt: Date;
+};
+
+export function NotificationList({ items }: { items: NotificationItem[] }) {
   const router = useRouter();
+  const queryClient = useQueryClient();
+  const mutation = useMutation({
+    mutationFn: (notificationId: string) => parentApi.markNotificationRead(notificationId),
+    onSuccess: async () => {
+      await Promise.all([
+        queryClient.invalidateQueries({ queryKey: queryKeys.parent.notifications }),
+        queryClient.invalidateQueries({ queryKey: queryKeys.parent.dashboard }),
+      ]);
+      router.refresh();
+    },
+  });
+
   return (
     <div className="space-y-3">
-      {items.map((item) => (
-        <button
-          type="button"
-          key={item.id}
-          onClick={async () => {
-            if (!item.readAt)
-              await requestJson(`/api/parent/notifications/${item.id}/read`, { method: "POST" });
-            router.refresh();
-          }}
-          className={`w-full rounded-2xl border p-4 text-left ${item.readAt ? "bg-white" : "border-[#e6a35e] bg-[#fff5df]"}`}
-        >
-          <div className="flex justify-between gap-3">
-            <strong>{item.title}</strong>
-            <time className="text-xs text-[#806d54]">
-              {new Date(item.createdAt).toLocaleDateString("vi-VN")}
-            </time>
-          </div>
-          <p className="mt-1 text-sm text-[#6f604b]">{item.body}</p>
-        </button>
-      ))}
+      {items.map((item) => {
+        const pending = mutation.isPending && mutation.variables === item.id;
+        return (
+          <button
+            type="button"
+            key={item.id}
+            aria-busy={pending}
+            disabled={pending || Boolean(item.readAt)}
+            onClick={() => mutation.mutate(item.id)}
+            className={cn(
+              "w-full rounded-2xl border p-4 text-left transition disabled:cursor-default",
+              item.readAt ? "bg-white" : "border-[#e6a35e] bg-[#fff5df] hover:border-[#d98732]",
+              pending && "opacity-60",
+            )}
+          >
+            <div className="flex justify-between gap-3">
+              <strong>{item.title}</strong>
+              <time className="text-xs text-[#806d54]">
+                {new Date(item.createdAt).toLocaleDateString("vi-VN")}
+              </time>
+            </div>
+            <p className="mt-1 text-sm text-[#6f604b]">{item.body}</p>
+          </button>
+        );
+      })}
+      <FormStatus status={mutation.isError ? "error" : "idle"} message={mutation.error?.message} />
     </div>
   );
 }

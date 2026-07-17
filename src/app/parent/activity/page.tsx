@@ -1,33 +1,40 @@
 import Image from "next/image";
 import { redirect } from "next/navigation";
-import { Card, Pill } from "@/components/ui";
-import { ParentShell } from "@/features/parent/parent-shell";
+import { Button, Card, Pill } from "@/components/ui";
+import { contentTemplate, contentText } from "@/content/resolve";
+import { getContentNamespace } from "@/modules/content/content";
 import { getActiveChild } from "@/modules/family/active-child";
-import { requireParentWorkspace } from "@/modules/parent/access";
-import { getActivityHistory, getParentDashboard } from "@/modules/parent/parent-data";
+import { getActivityHistory } from "@/modules/parent/parent-data";
+
 export default async function Page({
   searchParams,
 }: {
   searchParams: Promise<{ status?: string; from?: string; to?: string }>;
 }) {
-  const { parent } = await requireParentWorkspace();
   const active = await getActiveChild();
   if (!active) redirect("/onboarding");
   const filters = await searchParams;
-  const [items, dashboard] = await Promise.all([
+  const [items, content] = await Promise.all([
     getActivityHistory(active.child.id, filters),
-    getParentDashboard(active.child.id, parent.id),
+    getContentNamespace("parent"),
   ]);
+
   return (
-    <ParentShell childName={active.child.displayName} unread={dashboard.unreadNotifications}>
-      <h1 className="text-3xl font-black">Lịch sử hoạt động</h1>
-      <p className="mt-2 text-[#806d54]">Theo dõi hành trình của riêng bé, không so sánh với trẻ khác.</p>
+    <>
+      <h1 className="text-3xl font-black">{contentText(content, "activity.title", "Lịch sử hoạt động")}</h1>
+      <p className="mt-2 text-[#806d54]">
+        {contentText(
+          content,
+          "activity.description",
+          "Theo dõi hành trình của riêng bé, không so sánh với trẻ khác.",
+        )}
+      </p>
       <form className="mt-5 grid gap-3 rounded-2xl border bg-white p-4 sm:grid-cols-4">
         <select name="status" defaultValue={filters.status ?? ""} className="min-h-11 rounded-xl border px-3">
-          <option value="">Tất cả trạng thái</option>
-          <option value="completed">Đã hoàn thành</option>
-          <option value="in_progress">Đang tiếp tục</option>
-          <option value="exited">Đã dừng</option>
+          <option value="">{contentText(content, "activity.allStatuses", "Tất cả trạng thái")}</option>
+          <option value="completed">{contentText(content, "activity.completed", "Đã hoàn thành")}</option>
+          <option value="in_progress">{contentText(content, "activity.inProgress", "Đang tiếp tục")}</option>
+          <option value="exited">{contentText(content, "activity.exited", "Đã dừng")}</option>
         </select>
         <input
           type="date"
@@ -36,7 +43,9 @@ export default async function Page({
           className="min-h-11 rounded-xl border px-3"
         />
         <input type="date" name="to" defaultValue={filters.to} className="min-h-11 rounded-xl border px-3" />
-        <button className="rounded-xl bg-[#e9641a] px-4 font-black text-white">Lọc hoạt động</button>
+        <Button type="submit" className="min-h-11 rounded-xl px-4 py-2">
+          {contentText(content, "activity.filter", "Lọc hoạt động")}
+        </Button>
       </form>
       <div className="mt-5 space-y-3">
         {items.map((item) => (
@@ -53,23 +62,36 @@ export default async function Page({
               <p className="text-sm text-[#806d54]">{new Date(item.startedAt).toLocaleString("vi-VN")}</p>
               <div className="mt-2 flex flex-wrap gap-2">
                 <Pill>
-                  {item.correctCount}/{item.totalQuestions} câu
+                  {contentTemplate(content, "activity.questions", "{correct}/{total} câu", {
+                    correct: item.correctCount,
+                    total: item.totalQuestions,
+                  })}
                 </Pill>
-                <Pill>{item.hints} gợi ý</Pill>
-                <Pill>{item.retries} lần thử lại</Pill>
+                <Pill>
+                  {contentTemplate(content, "activity.hints", "{count} gợi ý", { count: item.hints })}
+                </Pill>
+                <Pill>
+                  {contentTemplate(content, "activity.retries", "{count} lần thử lại", {
+                    count: item.retries,
+                  })}
+                </Pill>
               </div>
             </div>
             <Pill>
               {item.status === "completed"
-                ? "Hoàn thành"
+                ? contentText(content, "activity.completed", "Hoàn thành")
                 : item.status === "in_progress"
-                  ? "Đang tiếp tục"
-                  : "Đã dừng"}
+                  ? contentText(content, "activity.inProgress", "Đang tiếp tục")
+                  : contentText(content, "activity.exited", "Đã dừng")}
             </Pill>
           </Card>
         ))}
-        {!items.length ? <Card className="p-8 text-center">Không có hoạt động phù hợp bộ lọc.</Card> : null}
+        {!items.length ? (
+          <Card className="p-8 text-center">
+            {contentText(content, "activity.empty", "Không có hoạt động phù hợp bộ lọc.")}
+          </Card>
+        ) : null}
       </div>
-    </ParentShell>
+    </>
   );
 }

@@ -1,89 +1,64 @@
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useMutation } from "@tanstack/react-query";
-import { useRouter } from "next/navigation";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import Image from "next/image";
+import { useRouter } from "next/navigation";
 import { useForm, useWatch } from "react-hook-form";
 import { toast } from "sonner";
-import { createChildProfileSchema, type CreateChildProfileInput } from "@/domain/schemas";
-import { requestJson } from "@/lib/http";
-import { Button, Card } from "@/components/ui";
+import { childrenApi } from "@/api/children";
+import { FormStatus, SubmitButton, TextField } from "@/components/form";
+import { Card } from "@/components/ui";
 import { contentText, useContent } from "@/content/client";
-
-const ageOptions = [
-  { id: "2-3", title: "2–3 tuổi", note: "Nhận biết và ghép đôi" },
-  { id: "4-5", title: "4–5 tuổi", note: "Quy luật đơn giản" },
-  { id: "6-8", title: "6–8 tuổi", note: "Suy luận và so sánh" },
-] as const;
+import { createChildProfileSchema, type CreateChildProfileInput } from "@/domain/schemas";
+import { AgeGroupCardsField } from "@/features/profile/age-group-cards-field";
+import { getAgeGroupOptions } from "@/features/profile/age-group-options";
+import { queryKeys } from "@/lib/query/keys";
 
 export function CreateProfileForm() {
   const content = useContent("profile");
   const router = useRouter();
+  const queryClient = useQueryClient();
   const form = useForm<CreateChildProfileInput>({
     resolver: zodResolver(createChildProfileSchema),
     defaultValues: { displayName: "", ageGroup: "4-5" },
   });
   const selectedAgeGroup = useWatch({ control: form.control, name: "ageGroup" });
   const mutation = useMutation({
-    mutationFn: (input: CreateChildProfileInput) =>
-      requestJson<{ id: string; displayName: string }>("/api/children", {
-        method: "POST",
-        body: JSON.stringify(input),
-      }),
-    onSuccess(profile) {
-      toast.success(`Hồ sơ của ${profile.displayName} đã sẵn sàng!`);
+    mutationFn: childrenApi.create,
+    onSuccess: async (profile) => {
+      await queryClient.invalidateQueries({ queryKey: queryKeys.children.all });
+      toast.success(
+        `${profile.displayName}: ${contentText(content, "create.success", "Hồ sơ đã sẵn sàng!")}`,
+      );
       router.push("/profiles");
-    },
-    onError(error) {
-      toast.error(error.message);
+      router.refresh();
     },
   });
 
   return (
-    <form onSubmit={form.handleSubmit((values) => mutation.mutate(values))} className="space-y-5">
+    <form onSubmit={form.handleSubmit((values) => mutation.mutate(values))} className="space-y-5" noValidate>
       <Card className="p-5">
-        <label className="mb-2 block font-black" htmlFor="displayName">
-          Tên thân mật của bé
-        </label>
-        <p className="mb-3 text-sm text-[#806d54]">Không cần dùng tên thật đâu nhé.</p>
-        <input
-          id="displayName"
+        <TextField
+          label={contentText(content, "create.nameLabel", "Tên thân mật của bé")}
+          description={contentText(content, "create.nameDescription", "Không cần dùng tên thật đâu nhé.")}
           placeholder={contentText(content, "create.namePlaceholder", "Ví dụ: Bống, Mít...")}
           autoComplete="off"
-          className="min-h-14 w-full rounded-2xl border-2 border-[#eadfc9] bg-[#fffdf8] px-4 text-lg outline-none focus:border-[#e9641a]"
-          {...form.register("displayName")}
+          registration={form.register("displayName")}
+          error={form.formState.errors.displayName?.message}
+          className="min-h-14 text-lg"
         />
-        {form.formState.errors.displayName ? (
-          <p className="mt-2 text-sm font-bold text-red-700">{form.formState.errors.displayName.message}</p>
-        ) : null}
       </Card>
 
       <Card className="p-5">
-        <p className="font-black">Bé thuộc nhóm tuổi nào?</p>
-        <p className="mb-4 text-sm text-[#806d54]">Để Bống chọn nhiệm vụ vừa sức nhất.</p>
-        <div className="grid gap-3 sm:grid-cols-3">
-          {ageOptions.map((option) => {
-            const selected = selectedAgeGroup === option.id;
-            return (
-              <label
-                key={option.id}
-                className={`cursor-pointer rounded-2xl border-2 p-3 text-center transition ${selected ? "border-[#e9641a] bg-[#fff1de]" : "border-[#eadfc9] bg-white"}`}
-              >
-                <input type="radio" value={option.id} className="sr-only" {...form.register("ageGroup")} />
-                <Image
-                  src="/assets/mascots/mascot-detective-boy-standing.png"
-                  width={92}
-                  height={92}
-                  alt="Bé thám tử"
-                  className="mx-auto h-20 w-20 object-contain"
-                />
-                <strong className="block">{option.title}</strong>
-                <span className="text-xs text-[#806d54]">{option.note}</span>
-              </label>
-            );
-          })}
-        </div>
+        <AgeGroupCardsField
+          label={contentText(content, "create.ageLabel", "Bé thuộc nhóm tuổi nào?")}
+          description={contentText(content, "create.ageDescription", "Chọn nhiệm vụ vừa sức nhất.")}
+          options={getAgeGroupOptions(content)}
+          value={selectedAgeGroup}
+          registration={form.register("ageGroup")}
+          error={form.formState.errors.ageGroup?.message}
+        />
       </Card>
 
       <Card className="flex gap-3 bg-[#edf4df] p-4">
@@ -91,7 +66,7 @@ export function CreateProfileForm() {
           src="/assets/props/badge-privacy-shield-lock.png"
           width={58}
           height={58}
-          alt="Lá chắn riêng tư"
+          alt=""
           className="size-14 object-contain"
         />
         <div>
@@ -99,13 +74,17 @@ export function CreateProfileForm() {
             {contentText(content, "create.privacyTitle", "Chỉ thu thập điều thật sự cần")}
           </p>
           <p className="text-sm text-[#5b714c]">
-            Không email của bé, không ngày sinh đầy đủ, không quảng cáo và không mua hàng.
+            {contentText(content, "create.privacyDescription", "Không thu thập thông tin định danh của bé.")}
           </p>
         </div>
       </Card>
-      <Button type="submit" disabled={mutation.isPending} className="w-full">
-        {mutation.isPending ? "Đang tạo hồ sơ..." : "Bắt đầu chế độ bé  →"}
-      </Button>
+      <FormStatus status={mutation.isError ? "error" : "idle"} message={mutation.error?.message} />
+      <SubmitButton
+        pending={mutation.isPending}
+        pendingLabel={contentText(content, "create.submitting", "Đang tạo hồ sơ...")}
+      >
+        {contentText(content, "create.submit", "Bắt đầu chế độ bé →")}
+      </SubmitButton>
     </form>
   );
 }

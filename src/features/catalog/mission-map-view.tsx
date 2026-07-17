@@ -1,9 +1,11 @@
-import Image from "next/image";
-import Link from "next/link";
+import * as motion from "motion/react-client";
 import { CheckCircle2, LockKeyhole, Sparkles } from "lucide-react";
-import { Card, Pill } from "@/components/ui";
+import { Pill } from "@/components/ui";
+import { contentTemplate, contentText } from "@/content/resolve";
+import type { ContentDictionary } from "@/content/types";
+import { MissionCard } from "@/features/catalog/mission-card";
+import type { MissionMapData } from "@/features/catalog/mission-map-types";
 
-type MapData = Awaited<ReturnType<typeof import("@/modules/catalog/catalog").getMissionMap>>;
 const themes: Record<string, string> = {
   green: "border-[#8eb273] bg-[#f0f6e9]",
   blue: "border-[#77a7bc] bg-[#eaf5f8]",
@@ -11,88 +13,55 @@ const themes: Record<string, string> = {
   orange: "border-[#e6a35e] bg-[#fff0df]",
 };
 
-export function MissionMapView({ data }: { data: MapData }) {
+export function MissionMapView({ data, content }: { data: MissionMapData; content: ContentDictionary }) {
   return (
     <div className="space-y-7">
       {data.worlds.map((world, worldIndex) => (
-        <section key={world.id} className={`${!world.unlocked ? "opacity-70" : ""}`}>
-          <div className="mb-3 flex items-end justify-between">
+        <motion.section
+          key={world.id}
+          className={!world.unlocked ? "opacity-70" : undefined}
+          initial={{ opacity: 0, y: 18 }}
+          whileInView={{ opacity: world.unlocked ? 1 : 0.7, y: 0 }}
+          viewport={{ once: true, amount: 0.1 }}
+        >
+          <div className="mb-3 flex items-end justify-between gap-3">
             <div>
               <p className="text-xs font-black tracking-widest text-[#d17c14] uppercase">
-                Thế giới {world.order}
+                {contentTemplate(content, "mission.world", "Thế giới {order}", { order: world.order })}
               </p>
               <h2 className="text-2xl font-black">{world.title}</h2>
               <p className="text-sm text-[#806d54]">{world.subtitle}</p>
             </div>
             {world.completed ? (
-              <Pill className="bg-green-50 text-green-700">
+              <Pill className="shrink-0 bg-green-50 text-green-700">
                 <CheckCircle2 size={15} />
-                Đã khám phá
+                {contentText(content, "mission.completedWorld", "Đã khám phá")}
               </Pill>
             ) : world.unlocked ? (
-              <Pill>
+              <Pill className="shrink-0">
                 <Sparkles size={15} />
-                Đang mở
+                {contentText(content, "mission.openWorld", "Đang mở")}
               </Pill>
             ) : (
-              <Pill>
+              <Pill className="shrink-0">
                 <LockKeyhole size={15} />
-                Chưa mở
+                {contentText(content, "mission.lockedWorld", "Chưa mở")}
               </Pill>
             )}
           </div>
-          <div className="grid grid-cols-2 gap-3">
-            {world.missions.map((mission, missionIndex) => {
-              const card = (
-                <Card
-                  className={`relative overflow-hidden border-2 p-2 ${themes[world.theme] ?? themes.green} ${!mission.unlocked ? "grayscale-[.4]" : "transition hover:-translate-y-1"}`}
-                >
-                  <div className="relative h-36 overflow-hidden rounded-[20px]">
-                    <Image
-                      src={mission.coverUrl}
-                      fill
-                      alt={mission.title}
-                      className="object-cover"
-                      sizes="220px"
-                      priority={worldIndex === 0 && missionIndex < 3}
-                    />
-                    {mission.completed ? (
-                      <span className="absolute top-2 right-2 grid size-9 place-items-center rounded-full bg-white text-green-700">
-                        <CheckCircle2 size={20} />
-                      </span>
-                    ) : !mission.unlocked ? (
-                      <span className="absolute top-2 right-2 grid size-9 place-items-center rounded-full bg-white">
-                        <LockKeyhole size={18} />
-                      </span>
-                    ) : null}
-                  </div>
-                  <div className="p-2 text-center">
-                    <h3 className="leading-tight font-black">{mission.title}</h3>
-                    <p className="mt-1 text-xs text-[#6f604b]">
-                      {mission.estimatedMinutes} phút · Mức {mission.difficulty}
-                    </p>
-                    <span className="mt-2 inline-block rounded-full bg-white/80 px-2 py-1 text-[10px] font-black">
-                      {mission.completed
-                        ? "Chơi lại"
-                        : mission.recommended
-                          ? "Gợi ý hôm nay"
-                          : mission.unlocked
-                            ? "Bắt đầu"
-                            : "Hoàn thành nhiệm vụ trước"}
-                    </span>
-                  </div>
-                </Card>
-              );
-              return mission.unlocked ? (
-                <Link key={mission.id} href={`/missions/${mission.slug}`}>
-                  {card}
-                </Link>
-              ) : (
-                <div key={mission.id}>{card}</div>
-              );
-            })}
+          <div className="grid auto-rows-fr grid-cols-2 items-stretch gap-3">
+            {world.missions.map((mission, missionIndex) => (
+              <MissionCard
+                key={mission.id}
+                mission={mission}
+                themeClassName={themes[world.theme] ?? themes.green}
+                priority={worldIndex === 0 && missionIndex < 3}
+                index={missionIndex}
+                content={content}
+              />
+            ))}
           </div>
-        </section>
+        </motion.section>
       ))}
     </div>
   );
