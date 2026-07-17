@@ -26,6 +26,25 @@ test("admin uses plain-language navigation and a structured mission editor", asy
   await expect(page.getByPlaceholder("tham-tu-dau-chan")).toHaveValue("nhiem-vu-ux-de-hieu");
 });
 
+test("admin actions and protected pages match the signed-in role", async ({ page }) => {
+  await signIn(page, "content@demo.local", "/admin");
+  await expect(page.getByRole("link", { name: /bản nháp đang soạn/i })).toBeVisible();
+  await expect(page.getByRole("link", { name: "Duyệt nội dung" })).toHaveCount(0);
+  await page.goto("/admin/reviews");
+  await expect(page).toHaveURL(/\/auth\/error\?reason=forbidden/);
+
+  await clearAuth(page);
+  await signIn(page, "reviewer@demo.local", "/admin");
+  await expect(page.getByText("Người kiểm duyệt", { exact: true })).toBeVisible();
+  await expect(page.getByRole("link", { name: "Duyệt nội dung" })).toBeVisible();
+  await expect(page.getByRole("link", { name: "Tạo nhiệm vụ mới" })).toHaveCount(0);
+
+  await page.goto("/admin/missions");
+  await expect(page.getByRole("button", { name: "Nhân bản nhiệm vụ" })).toHaveCount(0);
+  await page.goto("/admin/missions/new");
+  await expect(page).toHaveURL(/\/auth\/error\?reason=forbidden/);
+});
+
 test("health endpoints report liveness and database readiness", async ({ page }) => {
   const live = await apiData<{ status: string; service: string }>(await page.request.get("/api/health/live"));
   expect(live).toEqual(expect.objectContaining({ status: "ok", service: "sln-gpt" }));
