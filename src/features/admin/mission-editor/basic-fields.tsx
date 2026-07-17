@@ -9,6 +9,17 @@ import type { AdminMissionDraft } from "@/modules/admin/schemas";
 
 const ageGroups = ["2-3", "4-5", "6-8"] as const;
 
+function createSlug(value: string) {
+  return value
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .replace(/đ/gi, "d")
+    .toLowerCase()
+    .trim()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "");
+}
+
 export function MissionBasicFields({ taxonomy }: { taxonomy: MissionEditorTaxonomy }) {
   const content = useContent("admin");
   const form = useFormContext<AdminMissionDraft>();
@@ -27,42 +38,46 @@ export function MissionBasicFields({ taxonomy }: { taxonomy: MissionEditorTaxono
   return (
     <Card className="rounded-2xl p-5 shadow-sm">
       <h2 className="text-xl font-black">
-        {contentText(content, "missionEditor.basicTitle", "1. Thông tin cơ bản")}
+        {contentText(content, "missionEditor.basicTitle", "1. Nội dung hiển thị")}
       </h2>
+      <p className="mt-1 text-sm text-[#6f6558]">
+        Nhập những gì trẻ và phụ huynh sẽ nhìn thấy khi chọn nhiệm vụ.
+      </p>
       <div className="mt-4 grid gap-4 md:grid-cols-2">
         <TextField
-          label={contentText(content, "missionEditor.title", "Tiêu đề")}
+          label={contentText(content, "missionEditor.title", "Tên nhiệm vụ")}
           placeholder="Ví dụ: Thám tử dấu chân"
-          registration={form.register("title")}
-          error={form.formState.errors.title?.message}
-        />
-        <TextField
-          label={contentText(content, "missionEditor.slug", "Slug")}
-          placeholder="tham-tu-dau-chan"
-          registration={form.register("slug", {
+          description="Tên ngắn, dễ hiểu và gợi cảm giác khám phá."
+          registration={form.register("title", {
             onChange: (event) => {
-              event.target.value = event.target.value.toLowerCase().replace(/[^a-z0-9-]/g, "-");
+              if (!form.formState.dirtyFields.slug) {
+                form.setValue("slug", createSlug(event.target.value), { shouldValidate: true });
+              }
             },
           })}
-          error={form.formState.errors.slug?.message}
+          error={form.formState.errors.title?.message}
+          containerClassName="md:col-span-2"
         />
         <TextField
-          label={contentText(content, "missionEditor.subtitle", "Phụ đề")}
-          placeholder="Một câu phụ đề ngắn gọn"
+          label={contentText(content, "missionEditor.subtitle", "Câu giới thiệu ngắn")}
+          placeholder="Ví dụ: Quan sát thật tinh"
+          description="Hiển thị ngay dưới tên nhiệm vụ."
           registration={form.register("subtitle")}
           error={form.formState.errors.subtitle?.message}
           containerClassName="md:col-span-2"
         />
         <TextField
-          label={contentText(content, "missionEditor.shortDescription", "Mô tả ngắn")}
-          placeholder="Mô tả ngắn hiển thị trên thẻ nhiệm vụ"
+          label={contentText(content, "missionEditor.shortDescription", "Mô tả trên thẻ nhiệm vụ")}
+          placeholder="Bé sẽ làm gì trong nhiệm vụ này?"
+          description="Viết một câu giúp phụ huynh và trẻ hiểu nhanh nội dung."
           registration={form.register("shortDescription")}
           error={form.formState.errors.shortDescription?.message}
           containerClassName="md:col-span-2"
         />
         <TextareaField
-          label={contentText(content, "missionEditor.storyIntro", "Câu chuyện dẫn dắt")}
-          placeholder="Câu chuyện dẫn dắt bé vào nhiệm vụ..."
+          label={contentText(content, "missionEditor.storyIntro", "Câu chuyện mở đầu")}
+          placeholder="Kể ngắn gọn tình huống để bé muốn bắt đầu khám phá..."
+          description="Dùng ngôn ngữ tích cực, đơn giản và phù hợp nhóm tuổi."
           rows={5}
           registration={form.register("storyIntro")}
           error={form.formState.errors.storyIntro?.message}
@@ -102,13 +117,6 @@ export function MissionBasicFields({ taxonomy }: { taxonomy: MissionEditorTaxono
           label={contentText(content, "missionEditor.difficulty", "Độ khó")}
           registration={form.register("difficulty", { valueAsNumber: true })}
           options={[1, 2, 3, 4, 5].map((value) => ({ value: String(value), label: `Mức ${value}` }))}
-        />
-        <TextField
-          label={contentText(content, "missionEditor.cover", "Ảnh bìa URL")}
-          placeholder="/assets/cards/mission-cover.png"
-          registration={form.register("coverUrl")}
-          error={form.formState.errors.coverUrl?.message}
-          containerClassName="md:col-span-2"
         />
       </div>
       <fieldset className="mt-4">
@@ -158,16 +166,41 @@ export function MissionBasicFields({ taxonomy }: { taxonomy: MissionEditorTaxono
         </div>
       </fieldset>
 
-      <div className="mt-4 flex flex-wrap gap-4">
-        <CheckboxField
-          label={contentText(content, "missionEditor.allowReplay", "Cho phép chơi lại")}
-          registration={form.register("allowReplay")}
-        />
-        <CheckboxField
-          label={contentText(content, "missionEditor.randomize", "Đảo đáp án khi chơi")}
-          registration={form.register("randomizeAnswers")}
-        />
-      </div>
+      <details className="mt-5 rounded-2xl border bg-[#fbf8f2] p-4">
+        <summary className="cursor-pointer font-black">Thiết lập nâng cao</summary>
+        <p className="mt-1 text-sm text-[#6f6558]">
+          Các mục này thường được hệ thống tự tạo. Chỉ thay đổi khi bạn hiểu rõ ảnh hưởng.
+        </p>
+        <div className="mt-4 grid gap-4 md:grid-cols-2">
+          <TextField
+            label={contentText(content, "missionEditor.slug", "Mã đường dẫn")}
+            placeholder="tham-tu-dau-chan"
+            description="Dùng trong đường dẫn nội bộ và không hiển thị cho trẻ."
+            registration={form.register("slug", {
+              onChange: (event) => {
+                event.target.value = event.target.value.toLowerCase().replace(/[^a-z0-9-]/g, "-");
+              },
+            })}
+            error={form.formState.errors.slug?.message}
+          />
+          <TextField
+            label={contentText(content, "missionEditor.cover", "Đường dẫn ảnh bìa")}
+            placeholder="/assets/cards/mission-cover.png"
+            registration={form.register("coverUrl")}
+            error={form.formState.errors.coverUrl?.message}
+          />
+        </div>
+        <div className="mt-4 flex flex-wrap gap-4">
+          <CheckboxField
+            label={contentText(content, "missionEditor.allowReplay", "Cho phép chơi lại")}
+            registration={form.register("allowReplay")}
+          />
+          <CheckboxField
+            label={contentText(content, "missionEditor.randomize", "Đổi thứ tự đáp án khi chơi")}
+            registration={form.register("randomizeAnswers")}
+          />
+        </div>
+      </details>
     </Card>
   );
 }

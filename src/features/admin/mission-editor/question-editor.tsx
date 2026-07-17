@@ -12,7 +12,7 @@ import {
 import { Card } from "@/components/ui";
 import { contentText, useContent } from "@/content/client";
 import { questionTypeLabelKeys, questionTypes } from "@/features/admin/mission-editor/constants";
-import { MissionJsonField } from "@/features/admin/mission-editor/json-field";
+import { QuestionConfigurationEditor } from "@/features/admin/mission-editor/question-configuration-editor";
 import type { QuestionType } from "@/features/admin/mission-editor/types";
 import type { AdminMissionDraft } from "@/modules/admin/schemas";
 
@@ -47,13 +47,6 @@ export function MissionQuestionEditor({
   const form = useFormContext<AdminMissionDraft>();
   const question = useWatch({ control: form.control, name: `questions.${index}` as const });
   const errors = form.formState.errors.questions?.[index];
-
-  function setQuestionValue(field: "payload" | "correctAnswer", value: unknown) {
-    form.setValue(`questions.${index}.${field}` as const, value as never, {
-      shouldDirty: true,
-      shouldValidate: true,
-    });
-  }
 
   function updateHints(text: string) {
     const hints = text
@@ -106,78 +99,72 @@ export function MissionQuestionEditor({
           <Trash2 size={16} />
         </button>
       </div>
-      <div className="mt-4 grid gap-4 md:grid-cols-2">
-        <ControlledSelectField
-          label={contentText(content, "missionEditor.questionType", "Loại câu hỏi")}
-          value={question.type}
-          onValueChange={(value) => onTypeChange(value as QuestionType)}
-          options={questionTypes.map((type) => ({
-            value: type,
-            label: contentText(content, questionTypeLabelKeys[type], typeFallbacks[type]),
-          }))}
-        />
-        <SelectField
-          label={contentText(content, "missionEditor.difficulty", "Độ khó")}
-          registration={form.register(`questions.${index}.difficulty` as const, { valueAsNumber: true })}
-          options={[1, 2, 3, 4, 5].map((value) => ({ value: String(value), label: `Mức ${value}` }))}
-        />
-        <TextField
-          label={contentText(content, "missionEditor.prompt", "Câu hỏi")}
-          placeholder="Ví dụ: Hình nào xuất hiện tiếp theo?"
-          registration={form.register(`questions.${index}.prompt` as const)}
-          error={errors?.prompt?.message}
-          containerClassName="md:col-span-2"
-        />
-        <TextField
-          label={contentText(content, "missionEditor.instruction", "Hướng dẫn")}
-          placeholder="Hướng dẫn ngắn, rõ và phù hợp độ tuổi"
-          registration={form.register(`questions.${index}.instruction` as const)}
-          error={errors?.instruction?.message}
-          containerClassName="md:col-span-2"
-        />
-        <div className="md:col-span-2">
-          <MissionJsonField
-            key={`payload-${question.type}`}
-            label={contentText(content, "missionEditor.payload", "Payload JSON")}
-            rows={8}
-            value={question.payload}
-            placeholder='{"options":[{"id":"a","label":"Lựa chọn A"}]}'
-            onValidChange={(value) => setQuestionValue("payload", value)}
+      {active ? (
+        <div className="mt-4 grid gap-4 md:grid-cols-2">
+          <ControlledSelectField
+            label={contentText(content, "missionEditor.questionType", "Loại câu hỏi")}
+            value={question.type}
+            onValueChange={(value) => onTypeChange(value as QuestionType)}
+            options={questionTypes.map((type) => ({
+              value: type,
+              label: contentText(content, questionTypeLabelKeys[type], typeFallbacks[type]),
+            }))}
           />
-        </div>
-        <div className="md:col-span-2">
-          <MissionJsonField
-            key={`answer-${question.type}`}
-            label={contentText(content, "missionEditor.answer", "Đáp án đúng JSON")}
+          <SelectField
+            label={contentText(content, "missionEditor.difficulty", "Độ khó")}
+            registration={form.register(`questions.${index}.difficulty` as const, { valueAsNumber: true })}
+            options={[1, 2, 3, 4, 5].map((value) => ({ value: String(value), label: `Mức ${value}` }))}
+          />
+          <TextField
+            label={contentText(content, "missionEditor.prompt", "Câu hỏi")}
+            placeholder="Ví dụ: Hình nào xuất hiện tiếp theo?"
+            registration={form.register(`questions.${index}.prompt` as const)}
+            error={errors?.prompt?.message}
+            containerClassName="md:col-span-2"
+          />
+          <TextField
+            label={contentText(content, "missionEditor.instruction", "Hướng dẫn")}
+            placeholder="Hướng dẫn ngắn, rõ và phù hợp độ tuổi"
+            registration={form.register(`questions.${index}.instruction` as const)}
+            error={errors?.instruction?.message}
+            containerClassName="md:col-span-2"
+          />
+          <div className="md:col-span-2">
+            <QuestionConfigurationEditor key={question.type} index={index} />
+          </div>
+          <ControlledTextareaField
+            label={contentText(content, "missionEditor.hints", "Gợi ý, mỗi dòng là một cấp")}
             rows={4}
-            value={question.correctAnswer}
-            placeholder='"a" hoặc ["a","b"]'
-            onValidChange={(value) => setQuestionValue("correctAnswer", value)}
+            value={question.hints.map((hint) => hint.text).join("\n")}
+            onValueChange={updateHints}
+            error={errors?.hints?.message}
+            containerClassName="md:col-span-2"
+          />
+          <TextareaField
+            label={contentText(content, "missionEditor.correctFeedback", "Phản hồi đúng")}
+            rows={3}
+            placeholder="Phản hồi tích cực khi bé trả lời đúng"
+            registration={form.register(`questions.${index}.feedbackCorrect` as const)}
+            error={errors?.feedbackCorrect?.message}
+          />
+          <TextareaField
+            label={contentText(content, "missionEditor.incorrectFeedback", "Phản hồi chưa đúng")}
+            rows={3}
+            placeholder="Khuyến khích bé thử lại, không tạo áp lực"
+            registration={form.register(`questions.${index}.feedbackIncorrect` as const)}
+            error={errors?.feedbackIncorrect?.message}
           />
         </div>
-        <ControlledTextareaField
-          label={contentText(content, "missionEditor.hints", "Gợi ý, mỗi dòng là một cấp")}
-          rows={4}
-          value={question.hints.map((hint) => hint.text).join("\n")}
-          onValueChange={updateHints}
-          error={errors?.hints?.message}
-          containerClassName="md:col-span-2"
-        />
-        <TextareaField
-          label={contentText(content, "missionEditor.correctFeedback", "Phản hồi đúng")}
-          rows={3}
-          placeholder="Phản hồi tích cực khi bé trả lời đúng"
-          registration={form.register(`questions.${index}.feedbackCorrect` as const)}
-          error={errors?.feedbackCorrect?.message}
-        />
-        <TextareaField
-          label={contentText(content, "missionEditor.incorrectFeedback", "Phản hồi chưa đúng")}
-          rows={3}
-          placeholder="Khuyến khích bé thử lại, không tạo áp lực"
-          registration={form.register(`questions.${index}.feedbackIncorrect` as const)}
-          error={errors?.feedbackIncorrect?.message}
-        />
-      </div>
+      ) : (
+        <button
+          type="button"
+          onClick={onActivate}
+          className="mt-3 w-full rounded-xl bg-[#f7f3eb] p-3 text-left text-sm text-[#6f6558]"
+        >
+          <strong className="block text-[#342f28]">{question.prompt}</strong>
+          Chọn để mở và chỉnh sửa câu hỏi này.
+        </button>
+      )}
     </Card>
   );
 }

@@ -5,9 +5,9 @@ import type { AdminMissionDraft } from "@/modules/admin/schemas";
 export default async function Page() {
   const taxonomy = await getAdminTaxonomy();
   const initial: AdminMissionDraft = {
-    slug: "mission-moi",
+    slug: "",
     worldId: taxonomy.worlds[0].id,
-    title: "Nhiệm vụ mới",
+    title: "",
     subtitle: "Một chuyến khám phá ngắn và tích cực",
     shortDescription: "Mô tả ngắn mục tiêu của nhiệm vụ dành cho trẻ.",
     storyIntro:

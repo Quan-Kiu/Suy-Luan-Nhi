@@ -22,9 +22,7 @@ export function ReviewPublishActions({ missionId, versionId }: { missionId: stri
   const publishMutation = useMutation({
     mutationFn: () => reviewsApi.publish(missionId, versionId),
     onSuccess: () => {
-      toast.success(
-        contentText(content, "review.publishSuccess", "Phiên bản đã được xuất bản cho Child App"),
-      );
+      toast.success(contentText(content, "review.publishSuccess", "Nhiệm vụ đã được hiển thị cho trẻ"));
       router.refresh();
     },
   });

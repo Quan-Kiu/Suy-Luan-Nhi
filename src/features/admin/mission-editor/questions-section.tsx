@@ -48,10 +48,16 @@ export function MissionQuestionsSection({
 
   return (
     <section className="space-y-4">
-      <div className="flex items-center justify-between gap-3">
-        <h2 className="text-xl font-black">
-          {contentText(content, "missionEditor.questionsTitle", "2. Câu hỏi")} ({fieldArray.fields.length})
-        </h2>
+      <div className="flex flex-wrap items-end justify-between gap-3">
+        <div>
+          <h2 className="text-xl font-black">
+            {contentText(content, "missionEditor.questionsTitle", "2. Câu hỏi trong nhiệm vụ")} (
+            {fieldArray.fields.length})
+          </h2>
+          <p className="mt-1 text-sm text-[#6f6558]">
+            Chọn loại câu hỏi, nhập nội dung và đánh dấu đáp án đúng bằng các trường bên dưới.
+          </p>
+        </div>
         <button
           type="button"
           onClick={() => {

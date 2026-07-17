@@ -1,6 +1,11 @@
 import { eq } from "drizzle-orm";
+import { ArrowLeft, ClipboardCheck } from "lucide-react";
+import Link from "next/link";
 import { notFound } from "next/navigation";
+import { friendlyLabel, questionTypeLabels, safetyChecklistLabels } from "@/features/admin/admin-labels";
+import { AdminPageHeader } from "@/features/admin/admin-page-header";
 import { AdminQuestionPreview } from "@/features/admin/admin-question-preview";
+import { MissionStatusBadge } from "@/features/admin/mission-status-badge";
 import { ReviewActions } from "@/features/admin/review-actions";
 import { Card, Pill } from "@/components/ui";
 import { db } from "@/db/client";
@@ -19,15 +24,20 @@ export default async function Page({ params }: { params: Promise<{ versionId: st
   if (!result) notFound();
   const snapshot = parseMissionSnapshot(result.version.snapshot);
   return (
-    <div>
-      <div className="flex flex-wrap items-end justify-between gap-3">
-        <div>
-          <p className="text-sm text-[#806d54]">Review version {result.version.versionNumber}</p>
-          <h1 className="text-3xl font-black">{snapshot.title}</h1>
-          <p className="mt-1 text-[#806d54]">{snapshot.subtitle}</p>
-        </div>
-        <Pill>{result.version.status}</Pill>
-      </div>
+    <div className="space-y-6">
+      <Link
+        href="/admin/reviews"
+        className="inline-flex items-center gap-2 text-sm font-black text-[#6f6558]"
+      >
+        <ArrowLeft size={17} /> Quay lại danh sách chờ duyệt
+      </Link>
+      <AdminPageHeader
+        eyebrow={`Kiểm duyệt · Lần gửi ${result.version.versionNumber}`}
+        title={snapshot.title}
+        description={`${snapshot.subtitle}. Xem lần lượt phần giới thiệu, từng câu hỏi và kiểm tra an toàn trước khi quyết định.`}
+        icon={ClipboardCheck}
+        actions={<MissionStatusBadge status={result.version.status} />}
+      />
       <div className="mt-6 grid gap-5 xl:grid-cols-[minmax(0,1fr)_360px]">
         <div className="space-y-5">
           <Card className="p-5">
@@ -45,7 +55,7 @@ export default async function Page({ params }: { params: Promise<{ versionId: st
           {snapshot.questions.map((question, index) => (
             <Card key={question.id} className="p-4">
               <p className="mb-3 text-xs font-black text-[#806d54]">
-                Câu {index + 1} · {question.type}
+                Câu {index + 1} · {friendlyLabel(questionTypeLabels, question.type)}
               </p>
               <AdminQuestionPreview question={question} />
               <div className="mt-4 grid gap-3 sm:grid-cols-2">
@@ -66,14 +76,17 @@ export default async function Page({ params }: { params: Promise<{ versionId: st
         </div>
         <aside className="space-y-4">
           <Card className="sticky top-20 p-5">
-            <h2 className="text-xl font-black">Safety Checklist</h2>
+            <h2 className="text-xl font-black">Kiểm tra trước khi quyết định</h2>
+            <p className="mt-1 text-sm leading-6 text-[#6f6558]">
+              Các mục bên dưới do người soạn tự xác nhận. Hãy đối chiếu lại với nội dung đang xem.
+            </p>
             <div className="mt-3 space-y-2">
               {Object.entries(snapshot.safetyChecklist).map(([key, passed]) => (
                 <div
                   key={key}
                   className={`rounded-xl p-3 text-sm font-bold ${passed ? "bg-green-50 text-green-800" : "bg-red-50 text-red-800"}`}
                 >
-                  {passed ? "✓" : "✕"} {key}
+                  {passed ? "✓" : "✕"} {friendlyLabel(safetyChecklistLabels, key)}
                 </div>
               ))}
             </div>

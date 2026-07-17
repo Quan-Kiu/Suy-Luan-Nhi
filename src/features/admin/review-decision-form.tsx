@@ -11,7 +11,7 @@ import { reviewsApi } from "@/api/admin/reviews";
 import { FormStatus, TextareaField } from "@/components/form";
 import { contentText, useContent } from "@/content/client";
 
-const schema = z.object({ comment: z.string().trim().min(4, "Reviewer cần ghi nhận xét ít nhất 4 ký tự") });
+const schema = z.object({ comment: z.string().trim().min(4, "Vui lòng ghi nhận xét ít nhất 4 ký tự") });
 type FormValues = z.infer<typeof schema>;
 type Action = "approve" | "reject";
 
@@ -39,7 +39,7 @@ export function ReviewDecisionForm({ missionId, versionId }: { missionId: string
   return (
     <form className="space-y-3" onSubmit={(event) => event.preventDefault()} noValidate>
       <TextareaField
-        label={contentText(content, "review.commentLabel", "Nhận xét reviewer")}
+        label={contentText(content, "review.commentLabel", "Nhận xét cho người soạn")}
         rows={5}
         placeholder={contentText(
           content,
@@ -59,7 +59,7 @@ export function ReviewDecisionForm({ missionId, versionId }: { missionId: string
           <CheckCircle2 size={18} />
           {mutation.isPending && mutation.variables.action === "approve"
             ? contentText(content, "review.approving", "Đang duyệt...")
-            : contentText(content, "review.approve", "Duyệt phiên bản")}
+            : contentText(content, "review.approve", "Nội dung đạt yêu cầu")}
         </button>
         <button
           type="button"

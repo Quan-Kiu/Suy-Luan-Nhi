@@ -29,7 +29,8 @@ export function MissionEditorPreview({ activeQuestion }: { activeQuestion: numbe
             <Image
               src={coverUrl || "/assets/cards/mission-thumb-footprint-detective.png"}
               fill
-              alt={contentText(content, "missionEditor.previewAlt", "Preview ảnh bìa")}
+              sizes="(min-width: 1280px) 360px, 100vw"
+              alt={contentText(content, "missionEditor.previewAlt", "Ảnh bìa nhiệm vụ")}
               className="object-cover"
             />
           </div>
@@ -42,23 +43,26 @@ export function MissionEditorPreview({ activeQuestion }: { activeQuestion: numbe
         </Card>
         <Card className="p-4">
           <p className="font-black">
-            {contentText(content, "missionEditor.previewRules", "Quy tắc xuất bản")}
+            {contentText(content, "missionEditor.previewRules", "Điều gì xảy ra sau khi soạn?")}
           </p>
-          <ul className="mt-2 space-y-2 text-sm text-[#746b60]">
+          <ol className="mt-3 space-y-3 text-sm text-[#746b60]">
             <li>
-              ✓{" "}
-              {contentText(content, "missionEditor.ruleDraft", "Draft không ghi đè phiên bản đang publish.")}
-            </li>
-            <li>✓ {contentText(content, "missionEditor.ruleSnapshot", "Submit tạo snapshot bất biến.")}</li>
-            <li>
-              ✓{" "}
-              {contentText(content, "missionEditor.ruleReview", "Reviewer duyệt hoặc trả lại với nhận xét.")}
+              <strong className="text-[#342f28]">1. Lưu bản nháp:</strong> Bạn có thể quay lại chỉnh sửa bất
+              cứ lúc nào.
             </li>
             <li>
-              ✓{" "}
-              {contentText(content, "missionEditor.rulePublish", "Chỉ phiên bản approved mới được publish.")}
+              <strong className="text-[#342f28]">2. Gửi kiểm duyệt:</strong> Một người khác sẽ kiểm tra nội
+              dung và an toàn.
             </li>
-          </ul>
+            <li>
+              <strong className="text-[#342f28]">3. Chỉnh sửa nếu cần:</strong> Nhận xét sẽ nêu rõ phần cần
+              thay đổi.
+            </li>
+            <li>
+              <strong className="text-[#342f28]">4. Hiển thị cho trẻ:</strong> Chỉ nội dung đã được duyệt mới
+              được xuất bản.
+            </li>
+          </ol>
         </Card>
       </div>
     </aside>
