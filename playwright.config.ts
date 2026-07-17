@@ -4,8 +4,8 @@ const databaseUrl = process.env.E2E_DATABASE_URL ?? "postgresql://sln@127.0.0.1:
 const baseURL = "http://127.0.0.1:3100";
 const production = process.env.E2E_SERVER_MODE === "production";
 const serverCommand = production
-  ? "rm -rf .next/standalone/public .next/standalone/.next/static && cp -R public .next/standalone/public && mkdir -p .next/standalone/.next && cp -R .next/static .next/standalone/.next/static && cd .next/standalone && HOSTNAME=127.0.0.1 PORT=3100 node server.js"
-  : "npm run dev -- --hostname 127.0.0.1 --port 3100";
+  ? "rm -rf .next/standalone/public .next/standalone/.next/static .next/standalone/.next/cache && cp -R public .next/standalone/public && mkdir -p .next/standalone/.next && cp -R .next/static .next/standalone/.next/static && cd .next/standalone && HOSTNAME=127.0.0.1 PORT=3100 node server.js"
+  : "rm -rf .next/dev/cache/fetch-cache .next/cache/fetch-cache && npm run dev -- --hostname 127.0.0.1 --port 3100";
 const environment = [
   `DATABASE_URL='${databaseUrl}'`,
   `E2E_DATABASE_URL='${databaseUrl}'`,

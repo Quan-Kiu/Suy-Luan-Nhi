@@ -50,6 +50,14 @@ test("content admin can override UI copy from the database", async ({ page }) =>
   await row.getByRole("button", { name: "Lưu nội dung" }).click();
   await expect(page.getByText("Đã lưu auth.signIn.emailPlaceholder")).toBeVisible();
 
+  const dashboardTitleRow = page.locator("article").filter({ hasText: "dashboard.title" });
+  await expect(dashboardTitleRow).toBeVisible();
+  await dashboardTitleRow.locator("textarea").fill('"Bảng điều hành E2E"');
+  await dashboardTitleRow.getByRole("button", { name: "Lưu nội dung" }).click();
+  await expect(page.getByText("Đã lưu admin.dashboard.title")).toBeVisible();
+  await page.goto("/admin");
+  await expect(page.getByRole("heading", { name: "Bảng điều hành E2E" })).toBeVisible();
+
   await page.context().clearCookies();
   await page.goto("/auth/sign-in");
   await expect(page.getByLabel("Email")).toHaveAttribute("placeholder", "email-e2e@example.com");

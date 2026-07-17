@@ -49,7 +49,9 @@ test("content admin creates taxonomy and world content through the CMS", async (
   await newWorld.getByPlaceholder("Mô tả").fill("Thế giới được tạo từ browser test thực tế.");
   await newWorld.getByRole("button", { name: "Tạo thế giới" }).click();
   await expect(page.getByText("Đã tạo Mission World")).toBeVisible();
-  await expect(page.locator('input[value="Thế giới E2E"]')).toBeVisible();
+  await expect(
+    page.getByRole("article", { name: "Mission World: Thế giới E2E" }).getByPlaceholder("Tiêu đề"),
+  ).toHaveValue("Thế giới E2E");
 
   await page.goto("/admin/taxonomy");
   const newSkill = page.getByRole("region", { name: "Tạo kỹ năng mới" });
@@ -59,7 +61,9 @@ test("content admin creates taxonomy and world content through the CMS", async (
   await newSkill.getByPlaceholder("category").fill("thinking");
   await newSkill.getByRole("button", { name: "Tạo" }).click();
   await expect(page.getByText("Đã tạo kỹ năng")).toBeVisible();
-  await expect(page.locator('input[value="Tư duy E2E"]')).toBeVisible();
+  await expect(
+    page.getByRole("article", { name: "Kỹ năng: Tư duy E2E" }).getByPlaceholder("Tên kỹ năng"),
+  ).toHaveValue("Tư duy E2E");
 });
 test("media follows upload, reviewer approval and owner deletion permissions", async ({ page }) => {
   await signIn(page, "content@demo.local", "/admin/media");

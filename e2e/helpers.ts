@@ -37,12 +37,18 @@ export async function selectChild(page: Page, childId: string) {
 
 export async function unlockParentGate(page: Page, answer = "23") {
   await page.goto("/parent");
+  const dashboard = page.getByRole("heading", { name: /Tuần của/i });
   const input = page.getByLabel(/Kết quả phép tính|PIN phụ huynh/);
-  if (await input.isVisible()) {
+  const gateVisible = await input
+    .waitFor({ state: "visible", timeout: 5_000 })
+    .then(() => true)
+    .catch(() => false);
+
+  if (gateVisible) {
     await input.fill(answer);
     await page.getByRole("button", { name: /Mở khu vực phụ huynh/i }).click();
   }
-  await expect(page.getByRole("heading", { name: /Tuần của/i })).toBeVisible();
+  await expect(dashboard).toBeVisible();
 }
 
 export async function clearAuth(page: Page) {
