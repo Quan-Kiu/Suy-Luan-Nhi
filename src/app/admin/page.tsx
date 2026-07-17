@@ -1,90 +1,160 @@
+import { ArrowRight, ClipboardCheck, FilePlus2, ImageIcon, MonitorDot, Users } from "lucide-react";
 import Link from "next/link";
-import { ClipboardCheck, FileText, ImageIcon, MonitorDot, Users } from "lucide-react";
 import { Card, Pill } from "@/components/ui";
 import { contentText } from "@/content/resolve";
+import {
+  auditActionLabels,
+  friendlyLabel,
+  missionStatusLabels,
+  resourceTypeLabels,
+} from "@/features/admin/admin-labels";
+import { AdminPageHeader } from "@/features/admin/admin-page-header";
 import { getAdminDashboard } from "@/modules/admin/operations";
 import { getContentNamespace } from "@/modules/content/content";
 
 export default async function Page() {
   const [data, content] = await Promise.all([getAdminDashboard(), getContentNamespace("admin")]);
   const t = (key: string, fallback: string) => contentText(content, key, fallback);
-  const cards = [
-    { label: t("dashboard.accounts", "Tài khoản"), value: data.users, icon: Users, href: "/admin/members" },
-    { label: t("dashboard.children", "Hồ sơ bé"), value: data.children, icon: Users, href: "/admin/reports" },
+  const publishedCount = data.missionCounts.published ?? 0;
+  const draftCount = data.missionCounts.draft ?? 0;
+  const urgentTasks = [
     {
-      label: t("dashboard.sessions30d", "Phiên chơi 30 ngày"),
-      value: data.sessions30d,
-      icon: MonitorDot,
-      href: "/admin/reports",
+      title: t("dashboard.createMission", "Tạo nhiệm vụ mới"),
+      description: t("dashboard.createMissionDescription", "Bắt đầu từ mẫu và xem trước ngay khi soạn."),
+      href: "/admin/missions/new",
+      icon: FilePlus2,
     },
     {
-      label: t("dashboard.pendingReviews", "Chờ duyệt"),
-      value: data.pendingReviews,
-      icon: ClipboardCheck,
+      title: `${data.pendingReviews} ${t("dashboard.reviewTasks", "nhiệm vụ chờ duyệt")}`,
+      description: t("dashboard.reviewTasksDescription", "Kiểm tra nội dung trước khi hiển thị cho trẻ."),
       href: "/admin/reviews",
+      icon: ClipboardCheck,
     },
     {
-      label: t("dashboard.pendingMedia", "Media chờ duyệt"),
-      value: data.pendingMedia,
-      icon: ImageIcon,
+      title: `${data.pendingMedia} ${t("dashboard.mediaTasks", "tư liệu cần kiểm tra")}`,
+      description: t("dashboard.mediaTasksDescription", "Xác nhận hình ảnh và âm thanh phù hợp."),
       href: "/admin/media",
+      icon: ImageIcon,
     },
   ];
+
+  const metrics = [
+    { label: "Nhiệm vụ đang hiển thị", value: publishedCount, icon: ClipboardCheck },
+    { label: "Bản nháp đang soạn", value: draftCount, icon: FilePlus2 },
+    { label: "Phiên chơi trong 30 ngày", value: data.sessions30d, icon: MonitorDot },
+    { label: "Hồ sơ bé đang hoạt động", value: data.children, icon: Users },
+  ];
   return (
-    <div>
-      <div>
-        <p className="text-sm text-[#806d54]">{t("dashboard.eyebrow", "Operational overview")}</p>
-        <h1 className="text-3xl font-black">{t("dashboard.title", "Tổng quan hệ thống")}</h1>
-      </div>
-      <div className="mt-5 grid gap-4 sm:grid-cols-2 xl:grid-cols-5">
-        {cards.map(({ label, value, icon: Icon, href }) => (
-          <Link key={label} href={href}>
-            <Card className="h-full p-4 transition hover:-translate-y-1">
-              <Icon className="text-[#e9641a]" />
+    <div className="space-y-7">
+      <AdminPageHeader
+        eyebrow={t("dashboard.eyebrow", "Trung tâm công việc")}
+        title={t("dashboard.title", "Hôm nay cần làm gì?")}
+        description={t(
+          "dashboard.description",
+          "Bắt đầu từ các việc quan trọng, theo dõi nội dung đang soạn và kiểm tra những thay đổi gần đây.",
+        )}
+      />
+
+      <section aria-labelledby="admin-priority-title">
+        <h2 id="admin-priority-title" className="text-xl font-black">
+          {t("dashboard.priorityTitle", "Việc ưu tiên")}
+        </h2>
+        <div className="mt-3 grid gap-4 lg:grid-cols-3">
+          {urgentTasks.map(({ title, description, href, icon: Icon }) => (
+            <Link key={href} href={href} className="group">
+              <Card className="flex h-full items-start gap-4 p-5 transition group-hover:-translate-y-0.5 group-hover:shadow-lg">
+                <span className="grid size-11 shrink-0 place-items-center rounded-2xl bg-[#fff0df] text-[#d95812]">
+                  <Icon size={21} />
+                </span>
+                <span className="min-w-0 flex-1">
+                  <strong className="block text-lg">{title}</strong>
+                  <span className="mt-1 block text-sm leading-6 text-[#6f6558]">{description}</span>
+                </span>
+                <ArrowRight size={18} className="mt-1 shrink-0 transition group-hover:translate-x-1" />
+              </Card>
+            </Link>
+          ))}
+        </div>
+      </section>
+      <section aria-labelledby="admin-summary-title">
+        <h2 id="admin-summary-title" className="text-xl font-black">
+          {t("dashboard.summaryTitle", "Tình hình chung")}
+        </h2>
+        <div className="mt-3 grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+          {metrics.map(({ label, value, icon: Icon }) => (
+            <Card key={label} className="p-4">
+              <Icon size={20} className="text-[#e9641a]" />
               <p className="mt-3 text-3xl font-black">{value}</p>
-              <p className="text-xs font-bold text-[#806d54]">{label}</p>
+              <p className="mt-1 text-sm font-bold text-[#6f6558]">{label}</p>
             </Card>
-          </Link>
-        ))}
-      </div>
-      <div className="mt-6 grid gap-5 lg:grid-cols-[1fr_.75fr]">
+          ))}
+        </div>
+      </section>
+
+      <div className="grid gap-5 xl:grid-cols-[1fr_.85fr]">
         <Card className="p-5">
-          <div className="flex items-center justify-between">
-            <h2 className="text-xl font-black">{t("dashboard.contentStatus", "Trạng thái nội dung")}</h2>
-            <Link href="/admin/missions" className="text-sm font-bold underline">
-              {t("dashboard.openCms", "Mở CMS")}
+          <div className="flex flex-wrap items-center justify-between gap-3">
+            <div>
+              <h2 className="text-xl font-black">{t("dashboard.contentStatus", "Tiến độ nội dung")}</h2>
+              <p className="mt-1 text-sm text-[#6f6558]">Theo dõi nhiệm vụ từ lúc soạn đến khi hiển thị.</p>
+            </div>
+            <Link
+              href="/admin/missions"
+              className="inline-flex items-center gap-1 text-sm font-black text-[#d95812]"
+            >
+              {t("dashboard.openCms", "Xem tất cả nhiệm vụ")}
+              <ArrowRight size={16} />
             </Link>
           </div>
-          <div className="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-3">
+          <div className="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
             {Object.entries(data.missionCounts).map(([status, count]) => (
-              <div key={status} className="rounded-xl bg-[#f7f3eb] p-3 text-center">
+              <Link
+                key={status}
+                href={`/admin/missions?status=${status}`}
+                className="rounded-2xl border bg-[#fbf8f2] p-4 transition hover:border-[#e5b98f]"
+              >
                 <p className="text-2xl font-black">{count}</p>
-                <p className="text-xs font-bold">{status}</p>
-              </div>
+                <p className="mt-1 text-sm font-bold">{friendlyLabel(missionStatusLabels, status)}</p>
+              </Link>
             ))}
           </div>
           {!Object.keys(data.missionCounts).length ? (
-            <p className="mt-4 text-sm">{t("dashboard.emptyMissions", "Chưa có dữ liệu nhiệm vụ.")}</p>
+            <p className="mt-4 text-sm text-[#6f6558]">
+              {t("dashboard.emptyMissions", "Chưa có nhiệm vụ nào.")}
+            </p>
           ) : null}
         </Card>
+
         <Card className="p-5">
-          <div className="flex items-center gap-2">
-            <FileText size={20} />
-            <h2 className="text-xl font-black">{t("dashboard.recentAudit", "Audit gần đây")}</h2>
+          <div className="flex items-center justify-between gap-3">
+            <div>
+              <h2 className="text-xl font-black">{t("dashboard.recentAudit", "Thay đổi gần đây")}</h2>
+              <p className="mt-1 text-sm text-[#6f6558]">Các thao tác mới nhất trong khu vực quản trị.</p>
+            </div>
+            <Pill>{data.users} tài khoản</Pill>
           </div>
           <div className="mt-4 space-y-3">
-            {data.recentAudit.map((item) => (
+            {data.recentAudit.slice(0, 5).map((item) => (
               <div key={item.id} className="rounded-xl border p-3">
-                <div className="flex justify-between gap-2">
-                  <strong className="text-sm">{item.action}</strong>
-                  <Pill>{item.resourceType}</Pill>
+                <div className="flex flex-wrap items-center justify-between gap-2">
+                  <strong className="text-sm">{friendlyLabel(auditActionLabels, item.action)}</strong>
+                  <Pill>{friendlyLabel(resourceTypeLabels, item.resourceType)}</Pill>
                 </div>
                 <p className="mt-1 text-xs text-[#806d54]">{item.createdAt.toLocaleString("vi-VN")}</p>
               </div>
             ))}
+            {!data.recentAudit.length ? (
+              <p className="rounded-xl bg-[#f7f3eb] p-4 text-sm text-[#6f6558]">
+                Chưa có thay đổi nào được ghi nhận.
+              </p>
+            ) : null}
           </div>
-          <Link href="/admin/audit" className="mt-4 inline-block text-sm font-bold underline">
-            {t("dashboard.viewAudit", "Xem toàn bộ audit log")}
+          <Link
+            href="/admin/audit"
+            className="mt-4 inline-flex items-center gap-1 text-sm font-black text-[#d95812]"
+          >
+            {t("dashboard.viewAudit", "Xem nhật ký thay đổi")}
+            <ArrowRight size={16} />
           </Link>
         </Card>
       </div>

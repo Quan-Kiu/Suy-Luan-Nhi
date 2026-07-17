@@ -7,6 +7,21 @@ import type { ContentValue } from "@/content/types";
 import { ContentEntryForm, type ContentEntryItem } from "@/features/admin/content-entry-form";
 import { useHydrated } from "@/hooks/use-hydrated";
 
+const namespaceLabels: Record<string, string> = {
+  landing: "Trang giới thiệu",
+  auth: "Đăng nhập & tài khoản",
+  profile: "Hồ sơ của bé",
+  child: "Khu vực của bé",
+  game: "Nhiệm vụ & trò chơi",
+  parent: "Khu vực phụ huynh",
+  admin: "Khu vực quản trị",
+  system: "Thông báo dùng chung",
+};
+
+function namespaceLabel(namespace: string) {
+  return namespaceLabels[namespace] ?? "Nội dung khác";
+}
+
 export function ContentManager({ items, canEdit }: { items: ContentEntryItem[]; canEdit: boolean }) {
   const content = useContent("admin");
   const [query, setQuery] = useState("");
@@ -17,7 +32,9 @@ export function ContentManager({ items, canEdit }: { items: ContentEntryItem[]; 
     const needle = query.trim().toLocaleLowerCase("vi");
     if (!needle) return rows;
     return rows.filter((item) =>
-      `${item.namespace} ${item.key} ${item.description}`.toLocaleLowerCase("vi").includes(needle),
+      `${namespaceLabel(item.namespace)} ${item.namespace} ${item.key} ${item.description} ${JSON.stringify(item.value)}`
+        .toLocaleLowerCase("vi")
+        .includes(needle),
     );
   }, [query, rows]);
 
@@ -42,7 +59,7 @@ export function ContentManager({ items, canEdit }: { items: ContentEntryItem[]; 
           placeholder={contentText(
             content,
             "content.searchPlaceholder",
-            "Tìm namespace, key hoặc mô tả nội dung",
+            "Tìm theo trang, mô tả hoặc câu chữ đang hiển thị",
           )}
           className="min-h-11 w-full rounded-xl border bg-white py-2 pr-3 pl-10"
         />
@@ -55,15 +72,24 @@ export function ContentManager({ items, canEdit }: { items: ContentEntryItem[]; 
           >
             <div className="flex flex-wrap items-start justify-between gap-3">
               <div>
-                <p className="text-xs font-black tracking-wider text-[#d95812] uppercase">
-                  {row.namespace} · {row.locale}
+                <p className="text-sm font-black text-[#d95812]">{namespaceLabel(row.namespace)}</p>
+                <p className="mt-1 text-sm leading-6 text-[#6f6558]">
+                  Câu chữ được dùng trong {namespaceLabel(row.namespace).toLocaleLowerCase("vi")}.
                 </p>
-                <p className="mt-1 text-xs text-[#806d54]">{row.description}</p>
               </div>
               <span className="rounded-full bg-[#f5f2ec] px-3 py-1 text-xs font-black">
-                {row.source === "database" ? "DB override" : "Default"}
+                {row.source === "database" ? "Đã tùy chỉnh" : "Đang dùng mặc định"}
               </span>
             </div>
+            <details className="mt-3 rounded-xl bg-[#f7f3eb] p-3 text-xs text-[#6f6558]">
+              <summary className="cursor-pointer font-black text-[#342f28]">
+                Thông tin vị trí hiển thị
+              </summary>
+              <p className="mt-2">{row.description}</p>
+              <p className="mt-1 break-all">
+                Mã: {row.namespace}.{row.key} · Ngôn ngữ: {row.locale}
+              </p>
+            </details>
             <ContentEntryForm
               item={row}
               canEdit={canEdit}

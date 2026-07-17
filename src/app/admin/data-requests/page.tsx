@@ -1,5 +1,7 @@
 import { desc, eq } from "drizzle-orm";
+import { ShieldCheck } from "lucide-react";
 import { requireRoles } from "@/auth/session";
+import { AdminPageHeader } from "@/features/admin/admin-page-header";
 import { DataRequestManager } from "@/features/admin/data-request-manager";
 import { db } from "@/db/client";
 import { dataRequests, parentProfiles, user } from "@/db/schema";
@@ -21,11 +23,13 @@ export default async function Page() {
     .innerJoin(user, eq(parentProfiles.userId, user.id))
     .orderBy(desc(dataRequests.requestedAt));
   return (
-    <div>
-      <h1 className="text-3xl font-black">Data requests</h1>
-      <p className="mt-2 mb-5 text-[#806d54]">
-        Xuất dữ liệu được hoàn thành ngay; xóa dữ liệu cần super admin xác nhận và được audit.
-      </p>
+    <div className="space-y-6">
+      <AdminPageHeader
+        eyebrow="Quyền riêng tư gia đình"
+        title="Yêu cầu dữ liệu"
+        description="Theo dõi yêu cầu tải xuống hoặc xóa dữ liệu. Yêu cầu xóa cần quản trị viên xác nhận và mọi thao tác đều được ghi lại."
+        icon={ShieldCheck}
+      />
       <DataRequestManager items={items} />
     </div>
   );

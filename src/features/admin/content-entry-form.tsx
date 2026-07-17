@@ -9,7 +9,7 @@ import { contentApi } from "@/api/content";
 import { CheckboxField, FormStatus, SubmitButton, TextareaField } from "@/components/form";
 import { contentText, useContent } from "@/content/client";
 import type { ContentValue } from "@/content/types";
-import { parseJsonText, jsonTextSchema } from "@/lib/json-form";
+import { jsonTextSchema } from "@/lib/json-form";
 import { queryKeys } from "@/lib/query/keys";
 
 export type ContentEntryItem = {
@@ -21,9 +21,15 @@ export type ContentEntryItem = {
   active: boolean;
   source: "default" | "database";
 };
-const schema = z.object({ text: jsonTextSchema, active: z.boolean() });
+type FormValues = { text: string; active: boolean };
 
-type FormValues = z.infer<typeof schema>;
+function serializeContentValue(value: ContentValue) {
+  return typeof value === "string" ? value : JSON.stringify(value, null, 2);
+}
+
+function parseContentValue(text: string, original: ContentValue): ContentValue {
+  return typeof original === "string" ? text : (JSON.parse(text) as ContentValue);
+}
 
 export function ContentEntryForm({
   item,
@@ -38,13 +44,17 @@ export function ContentEntryForm({
 }) {
   const content = useContent("admin");
   const queryClient = useQueryClient();
+  const textSchema =
+    typeof item.value === "string"
+      ? z.string().trim().min(1, "Nội dung không được để trống")
+      : jsonTextSchema;
   const form = useForm<FormValues>({
-    resolver: zodResolver(schema),
-    defaultValues: { text: JSON.stringify(item.value, null, 2), active: item.active },
+    resolver: zodResolver(z.object({ text: textSchema, active: z.boolean() })),
+    defaultValues: { text: serializeContentValue(item.value), active: item.active },
   });
   const mutation = useMutation({
     mutationFn: ({ text, active }: FormValues) => {
-      const value = parseJsonText<ContentValue>(text);
+      const value = parseContentValue(text, item.value);
       return contentApi
         .update({
           namespace: item.namespace,
@@ -64,7 +74,7 @@ export function ContentEntryForm({
           queryKey: queryKeys.content.namespace(item.namespace, item.locale),
         }),
       ]);
-      toast.success(`Đã lưu ${item.namespace}.${item.key}`);
+      toast.success("Đã lưu nội dung hiển thị");
     },
   });
 
@@ -83,13 +93,22 @@ export function ContentEntryForm({
       noValidate
     >
       <TextareaField
-        label={`${item.namespace}.${item.key}`}
-        rows={6}
+        label="Nội dung hiển thị"
+        description={
+          typeof item.value === "string"
+            ? "Nhập câu chữ người dùng sẽ nhìn thấy."
+            : "Nội dung này có cấu trúc nâng cao; giữ nguyên dấu ngoặc và dấu phẩy."
+        }
+        rows={typeof item.value === "string" ? 4 : 6}
         disabled={!canEdit || !interactive}
-        placeholder={contentText(content, "content.valuePlaceholder", "Nhập chuỗi hoặc JSON hợp lệ")}
+        placeholder={contentText(content, "content.valuePlaceholder", "Nhập nội dung hiển thị")}
         registration={form.register("text")}
         error={form.formState.errors.text?.message}
-        className="font-mono text-sm disabled:bg-[#f7f3eb]"
+        className={
+          typeof item.value === "string"
+            ? "text-sm disabled:bg-[#f7f3eb]"
+            : "font-mono text-sm disabled:bg-[#f7f3eb]"
+        }
       />
       <CheckboxField
         label={contentText(content, "content.active", "Đang sử dụng")}

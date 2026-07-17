@@ -1,14 +1,21 @@
-import { requireStaff } from "@/auth/session";
+import { ImageIcon } from "lucide-react";
 import { hasRole } from "@/auth/roles";
+import { requireStaff } from "@/auth/session";
+import { AdminPageHeader } from "@/features/admin/admin-page-header";
 import { MediaLibrary } from "@/features/admin/media-library";
 import { listMedia } from "@/modules/media/media";
+
 export default async function Page() {
   const session = await requireStaff();
   const items = await listMedia();
   return (
-    <div>
-      <h1 className="text-3xl font-black">Thư viện media</h1>
-      <p className="mt-2 mb-5 text-[#806d54]">Quản lý ảnh và audio được phép dùng trong nội dung trẻ em.</p>
+    <div className="space-y-6">
+      <AdminPageHeader
+        eyebrow="Tư liệu dùng trong nhiệm vụ"
+        title="Hình ảnh & âm thanh"
+        description="Tải lên, xem lại và xác nhận tư liệu phù hợp trước khi dùng trong nội dung dành cho trẻ."
+        icon={ImageIcon}
+      />
       <MediaLibrary
         items={items}
         canReview={hasRole(session.user.role, ["reviewer", "super_admin"])}

@@ -11,7 +11,7 @@ export function WorldManager({ initial }: { initial: WorldItem[] }) {
         {initial.map((item) => (
           <article
             key={item.id}
-            aria-label={`Mission World: ${item.title}`}
+            aria-label={`Thế giới nhiệm vụ: ${item.title}`}
             className="rounded-2xl border bg-white p-4"
           >
             <WorldForm mode="edit" initial={item} />
@@ -20,7 +20,7 @@ export function WorldManager({ initial }: { initial: WorldItem[] }) {
       </div>
       <article className="rounded-2xl border-2 border-dashed bg-white/70 p-5">
         <h2 className="text-xl font-black">
-          {contentText(content, "world.createTitle", "Tạo Mission World mới")}
+          {contentText(content, "world.createTitle", "Tạo thế giới nhiệm vụ mới")}
         </h2>
         <div className="mt-4">
           <WorldForm

@@ -12,9 +12,9 @@ import { contentText, useContent } from "@/content/client";
 const schema = z.object({
   file: z.custom<FileList>(
     (value) => value instanceof FileList && value.length === 1,
-    "Hãy chọn một tệp media",
+    "Hãy chọn một tệp hình ảnh hoặc âm thanh",
   ),
-  altText: z.string().trim().min(3, "Alt text cần ít nhất 3 ký tự"),
+  altText: z.string().trim().min(3, "Mô tả cần ít nhất 3 ký tự"),
 });
 
 type FormValues = z.infer<typeof schema>;
@@ -27,7 +27,7 @@ export function MediaUploadForm({ onUploaded }: { onUploaded: (item: MediaItem) 
     onSuccess: (item) => {
       onUploaded(item);
       form.reset();
-      toast.success(contentText(content, "media.uploadSuccess", "Đã tải media lên storage"));
+      toast.success(contentText(content, "media.uploadSuccess", "Đã tải tư liệu lên thư viện"));
     },
   });
 
@@ -37,13 +37,17 @@ export function MediaUploadForm({ onUploaded }: { onUploaded: (item: MediaItem) 
       onSubmit={form.handleSubmit((values) => mutation.mutate(values))}
       noValidate
     >
-      <h2 className="text-xl font-black">{contentText(content, "media.uploadTitle", "Tải media mới")}</h2>
+      <h2 className="text-xl font-black">{contentText(content, "media.uploadTitle", "Tải tư liệu mới")}</h2>
       <p className="mt-1 text-sm text-[#806d54]">
-        {contentText(content, "media.uploadDescription", "Alt text là bắt buộc.")}
+        {contentText(
+          content,
+          "media.uploadDescription",
+          "Hãy mô tả rõ hình ảnh hoặc âm thanh để hỗ trợ khả năng tiếp cận.",
+        )}
       </p>
       <div className="mt-4 grid gap-3 md:grid-cols-[1fr_1fr_auto] md:items-end">
         <label className="block font-bold">
-          Tệp media
+          Tệp hình ảnh hoặc âm thanh
           <input
             type="file"
             accept="image/png,image/jpeg,image/webp,image/gif,audio/mpeg,audio/wav,audio/ogg"
@@ -57,8 +61,8 @@ export function MediaUploadForm({ onUploaded }: { onUploaded: (item: MediaItem) 
           ) : null}
         </label>
         <TextField
-          label={contentText(content, "media.altLabel", "Mô tả hình ảnh hoặc audio")}
-          placeholder={contentText(content, "media.altPlaceholder", "Mô tả hình ảnh hoặc audio")}
+          label={contentText(content, "media.altLabel", "Mô tả nội dung tư liệu")}
+          placeholder={contentText(content, "media.altPlaceholder", "Mô tả hình ảnh hoặc âm thanh")}
           registration={form.register("altText")}
           error={form.formState.errors.altText?.message}
         />

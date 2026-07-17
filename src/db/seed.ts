@@ -1,5 +1,5 @@
 import "dotenv/config";
-import { and, eq } from "drizzle-orm";
+import { and, eq, isNull } from "drizzle-orm";
 import { auth } from "@/auth/auth";
 import { db, pool } from "@/db/client";
 import {
@@ -104,6 +104,17 @@ async function seedSystemContent() {
         description: entry.description,
       })
       .onConflictDoNothing();
+    await db
+      .update(contentEntries)
+      .set({ value: entry.value, description: entry.description, updatedAt: new Date() })
+      .where(
+        and(
+          eq(contentEntries.namespace, entry.namespace),
+          eq(contentEntries.key, entry.key),
+          eq(contentEntries.locale, entry.locale),
+          isNull(contentEntries.updatedBy),
+        ),
+      );
   }
 }
 

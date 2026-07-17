@@ -7,6 +7,19 @@ import { toast } from "sonner";
 import { dataRequestsApi } from "@/api/admin/data-requests";
 import { FormStatus } from "@/components/form";
 
+const typeLabels: Record<string, string> = {
+  export: "Tải xuống dữ liệu",
+  delete: "Xóa dữ liệu gia đình",
+};
+
+const statusLabels: Record<string, string> = {
+  pending: "Đang chờ xử lý",
+  processing: "Đang xử lý",
+  completed: "Đã hoàn thành",
+  failed: "Xử lý thất bại",
+  cancelled: "Đã hủy",
+};
+
 type RequestItem = {
   id: string;
   type: "export" | "delete";
@@ -45,12 +58,12 @@ export function DataRequestManager({ items }: { items: RequestItem[] }) {
               const pending = mutation.isPending && mutation.variables === item.id;
               return (
                 <tr key={item.id} className="border-t">
-                  <td className="p-3 font-black">{item.type}</td>
+                  <td className="p-3 font-black">{typeLabels[item.type] ?? item.type}</td>
                   <td className="p-3">
                     <strong className="block">{item.parentDisplayName}</strong>
                     <small>{item.userEmail}</small>
                   </td>
-                  <td className="p-3">{item.status}</td>
+                  <td className="p-3">{statusLabels[item.status] ?? item.status}</td>
                   <td className="p-3">{new Date(item.requestedAt).toLocaleString("vi-VN")}</td>
                   <td className="p-3">
                     {item.type === "delete" && item.status === "pending" ? (
@@ -60,7 +73,9 @@ export function DataRequestManager({ items }: { items: RequestItem[] }) {
                         aria-busy={pending}
                         onClick={() => {
                           if (
-                            window.confirm("Xử lý yêu cầu xóa: hồ sơ sẽ được anonymize và khóa đăng nhập?")
+                            window.confirm(
+                              "Xác nhận xóa dữ liệu gia đình? Hồ sơ của bé sẽ bị xóa và tài khoản sẽ không thể đăng nhập lại.",
+                            )
                           ) {
                             mutation.mutate(item.id);
                           }

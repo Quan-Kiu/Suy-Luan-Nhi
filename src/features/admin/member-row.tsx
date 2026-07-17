@@ -40,14 +40,14 @@ export function MemberRow({ item, currentUserId }: { item: MemberItem; currentUs
           disabled={isCurrentUser || mutation.isPending}
           defaultValue={item.role}
           onChange={(event) =>
-            mutation.mutate({ payload: { role: event.target.value }, successMessage: "Đã cập nhật role" })
+            mutation.mutate({ payload: { role: event.target.value }, successMessage: "Đã cập nhật vai trò" })
           }
           className="min-h-10 rounded-xl border px-3 disabled:opacity-50"
         >
-          <option value="parent">parent</option>
-          <option value="content_admin">content_admin</option>
-          <option value="reviewer">reviewer</option>
-          <option value="super_admin">super_admin</option>
+          <option value="parent">Phụ huynh</option>
+          <option value="content_admin">Biên tập nội dung</option>
+          <option value="reviewer">Người kiểm duyệt</option>
+          <option value="super_admin">Quản trị viên</option>
         </select>
       </td>
       <td className="p-3">

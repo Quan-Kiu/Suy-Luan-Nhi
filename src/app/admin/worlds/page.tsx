@@ -1,13 +1,20 @@
-import { WorldManager } from "@/features/admin/world-manager";
+import { asc } from "drizzle-orm";
+import { Layers3 } from "lucide-react";
 import { db } from "@/db/client";
 import { missionWorlds } from "@/db/schema";
-import { asc } from "drizzle-orm";
+import { AdminPageHeader } from "@/features/admin/admin-page-header";
+import { WorldManager } from "@/features/admin/world-manager";
+
 export default async function Page() {
   const items = await db.select().from(missionWorlds).orderBy(asc(missionWorlds.sortOrder));
   return (
-    <div>
-      <h1 className="text-3xl font-black">Mission Worlds</h1>
-      <p className="mt-2 mb-5 text-[#806d54]">Quản lý thứ tự, trạng thái, chủ đề và ảnh bìa các thế giới.</p>
+    <div className="space-y-6">
+      <AdminPageHeader
+        eyebrow="Cấu trúc nội dung"
+        title="Thế giới nhiệm vụ"
+        description="Sắp xếp các nhóm nhiệm vụ mà trẻ nhìn thấy trên bản đồ, đồng thời quản lý tên, hình bìa và trạng thái hiển thị."
+        icon={Layers3}
+      />
       <WorldManager initial={items} />
     </div>
   );

@@ -1,0 +1,19 @@
+import { parseRoles, type AppRole } from "@/auth/roles";
+
+const rolePriority: AppRole[] = ["super_admin", "reviewer", "content_admin", "parent"];
+
+const roleLabels: Record<AppRole, string> = {
+  parent: "Phụ huynh",
+  content_admin: "Biên tập nội dung",
+  reviewer: "Người kiểm duyệt",
+  super_admin: "Quản trị viên",
+};
+
+export function getPrimaryRole(value: unknown): AppRole {
+  const roles = parseRoles(value);
+  return rolePriority.find((role) => roles.includes(role)) ?? "content_admin";
+}
+
+export function getRoleLabel(value: unknown) {
+  return roleLabels[getPrimaryRole(value)];
+}

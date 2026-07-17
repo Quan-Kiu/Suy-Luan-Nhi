@@ -9,6 +9,12 @@ import { contentText, useContent } from "@/content/client";
 
 type Action = "approve" | "reject" | "delete";
 
+const safetyStatusLabels: Record<string, string> = {
+  pending: "Chờ kiểm tra",
+  approved: "Đã duyệt",
+  rejected: "Không phù hợp",
+};
+
 export function MediaCard({
   item,
   canReview,
@@ -40,14 +46,14 @@ export function MediaCard({
 
   return (
     <article className="overflow-hidden rounded-2xl border bg-white">
-      <div className="grid h-44 place-items-center bg-[#f6f2ea]">
+      <div className="relative grid h-44 place-items-center bg-[#f6f2ea]">
         {item.type === "image" ? (
           <Image
             src={item.url}
-            width={320}
-            height={220}
+            fill
+            sizes="(min-width: 1280px) 25vw, (min-width: 640px) 50vw, 100vw"
             alt={item.altText}
-            className="h-full w-full object-contain"
+            className="object-contain"
           />
         ) : (
           <audio controls src={item.url} className="w-[90%]" />
@@ -60,14 +66,14 @@ export function MediaCard({
         <p className="mt-1 line-clamp-2 text-xs text-[#806d54]">{item.altText}</p>
         <div className="mt-3 flex items-center justify-between gap-2">
           <span className="rounded-full bg-[#f5f2ec] px-2 py-1 text-[10px] font-black">
-            {item.safetyStatus}
+            {safetyStatusLabels[item.safetyStatus] ?? item.safetyStatus}
           </span>
           <div className="flex gap-1">
             {canReview ? (
               <>
                 <button
                   type="button"
-                  aria-label={contentText(content, "media.approve", "Duyệt media")}
+                  aria-label={contentText(content, "media.approve", "Duyệt tư liệu")}
                   disabled={mutation.isPending}
                   onClick={() => mutation.mutate("approve")}
                   className="rounded-lg border p-2 text-green-700 disabled:opacity-50"
@@ -80,7 +86,7 @@ export function MediaCard({
                 </button>
                 <button
                   type="button"
-                  aria-label={contentText(content, "media.reject", "Từ chối media")}
+                  aria-label={contentText(content, "media.reject", "Đánh dấu tư liệu không phù hợp")}
                   disabled={mutation.isPending}
                   onClick={() => mutation.mutate("reject")}
                   className="rounded-lg border p-2 text-red-700 disabled:opacity-50"
@@ -96,11 +102,11 @@ export function MediaCard({
             {canDelete ? (
               <button
                 type="button"
-                aria-label={contentText(content, "media.delete", "Xóa media")}
+                aria-label={contentText(content, "media.delete", "Xóa tư liệu")}
                 disabled={mutation.isPending}
                 onClick={() => {
                   if (
-                    window.confirm(contentText(content, "media.deleteConfirm", "Xóa media này khỏi storage?"))
+                    window.confirm(contentText(content, "media.deleteConfirm", "Xóa vĩnh viễn tư liệu này?"))
                   )
                     mutation.mutate("delete");
                 }}
@@ -120,7 +126,10 @@ export function MediaCard({
           message={mutation.error?.message}
           className="mt-3"
         />
-        <code className="mt-3 block rounded-lg bg-[#f5f2ec] p-2 text-[10px] break-all">{item.url}</code>
+        <details className="mt-3 rounded-lg bg-[#f5f2ec] p-2 text-[10px]">
+          <summary className="cursor-pointer font-black">Đường dẫn kỹ thuật</summary>
+          <code className="mt-2 block break-all">{item.url}</code>
+        </details>
       </div>
     </article>
   );

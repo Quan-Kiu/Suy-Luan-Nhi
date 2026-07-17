@@ -1,4 +1,9 @@
+import { Database, Filter, X } from "lucide-react";
+import Link from "next/link";
+import { auditActionLabels, friendlyLabel, resourceTypeLabels } from "@/features/admin/admin-labels";
+import { AdminPageHeader } from "@/features/admin/admin-page-header";
 import { listAuditLogs } from "@/modules/admin/operations";
+
 export default async function Page({
   searchParams,
 }: {
@@ -6,61 +11,96 @@ export default async function Page({
 }) {
   const filters = await searchParams;
   const items = await listAuditLogs(filters);
+  const hasFilters = Boolean(filters.resourceType || filters.action);
+
   return (
-    <div>
-      <h1 className="text-3xl font-black">Audit log</h1>
-      <p className="mt-2 text-[#806d54]">
-        Lịch sử bất biến cho thao tác quản trị, nội dung, dữ liệu và quyền truy cập.
-      </p>
-      <form className="mt-5 grid gap-3 rounded-2xl border bg-white p-4 md:grid-cols-[1fr_1fr_auto]">
-        <input
-          name="resourceType"
-          defaultValue={filters.resourceType}
-          placeholder="resource type"
-          className="min-h-11 rounded-xl border px-3"
-        />
-        <input
-          name="action"
-          defaultValue={filters.action}
-          placeholder="action contains"
-          className="min-h-11 rounded-xl border px-3"
-        />
-        <button className="rounded-xl bg-[#3f392f] px-4 font-black text-white">Lọc</button>
-      </form>
-      <div className="mt-5 overflow-x-auto rounded-2xl border bg-white">
-        <table className="min-w-full text-xs">
-          <thead className="bg-[#f7f3eb] text-left">
-            <tr>
-              <th className="p-3">Thời gian</th>
-              <th className="p-3">Action</th>
-              <th className="p-3">Resource</th>
-              <th className="p-3">Actor</th>
-              <th className="p-3">Metadata</th>
-            </tr>
-          </thead>
-          <tbody>
-            {items.map((item) => (
-              <tr key={item.id} className="border-t align-top">
-                <td className="p-3 whitespace-nowrap">{item.createdAt.toLocaleString("vi-VN")}</td>
-                <td className="p-3 font-black">{item.action}</td>
-                <td className="p-3">
-                  {item.resourceType}
-                  <br />
-                  <code>{item.resourceId}</code>
-                </td>
-                <td className="p-3">
-                  <code>{item.actorId ?? "system"}</code>
-                </td>
-                <td className="max-w-md p-3">
-                  <pre className="break-all whitespace-pre-wrap">
-                    {JSON.stringify(item.metadata, null, 2)}
-                  </pre>
-                </td>
-              </tr>
+    <div className="space-y-6">
+      <AdminPageHeader
+        eyebrow="Theo dõi hoạt động quản trị"
+        title="Nhật ký thay đổi"
+        description="Xem ai đã thay đổi nội dung, quyền truy cập hoặc cài đặt và thời điểm thay đổi. Thông tin kỹ thuật được thu gọn để dễ đọc hơn."
+        icon={Database}
+      />
+      <form className="grid gap-3 rounded-2xl border bg-white p-4 md:grid-cols-[1fr_1fr_auto_auto]">
+        <label>
+          <span className="mb-1 block text-xs font-black text-[#6f6558]">Loại nội dung</span>
+          <select
+            name="resourceType"
+            defaultValue={filters.resourceType ?? ""}
+            className="min-h-11 w-full rounded-xl border px-3"
+          >
+            <option value="">Tất cả loại nội dung</option>
+            {Object.entries(resourceTypeLabels).map(([value, label]) => (
+              <option key={value} value={value}>
+                {label}
+              </option>
             ))}
-          </tbody>
-        </table>
+          </select>
+        </label>
+        <label>
+          <span className="mb-1 block text-xs font-black text-[#6f6558]">Hành động</span>
+          <input
+            name="action"
+            defaultValue={filters.action}
+            placeholder="Ví dụ: tạo, cập nhật, xuất bản"
+            className="min-h-11 w-full rounded-xl border px-3"
+          />
+        </label>
+        <button className="mt-auto inline-flex min-h-11 items-center justify-center gap-2 rounded-xl bg-[#3f392f] px-4 font-black text-white">
+          <Filter size={17} /> Áp dụng
+        </button>
+        {hasFilters ? (
+          <Link
+            href="/admin/audit"
+            className="mt-auto inline-flex min-h-11 items-center justify-center gap-2 rounded-xl border px-4 font-black"
+          >
+            <X size={17} /> Xóa lọc
+          </Link>
+        ) : null}
+      </form>
+
+      <p className="text-sm font-bold text-[#6f6558]">{items.length} thay đổi gần nhất</p>
+      <div className="space-y-3">
+        {items.map((item) => (
+          <article key={item.id} className="rounded-2xl border bg-white p-4">
+            <div className="flex flex-wrap items-start justify-between gap-3">
+              <div>
+                <p className="font-black">{friendlyLabel(auditActionLabels, item.action)}</p>
+                <p className="mt-1 text-sm text-[#6f6558]">
+                  {friendlyLabel(resourceTypeLabels, item.resourceType)} ·{" "}
+                  {item.createdAt.toLocaleString("vi-VN")}
+                </p>
+              </div>
+              <span className="rounded-full bg-[#f5f2ec] px-3 py-1 text-xs font-black">
+                {item.actorId ? "Tài khoản quản trị" : "Hệ thống tự động"}
+              </span>
+            </div>
+            <details className="mt-3 rounded-xl bg-[#f7f3eb] p-3 text-xs">
+              <summary className="cursor-pointer font-black">Xem thông tin kỹ thuật</summary>
+              <dl className="mt-3 grid gap-2 sm:grid-cols-2">
+                <div>
+                  <dt className="font-bold">Mã đối tượng</dt>
+                  <dd className="break-all">{item.resourceId ?? "Không có"}</dd>
+                </div>
+                <div>
+                  <dt className="font-bold">Mã người thực hiện</dt>
+                  <dd className="break-all">{item.actorId ?? "system"}</dd>
+                </div>
+              </dl>
+              {Object.keys(item.metadata).length ? (
+                <pre className="mt-3 overflow-x-auto rounded-lg bg-white p-3 whitespace-pre-wrap">
+                  {JSON.stringify(item.metadata, null, 2)}
+                </pre>
+              ) : null}
+            </details>
+          </article>
+        ))}
       </div>
+      {!items.length ? (
+        <div className="rounded-2xl border bg-white p-10 text-center text-[#6f6558]">
+          Không có thay đổi phù hợp với bộ lọc.
+        </div>
+      ) : null}
     </div>
   );
 }

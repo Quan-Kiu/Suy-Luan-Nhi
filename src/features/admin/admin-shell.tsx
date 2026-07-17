@@ -9,6 +9,7 @@ import { useEffect, useState } from "react";
 import { signOut } from "@/auth/client";
 import { contentText, useContent } from "@/content/client";
 import { AdminNavigation } from "@/features/admin/admin-navigation";
+import { getRoleLabel } from "@/features/admin/admin-role";
 
 export function AdminShell({
   children,
@@ -23,6 +24,7 @@ export function AdminShell({
   const pathname = usePathname();
   const router = useRouter();
   const [menuOpen, setMenuOpen] = useState(false);
+  const roleLabel = getRoleLabel(role);
 
   useEffect(() => {
     function closeOnEscape(event: KeyboardEvent) {
@@ -58,15 +60,15 @@ export function AdminShell({
               src="/assets/mascots/brand-logo-detective-head.png"
               width={40}
               height={42}
-              alt="Suy Luận Nhí CMS"
+              alt="Trung tâm quản trị Suy Luận Nhí"
               className="h-10 w-auto object-contain"
             />
             <div className="min-w-0">
               <p className="truncate font-black">
-                {contentText(content, "shell.cmsName", "Suy Luận Nhí CMS")}
+                {contentText(content, "shell.cmsName", "Trung tâm quản trị")}
               </p>
               <p className="hidden truncate text-xs text-[#7d7468] sm:block">
-                {contentText(content, "shell.cmsDescription", "Quản trị nội dung an toàn")}
+                {contentText(content, "shell.cmsDescription", "Quản lý nhiệm vụ và nội dung")}
               </p>
             </div>
           </Link>
@@ -74,7 +76,7 @@ export function AdminShell({
         <div className="flex items-center gap-3">
           <span className="hidden text-right text-xs sm:block">
             <strong className="block">{userName}</strong>
-            <span className="text-[#806d54]">{role}</span>
+            <span className="text-[#806d54]">{roleLabel}</span>
           </span>
           <button
             type="button"
@@ -112,6 +114,7 @@ export function AdminShell({
             >
               <AdminNavigation
                 pathname={pathname}
+                role={role}
                 content={content}
                 ariaLabel="Điều hướng quản trị mobile"
                 onNavigate={() => setMenuOpen(false)}
@@ -121,10 +124,10 @@ export function AdminShell({
         ) : null}
       </AnimatePresence>
 
-      <div className="grid min-h-[calc(100vh-4rem)] lg:grid-cols-[230px_minmax(0,1fr)]">
+      <div className="grid min-h-[calc(100vh-4rem)] lg:grid-cols-[280px_minmax(0,1fr)]">
         <aside className="hidden border-r bg-white p-4 lg:block">
           <div className="sticky top-20">
-            <AdminNavigation pathname={pathname} content={content} />
+            <AdminNavigation pathname={pathname} role={role} content={content} />
           </div>
         </aside>
         <main className="min-w-0 p-4 sm:p-6 lg:p-8">{children}</main>

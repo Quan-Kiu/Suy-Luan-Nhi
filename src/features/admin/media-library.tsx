@@ -38,7 +38,11 @@ export function MediaLibrary({
         <MediaUploadForm onUploaded={addMedia} />
       ) : (
         <div className="rounded-2xl border bg-white p-5 text-sm text-[#806d54]">
-          {contentText(content, "media.reviewOnly", "Reviewer có thể duyệt hoặc từ chối media.")}
+          {contentText(
+            content,
+            "media.reviewOnly",
+            "Bạn có thể kiểm tra và duyệt tư liệu. Chỉ biên tập viên hoặc quản trị viên mới được tải tệp mới.",
+          )}
         </div>
       )}
       <div className="mt-5 grid gap-4 sm:grid-cols-2 xl:grid-cols-4">

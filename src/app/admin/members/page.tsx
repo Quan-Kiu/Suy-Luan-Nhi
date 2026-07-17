@@ -1,13 +1,20 @@
+import { Users } from "lucide-react";
 import { requireRoles } from "@/auth/session";
+import { AdminPageHeader } from "@/features/admin/admin-page-header";
 import { MemberManager } from "@/features/admin/member-manager";
 import { listMembers } from "@/modules/admin/operations";
+
 export default async function Page() {
   const session = await requireRoles(["super_admin"]);
   const items = await listMembers();
   return (
-    <div>
-      <h1 className="text-3xl font-black">Thành viên & phân quyền</h1>
-      <p className="mt-2 mb-5 text-[#806d54]">Role được kiểm tra lại ở server cho mọi API và trang bảo vệ.</p>
+    <div className="space-y-6">
+      <AdminPageHeader
+        eyebrow="Quản lý quyền truy cập"
+        title="Thành viên & phân quyền"
+        description="Xem tài khoản quản trị, giao đúng vai trò và tạm ngưng quyền truy cập khi cần. Mọi thay đổi đều được ghi lại."
+        icon={Users}
+      />
       <MemberManager items={items} currentUserId={session.user.id} />
     </div>
   );

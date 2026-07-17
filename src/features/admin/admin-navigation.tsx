@@ -13,73 +13,181 @@ import {
   Users,
 } from "lucide-react";
 import Link from "next/link";
+import type { AppRole } from "@/auth/roles";
 import { contentText } from "@/content/resolve";
 import type { ContentDictionary } from "@/content/types";
+import { getPrimaryRole } from "@/features/admin/admin-role";
 import { cn } from "@/lib/utils";
 
-const navItems = [
-  { href: "/admin", labelKey: "nav.dashboard", fallback: "Tổng quan", icon: Gauge, exact: true },
-  { href: "/admin/missions", labelKey: "nav.missions", fallback: "Nhiệm vụ", icon: FileText },
-  { href: "/admin/reviews", labelKey: "nav.reviews", fallback: "Kiểm duyệt", icon: ClipboardCheck },
-  { href: "/admin/media", labelKey: "nav.media", fallback: "Media", icon: ImageIcon },
-  { href: "/admin/content", labelKey: "nav.content", fallback: "Nội dung hệ thống", icon: Languages },
-  { href: "/admin/worlds", labelKey: "nav.worlds", fallback: "Thế giới", icon: Layers3 },
-  { href: "/admin/taxonomy", labelKey: "nav.taxonomy", fallback: "Độ tuổi & kỹ năng", icon: Tags },
-  { href: "/admin/members", labelKey: "nav.members", fallback: "Thành viên", icon: Users },
-  { href: "/admin/reports", labelKey: "nav.reports", fallback: "Báo cáo", icon: BarChart3 },
+const allStaff: AppRole[] = ["content_admin", "reviewer", "super_admin"];
+const editors: AppRole[] = ["content_admin", "super_admin"];
+const reviewers: AppRole[] = ["reviewer", "super_admin"];
+const superAdmins: AppRole[] = ["super_admin"];
+const navGroups = [
   {
-    href: "/admin/data-requests",
-    labelKey: "nav.dataRequests",
-    fallback: "Data requests",
-    icon: ShieldCheck,
+    labelKey: "navGroup.primary",
+    fallback: "Công việc chính",
+    items: [
+      {
+        href: "/admin",
+        labelKey: "nav.dashboard",
+        fallback: "Tổng quan",
+        icon: Gauge,
+        roles: allStaff,
+        exact: true,
+      },
+      {
+        href: "/admin/missions",
+        labelKey: "nav.missions",
+        fallback: "Nhiệm vụ",
+        icon: FileText,
+        roles: allStaff,
+      },
+      {
+        href: "/admin/reviews",
+        labelKey: "nav.reviews",
+        fallback: "Duyệt nội dung",
+        icon: ClipboardCheck,
+        roles: reviewers,
+      },
+    ],
   },
-  { href: "/admin/audit", labelKey: "nav.audit", fallback: "Audit log", icon: Database },
-  { href: "/admin/settings", labelKey: "nav.settings", fallback: "Cài đặt", icon: Settings },
+  {
+    labelKey: "navGroup.content",
+    fallback: "Nội dung hiển thị",
+    items: [
+      {
+        href: "/admin/media",
+        labelKey: "nav.media",
+        fallback: "Hình ảnh & âm thanh",
+        icon: ImageIcon,
+        roles: allStaff,
+      },
+      {
+        href: "/admin/content",
+        labelKey: "nav.content",
+        fallback: "Nội dung giao diện",
+        icon: Languages,
+        roles: allStaff,
+      },
+      {
+        href: "/admin/worlds",
+        labelKey: "nav.worlds",
+        fallback: "Thế giới nhiệm vụ",
+        icon: Layers3,
+        roles: editors,
+      },
+      {
+        href: "/admin/taxonomy",
+        labelKey: "nav.taxonomy",
+        fallback: "Độ tuổi & kỹ năng",
+        icon: Tags,
+        roles: editors,
+      },
+    ],
+  },
+  {
+    labelKey: "navGroup.operations",
+    fallback: "Theo dõi & vận hành",
+    items: [
+      {
+        href: "/admin/reports",
+        labelKey: "nav.reports",
+        fallback: "Báo cáo",
+        icon: BarChart3,
+        roles: allStaff,
+      },
+      {
+        href: "/admin/members",
+        labelKey: "nav.members",
+        fallback: "Thành viên & quyền",
+        icon: Users,
+        roles: superAdmins,
+      },
+      {
+        href: "/admin/data-requests",
+        labelKey: "nav.dataRequests",
+        fallback: "Yêu cầu dữ liệu",
+        icon: ShieldCheck,
+        roles: superAdmins,
+      },
+      {
+        href: "/admin/audit",
+        labelKey: "nav.audit",
+        fallback: "Nhật ký thay đổi",
+        icon: Database,
+        roles: allStaff,
+      },
+      {
+        href: "/admin/settings",
+        labelKey: "nav.settings",
+        fallback: "Cài đặt nâng cao",
+        icon: Settings,
+        roles: superAdmins,
+      },
+    ],
+  },
 ] as const;
-export function AdminNavigation({
-  pathname,
-  content,
-  onNavigate,
-  ariaLabel,
-}: {
+
+type Props = {
   pathname: string;
+  role: unknown;
   content: ContentDictionary;
   onNavigate?: () => void;
   ariaLabel?: string;
-}) {
+};
+
+export function AdminNavigation({ pathname, role, content, onNavigate, ariaLabel }: Props) {
+  const primaryRole = getPrimaryRole(role);
   return (
-    <nav aria-label={ariaLabel} className="space-y-1 text-sm font-bold">
-      {navItems.map((item) => {
-        const { href, labelKey, fallback, icon: Icon } = item;
-        const exact = "exact" in item && item.exact;
-        const active = exact ? pathname === href : pathname === href || pathname.startsWith(`${href}/`);
+    <nav aria-label={ariaLabel} className="space-y-6 text-sm">
+      {navGroups.map((group) => {
+        const visibleItems = group.items.filter((item) => item.roles.includes(primaryRole));
+        if (!visibleItems.length) return null;
+
         return (
-          <Link
-            key={href}
-            href={href}
-            onClick={onNavigate}
-            className={cn(
-              "flex items-center gap-3 rounded-xl px-3 py-2.5 hover:bg-[#f5f2ec]",
-              active && "bg-[#fff0df] text-[#d95812]",
-            )}
-          >
-            <Icon size={18} />
-            {contentText(content, labelKey, fallback)}
-          </Link>
+          <section key={group.labelKey}>
+            <p className="mb-2 px-3 text-[11px] font-black tracking-[0.14em] text-[#8a8176] uppercase">
+              {contentText(content, group.labelKey, group.fallback)}
+            </p>
+            <div className="space-y-1">
+              {visibleItems.map((item) => {
+                const active =
+                  "exact" in item && item.exact
+                    ? pathname === item.href
+                    : pathname === item.href || pathname.startsWith(`${item.href}/`);
+                const Icon = item.icon;
+                return (
+                  <Link
+                    key={item.href}
+                    href={item.href}
+                    onClick={onNavigate}
+                    aria-current={active ? "page" : undefined}
+                    className={cn(
+                      "flex min-h-11 items-center gap-3 rounded-xl px-3 font-bold transition hover:bg-[#f5f2ec]",
+                      active && "bg-[#fff0df] text-[#d95812] shadow-sm",
+                    )}
+                  >
+                    <Icon size={18} className="shrink-0" />
+                    <span>{contentText(content, item.labelKey, item.fallback)}</span>
+                  </Link>
+                );
+              })}
+            </div>
+          </section>
         );
       })}
-      <div className="mt-8 rounded-2xl bg-[#edf4df] p-3 text-xs text-[#587048]">
+
+      <div className="rounded-2xl bg-[#edf4df] p-4 text-xs text-[#587048]">
         <div className="flex items-center gap-2 font-black">
           <ShieldCheck size={16} />
-          {contentText(content, "shell.workflowTitle", "Child-safe workflow")}
+          {contentText(content, "shell.workflowTitle", "Quy trình nội dung an toàn")}
         </div>
-        <p className="mt-1 leading-5">
-          {contentText(
-            content,
-            "shell.workflowDescription",
-            "Draft không thay đổi phiên bản đã publish. Reviewer phải duyệt trước khi xuất bản.",
-          )}
-        </p>
+        <ol className="mt-2 space-y-1.5 leading-5">
+          <li>1. Soạn và lưu nội dung.</li>
+          <li>2. Kiểm tra an toàn cho trẻ.</li>
+          <li>3. Người kiểm duyệt xác nhận trước khi hiển thị.</li>
+        </ol>
       </div>
     </nav>
   );

@@ -21,7 +21,7 @@ export function TaxonomyManager({ ages, skills }: { ages: AgeGroupItem[]; skills
       </section>
       <section>
         <h2 className="text-2xl font-black">
-          {contentText(content, "taxonomy.skillTitle", "Kỹ năng & Thinking Habits")}
+          {contentText(content, "taxonomy.skillTitle", "Kỹ năng & thói quen tư duy")}
         </h2>
         <div className="mt-4 space-y-3">
           {skills.map((skill) => (
