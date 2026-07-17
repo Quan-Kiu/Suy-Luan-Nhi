@@ -77,6 +77,11 @@ export const adminOperationsContentEntries = defineContent("admin", {
     value: "Bắt đầu từ mẫu và xem trước ngay khi soạn.",
     description: "Mô tả CTA tạo nhiệm vụ.",
   },
+  "dashboard.draftTasks": { value: "bản nháp đang soạn", description: "CTA bản nháp." },
+  "dashboard.draftTasksDescription": {
+    value: "Tiếp tục nội dung còn dang dở hoặc cần chỉnh sửa.",
+    description: "Mô tả CTA bản nháp.",
+  },
   "dashboard.reviewTasks": { value: "nhiệm vụ chờ duyệt", description: "CTA kiểm duyệt." },
   "dashboard.reviewTasksDescription": {
     value: "Kiểm tra nội dung trước khi hiển thị cho trẻ.",
@@ -87,6 +92,16 @@ export const adminOperationsContentEntries = defineContent("admin", {
     value: "Xác nhận hình ảnh và âm thanh phù hợp.",
     description: "Mô tả CTA kiểm tra tư liệu.",
   },
+  "dashboard.mediaLibrary": { value: "Quản lý hình ảnh & âm thanh", description: "CTA thư viện tư liệu." },
+  "dashboard.mediaLibraryDescription": {
+    value: "Tải lên và sắp xếp tư liệu dùng trong nhiệm vụ.",
+    description: "Mô tả CTA thư viện tư liệu.",
+  },
+  "dashboard.viewReports": { value: "Xem báo cáo 30 ngày", description: "CTA báo cáo." },
+  "dashboard.viewReportsDescription": {
+    value: "Theo dõi lượt chơi, độ chính xác và nội dung nổi bật.",
+    description: "Mô tả CTA báo cáo.",
+  },
   "dashboard.contentStatus": { value: "Tiến độ nội dung", description: "Tiêu đề tiến độ nội dung." },
   "dashboard.openCms": { value: "Xem tất cả nhiệm vụ", description: "CTA mở danh sách nhiệm vụ." },
   "dashboard.emptyMissions": { value: "Chưa có nhiệm vụ nào.", description: "Trạng thái nhiệm vụ trống." },
@@ -96,7 +111,11 @@ export const adminOperationsContentEntries = defineContent("admin", {
   "missions.title": { value: "Quản lý nhiệm vụ", description: "Tiêu đề danh sách nhiệm vụ." },
   "missions.description": {
     value: "Tạo, chỉnh sửa và theo dõi từng nhiệm vụ từ bản nháp đến khi hiển thị cho trẻ.",
-    description: "Mô tả danh sách nhiệm vụ.",
+    description: "Mô tả danh sách nhiệm vụ cho biên tập viên.",
+  },
+  "missions.readOnlyDescription": {
+    value: "Xem toàn bộ nhiệm vụ và trạng thái hiện tại; nội dung chờ duyệt nằm trong mục Duyệt nội dung.",
+    description: "Mô tả danh sách nhiệm vụ cho người kiểm duyệt.",
   },
   "missions.create": { value: "Tạo nhiệm vụ mới", description: "CTA tạo nhiệm vụ." },
   "missions.search": { value: "Tìm theo tên nhiệm vụ", description: "Placeholder tìm nhiệm vụ." },

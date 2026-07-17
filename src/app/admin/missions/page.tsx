@@ -1,6 +1,8 @@
 import { FileText, Filter, Plus, Search, X } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
+import { hasRole } from "@/auth/roles";
+import { requireStaff } from "@/auth/session";
 import { contentTemplate, contentText } from "@/content/resolve";
 import { AdminPageHeader } from "@/features/admin/admin-page-header";
 import { MissionListActions } from "@/features/admin/mission-list-actions";
@@ -9,12 +11,33 @@ import { missionStatusLabels } from "@/features/admin/admin-labels";
 import { getAdminTaxonomy, listAdminMissions } from "@/modules/admin/mission-admin";
 import { getContentNamespace } from "@/modules/content/content";
 
+function MissionEditTarget({
+  canEdit,
+  href,
+  className,
+  children,
+}: {
+  canEdit: boolean;
+  href: string;
+  className: string;
+  children: React.ReactNode;
+}) {
+  return canEdit ? (
+    <Link href={href} className={className}>
+      {children}
+    </Link>
+  ) : (
+    <div className={className}>{children}</div>
+  );
+}
+
 export default async function Page({
   searchParams,
 }: {
   searchParams: Promise<{ status?: string; worldId?: string; search?: string }>;
 }) {
-  const filters = await searchParams;
+  const [filters, session] = await Promise.all([searchParams, requireStaff()]);
+  const canEdit = hasRole(session.user.role, ["content_admin", "super_admin"]);
   const [items, taxonomy, content] = await Promise.all([
     listAdminMissions(filters),
     getAdminTaxonomy(),
@@ -27,18 +50,27 @@ export default async function Page({
       <AdminPageHeader
         eyebrow={t("missions.eyebrow", "Kho nội dung")}
         title={t("missions.title", "Quản lý nhiệm vụ")}
-        description={t(
-          "missions.description",
-          "Tạo, chỉnh sửa và theo dõi từng nhiệm vụ từ bản nháp đến khi hiển thị cho trẻ.",
-        )}
+        description={
+          canEdit
+            ? t(
+                "missions.description",
+                "Tạo, chỉnh sửa và theo dõi từng nhiệm vụ từ bản nháp đến khi hiển thị cho trẻ.",
+              )
+            : t(
+                "missions.readOnlyDescription",
+                "Xem toàn bộ nhiệm vụ và trạng thái hiện tại; nội dung chờ duyệt nằm trong mục Duyệt nội dung.",
+              )
+        }
         icon={FileText}
         actions={
-          <Link
-            href="/admin/missions/new"
-            className="inline-flex min-h-11 items-center gap-2 rounded-xl bg-[#e9641a] px-4 font-black text-white shadow-[0_4px_0_#bd4910]"
-          >
-            <Plus size={18} /> {t("missions.create", "Tạo nhiệm vụ mới")}
-          </Link>
+          canEdit ? (
+            <Link
+              href="/admin/missions/new"
+              className="inline-flex min-h-11 items-center gap-2 rounded-xl bg-[#e9641a] px-4 font-black text-white shadow-[0_4px_0_#bd4910]"
+            >
+              <Plus size={18} /> {t("missions.create", "Tạo nhiệm vụ mới")}
+            </Link>
+          ) : null
         }
       />
 
@@ -105,7 +137,7 @@ export default async function Page({
       <div className="grid gap-4 md:hidden">
         {items.map((item) => (
           <article key={item.id} className="overflow-hidden rounded-2xl border bg-white shadow-sm">
-            <Link href={`/admin/missions/${item.id}/edit`} className="block">
+            <MissionEditTarget canEdit={canEdit} href={`/admin/missions/${item.id}/edit`} className="block">
               <Image
                 src={item.coverUrl}
                 width={760}
@@ -136,10 +168,12 @@ export default async function Page({
                   Cập nhật {item.updatedAt.toLocaleDateString("vi-VN")}
                 </p>
               </div>
-            </Link>
-            <div className="border-t px-4 py-3">
-              <MissionListActions missionId={item.id} showLabels />
-            </div>
+            </MissionEditTarget>
+            {canEdit ? (
+              <div className="border-t px-4 py-3">
+                <MissionListActions missionId={item.id} showLabels />
+              </div>
+            ) : null}
           </article>
         ))}
       </div>
@@ -152,14 +186,18 @@ export default async function Page({
               <th className="p-3">{t("missions.columnStatus", "Trạng thái")}</th>
               <th className="p-3">{t("missions.columnContent", "Độ dài")}</th>
               <th className="p-3">{t("missions.columnUpdated", "Cập nhật")}</th>
-              <th className="p-3">{t("missions.columnActions", "Thao tác")}</th>
+              {canEdit ? <th className="p-3">{t("missions.columnActions", "Thao tác")}</th> : null}
             </tr>
           </thead>
           <tbody>
             {items.map((item) => (
               <tr key={item.id} className="border-t align-middle hover:bg-[#fffdf8]">
                 <td className="p-3">
-                  <Link href={`/admin/missions/${item.id}/edit`} className="flex min-w-64 items-center gap-3">
+                  <MissionEditTarget
+                    canEdit={canEdit}
+                    href={`/admin/missions/${item.id}/edit`}
+                    className="flex min-w-64 items-center gap-3"
+                  >
                     <Image
                       src={item.coverUrl}
                       width={68}
@@ -171,7 +209,7 @@ export default async function Page({
                       <strong className="block">{item.title}</strong>
                       <small className="text-[#806d54]">Mã nội bộ: {item.slug}</small>
                     </span>
-                  </Link>
+                  </MissionEditTarget>
                 </td>
                 <td className="p-3">{item.worldTitle}</td>
                 <td className="p-3">
@@ -184,9 +222,11 @@ export default async function Page({
                   })}
                 </td>
                 <td className="p-3 text-[#806d54]">{item.updatedAt.toLocaleDateString("vi-VN")}</td>
-                <td className="p-3">
-                  <MissionListActions missionId={item.id} />
-                </td>
+                {canEdit ? (
+                  <td className="p-3">
+                    <MissionListActions missionId={item.id} showLabels />
+                  </td>
+                ) : null}
               </tr>
             ))}
           </tbody>
@@ -195,7 +235,11 @@ export default async function Page({
       {!items.length ? (
         <div className="rounded-2xl border bg-white p-10 text-center">
           <p className="font-black">{t("missions.empty", "Không tìm thấy nhiệm vụ phù hợp.")}</p>
-          <p className="mt-2 text-sm text-[#6f6558]">Thử xóa bộ lọc hoặc tạo một nhiệm vụ mới.</p>
+          <p className="mt-2 text-sm text-[#6f6558]">
+            {canEdit
+              ? "Thử xóa bộ lọc hoặc tạo một nhiệm vụ mới."
+              : "Thử xóa bộ lọc để xem toàn bộ nhiệm vụ."}
+          </p>
         </div>
       ) : null}
     </div>

@@ -140,7 +140,7 @@ export function ProductionMissionEditor({
             />
           ) : null}
 
-          <div className="sticky bottom-3 z-20 flex flex-wrap items-center justify-between gap-3 rounded-2xl border bg-white/95 p-3 shadow-xl backdrop-blur">
+          <div className="flex flex-wrap items-center justify-between gap-3 rounded-2xl border bg-white p-4 shadow-sm">
             <div>
               <p className="text-sm font-black">Hoàn tất nội dung theo thứ tự từ trên xuống.</p>
               <p className="text-xs text-[#6f6558]">

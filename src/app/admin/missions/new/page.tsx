@@ -1,8 +1,10 @@
+import { requireRoles } from "@/auth/session";
 import { ProductionMissionEditor } from "@/features/admin/production-mission-editor";
 import { getAdminTaxonomy } from "@/modules/admin/mission-admin";
 import type { AdminMissionDraft } from "@/modules/admin/schemas";
 
 export default async function Page() {
+  await requireRoles(["content_admin", "super_admin"]);
   const taxonomy = await getAdminTaxonomy();
   const initial: AdminMissionDraft = {
     slug: "",

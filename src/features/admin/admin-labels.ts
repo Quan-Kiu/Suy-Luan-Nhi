@@ -52,7 +52,14 @@ export const auditActionLabels: Record<string, string> = {
   "child.created": "Tạo hồ sơ bé",
   "child.updated": "Cập nhật hồ sơ bé",
   "child.deleted": "Xóa hồ sơ bé",
-  "settings.updated": "Cập nhật cài đặt",
+  "child.delete_requested": "Phụ huynh yêu cầu xóa hồ sơ bé",
+  "child.progress_reset": "Đặt lại tiến độ của bé",
+  "parent.settings_updated": "Cập nhật cài đặt phụ huynh",
+  "mission.scheduled": "Lên lịch hiển thị nhiệm vụ",
+  "age_group.updated": "Cập nhật nhóm tuổi",
+  "skill.created": "Tạo kỹ năng",
+  "skill.updated": "Cập nhật kỹ năng",
+  "system_setting.updated": "Cập nhật cài đặt nâng cao",
 };
 export const resourceTypeLabels: Record<string, string> = {
   mission: "Nhiệm vụ",

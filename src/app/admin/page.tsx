@@ -1,5 +1,6 @@
-import { ArrowRight, ClipboardCheck, FilePlus2, ImageIcon, MonitorDot, Users } from "lucide-react";
+import { ArrowRight, BarChart3, ClipboardCheck, FilePlus2, ImageIcon, MonitorDot, Users } from "lucide-react";
 import Link from "next/link";
+import { requireStaff } from "@/auth/session";
 import { Card, Pill } from "@/components/ui";
 import { contentText } from "@/content/resolve";
 import {
@@ -9,34 +10,67 @@ import {
   resourceTypeLabels,
 } from "@/features/admin/admin-labels";
 import { AdminPageHeader } from "@/features/admin/admin-page-header";
+import { getPrimaryRole } from "@/features/admin/admin-role";
 import { getAdminDashboard } from "@/modules/admin/operations";
 import { getContentNamespace } from "@/modules/content/content";
 
 export default async function Page() {
-  const [data, content] = await Promise.all([getAdminDashboard(), getContentNamespace("admin")]);
+  const [data, content, session] = await Promise.all([
+    getAdminDashboard(),
+    getContentNamespace("admin"),
+    requireStaff(),
+  ]);
   const t = (key: string, fallback: string) => contentText(content, key, fallback);
+  const role = getPrimaryRole(session.user.role);
   const publishedCount = data.missionCounts.published ?? 0;
   const draftCount = data.missionCounts.draft ?? 0;
-  const urgentTasks = [
-    {
+  const tasks = {
+    create: {
       title: t("dashboard.createMission", "Tạo nhiệm vụ mới"),
       description: t("dashboard.createMissionDescription", "Bắt đầu từ mẫu và xem trước ngay khi soạn."),
       href: "/admin/missions/new",
       icon: FilePlus2,
     },
-    {
+    drafts: {
+      title: `${draftCount} ${t("dashboard.draftTasks", "bản nháp đang soạn")}`,
+      description: t("dashboard.draftTasksDescription", "Tiếp tục nội dung còn dang dở hoặc cần chỉnh sửa."),
+      href: "/admin/missions?status=draft",
+      icon: FilePlus2,
+    },
+    reviews: {
       title: `${data.pendingReviews} ${t("dashboard.reviewTasks", "nhiệm vụ chờ duyệt")}`,
       description: t("dashboard.reviewTasksDescription", "Kiểm tra nội dung trước khi hiển thị cho trẻ."),
       href: "/admin/reviews",
       icon: ClipboardCheck,
     },
-    {
+    mediaReview: {
       title: `${data.pendingMedia} ${t("dashboard.mediaTasks", "tư liệu cần kiểm tra")}`,
       description: t("dashboard.mediaTasksDescription", "Xác nhận hình ảnh và âm thanh phù hợp."),
       href: "/admin/media",
       icon: ImageIcon,
     },
-  ];
+    mediaLibrary: {
+      title: t("dashboard.mediaLibrary", "Quản lý hình ảnh & âm thanh"),
+      description: t("dashboard.mediaLibraryDescription", "Tải lên và sắp xếp tư liệu dùng trong nhiệm vụ."),
+      href: "/admin/media",
+      icon: ImageIcon,
+    },
+    reports: {
+      title: t("dashboard.viewReports", "Xem báo cáo 30 ngày"),
+      description: t(
+        "dashboard.viewReportsDescription",
+        "Theo dõi lượt chơi, độ chính xác và nội dung nổi bật.",
+      ),
+      href: "/admin/reports",
+      icon: BarChart3,
+    },
+  };
+  const urgentTasks =
+    role === "reviewer"
+      ? [tasks.reviews, tasks.mediaReview, tasks.reports]
+      : role === "content_admin"
+        ? [tasks.create, tasks.drafts, tasks.mediaLibrary]
+        : [tasks.create, tasks.reviews, tasks.mediaReview];
 
   const metrics = [
     { label: "Nhiệm vụ đang hiển thị", value: publishedCount, icon: ClipboardCheck },
@@ -131,7 +165,7 @@ export default async function Page() {
               <h2 className="text-xl font-black">{t("dashboard.recentAudit", "Thay đổi gần đây")}</h2>
               <p className="mt-1 text-sm text-[#6f6558]">Các thao tác mới nhất trong khu vực quản trị.</p>
             </div>
-            <Pill>{data.users} tài khoản</Pill>
+            <Pill>{Math.min(data.recentAudit.length, 5)} thay đổi</Pill>
           </div>
           <div className="mt-4 space-y-3">
             {data.recentAudit.slice(0, 5).map((item) => (
