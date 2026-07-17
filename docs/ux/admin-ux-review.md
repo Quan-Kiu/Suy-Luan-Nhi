@@ -65,3 +65,23 @@ The former JSON editor is no longer part of the normal workflow. Advanced identi
 - Statuses and roles are displayed with Vietnamese user-facing labels.
 - Mobile navigation remains accessible and persistent layouts remain intact.
 - Existing custom content registry values are preserved when defaults are synchronized.
+
+## Role-aligned workflows
+
+The dashboard and routes now follow the responsibility of the signed-in staff member instead of presenting every possible action.
+
+| Role              | Priority work                                                            | Restricted work                                        |
+| ----------------- | ------------------------------------------------------------------------ | ------------------------------------------------------ |
+| Biên tập nội dung | Create missions, continue drafts, manage media and taxonomy              | Review approval and publication                        |
+| Người kiểm duyệt  | Review submitted missions, review media, inspect reports                 | Create, edit, duplicate, archive, worlds, and taxonomy |
+| Quản trị viên     | Full editorial, review, privacy, membership, and configuration workflows | None inside the staff area                             |
+
+Navigation filtering is backed by server-side route guards. Hiding an action is not treated as authorization.
+
+## Verification completed
+
+- Formatting, lint, TypeScript, unit tests, and production build pass.
+- Admin desktop browser tests pass, including role-specific navigation and forbidden direct routes.
+- The full editorial-to-reviewer publication flow passes.
+- Critical mobile flows pass, including the admin drawer and persistent layouts.
+- Desktop and mobile screenshots were reviewed for dashboard, mission list, editor, and navigation states.
