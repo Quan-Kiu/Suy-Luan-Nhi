@@ -18,3 +18,7 @@ Use the canonical labels `needs-triage`, `needs-info`, `ready-for-agent`, `ready
 ### Domain docs
 
 This is a single-context repository. Read `CONTEXT.md` and relevant ADRs under `docs/adr/` before changing domain behaviour. See `docs/agents/domain.md`.
+
+### Frontend architecture
+
+Frontend work must follow the Axios, TanStack Query, React Hook Form, Content Registry, App Router layout, cache, and Motion conventions in `docs/engineering/frontend-architecture.md`.
