@@ -89,11 +89,13 @@ test("content admin submits an immutable version and reviewer publishes it", asy
   const reviewHref = await reviewLink.getAttribute("href");
   expect(reviewHref).toMatch(/^\/admin\/reviews\//);
   await page.goto(reviewHref!);
-  await page.getByLabel("Nhận xét reviewer").fill("Nội dung, phản hồi và Safety Checklist đã đạt yêu cầu.");
-  await page.getByRole("button", { name: /Duyệt phiên bản/i }).click();
+  await page
+    .getByLabel("Nhận xét cho người soạn")
+    .fill("Nội dung, phản hồi và kiểm tra an toàn đã đạt yêu cầu.");
+  await page.getByRole("button", { name: /Nội dung đạt yêu cầu/i }).click();
   await expect(page.getByRole("button", { name: /Xuất bản ngay/i })).toBeVisible();
   await page.getByRole("button", { name: /Xuất bản ngay/i }).click();
-  await expect(page.getByText("published", { exact: true })).toBeVisible();
+  await expect(page.getByText("Đang hiển thị", { exact: true })).toBeVisible();
 
   await signOutByClearingSession(page);
   await signIn(page, "content@demo.local", "/admin/missions");

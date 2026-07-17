@@ -8,6 +8,24 @@ const tinyPng = Buffer.from(
 
 test.describe.configure({ mode: "serial" });
 
+test("admin uses plain-language navigation and a structured mission editor", async ({ page }) => {
+  await signIn(page, "content@demo.local", "/admin");
+  await expect(page.getByRole("heading", { name: "Hôm nay cần làm gì?" })).toBeVisible();
+  await expect(page.getByText("Biên tập nội dung", { exact: true })).toBeVisible();
+  await expect(page.getByRole("link", { name: "Thành viên & quyền" })).toHaveCount(0);
+  await expect(page.getByRole("link", { name: "Cài đặt nâng cao" })).toHaveCount(0);
+
+  await page.getByRole("link", { name: "Tạo nhiệm vụ mới" }).first().click();
+  await expect(page.getByRole("heading", { name: "Nhiệm vụ chưa đặt tên" })).toBeVisible();
+  await expect(page.getByText("Payload JSON")).toHaveCount(0);
+  await expect(page.getByText("Đáp án đúng JSON")).toHaveCount(0);
+  await expect(page.getByRole("group", { name: "Các lựa chọn" })).toBeVisible();
+
+  await page.getByPlaceholder("Ví dụ: Thám tử dấu chân").fill("Nhiệm vụ UX dễ hiểu");
+  await page.getByText("Thiết lập nâng cao").first().click();
+  await expect(page.getByPlaceholder("tham-tu-dau-chan")).toHaveValue("nhiem-vu-ux-de-hieu");
+});
+
 test("health endpoints report liveness and database readiness", async ({ page }) => {
   const live = await apiData<{ status: string; service: string }>(await page.request.get("/api/health/live"));
   expect(live).toEqual(expect.objectContaining({ status: "ok", service: "sln-gpt" }));
@@ -39,18 +57,24 @@ test("parent is denied admin UI and mutations with the shared error envelope", a
 });
 test("content admin creates taxonomy and world content through the CMS", async ({ page }) => {
   await signIn(page, "content@demo.local", "/admin/worlds");
-  await expect(page.getByRole("heading", { name: "Mission Worlds", exact: true })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Thế giới nhiệm vụ", exact: true })).toBeVisible();
 
-  const newWorld = page.locator("article").filter({ hasText: "Tạo Mission World mới" });
-  await newWorld.getByPlaceholder("slug").fill("e2e-world");
-  await newWorld.getByPlaceholder("Tiêu đề").fill("Thế giới E2E");
-  await newWorld.getByPlaceholder("Phụ đề").fill("Kiểm thử vận hành");
-  await newWorld.getByPlaceholder("Cover URL").fill("/assets/cards/world-card-detective-rules.png");
-  await newWorld.getByPlaceholder("Mô tả").fill("Thế giới được tạo từ browser test thực tế.");
+  const newWorld = page.locator("article").filter({ hasText: "Tạo thế giới nhiệm vụ mới" });
+  await newWorld.getByPlaceholder("Ví dụ: Thám tử Quy luật").fill("Thế giới E2E");
+  await newWorld.getByPlaceholder("Ví dụ: Quan sát thật tinh").fill("Kiểm thử vận hành");
+  await newWorld
+    .getByPlaceholder("Giới thiệu trẻ sẽ khám phá điều gì trong thế giới này")
+    .fill("Thế giới được tạo từ browser test thực tế.");
+  await newWorld.getByText("Thiết lập nâng cao").click();
+  await newWorld
+    .getByPlaceholder("/assets/cards/world-cover.png")
+    .fill("/assets/cards/world-card-detective-rules.png");
   await newWorld.getByRole("button", { name: "Tạo thế giới" }).click();
-  await expect(page.getByText("Đã tạo Mission World")).toBeVisible();
+  await expect(page.getByText("Đã tạo thế giới nhiệm vụ")).toBeVisible();
   await expect(
-    page.getByRole("article", { name: "Mission World: Thế giới E2E" }).getByPlaceholder("Tiêu đề"),
+    page
+      .getByRole("article", { name: "Thế giới nhiệm vụ: Thế giới E2E" })
+      .getByPlaceholder("Ví dụ: Thám tử Quy luật"),
   ).toHaveValue("Thế giới E2E");
 
   await page.goto("/admin/taxonomy");
@@ -72,11 +96,11 @@ test("media follows upload, reviewer approval and owner deletion permissions", a
     mimeType: "image/png",
     buffer: tinyPng,
   });
-  await page.getByPlaceholder("Mô tả hình ảnh hoặc audio").fill("Điểm ảnh dùng cho kiểm thử media");
+  await page.getByPlaceholder("Mô tả hình ảnh hoặc âm thanh").fill("Điểm ảnh dùng cho kiểm thử media");
   await page.getByRole("button", { name: "Tải lên" }).click();
-  await expect(page.getByText("Đã tải media lên storage")).toBeVisible();
+  await expect(page.getByText("Đã tải tư liệu lên thư viện")).toBeVisible();
   const uploadedCard = page.locator("article").filter({ hasText: "e2e-pixel.png" });
-  await expect(uploadedCard).toContainText("pending");
+  await expect(uploadedCard).toContainText("Chờ kiểm tra");
   const mediaUrl = (await uploadedCard.locator("code").textContent())?.trim();
   expect(mediaUrl).toMatch(/^\/uploads\/e2e\/image\//);
   const mediaResponse = await page.request.get(mediaUrl!);
@@ -92,24 +116,24 @@ test("media follows upload, reviewer approval and owner deletion permissions", a
   await clearAuth(page);
   await signIn(page, "reviewer@demo.local", "/admin/media");
   const reviewCard = page.locator("article").filter({ hasText: "e2e-pixel.png" });
-  await reviewCard.getByLabel("Duyệt media").click();
-  await expect(reviewCard).toContainText("approved");
-  await expect(reviewCard.getByLabel("Xóa media")).toHaveCount(0);
+  await reviewCard.getByLabel("Duyệt tư liệu").click();
+  await expect(reviewCard).toContainText("Đã duyệt");
+  await expect(reviewCard.getByLabel("Xóa tư liệu")).toHaveCount(0);
 
   await clearAuth(page);
   await signIn(page, "content@demo.local", "/admin/media");
   const deleteCard = page.locator("article").filter({ hasText: "e2e-pixel.png" });
   page.once("dialog", (dialog) => dialog.accept());
-  await deleteCard.getByLabel("Xóa media").click();
+  await deleteCard.getByLabel("Xóa tư liệu").click();
   await expect(deleteCard).toHaveCount(0);
   expect((await page.request.get(mediaUrl!)).status()).toBe(404);
 });
 test("super admin persists system settings and receives audit-safe responses", async ({ page }) => {
   await signIn(page, "admin@demo.local", "/admin/settings");
-  await page.getByPlaceholder("key.ví_dụ").fill("e2e.feature.enabled");
+  await page.getByPlaceholder("Ví dụ: feature.enabled").fill("e2e.feature.enabled");
   await page.locator("textarea").last().fill('{"enabled":true,"source":"browser-test"}');
-  await page.getByRole("button", { name: "Thêm setting" }).click();
-  await expect(page.getByText("Đã lưu system setting")).toBeVisible();
+  await page.getByRole("button", { name: "Thêm cấu hình" }).click();
+  await expect(page.getByText("Đã lưu cấu hình")).toBeVisible();
   await expect(page.getByText("e2e.feature.enabled")).toBeVisible();
 
   const response = await page.request.patch("/api/admin/settings", {
