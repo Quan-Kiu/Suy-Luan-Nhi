@@ -35,11 +35,11 @@ test("family deletion request is parent-gated and super-admin anonymizes the acc
   await clearAuth(page);
   await signIn(page, "admin@demo.local", "/admin/data-requests");
   const row = page.locator("tr").filter({ hasText: email });
-  await expect(row).toContainText("pending");
+  await expect(row).toContainText("Đang chờ xử lý");
   page.once("dialog", (dialog) => dialog.accept());
   await row.getByRole("button", { name: "Xử lý xóa" }).click();
   const completedRow = page.locator("tr").filter({ hasText: "Đã xóa" });
-  await expect(completedRow).toContainText("completed");
+  await expect(completedRow).toContainText("Đã hoàn thành");
 
   await clearAuth(page);
   const loginResponse = await page.request.post("/api/auth/sign-in/email", {

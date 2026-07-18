@@ -35,7 +35,7 @@ export async function selectChild(page: Page, childId: string) {
   await apiData(await page.request.post(`/api/children/${childId}/select`));
 }
 
-export async function unlockParentGate(page: Page, answer = "23") {
+export async function unlockParentGate(page: Page, answer?: string) {
   await page.goto("/parent");
   const dashboard = page.getByRole("heading", { name: /Tuần của/i });
   const input = page.getByLabel(/Kết quả phép tính|PIN phụ huynh/);
@@ -45,7 +45,9 @@ export async function unlockParentGate(page: Page, answer = "23") {
     .catch(() => false);
 
   if (gateVisible) {
-    await input.fill(answer);
+    const placeholder = await input.getAttribute("placeholder");
+    const gateAnswer = answer ?? (placeholder?.includes("PIN") ? "2468" : "23");
+    await input.fill(gateAnswer);
     await page.getByRole("button", { name: /Mở khu vực phụ huynh/i }).click();
   }
   await expect(dashboard).toBeVisible();
