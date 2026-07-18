@@ -42,7 +42,7 @@ export function ReviewPublishActions({ missionId, versionId }: { missionId: stri
         pendingLabel={contentText(content, "review.publishing", "Đang xuất bản...")}
         onClick={() => publishMutation.mutate()}
         disabled={scheduleMutation.isPending}
-        className="w-full bg-[#5d8c48] shadow-none"
+        className="w-full bg-[#517d3f] shadow-none"
       >
         <Rocket size={18} className="mr-2 inline" />
         {contentText(content, "review.publish", "Xuất bản ngay")}
@@ -63,7 +63,7 @@ export function ReviewPublishActions({ missionId, versionId }: { missionId: stri
           pending={scheduleMutation.isPending}
           pendingLabel={contentText(content, "review.scheduling", "Đang lên lịch...")}
           disabled={publishMutation.isPending}
-          className="mt-3 border border-[#5d8c48] bg-white text-[#4d743b] shadow-none"
+          className="mt-3 border border-[#517d3f] bg-white text-[#4d743b] shadow-none"
         >
           {contentText(content, "review.schedule", "Lưu lịch xuất bản")}
         </SubmitButton>

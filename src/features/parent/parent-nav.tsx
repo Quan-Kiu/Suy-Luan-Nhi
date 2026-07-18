@@ -53,7 +53,7 @@ export function ParentNav({ unread = 0 }: { unread?: number }) {
               href={href}
               className={cn(
                 "flex items-center gap-2 rounded-xl px-3 py-2 text-sm font-bold",
-                isActive(pathname, href, exact) && "bg-[#fff0df] text-[#d95812]",
+                isActive(pathname, href, exact) && "bg-[#fff0df] text-[#bd4910]",
               )}
             >
               <Icon size={18} />
@@ -93,7 +93,7 @@ export function ParentNav({ unread = 0 }: { unread?: number }) {
             href={href}
             className={cn(
               "text-center text-[11px] font-bold",
-              isActive(pathname, href, exact) && "text-[#e9641a]",
+              isActive(pathname, href, exact) && "text-[#bd4910]",
             )}
           >
             <Icon className="mx-auto" size={20} />

@@ -121,7 +121,7 @@ export function ChildHeader() {
                       onClick={() => setOpen(false)}
                       className={cn(
                         "flex min-h-12 items-center gap-3 rounded-2xl px-4 font-black",
-                        active ? "bg-[#fff0df] text-[#d95812]" : "hover:bg-white",
+                        active ? "bg-[#fff0df] text-[#bd4910]" : "hover:bg-white",
                       )}
                     >
                       <Icon size={19} />

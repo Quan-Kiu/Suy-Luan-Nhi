@@ -122,7 +122,7 @@ export default async function HomePage() {
           className="mx-auto h-24 w-24 object-contain"
         />
         <h2 className="text-3xl font-black">{t("how.title", "Một nhiệm vụ nhỏ, một thói quen nghĩ mới")}</h2>
-        <p className="mx-auto mt-3 max-w-2xl text-[#667653]">
+        <p className="mx-auto mt-3 max-w-2xl text-[#617149]">
           {t(
             "how.description",
             "Chọn thế giới, quan sát câu hỏi, nhận gợi ý dịu dàng và cùng bé chúc mừng từng lần thử.",

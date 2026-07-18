@@ -20,7 +20,7 @@ export function MissionDetailView({ data, childId }: { data: Published; childId:
           className="h-72 w-full object-cover"
         />
         <div className="absolute top-4 left-4">
-          <Pill className="bg-[#6f914c] text-white">{data.world.title}</Pill>
+          <Pill className="bg-[#55773a] text-white">{data.world.title}</Pill>
         </div>
       </div>
       <Card className="relative mx-2 -mt-5 p-5 text-center">
@@ -55,7 +55,7 @@ export function MissionDetailView({ data, childId }: { data: Published; childId:
             className="size-20 object-contain"
           />
           <div>
-            <p className="flex items-center gap-2 text-xs font-black tracking-wider text-[#bc7917] uppercase">
+            <p className="flex items-center gap-2 text-xs font-black tracking-wider text-[#9a5f0e] uppercase">
               <Gift size={16} />
               Phần thưởng
             </p>

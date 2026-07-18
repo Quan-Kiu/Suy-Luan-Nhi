@@ -22,7 +22,7 @@ export default async function Page({
   return (
     <>
       <h1 className="text-3xl font-black">{contentText(content, "activity.title", "Lịch sử hoạt động")}</h1>
-      <p className="mt-2 text-[#806d54]">
+      <p className="mt-2 text-[#786348]">
         {contentText(
           content,
           "activity.description",
@@ -30,19 +30,39 @@ export default async function Page({
         )}
       </p>
       <form className="mt-5 grid gap-3 rounded-2xl border bg-white p-4 sm:grid-cols-4">
-        <select name="status" defaultValue={filters.status ?? ""} className="min-h-11 rounded-xl border px-3">
-          <option value="">{contentText(content, "activity.allStatuses", "Tất cả trạng thái")}</option>
-          <option value="completed">{contentText(content, "activity.completed", "Đã hoàn thành")}</option>
-          <option value="in_progress">{contentText(content, "activity.inProgress", "Đang tiếp tục")}</option>
-          <option value="exited">{contentText(content, "activity.exited", "Đã dừng")}</option>
-        </select>
-        <input
-          type="date"
-          name="from"
-          defaultValue={filters.from}
-          className="min-h-11 rounded-xl border px-3"
-        />
-        <input type="date" name="to" defaultValue={filters.to} className="min-h-11 rounded-xl border px-3" />
+        <label>
+          <span className="sr-only">Trạng thái hoạt động</span>
+          <select
+            name="status"
+            defaultValue={filters.status ?? ""}
+            className="min-h-11 w-full rounded-xl border px-3"
+          >
+            <option value="">{contentText(content, "activity.allStatuses", "Tất cả trạng thái")}</option>
+            <option value="completed">{contentText(content, "activity.completed", "Đã hoàn thành")}</option>
+            <option value="in_progress">
+              {contentText(content, "activity.inProgress", "Đang tiếp tục")}
+            </option>
+            <option value="exited">{contentText(content, "activity.exited", "Đã dừng")}</option>
+          </select>
+        </label>
+        <label>
+          <span className="sr-only">Từ ngày</span>
+          <input
+            type="date"
+            name="from"
+            defaultValue={filters.from}
+            className="min-h-11 w-full rounded-xl border px-3"
+          />
+        </label>
+        <label>
+          <span className="sr-only">Đến ngày</span>
+          <input
+            type="date"
+            name="to"
+            defaultValue={filters.to}
+            className="min-h-11 w-full rounded-xl border px-3"
+          />
+        </label>
         <Button type="submit" className="min-h-11 rounded-xl px-4 py-2">
           {contentText(content, "activity.filter", "Lọc hoạt động")}
         </Button>
@@ -59,7 +79,7 @@ export default async function Page({
             />
             <div className="flex-1">
               <h2 className="font-black">{item.missionTitle}</h2>
-              <p className="text-sm text-[#806d54]">{new Date(item.startedAt).toLocaleString("vi-VN")}</p>
+              <p className="text-sm text-[#786348]">{new Date(item.startedAt).toLocaleString("vi-VN")}</p>
               <div className="mt-2 flex flex-wrap gap-2">
                 <Pill>
                   {contentTemplate(content, "activity.questions", "{correct}/{total} câu", {

@@ -37,6 +37,7 @@ export function MemberRow({ item, currentUserId }: { item: MemberItem; currentUs
       </td>
       <td className="p-3">
         <select
+          aria-label={`Vai trò của ${item.name}`}
           disabled={isCurrentUser || mutation.isPending}
           defaultValue={item.role}
           onChange={(event) =>

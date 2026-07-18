@@ -54,7 +54,7 @@ export function ReviewDecisionForm({ missionId, versionId }: { missionId: string
           type="button"
           onClick={() => submit("approve")}
           disabled={mutation.isPending}
-          className="inline-flex min-h-11 items-center gap-2 rounded-xl bg-[#5d8c48] px-4 font-black text-white disabled:opacity-50"
+          className="inline-flex min-h-11 items-center gap-2 rounded-xl bg-[#517d3f] px-4 font-black text-white disabled:opacity-50"
         >
           <CheckCircle2 size={18} />
           {mutation.isPending && mutation.variables.action === "approve"

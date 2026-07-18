@@ -66,7 +66,7 @@ export default async function Page({
           canEdit ? (
             <Link
               href="/admin/missions/new"
-              className="inline-flex min-h-11 items-center gap-2 rounded-xl bg-[#e9641a] px-4 font-black text-white shadow-[0_4px_0_#bd4910]"
+              className="inline-flex min-h-11 items-center gap-2 rounded-xl bg-[#b9470d] px-4 font-black text-white shadow-[0_4px_0_#7f2e05]"
             >
               <Plus size={18} /> {t("missions.create", "Tạo nhiệm vụ mới")}
             </Link>
@@ -135,16 +135,19 @@ export default async function Page({
       </div>
 
       <div className="grid gap-4 md:hidden">
-        {items.map((item) => (
+        {items.map((item, index) => (
           <article key={item.id} className="overflow-hidden rounded-2xl border bg-white shadow-sm">
             <MissionEditTarget canEdit={canEdit} href={`/admin/missions/${item.id}/edit`} className="block">
-              <Image
-                src={item.coverUrl}
-                width={760}
-                height={360}
-                alt=""
-                className="h-36 w-full object-cover"
-              />
+              <div className="relative h-36 w-full overflow-hidden">
+                <Image
+                  src={item.coverUrl}
+                  fill
+                  sizes="(max-width: 767px) calc(100vw - 2rem), 1px"
+                  preload={index === 0}
+                  alt=""
+                  className="object-cover"
+                />
+              </div>
               <div className="p-4">
                 <div className="flex flex-wrap items-start justify-between gap-2">
                   <div className="min-w-0">
@@ -164,7 +167,7 @@ export default async function Page({
                     },
                   )}
                 </p>
-                <p className="mt-1 text-xs text-[#8a8176]">
+                <p className="mt-1 text-xs text-[#756b60]">
                   Cập nhật {item.updatedAt.toLocaleDateString("vi-VN")}
                 </p>
               </div>
@@ -198,13 +201,9 @@ export default async function Page({
                     href={`/admin/missions/${item.id}/edit`}
                     className="flex min-w-64 items-center gap-3"
                   >
-                    <Image
-                      src={item.coverUrl}
-                      width={68}
-                      height={52}
-                      alt=""
-                      className="h-13 w-17 rounded-xl object-cover"
-                    />
+                    <span className="relative block h-13 w-17 shrink-0 overflow-hidden rounded-xl">
+                      <Image src={item.coverUrl} fill sizes="68px" alt="" className="object-cover" />
+                    </span>
                     <span>
                       <strong className="block">{item.title}</strong>
                       <small className="text-[#806d54]">Mã nội bộ: {item.slug}</small>

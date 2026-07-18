@@ -9,6 +9,7 @@ export function SessionProgress({ current, total }: { current: number; total: nu
       </span>
       <div
         role="progressbar"
+        aria-label={`Tiến độ ${current} trên ${total}`}
         aria-valuemin={0}
         aria-valuemax={total}
         aria-valuenow={current}

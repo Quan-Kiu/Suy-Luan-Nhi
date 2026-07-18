@@ -42,7 +42,7 @@ export function AgeGroupCardsField({
               className="mx-auto h-20 w-20 object-contain"
             />
             <strong className="block">{option.title}</strong>
-            <span className="text-xs text-[#806d54]">{option.note}</span>
+            <span className="text-xs text-[#7d684f]">{option.note}</span>
           </label>
         ))}
       </div>

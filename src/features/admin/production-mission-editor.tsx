@@ -99,7 +99,7 @@ export function ProductionMissionEditor({
             </Link>
             <div className="mt-3 flex flex-wrap items-end justify-between gap-3">
               <div>
-                <p className="text-xs font-bold text-[#8a8176]">
+                <p className="text-xs font-bold text-[#756b60]">
                   {missionId
                     ? contentText(content, "missionEditor.modeEdit", "Đang chỉnh sửa nhiệm vụ")
                     : contentText(content, "missionEditor.modeCreate", "Tạo nhiệm vụ mới")}
@@ -159,7 +159,7 @@ export function ProductionMissionEditor({
                 onClick={submitReview}
                 disabled={pending || !allSafe}
                 aria-busy={submitMutation.isPending}
-                className="min-h-12 rounded-2xl bg-[#5d8c48] px-5 font-black text-white disabled:cursor-not-allowed disabled:opacity-40"
+                className="min-h-12 rounded-2xl bg-[#517d3f] px-5 font-black text-white disabled:cursor-not-allowed disabled:opacity-40"
               >
                 <Send size={18} className="mr-2 inline" />
                 {submitMutation.isPending

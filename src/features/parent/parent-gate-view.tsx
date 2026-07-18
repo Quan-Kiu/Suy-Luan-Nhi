@@ -17,7 +17,7 @@ export function ParentGateView({ hasPin, content }: { hasPin: boolean; content: 
         <h1 className="mt-3 text-3xl font-black">
           {contentText(content, "gate.title", "Khu vực phụ huynh")}
         </h1>
-        <p className="mt-2 text-[#806d54]">
+        <p className="mt-2 text-[#786348]">
           {contentText(
             content,
             "gate.description",

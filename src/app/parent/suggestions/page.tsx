@@ -11,7 +11,7 @@ export default async function Page() {
   return (
     <>
       <h1 className="text-3xl font-black">Gợi ý trò chuyện</h1>
-      <p className="mt-2 text-[#806d54]">
+      <p className="mt-2 text-[#786348]">
         Những câu hỏi ngắn giúp bé kể lại cách nghĩ mà không biến cuộc trò chuyện thành bài kiểm tra.
       </p>
       <div className="mt-5 grid gap-4 md:grid-cols-2">

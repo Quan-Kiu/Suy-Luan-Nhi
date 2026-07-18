@@ -97,7 +97,7 @@ export default async function Page() {
           {urgentTasks.map(({ title, description, href, icon: Icon }) => (
             <Link key={href} href={href} className="group">
               <Card className="flex h-full items-start gap-4 p-5 transition group-hover:-translate-y-0.5 group-hover:shadow-lg">
-                <span className="grid size-11 shrink-0 place-items-center rounded-2xl bg-[#fff0df] text-[#d95812]">
+                <span className="grid size-11 shrink-0 place-items-center rounded-2xl bg-[#fff0df] text-[#bd4910]">
                   <Icon size={21} />
                 </span>
                 <span className="min-w-0 flex-1">
@@ -134,7 +134,7 @@ export default async function Page() {
             </div>
             <Link
               href="/admin/missions"
-              className="inline-flex items-center gap-1 text-sm font-black text-[#d95812]"
+              className="inline-flex items-center gap-1 text-sm font-black text-[#bd4910]"
             >
               {t("dashboard.openCms", "Xem tất cả nhiệm vụ")}
               <ArrowRight size={16} />
@@ -185,7 +185,7 @@ export default async function Page() {
           </div>
           <Link
             href="/admin/audit"
-            className="mt-4 inline-flex items-center gap-1 text-sm font-black text-[#d95812]"
+            className="mt-4 inline-flex items-center gap-1 text-sm font-black text-[#bd4910]"
           >
             {t("dashboard.viewAudit", "Xem nhật ký thay đổi")}
             <ArrowRight size={16} />

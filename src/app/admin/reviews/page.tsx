@@ -23,13 +23,22 @@ export default async function Page() {
         icon={ClipboardCheck}
       />
       <div className="mt-6 grid gap-4 md:grid-cols-2 xl:grid-cols-3">
-        {items.map((item) => (
+        {items.map((item, index) => (
           <Link
             key={item.version.id}
             href={`/admin/reviews/${item.version.id}`}
             className="overflow-hidden rounded-2xl border bg-white transition hover:-translate-y-1 hover:shadow-lg"
           >
-            <Image src={item.coverUrl} width={560} height={300} alt="" className="h-44 w-full object-cover" />
+            <div className="relative h-44 w-full overflow-hidden">
+              <Image
+                src={item.coverUrl}
+                fill
+                sizes="(max-width: 767px) calc(100vw - 2rem), (max-width: 1279px) 50vw, 33vw"
+                loading={index === 0 ? "eager" : "lazy"}
+                alt=""
+                className="object-cover"
+              />
+            </div>
             <div className="p-4">
               <span className="rounded-full bg-[#fff5d8] px-3 py-1 text-xs font-black">
                 {contentTemplate(content, "reviews.version", "Lần gửi {number}", {
@@ -43,7 +52,7 @@ export default async function Page() {
                   time: item.version.createdAt.toLocaleString("vi-VN"),
                 })}
               </p>
-              <span className="mt-4 inline-flex items-center gap-1 text-sm font-black text-[#d95812]">
+              <span className="mt-4 inline-flex items-center gap-1 text-sm font-black text-[#bd4910]">
                 Mở để kiểm duyệt <ArrowRight size={16} />
               </span>
             </div>

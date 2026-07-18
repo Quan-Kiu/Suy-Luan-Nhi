@@ -72,7 +72,7 @@ export function ContentManager({ items, canEdit }: { items: ContentEntryItem[]; 
           >
             <div className="flex flex-wrap items-start justify-between gap-3">
               <div>
-                <p className="text-sm font-black text-[#d95812]">{namespaceLabel(row.namespace)}</p>
+                <p className="text-sm font-black text-[#bd4910]">{namespaceLabel(row.namespace)}</p>
                 <p className="mt-1 text-sm leading-6 text-[#6f6558]">
                   Câu chữ được dùng trong {namespaceLabel(row.namespace).toLocaleLowerCase("vi")}.
                 </p>

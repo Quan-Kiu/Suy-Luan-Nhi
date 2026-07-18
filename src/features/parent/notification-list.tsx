@@ -48,7 +48,7 @@ export function NotificationList({ items }: { items: NotificationItem[] }) {
           >
             <div className="flex justify-between gap-3">
               <strong>{item.title}</strong>
-              <time className="text-xs text-[#806d54]">
+              <time className="text-xs text-[#786348]">
                 {new Date(item.createdAt).toLocaleDateString("vi-VN")}
               </time>
             </div>

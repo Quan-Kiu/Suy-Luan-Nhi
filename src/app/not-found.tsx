@@ -9,7 +9,7 @@ export default function NotFound() {
         <p className="mt-3 text-[#806d54]">
           Trang hoặc nhiệm vụ có thể đã được lưu trữ, di chuyển hoặc chưa được mở khóa.
         </p>
-        <Link href="/" className="mt-5 inline-block rounded-2xl bg-[#e9641a] px-5 py-3 font-black text-white">
+        <Link href="/" className="mt-5 inline-block rounded-2xl bg-[#b9470d] px-5 py-3 font-black text-white">
           Về trang chủ
         </Link>
       </section>

@@ -9,7 +9,7 @@ export default async function Page() {
   return (
     <>
       <h1 className="text-3xl font-black">Cài đặt gia đình</h1>
-      <p className="mt-2 mb-5 text-[#806d54]">
+      <p className="mt-2 mb-5 text-[#786348]">
         Âm thanh, thông báo, Parent PIN và quyền dữ liệu được lưu theo tài khoản phụ huynh.
       </p>
       <SettingsForm

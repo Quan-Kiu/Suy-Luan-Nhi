@@ -27,7 +27,7 @@ export async function sendTransactionalEmail(input: {
   const safeBody = escapeHtml(input.body);
   const action =
     input.actionLabel && input.actionUrl
-      ? `<p style="margin:24px 0"><a href="${escapeHtml(input.actionUrl)}" style="background:#e9641a;color:white;padding:12px 18px;border-radius:12px;text-decoration:none;font-weight:700">${escapeHtml(input.actionLabel)}</a></p>`
+      ? `<p style="margin:24px 0"><a href="${escapeHtml(input.actionUrl)}" style="background:#b9470d;color:white;padding:12px 18px;border-radius:12px;text-decoration:none;font-weight:700">${escapeHtml(input.actionLabel)}</a></p>`
       : "";
 
   await transporter.sendMail({

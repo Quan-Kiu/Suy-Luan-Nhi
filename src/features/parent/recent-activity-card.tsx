@@ -54,7 +54,7 @@ export function RecentActivityCard({
               />
               <div className="flex-1">
                 <p className="font-black">{item.missionTitle}</p>
-                <p className="text-xs text-[#806d54]">{statusText(item, content)}</p>
+                <p className="text-xs text-[#786348]">{statusText(item, content)}</p>
               </div>
             </div>
           ))

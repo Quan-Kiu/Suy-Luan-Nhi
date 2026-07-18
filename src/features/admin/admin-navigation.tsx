@@ -147,7 +147,7 @@ export function AdminNavigation({ pathname, role, content, onNavigate, ariaLabel
 
         return (
           <section key={group.labelKey}>
-            <p className="mb-2 px-3 text-[11px] font-black tracking-[0.14em] text-[#8a8176] uppercase">
+            <p className="mb-2 px-3 text-[11px] font-black tracking-[0.14em] text-[#756b60] uppercase">
               {contentText(content, group.labelKey, group.fallback)}
             </p>
             <div className="space-y-1">
@@ -165,7 +165,7 @@ export function AdminNavigation({ pathname, role, content, onNavigate, ariaLabel
                     aria-current={active ? "page" : undefined}
                     className={cn(
                       "flex min-h-11 items-center gap-3 rounded-xl px-3 font-bold transition hover:bg-[#f5f2ec]",
-                      active && "bg-[#fff0df] text-[#d95812] shadow-sm",
+                      active && "bg-[#fff0df] text-[#bd4910] shadow-sm",
                     )}
                   >
                     <Icon size={18} className="shrink-0" />

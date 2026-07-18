@@ -54,7 +54,7 @@ export function ParentHeader({
         </Link>
         <div className="min-w-0">
           <p className="truncate font-black">{contentText(content, "shell.title", "Khu vực phụ huynh")}</p>
-          <p className="truncate text-xs text-[#806d54]">
+          <p className="truncate text-xs text-[#786348]">
             {contentTemplate(content, "shell.viewing", "Đang xem: {childName}", { childName })}
           </p>
         </div>

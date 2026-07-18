@@ -49,7 +49,7 @@ export default async function ProfilesPage() {
             </p>
             <Link
               href="/onboarding"
-              className="mt-4 inline-block rounded-2xl bg-[#e9641a] px-5 py-3 font-black text-white"
+              className="mt-4 inline-block rounded-2xl bg-[#b9470d] px-5 py-3 font-black text-white"
             >
               {contentText(content, "list.emptyAction", "Tạo hồ sơ đầu tiên")}
             </Link>

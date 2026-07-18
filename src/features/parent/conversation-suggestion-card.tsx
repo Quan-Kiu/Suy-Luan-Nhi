@@ -14,7 +14,7 @@ export function ConversationSuggestionCard({
 }) {
   return (
     <Card className="bg-[#eaf3df] p-5">
-      <p className="text-xs font-black tracking-wider text-[#608049] uppercase">
+      <p className="text-xs font-black tracking-wider text-[#587541] uppercase">
         {contentText(content, "dashboard.suggestionLabel", "Gợi ý trò chuyện")}
       </p>
       <h2 className="mt-2 text-xl font-black">

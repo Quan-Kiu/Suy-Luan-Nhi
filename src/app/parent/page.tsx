@@ -27,7 +27,7 @@ export default async function Page() {
     <>
       <div className="flex flex-wrap items-end justify-between gap-3">
         <div>
-          <p className="text-sm text-[#806d54]">
+          <p className="text-sm text-[#786348]">
             {contentTemplate(content, "dashboard.greeting", "Xin chào, {parentName}", {
               parentName: session.user.name,
             })}

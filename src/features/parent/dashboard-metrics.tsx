@@ -29,7 +29,7 @@ export function DashboardMetrics({
         <Card key={label} className="p-4 text-center">
           <Icon className="mx-auto text-[#e9641a]" />
           <p className="mt-2 text-3xl font-black">{value}</p>
-          <p className="text-xs font-bold text-[#806d54]">{label}</p>
+          <p className="text-xs font-bold text-[#786348]">{label}</p>
         </Card>
       ))}
     </div>

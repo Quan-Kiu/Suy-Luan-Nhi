@@ -18,7 +18,7 @@ function ValidQuestionPreview({ question }: { question: PlayableQuestion }) {
   const [value, setValue] = useState<QuestionSubmission | null>(() => initialValue(question));
   return (
     <div className="rounded-[28px] bg-[#fffaf0] p-4">
-      <p className="text-center text-xs font-black tracking-widest text-[#d78517] uppercase">
+      <p className="text-center text-xs font-black tracking-widest text-[#9f600b] uppercase">
         Preview Child Renderer
       </p>
       <h3 className="mt-2 text-center text-xl font-black">{question.prompt}</h3>

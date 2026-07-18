@@ -161,7 +161,7 @@ export function SettingsForm({ initial, childId }: { initial: Settings; childId:
                 resetMutation.mutate();
               }
             }}
-            className="h-full bg-amber-600 shadow-none"
+            className="h-full bg-amber-700 shadow-none"
           >
             {contentText(content, "settings.resetProgress", "Đặt lại tiến độ bé")}
           </AsyncButton>
