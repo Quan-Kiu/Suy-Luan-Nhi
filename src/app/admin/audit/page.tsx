@@ -1,5 +1,6 @@
 import { Database, Filter, X } from "lucide-react";
 import Link from "next/link";
+import { requireStaff } from "@/auth/session";
 import { auditActionLabels, friendlyLabel, resourceTypeLabels } from "@/features/admin/admin-labels";
 import { AdminPageHeader } from "@/features/admin/admin-page-header";
 import { listAuditLogs } from "@/modules/admin/operations";
@@ -9,6 +10,7 @@ export default async function Page({
 }: {
   searchParams: Promise<{ resourceType?: string; action?: string }>;
 }) {
+  await requireStaff();
   const filters = await searchParams;
   const items = await listAuditLogs(filters);
   const hasFilters = Boolean(filters.resourceType || filters.action);
