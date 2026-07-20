@@ -1,7 +1,8 @@
 import { z } from "zod";
+import { ageGroupCodes, type AgeGroup } from "@/domain/age-groups";
 
-export const ageGroupSchema = z.enum(["2-3", "4-5", "6-8"]);
-export type AgeGroup = z.infer<typeof ageGroupSchema>;
+export const ageGroupSchema = z.enum(ageGroupCodes);
+export type { AgeGroup };
 
 export const childProfileSchema = z.object({
   id: z.string().min(1),

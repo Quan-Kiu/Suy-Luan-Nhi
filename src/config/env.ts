@@ -40,7 +40,7 @@ const envSchema = z.object({
   SMTP_USER: optionalString,
   SMTP_PASSWORD: optionalString,
   SMTP_FROM: z.string().min(3).default("Suy Luận Nhí <no-reply@suyluannhi.local>"),
-  STORAGE_DRIVER: z.enum(["local", "s3"]).default("local"),
+  STORAGE_DRIVER: z.enum(["local", "s3", "cloudinary"]).default("local"),
   LOCAL_UPLOAD_DIR: z.string().default("public/uploads"),
   PUBLIC_UPLOAD_BASE_URL: z
     .string()
@@ -52,6 +52,11 @@ const envSchema = z.object({
   S3_ACCESS_KEY_ID: optionalString,
   S3_SECRET_ACCESS_KEY: optionalString,
   S3_PUBLIC_BASE_URL: optionalUrl,
+  CLOUDINARY_CLOUD_NAME: optionalString,
+  CLOUDINARY_API_KEY: optionalString,
+  CLOUDINARY_API_SECRET: optionalString,
+  CLOUDINARY_FOLDER: z.string().min(1).default("sln-gpt"),
+  CLOUDINARY_UPLOAD_PRESET: optionalString,
   PARENT_GATE_TTL_MINUTES: z.coerce.number().int().min(5).max(120).default(30),
   PARENT_GATE_MAX_ATTEMPTS: z.coerce.number().int().min(3).max(20).default(5),
   PARENT_GATE_LOCK_MINUTES: z.coerce.number().int().min(1).max(60).default(5),
@@ -81,6 +86,11 @@ if (parsed.data.STORAGE_DRIVER === "s3") {
     "S3_PUBLIC_BASE_URL",
   ] as const) {
     if (!parsed.data[key]) throw new Error(`${key} is required when STORAGE_DRIVER=s3`);
+  }
+}
+if (parsed.data.STORAGE_DRIVER === "cloudinary") {
+  for (const key of ["CLOUDINARY_CLOUD_NAME", "CLOUDINARY_API_KEY", "CLOUDINARY_API_SECRET"] as const) {
+    if (!parsed.data[key]) throw new Error(`${key} is required when STORAGE_DRIVER=cloudinary`);
   }
 }
 

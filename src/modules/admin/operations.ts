@@ -248,7 +248,7 @@ export async function updateSkill(
 
 export async function updateAgeGroup(
   actorId: string,
-  code: "2-3" | "4-5" | "6-8",
+  code: "6-8" | "9-10" | "11-12",
   input: Partial<{
     label: string;
     description: string;

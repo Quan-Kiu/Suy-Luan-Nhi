@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { ageGroupCodes } from "@/domain/age-groups";
 import {
   dragDropQuestionSchema,
   fillAnswerQuestionSchema,
@@ -48,7 +49,7 @@ const adminMissionDraftBaseSchema = z.object({
   secondarySkillIds: z.array(z.string().uuid()).max(8),
   rewardBadgeId: z.string().uuid().nullable(),
   coverUrl: z.string().trim().min(1),
-  ageGroups: z.array(z.enum(["2-3", "4-5", "6-8"])).min(1),
+  ageGroups: z.array(z.enum(ageGroupCodes)).min(1),
   difficulty: z.number().int().min(1).max(5),
   allowReplay: z.boolean(),
   randomizeAnswers: z.boolean(),

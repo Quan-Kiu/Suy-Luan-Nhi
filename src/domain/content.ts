@@ -79,7 +79,7 @@ export const footprintMission: Mission = {
   storyIntro:
     "Các bạn thú trong rừng để lại một dãy dấu chân bí mật. Bống cần con giúp tìm ra quy luật để mở chiếc rương nhỏ!",
   estimatedMinutes: 5,
-  targetAgeGroups: ["4-5", "6-8"],
+  targetAgeGroups: ["6-8", "6-8"],
   primarySkill: "Quan sát quy luật",
   secondarySkills: ["Nhìn kỹ", "Thử lại", "So sánh", "Kiểm tra"],
   reward: { name: "Thám tử tinh mắt", asset: assets.badge },

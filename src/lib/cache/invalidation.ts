@@ -7,6 +7,10 @@ export function invalidateContentCache() {
   revalidateTag(cacheTags.content, expireImmediately);
 }
 
+export function invalidateParentResources() {
+  revalidateTag(cacheTags.parentResources, expireImmediately);
+}
+
 export function invalidateParentDashboard(childId: string) {
   revalidateTag(cacheTags.parentDashboard(childId), expireImmediately);
 }

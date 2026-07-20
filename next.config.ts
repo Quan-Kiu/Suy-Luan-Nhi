@@ -10,6 +10,13 @@ if (process.env.S3_PUBLIC_BASE_URL) {
     pathname: `${url.pathname.replace(/\/$/, "")}/**`,
   });
 }
+if (process.env.CLOUDINARY_CLOUD_NAME) {
+  remotePatterns.push({
+    protocol: "https",
+    hostname: "res.cloudinary.com",
+    pathname: `/${process.env.CLOUDINARY_CLOUD_NAME}/**`,
+  });
+}
 
 const securityHeaders = [
   { key: "X-Content-Type-Options", value: "nosniff" },

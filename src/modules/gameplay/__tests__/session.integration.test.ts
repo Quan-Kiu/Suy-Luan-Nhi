@@ -9,11 +9,11 @@ import {
   analyticsEvents,
   childProfiles,
   missionSessions,
-  missions,
   notifications,
   parentProfiles,
   user,
 } from "@/db/schema";
+import { getMissionMap } from "@/modules/catalog/catalog";
 import { parseMissionSnapshot } from "@/modules/catalog/snapshot";
 import { completeMission, getSessionView, startMission, submitAnswer } from "@/modules/gameplay/session";
 
@@ -43,7 +43,7 @@ suite("Mission Session PostgreSQL integration", () => {
       .values({
         parentProfileId: parentId,
         displayName: "Test Child",
-        ageGroup: "4-5",
+        ageGroup: "6-8",
         avatarUrl: "/assets/mascots/mascot-dog-bong-avatar.png",
       })
       .returning({ id: childProfiles.id })
@@ -57,7 +57,8 @@ suite("Mission Session PostgreSQL integration", () => {
   });
 
   it("prevents duplicate active sessions and awards completion exactly once", async () => {
-    const mission = await db.query.missions.findFirst({ where: eq(missions.slug, "footprint-detective") });
+    const map = await getMissionMap({ id: childId, ageGroup: "6-8" });
+    const mission = map.worlds.flatMap((world) => world.missions).find((item) => item.unlocked);
     expect(mission).toBeTruthy();
 
     const firstStart = await startMission(userId, childId, mission!.id);
@@ -80,11 +81,12 @@ suite("Mission Session PostgreSQL integration", () => {
       if ("error" in view) return;
       expect(view.question.id).toBe(question.id);
       const key = randomUUID();
+      const submission = question.type === "fill_answer" ? question.correctAnswer[0] : question.correctAnswer;
       const answer = await submitAnswer({
         userId,
         sessionId,
         questionId: question.id,
-        submission: question.correctAnswer,
+        submission,
         responseTimeMs: 400,
         idempotencyKey: key,
       });
@@ -97,7 +99,7 @@ suite("Mission Session PostgreSQL integration", () => {
         userId,
         sessionId,
         questionId: question.id,
-        submission: question.correctAnswer,
+        submission,
         responseTimeMs: 400,
         idempotencyKey: key,
       });

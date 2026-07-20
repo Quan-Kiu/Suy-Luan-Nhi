@@ -1,0 +1,1 @@
+ALTER TABLE "parent_resources" ADD COLUMN "media_url" text;

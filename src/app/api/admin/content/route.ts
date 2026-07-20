@@ -1,5 +1,6 @@
 import { z } from "zod";
 import type { ContentValue } from "@/content/types";
+import { contentValueTypes, type ContentValueType } from "@/domain/content-classification";
 import { requireApiRoles } from "@/auth/api";
 import { apiJson } from "@/lib/api-response";
 import { invalidateContentCache } from "@/lib/cache/invalidation";
@@ -27,8 +28,22 @@ const updateSchema = z.object({
 export async function GET(request: Request) {
   const authResult = await requireApiRoles(request, ["content_admin", "reviewer", "super_admin"]);
   if ("error" in authResult) return authResult.error;
-  const locale = new URL(request.url).searchParams.get("locale")?.trim() || "vi";
-  return apiJson(await listContentEntries(locale));
+  const params = new URL(request.url).searchParams;
+  const rawValueType = params.get("valueType")?.trim();
+  const valueType = contentValueTypes.includes(rawValueType as ContentValueType)
+    ? (rawValueType as ContentValueType)
+    : undefined;
+  return apiJson(
+    await listContentEntries({
+      locale: params.get("locale")?.trim() || "vi",
+      namespace: params.get("namespace")?.trim() || undefined,
+      category: params.get("category")?.trim() || undefined,
+      valueType,
+      search: params.get("search")?.trim() || undefined,
+      page: Number(params.get("page") || 1),
+      pageSize: Number(params.get("pageSize") || 12),
+    }),
+  );
 }
 
 export async function PATCH(request: Request) {

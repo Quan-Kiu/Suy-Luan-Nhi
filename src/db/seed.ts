@@ -74,7 +74,7 @@ async function seedAccounts() {
     await db.insert(childProfiles).values({
       parentProfileId: parentProfile.id,
       displayName: "Bống",
-      ageGroup: "4-5",
+      ageGroup: "6-8",
       avatarUrl: "/assets/mascots/mascot-dog-bong-avatar.png",
       mascotId: "bong",
     });
@@ -100,13 +100,21 @@ async function seedSystemContent() {
         namespace: entry.namespace,
         key: entry.key,
         locale: entry.locale,
+        category: entry.category,
+        valueType: entry.valueType,
         value: entry.value,
         description: entry.description,
       })
       .onConflictDoNothing();
     await db
       .update(contentEntries)
-      .set({ value: entry.value, description: entry.description, updatedAt: new Date() })
+      .set({
+        category: entry.category,
+        valueType: entry.valueType,
+        value: entry.value,
+        description: entry.description,
+        updatedAt: new Date(),
+      })
       .where(
         and(
           eq(contentEntries.namespace, entry.namespace),
@@ -168,9 +176,9 @@ async function seedWorldsAndMissions() {
     await db
       .insert(worldAgeGroups)
       .values(
-        ["2-3", "4-5", "6-8"].map((ageGroup) => ({
+        ["6-8", "9-10", "11-12"].map((ageGroup) => ({
           worldId: worldRow.id,
-          ageGroup: ageGroup as "2-3" | "4-5" | "6-8",
+          ageGroup: ageGroup as "6-8" | "9-10" | "11-12",
         })),
       )
       .onConflictDoNothing();

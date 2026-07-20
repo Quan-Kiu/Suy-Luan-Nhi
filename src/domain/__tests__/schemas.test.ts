@@ -17,7 +17,7 @@ function validEditorInput() {
     storyIntro: footprintMission.storyIntro,
     estimatedMinutes: footprintMission.estimatedMinutes,
     primarySkill: footprintMission.primarySkill,
-    ageGroup: "4-5" as const,
+    ageGroup: "6-8" as const,
     coverImage: footprintMission.coverImage,
     rewardName: footprintMission.reward.name,
     prompt: question.prompt,
@@ -34,9 +34,9 @@ function validEditorInput() {
 
 describe("Child Profile validation", () => {
   it("accepts a privacy-minimal nickname and age group", () => {
-    expect(createChildProfileSchema.parse({ displayName: "Bống", ageGroup: "4-5" })).toEqual({
+    expect(createChildProfileSchema.parse({ displayName: "Bống", ageGroup: "6-8" })).toEqual({
       displayName: "Bống",
-      ageGroup: "4-5",
+      ageGroup: "6-8",
     });
   });
 

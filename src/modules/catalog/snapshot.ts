@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { ageGroupCodes } from "@/domain/age-groups";
 import { playableQuestionSchema } from "@/modules/gameplay/question";
 
 export const missionSnapshotSchema = z.object({
@@ -11,7 +12,7 @@ export const missionSnapshotSchema = z.object({
   shortDescription: z.string().min(1),
   storyIntro: z.string().min(1),
   estimatedMinutes: z.number().int().positive(),
-  ageGroups: z.array(z.enum(["2-3", "4-5", "6-8"])).min(1),
+  ageGroups: z.array(z.enum(ageGroupCodes)).min(1),
   primarySkill: z.string().min(1),
   secondarySkills: z.array(z.string()),
   coverUrl: z.string().min(1),

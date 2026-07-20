@@ -12,6 +12,8 @@ export async function GET(request: Request) {
       status: url.searchParams.get("status") ?? undefined,
       worldId: url.searchParams.get("worldId") ?? undefined,
       search: url.searchParams.get("search") ?? undefined,
+      page: Number(url.searchParams.get("page") || 1),
+      pageSize: Number(url.searchParams.get("pageSize") || 10),
     }),
   );
 }

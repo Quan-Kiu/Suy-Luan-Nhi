@@ -1,4 +1,4 @@
-import { and, asc, desc, eq, inArray, lte, ne, sql } from "drizzle-orm";
+import { and, asc, desc, eq, inArray, isNull, lte, ne, sql } from "drizzle-orm";
 import { db } from "@/db/client";
 import {
   auditLogs,
@@ -10,18 +10,26 @@ import {
   missionWorlds,
   mediaAssets,
   missions,
+  questionAttempts,
   questionSkills,
   questions,
   reviewHistories,
+  sessionQuestionStates,
   safetyChecklistEntries,
   skills,
 } from "@/db/schema";
 import { safetyKeys, type AdminMissionDraft } from "@/modules/admin/schemas";
 import { playableQuestionSchema } from "@/modules/gameplay/question";
 
-export async function listAdminMissions(
-  filters: { status?: string; worldId?: string; search?: string } = {},
-) {
+export type AdminMissionFilters = {
+  status?: string;
+  worldId?: string;
+  search?: string;
+  page?: number;
+  pageSize?: number;
+};
+
+export async function listAdminMissions(filters: AdminMissionFilters = {}) {
   const conditions = [];
   if (
     ["draft", "in_review", "rejected", "approved", "published", "archived"].includes(filters.status ?? "")
@@ -29,35 +37,49 @@ export async function listAdminMissions(
     conditions.push(eq(missions.status, filters.status as typeof missions.$inferSelect.status));
   }
   if (filters.worldId) conditions.push(eq(missions.worldId, filters.worldId));
-  if (filters.search)
+  if (filters.search?.trim()) {
+    const search = filters.search.trim();
     conditions.push(
-      sql`(${missions.title} ilike ${`%${filters.search}%`} or ${missions.slug} ilike ${`%${filters.search}%`})`,
+      sql`(${missions.title} ilike ${`%${search}%`} or ${missions.slug} ilike ${`%${search}%`})`,
     );
-
-  return db
-    .select({
-      id: missions.id,
-      slug: missions.slug,
-      title: missions.title,
-      subtitle: missions.subtitle,
-      status: missions.status,
-      difficulty: missions.difficulty,
-      estimatedMinutes: missions.estimatedMinutes,
-      coverUrl: missions.coverUrl,
-      currentDraftVersion: missions.currentDraftVersion,
-      publishedAt: missions.publishedAt,
-      scheduledFor: missions.scheduledFor,
-      updatedAt: missions.updatedAt,
-      worldId: missionWorlds.id,
-      worldTitle: missionWorlds.title,
-      primarySkillTitle: skills.title,
-      questionCount: sql<number>`(select count(*)::int from questions q where q.mission_id = ${missions.id})`,
-    })
-    .from(missions)
-    .innerJoin(missionWorlds, eq(missions.worldId, missionWorlds.id))
-    .innerJoin(skills, eq(missions.primarySkillId, skills.id))
-    .where(conditions.length ? and(...conditions) : undefined)
-    .orderBy(desc(missions.updatedAt));
+  }
+  const where = conditions.length ? and(...conditions) : undefined;
+  const pageSize = Math.min(50, Math.max(5, Math.trunc(filters.pageSize ?? 10)));
+  const page = Math.max(1, Math.trunc(filters.page ?? 1));
+  const [items, countRows] = await Promise.all([
+    db
+      .select({
+        id: missions.id,
+        slug: missions.slug,
+        title: missions.title,
+        subtitle: missions.subtitle,
+        status: missions.status,
+        difficulty: missions.difficulty,
+        estimatedMinutes: missions.estimatedMinutes,
+        coverUrl: missions.coverUrl,
+        currentDraftVersion: missions.currentDraftVersion,
+        publishedAt: missions.publishedAt,
+        scheduledFor: missions.scheduledFor,
+        updatedAt: missions.updatedAt,
+        worldId: missionWorlds.id,
+        worldTitle: missionWorlds.title,
+        primarySkillTitle: skills.title,
+        questionCount: sql<number>`(select count(*)::int from questions q where q.mission_id = ${missions.id} and q.retired_at is null)`,
+      })
+      .from(missions)
+      .innerJoin(missionWorlds, eq(missions.worldId, missionWorlds.id))
+      .innerJoin(skills, eq(missions.primarySkillId, skills.id))
+      .where(where)
+      .orderBy(desc(missions.updatedAt))
+      .limit(pageSize)
+      .offset((page - 1) * pageSize),
+    db
+      .select({ count: sql<number>`count(*)::int` })
+      .from(missions)
+      .where(where),
+  ]);
+  const total = countRows[0]?.count ?? 0;
+  return { items, total, page, pageSize, totalPages: Math.max(1, Math.ceil(total / pageSize)) };
 }
 
 export async function getAdminTaxonomy() {
@@ -75,7 +97,11 @@ export async function getAdminMission(missionId: string) {
   const [ageRows, secondaryRows, questionRows, safetyRows, versions, history] = await Promise.all([
     db.select().from(missionAgeGroups).where(eq(missionAgeGroups.missionId, missionId)),
     db.select().from(missionSecondarySkills).where(eq(missionSecondarySkills.missionId, missionId)),
-    db.select().from(questions).where(eq(questions.missionId, missionId)).orderBy(asc(questions.sortOrder)),
+    db
+      .select()
+      .from(questions)
+      .where(and(eq(questions.missionId, missionId), isNull(questions.retiredAt)))
+      .orderBy(asc(questions.sortOrder)),
     db.select().from(safetyChecklistEntries).where(eq(safetyChecklistEntries.missionId, missionId)),
     db
       .select()
@@ -138,6 +164,42 @@ async function replaceMissionContent(
   input: AdminMissionDraft,
   actorId: string,
 ) {
+  const existingQuestions = await tx
+    .select({ id: questions.id })
+    .from(questions)
+    .where(and(eq(questions.missionId, missionId), isNull(questions.retiredAt)));
+  const existingIds = new Set(existingQuestions.map((question) => question.id));
+  const retainedIds = new Set(input.questions.flatMap((question) => (question.id ? [question.id] : [])));
+  const removedIds = [...existingIds].filter((id) => !retainedIds.has(id));
+
+  if (removedIds.length) {
+    const [attemptRows, stateRows] = await Promise.all([
+      tx
+        .select({ id: questionAttempts.questionId })
+        .from(questionAttempts)
+        .where(inArray(questionAttempts.questionId, removedIds)),
+      tx
+        .select({ id: sessionQuestionStates.questionId })
+        .from(sessionQuestionStates)
+        .where(inArray(sessionQuestionStates.questionId, removedIds)),
+    ]);
+    const referenced = new Set([...attemptRows, ...stateRows].map((row) => row.id));
+    const deletable = removedIds.filter((id) => !referenced.has(id));
+    const archived = removedIds.filter((id) => referenced.has(id));
+
+    if (deletable.length) {
+      await tx.delete(questionSkills).where(inArray(questionSkills.questionId, deletable));
+      await tx.delete(hints).where(inArray(hints.questionId, deletable));
+      await tx.delete(questions).where(inArray(questions.id, deletable));
+    }
+    if (archived.length) {
+      await tx
+        .update(questions)
+        .set({ retiredAt: new Date(), updatedAt: new Date() })
+        .where(inArray(questions.id, archived));
+    }
+  }
+
   await tx.delete(missionAgeGroups).where(eq(missionAgeGroups.missionId, missionId));
   await tx.insert(missionAgeGroups).values(input.ageGroups.map((ageGroup) => ({ missionId, ageGroup })));
   await tx.delete(missionSecondarySkills).where(eq(missionSecondarySkills.missionId, missionId));
@@ -146,30 +208,48 @@ async function replaceMissionContent(
       .insert(missionSecondarySkills)
       .values(input.secondarySkillIds.map((skillId) => ({ missionId, skillId })));
   }
-  await tx.delete(questions).where(eq(questions.missionId, missionId));
-  for (const [index, questionInput] of input.questions.entries()) {
-    const [question] = await tx
-      .insert(questions)
-      .values({
-        missionId,
-        sortOrder: index + 1,
-        type: questionInput.type,
-        prompt: questionInput.prompt,
-        instruction: questionInput.instruction,
-        payload: questionInput.payload,
-        correctAnswer: questionInput.correctAnswer,
-        difficulty: questionInput.difficulty,
-        feedbackCorrect: questionInput.feedbackCorrect,
-        feedbackIncorrect: questionInput.feedbackIncorrect,
-      })
-      .returning();
+
+  if (retainedIds.size) {
     await tx
-      .insert(hints)
-      .values(
-        questionInput.hints.map((hint) => ({ questionId: question.id, level: hint.level, text: hint.text })),
+      .update(questions)
+      .set({ sortOrder: sql`${questions.sortOrder} + 10000`, updatedAt: new Date() })
+      .where(inArray(questions.id, [...retainedIds]));
+  }
+
+  for (const [index, questionInput] of input.questions.entries()) {
+    const values = {
+      missionId,
+      sortOrder: index + 1,
+      type: questionInput.type,
+      prompt: questionInput.prompt,
+      instruction: questionInput.instruction,
+      payload: questionInput.payload,
+      correctAnswer: questionInput.correctAnswer,
+      difficulty: questionInput.difficulty,
+      feedbackCorrect: questionInput.feedbackCorrect,
+      feedbackIncorrect: questionInput.feedbackIncorrect,
+      retiredAt: null,
+      updatedAt: new Date(),
+    };
+    const questionId = questionInput.id && existingIds.has(questionInput.id) ? questionInput.id : null;
+    const [question] = questionId
+      ? await tx.update(questions).set(values).where(eq(questions.id, questionId)).returning()
+      : await tx.insert(questions).values(values).returning();
+
+    await tx.delete(hints).where(eq(hints.questionId, question.id));
+    await tx.delete(questionSkills).where(eq(questionSkills.questionId, question.id));
+    if (questionInput.hints.length) {
+      await tx.insert(hints).values(
+        questionInput.hints.map((hint) => ({
+          questionId: question.id,
+          level: hint.level,
+          text: hint.text,
+        })),
       );
+    }
     await tx.insert(questionSkills).values({ questionId: question.id, skillId: input.primarySkillId });
   }
+
   await tx.delete(safetyChecklistEntries).where(eq(safetyChecklistEntries.missionId, missionId));
   await tx.insert(safetyChecklistEntries).values(
     safetyKeys.map((key) => ({

@@ -1,4 +1,5 @@
 import { describe, expect, it } from "vitest";
+import { adminResourceSchema } from "@/modules/admin/resource-admin";
 import { adminMissionDraftSchema, safetyKeys } from "@/modules/admin/schemas";
 
 const base = {
@@ -13,7 +14,7 @@ const base = {
   secondarySkillIds: [],
   rewardBadgeId: null,
   coverUrl: "/assets/demo.png",
-  ageGroups: ["4-5"] as const,
+  ageGroups: ["6-8"] as const,
   difficulty: 1,
   allowReplay: true,
   randomizeAnswers: false,
@@ -45,5 +46,26 @@ describe("adminMissionDraftSchema", () => {
   });
   it("rejects an invalid slug", () => {
     expect(adminMissionDraftSchema.safeParse({ ...base, slug: "Mission Demo" }).success).toBe(false);
+  });
+});
+
+const resourceBase = {
+  slug: "video-huong-dan-demo",
+  title: "Video hướng dẫn demo",
+  excerpt: "Một phần giới thiệu đủ dài cho tài nguyên video.",
+  content: "Nội dung hướng dẫn chi tiết dành cho phụ huynh và trẻ trong gia đình.",
+  resourceType: "video" as const,
+  category: "companionship" as const,
+  ageGroups: ["6-8"] as const,
+  coverUrl: "/assets/demo.png",
+  mediaUrl: "/uploads/video-demo.webm",
+  sortOrder: 1,
+  status: "draft" as const,
+};
+
+describe("adminResourceSchema", () => {
+  it("requires an uploaded video URL for video resources", () => {
+    expect(adminResourceSchema.safeParse({ ...resourceBase, mediaUrl: null }).success).toBe(false);
+    expect(adminResourceSchema.safeParse(resourceBase).success).toBe(true);
   });
 });

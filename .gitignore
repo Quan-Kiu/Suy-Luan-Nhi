@@ -54,3 +54,7 @@ next-env.d.ts
 /.verification/
 /backups/
 .env.production
+# local agent/runtime scratch artifacts
+/.scratch/db-backups/
+/.scratch/dev-cache-stale-*/
+/.scratch/playwright*.config.ts

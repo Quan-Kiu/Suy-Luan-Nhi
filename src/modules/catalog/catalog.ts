@@ -1,8 +1,7 @@
-import { and, asc, eq, inArray } from "drizzle-orm";
+import { and, asc, eq, inArray, isNotNull, ne, sql } from "drizzle-orm";
 import { db } from "@/db/client";
 import {
   badges,
-  missionAgeGroups,
   missionSessions,
   missionVersions,
   missionWorlds,
@@ -10,42 +9,70 @@ import {
   skills,
   worldAgeGroups,
 } from "@/db/schema";
+import type { AgeGroup } from "@/domain/age-groups";
+import { parseMissionSnapshot } from "@/modules/catalog/snapshot";
+import { resolveSkillLabels } from "@/modules/catalog/skill-labels";
 
-export async function getMissionMap(child: { id: string; ageGroup: "2-3" | "4-5" | "6-8" }) {
-  const worlds = await db
-    .select({
-      id: missionWorlds.id,
-      slug: missionWorlds.slug,
-      title: missionWorlds.title,
-      subtitle: missionWorlds.subtitle,
-      description: missionWorlds.description,
-      order: missionWorlds.sortOrder,
-      theme: missionWorlds.themeColor,
-      coverUrl: missionWorlds.coverUrl,
-    })
-    .from(missionWorlds)
-    .innerJoin(worldAgeGroups, eq(worldAgeGroups.worldId, missionWorlds.id))
-    .where(and(eq(missionWorlds.status, "published"), eq(worldAgeGroups.ageGroup, child.ageGroup)))
-    .orderBy(asc(missionWorlds.sortOrder));
+type PublishedMissionRow = {
+  mission: typeof missions.$inferSelect;
+  version: typeof missionVersions.$inferSelect;
+};
 
-  const missionRows = await db
-    .select({
-      id: missions.id,
-      slug: missions.slug,
-      worldId: missions.worldId,
-      title: missions.title,
-      subtitle: missions.subtitle,
-      shortDescription: missions.shortDescription,
-      coverUrl: missions.coverUrl,
-      difficulty: missions.difficulty,
-      estimatedMinutes: missions.estimatedMinutes,
-      publishedVersionId: missions.publishedVersionId,
-      createdAt: missions.createdAt,
-    })
+const publishedMissionCondition = and(
+  isNotNull(missions.publishedVersionId),
+  ne(missions.status, "archived"),
+  eq(missionVersions.status, "published"),
+);
+
+function publishedListItem(row: PublishedMissionRow) {
+  const snapshot = parseMissionSnapshot(row.version.snapshot);
+  return {
+    id: row.mission.id,
+    slug: snapshot.slug,
+    worldId: snapshot.worldId ?? row.mission.worldId,
+    title: snapshot.title,
+    subtitle: snapshot.subtitle,
+    shortDescription: snapshot.shortDescription,
+    coverUrl: snapshot.coverUrl,
+    difficulty: snapshot.difficulty,
+    estimatedMinutes: snapshot.estimatedMinutes,
+    publishedVersionId: row.version.id,
+    createdAt: row.mission.createdAt,
+    ageGroups: snapshot.ageGroups,
+  };
+}
+
+async function publishedMissionRows() {
+  return db
+    .select({ mission: missions, version: missionVersions })
     .from(missions)
-    .innerJoin(missionAgeGroups, eq(missionAgeGroups.missionId, missions.id))
-    .where(and(eq(missions.status, "published"), eq(missionAgeGroups.ageGroup, child.ageGroup)))
+    .innerJoin(missionVersions, eq(missions.publishedVersionId, missionVersions.id))
+    .where(publishedMissionCondition)
     .orderBy(asc(missions.createdAt));
+}
+
+export async function getMissionMap(child: { id: string; ageGroup: AgeGroup }) {
+  const [worlds, rows] = await Promise.all([
+    db
+      .select({
+        id: missionWorlds.id,
+        slug: missionWorlds.slug,
+        title: missionWorlds.title,
+        subtitle: missionWorlds.subtitle,
+        description: missionWorlds.description,
+        order: missionWorlds.sortOrder,
+        theme: missionWorlds.themeColor,
+        coverUrl: missionWorlds.coverUrl,
+      })
+      .from(missionWorlds)
+      .innerJoin(worldAgeGroups, eq(worldAgeGroups.worldId, missionWorlds.id))
+      .where(and(eq(missionWorlds.status, "published"), eq(worldAgeGroups.ageGroup, child.ageGroup)))
+      .orderBy(asc(missionWorlds.sortOrder)),
+    publishedMissionRows(),
+  ]);
+  const missionRows = rows
+    .map(publishedListItem)
+    .filter((mission) => mission.ageGroups.includes(child.ageGroup));
 
   const missionIds = missionRows.map((mission) => mission.id);
   const completedRows = missionIds.length
@@ -76,6 +103,13 @@ export async function getMissionMap(child: { id: string; ageGroup: "2-3" | "4-5"
         ...mission,
         completed: completed.has(mission.id),
         unlocked,
+        unlockMessage: unlocked
+          ? null
+          : previousMission
+            ? `Hoàn thành “${previousMission.title}” để mở nhiệm vụ này.`
+            : previousWorld
+              ? `Hoàn thành một nhiệm vụ trong “${previousWorld.title}” để mở thế giới này.`
+              : "Nhiệm vụ này chưa được mở.",
         recommended:
           unlocked &&
           !completed.has(mission.id) &&
@@ -94,30 +128,50 @@ export async function getMissionMap(child: { id: string; ageGroup: "2-3" | "4-5"
 }
 
 export async function getPublishedMission(identifier: string) {
+  const identifierCondition =
+    identifier.includes("-") && identifier.length === 36
+      ? eq(missions.id, identifier)
+      : sql`${missionVersions.snapshot}->>'slug' = ${identifier}`;
   const rows = await db
-    .select({
-      mission: missions,
-      world: missionWorlds,
-      version: missionVersions,
-      primarySkill: skills,
-      badge: badges,
-    })
+    .select({ mission: missions, version: missionVersions })
     .from(missions)
-    .innerJoin(missionWorlds, eq(missions.worldId, missionWorlds.id))
     .innerJoin(missionVersions, eq(missions.publishedVersionId, missionVersions.id))
-    .innerJoin(skills, eq(missions.primarySkillId, skills.id))
-    .leftJoin(badges, eq(missions.rewardBadgeId, badges.id))
-    .where(
-      and(
-        eq(missions.status, "published"),
-        eq(missionVersions.status, "published"),
-        identifier.includes("-") && identifier.length === 36
-          ? eq(missions.id, identifier)
-          : eq(missions.slug, identifier),
-      ),
-    )
+    .where(and(publishedMissionCondition, identifierCondition))
     .limit(1);
-  return rows[0] ?? null;
+  const result = rows[0];
+  if (!result) return null;
+
+  const snapshot = parseMissionSnapshot(result.version.snapshot);
+  const [world, primarySkill, badge] = await Promise.all([
+    snapshot.worldId
+      ? db.query.missionWorlds.findFirst({ where: eq(missionWorlds.id, snapshot.worldId) })
+      : snapshot.worldSlug
+        ? db.query.missionWorlds.findFirst({ where: eq(missionWorlds.slug, snapshot.worldSlug) })
+        : null,
+    db.query.skills.findFirst({ where: eq(skills.slug, snapshot.primarySkill) }),
+    snapshot.rewardBadge ? db.query.badges.findFirst({ where: eq(badges.slug, snapshot.rewardBadge) }) : null,
+  ]);
+  if (!world || !primarySkill) return null;
+  const mission = {
+    ...result.mission,
+    worldId: snapshot.worldId ?? result.mission.worldId,
+    slug: snapshot.slug,
+    title: snapshot.title,
+    subtitle: snapshot.subtitle,
+    shortDescription: snapshot.shortDescription,
+    storyIntro: snapshot.storyIntro,
+    estimatedMinutes: snapshot.estimatedMinutes,
+    coverUrl: snapshot.coverUrl,
+    difficulty: snapshot.difficulty,
+  };
+  return {
+    mission,
+    world,
+    version: result.version,
+    primarySkill,
+    badge,
+    secondarySkills: await resolveSkillLabels(snapshot.secondarySkills),
+  };
 }
 
 export async function listPublishedWorlds() {
@@ -128,19 +182,9 @@ export async function listPublishedWorlds() {
     .orderBy(asc(missionWorlds.sortOrder));
 }
 
-export async function listWorldMissions(worldId: string, ageGroup?: "2-3" | "4-5" | "6-8") {
-  const conditions = [eq(missions.worldId, worldId), eq(missions.status, "published")];
-  if (!ageGroup)
-    return db
-      .select()
-      .from(missions)
-      .where(and(...conditions))
-      .orderBy(asc(missions.createdAt));
-  return db
-    .select({ mission: missions })
-    .from(missions)
-    .innerJoin(missionAgeGroups, eq(missionAgeGroups.missionId, missions.id))
-    .where(and(...conditions, eq(missionAgeGroups.ageGroup, ageGroup)))
-    .orderBy(asc(missions.createdAt))
-    .then((rows) => rows.map((row) => row.mission));
+export async function listWorldMissions(worldId: string, ageGroup?: AgeGroup) {
+  const rows = await publishedMissionRows();
+  return rows
+    .map(publishedListItem)
+    .filter((mission) => mission.worldId === worldId && (!ageGroup || mission.ageGroups.includes(ageGroup)));
 }

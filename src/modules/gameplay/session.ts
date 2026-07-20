@@ -15,6 +15,7 @@ import {
 } from "@/db/schema";
 import { getMissionMap, getPublishedMission } from "@/modules/catalog/catalog";
 import { parseMissionSnapshot } from "@/modules/catalog/snapshot";
+import { resolveSkillLabels } from "@/modules/catalog/skill-labels";
 import { getOwnedChild } from "@/modules/family/family";
 import { evaluateQuestion, type QuestionSubmission } from "@/modules/gameplay/question";
 
@@ -459,9 +460,12 @@ export async function getCompletionSummary(userId: string, sessionId: string) {
   });
   if (!version) return null;
   const snapshot = parseMissionSnapshot(version.snapshot);
-  const badge = owned.mission.rewardBadgeId
-    ? await db.query.badges.findFirst({ where: eq(badges.id, owned.mission.rewardBadgeId) })
-    : null;
+  const [badge, thinkingHabits] = await Promise.all([
+    owned.mission.rewardBadgeId
+      ? db.query.badges.findFirst({ where: eq(badges.id, owned.mission.rewardBadgeId) })
+      : null,
+    resolveSkillLabels(snapshot.secondarySkills),
+  ]);
   return {
     session: owned.session,
     mission: {
@@ -471,6 +475,6 @@ export async function getCompletionSummary(userId: string, sessionId: string) {
       coverUrl: snapshot.coverUrl,
     },
     badge,
-    thinkingHabits: snapshot.secondarySkills,
+    thinkingHabits,
   };
 }

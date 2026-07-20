@@ -1,4 +1,5 @@
 import type { ContentDefinition, ContentValue } from "@/content/types";
+import { classifyContentValue, contentCategoryFromKey } from "@/domain/content-classification";
 
 type Definition = { value: ContentValue; description: string };
 
@@ -11,6 +12,8 @@ export function defineContent(
     namespace,
     key,
     locale,
+    category: contentCategoryFromKey(key),
+    valueType: classifyContentValue(definition.value),
     value: definition.value,
     description: definition.description,
   }));

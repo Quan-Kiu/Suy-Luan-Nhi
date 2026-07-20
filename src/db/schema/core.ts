@@ -15,9 +15,12 @@ import {
   uniqueIndex,
   uuid,
 } from "drizzle-orm/pg-core";
+import { ageGroupCodes, type AgeGroup } from "@/domain/age-groups";
+import type { ParentResourceCategory } from "@/domain/parent-resources";
+import { storageProviderNames } from "@/modules/media/storage/types";
 import { user } from "./auth";
 
-export const ageGroupCode = pgEnum("age_group_code", ["2-3", "4-5", "6-8"]);
+export const ageGroupCode = pgEnum("age_group_code", ageGroupCodes);
 export const childStatus = pgEnum("child_status", ["active", "pending_deletion", "deleted"]);
 export const contentStatus = pgEnum("content_status", [
   "draft",
@@ -36,7 +39,10 @@ export const questionType = pgEnum("question_type", [
   "sorting",
 ]);
 export const sessionStatus = pgEnum("mission_session_status", ["in_progress", "completed", "exited"]);
-export const mediaType = pgEnum("media_type", ["image", "audio"]);
+export const mediaType = pgEnum("media_type", ["image", "audio", "video"]);
+export const parentResourceType = pgEnum("parent_resource_type", ["article", "guide", "activity", "video"]);
+export const contentValueType = pgEnum("content_value_type", ["text", "number", "boolean", "json"]);
+export const storageProvider = pgEnum("storage_provider", storageProviderNames);
 export const mediaSafetyStatus = pgEnum("media_safety_status", ["pending", "approved", "rejected"]);
 export const reviewAction = pgEnum("review_action", [
   "created",
@@ -133,20 +139,30 @@ export const skills = pgTable("skills", {
   updatedAt: timestamp("updated_at", { withTimezone: true }).defaultNow().notNull(),
 });
 
-export const mediaAssets = pgTable("media_assets", {
-  id: uuid("id").defaultRandom().primaryKey(),
-  type: mediaType("type").notNull(),
-  storageKey: text("storage_key").notNull().unique(),
-  url: text("url").notNull(),
-  altText: text("alt_text").notNull(),
-  fileName: text("file_name").notNull(),
-  mimeType: text("mime_type").notNull(),
-  size: integer("size").notNull(),
-  uploadedBy: text("uploaded_by").references(() => user.id, { onDelete: "set null" }),
-  safetyStatus: mediaSafetyStatus("safety_status").default("pending").notNull(),
-  createdAt: timestamp("created_at", { withTimezone: true }).defaultNow().notNull(),
-  deletedAt: timestamp("deleted_at", { withTimezone: true }),
-});
+export const mediaAssets = pgTable(
+  "media_assets",
+  {
+    id: uuid("id").defaultRandom().primaryKey(),
+    type: mediaType("type").notNull(),
+    storageProvider: storageProvider("storage_provider").default("local").notNull(),
+    storageKey: text("storage_key").notNull(),
+    storageMetadata: jsonb("storage_metadata").$type<Record<string, unknown>>().default({}).notNull(),
+    category: text("category").default("general").notNull(),
+    url: text("url").notNull(),
+    altText: text("alt_text").notNull(),
+    fileName: text("file_name").notNull(),
+    mimeType: text("mime_type").notNull(),
+    size: integer("size").notNull(),
+    uploadedBy: text("uploaded_by").references(() => user.id, { onDelete: "set null" }),
+    safetyStatus: mediaSafetyStatus("safety_status").default("pending").notNull(),
+    createdAt: timestamp("created_at", { withTimezone: true }).defaultNow().notNull(),
+    deletedAt: timestamp("deleted_at", { withTimezone: true }),
+  },
+  (table) => [
+    uniqueIndex("media_assets_provider_key_unique").on(table.storageProvider, table.storageKey),
+    index("media_assets_filter_idx").on(table.type, table.category, table.safetyStatus, table.createdAt),
+  ],
+);
 
 export const badges = pgTable("badges", {
   id: uuid("id").defaultRandom().primaryKey(),
@@ -281,10 +297,15 @@ export const questions = pgTable(
     difficulty: integer("difficulty").default(1).notNull(),
     feedbackCorrect: text("feedback_correct").notNull(),
     feedbackIncorrect: text("feedback_incorrect").notNull(),
+    retiredAt: timestamp("retired_at", { withTimezone: true }),
     createdAt: timestamp("created_at", { withTimezone: true }).defaultNow().notNull(),
     updatedAt: timestamp("updated_at", { withTimezone: true }).defaultNow().notNull(),
   },
-  (table) => [unique("questions_mission_order_unique").on(table.missionId, table.sortOrder)],
+  (table) => [
+    uniqueIndex("questions_mission_order_active_unique")
+      .on(table.missionId, table.sortOrder)
+      .where(sql`${table.retiredAt} is null`),
+  ],
 );
 
 export const questionSkills = pgTable(
@@ -482,22 +503,35 @@ export const conversationSuggestions = pgTable("conversation_suggestions", {
   createdAt: timestamp("created_at", { withTimezone: true }).defaultNow().notNull(),
 });
 
-export const parentResources = pgTable("parent_resources", {
-  id: uuid("id").defaultRandom().primaryKey(),
-  slug: text("slug").notNull().unique(),
-  title: text("title").notNull(),
-  excerpt: text("excerpt").notNull(),
-  content: text("content").notNull(),
-  category: text("category").notNull(),
-  ageGroups: jsonb("age_groups").$type<string[]>().default([]).notNull(),
-  coverAssetId: uuid("cover_asset_id").references(() => mediaAssets.id, { onDelete: "set null" }),
-  coverUrl: text("cover_url"),
-  status: contentStatus("status").default("draft").notNull(),
-  sortOrder: integer("sort_order").default(0).notNull(),
-  publishedAt: timestamp("published_at", { withTimezone: true }),
-  createdBy: text("created_by").references(() => user.id, { onDelete: "set null" }),
-  updatedAt: timestamp("updated_at", { withTimezone: true }).defaultNow().notNull(),
-});
+export const parentResources = pgTable(
+  "parent_resources",
+  {
+    id: uuid("id").defaultRandom().primaryKey(),
+    slug: text("slug").notNull().unique(),
+    title: text("title").notNull(),
+    excerpt: text("excerpt").notNull(),
+    content: text("content").notNull(),
+    resourceType: parentResourceType("resource_type").default("article").notNull(),
+    category: text("category").$type<ParentResourceCategory>().notNull(),
+    ageGroups: jsonb("age_groups").$type<AgeGroup[]>().default([]).notNull(),
+    coverAssetId: uuid("cover_asset_id").references(() => mediaAssets.id, { onDelete: "set null" }),
+    coverUrl: text("cover_url"),
+    mediaUrl: text("media_url"),
+    status: contentStatus("status").default("draft").notNull(),
+    sortOrder: integer("sort_order").default(0).notNull(),
+    publishedAt: timestamp("published_at", { withTimezone: true }),
+    createdBy: text("created_by").references(() => user.id, { onDelete: "set null" }),
+    updatedAt: timestamp("updated_at", { withTimezone: true }).defaultNow().notNull(),
+  },
+  (table) => [
+    index("parent_resources_filter_idx").on(
+      table.status,
+      table.resourceType,
+      table.category,
+      table.publishedAt,
+    ),
+  ],
+);
 
 export const contentEntries = pgTable(
   "content_entries",
@@ -506,6 +540,8 @@ export const contentEntries = pgTable(
     namespace: text("namespace").notNull(),
     key: text("key").notNull(),
     locale: text("locale").default("vi").notNull(),
+    category: text("category").default("general").notNull(),
+    valueType: contentValueType("value_type").default("text").notNull(),
     value: jsonb("value").$type<unknown>().notNull(),
     description: text("description"),
     active: boolean("active").default(true).notNull(),
@@ -516,6 +552,7 @@ export const contentEntries = pgTable(
   (table) => [
     uniqueIndex("content_entry_namespace_key_locale_idx").on(table.namespace, table.key, table.locale),
     index("content_entry_namespace_idx").on(table.namespace, table.locale, table.active),
+    index("content_entry_filter_idx").on(table.namespace, table.category, table.valueType, table.active),
   ],
 );
 
