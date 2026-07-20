@@ -16,6 +16,8 @@ export type ContentEntryItem = {
   namespace: string;
   key: string;
   locale: string;
+  category: string;
+  valueType: "text" | "number" | "boolean" | "json";
   value: ContentValue;
   description: string;
   active: boolean;

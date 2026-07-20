@@ -8,12 +8,14 @@ import { z } from "zod";
 import { mediaApi, type MediaItem } from "@/api/admin/media";
 import { FormStatus, SubmitButton, TextField } from "@/components/form";
 import { contentText, useContent } from "@/content/client";
+import { mediaCategories, mediaCategoryLabels } from "@/domain/media";
 
 const schema = z.object({
   file: z.custom<FileList>(
     (value) => value instanceof FileList && value.length === 1,
-    "Hãy chọn một tệp hình ảnh hoặc âm thanh",
+    "Hãy chọn một tệp hình ảnh, âm thanh hoặc video",
   ),
+  category: z.enum(mediaCategories),
   altText: z.string().trim().min(3, "Mô tả cần ít nhất 3 ký tự"),
 });
 
@@ -21,9 +23,12 @@ type FormValues = z.infer<typeof schema>;
 
 export function MediaUploadForm({ onUploaded }: { onUploaded: (item: MediaItem) => void }) {
   const content = useContent("admin");
-  const form = useForm<FormValues>({ resolver: zodResolver(schema) });
+  const form = useForm<FormValues>({
+    resolver: zodResolver(schema),
+    defaultValues: { category: "general", altText: "" },
+  });
   const mutation = useMutation({
-    mutationFn: ({ file, altText }: FormValues) => mediaApi.upload(file[0], altText),
+    mutationFn: ({ file, altText, category }: FormValues) => mediaApi.upload(file[0], altText, category),
     onSuccess: (item) => {
       onUploaded(item);
       form.reset();
@@ -42,15 +47,15 @@ export function MediaUploadForm({ onUploaded }: { onUploaded: (item: MediaItem) 
         {contentText(
           content,
           "media.uploadDescription",
-          "Hãy mô tả rõ hình ảnh hoặc âm thanh để hỗ trợ khả năng tiếp cận.",
+          "Hãy mô tả rõ hình ảnh, âm thanh hoặc video để hỗ trợ khả năng tiếp cận.",
         )}
       </p>
-      <div className="mt-4 grid gap-3 md:grid-cols-[1fr_1fr_auto] md:items-end">
+      <div className="mt-4 grid gap-3 lg:grid-cols-[minmax(260px,1fr)_190px_minmax(260px,1fr)_auto] lg:items-end">
         <label className="block font-bold">
-          Tệp hình ảnh hoặc âm thanh
+          Tệp hình ảnh, âm thanh hoặc video
           <input
             type="file"
-            accept="image/png,image/jpeg,image/webp,image/gif,audio/mpeg,audio/wav,audio/ogg"
+            accept="image/png,image/jpeg,image/webp,image/gif,image/avif,audio/mpeg,audio/wav,audio/ogg,video/mp4,video/webm,video/quicktime"
             className="mt-1 min-h-12 w-full rounded-xl border p-2"
             {...form.register("file")}
           />
@@ -60,9 +65,19 @@ export function MediaUploadForm({ onUploaded }: { onUploaded: (item: MediaItem) 
             </span>
           ) : null}
         </label>
+        <label className="block font-bold">
+          Nhóm tư liệu
+          <select className="mt-1 min-h-12 w-full rounded-xl border px-3" {...form.register("category")}>
+            {mediaCategories.map((category) => (
+              <option key={category} value={category}>
+                {mediaCategoryLabels[category]}
+              </option>
+            ))}
+          </select>
+        </label>
         <TextField
           label={contentText(content, "media.altLabel", "Mô tả nội dung tư liệu")}
-          placeholder={contentText(content, "media.altPlaceholder", "Mô tả hình ảnh hoặc âm thanh")}
+          placeholder={contentText(content, "media.altPlaceholder", "Mô tả hình ảnh, âm thanh hoặc video")}
           registration={form.register("altText")}
           error={form.formState.errors.altText?.message}
         />

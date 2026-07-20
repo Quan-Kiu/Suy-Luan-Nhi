@@ -19,7 +19,7 @@ export default async function Page() {
     secondarySkillIds: [],
     rewardBadgeId: taxonomy.badges[0]?.id ?? null,
     coverUrl: "/assets/cards/mission-thumb-footprint-detective.png",
-    ageGroups: ["4-5"],
+    ageGroups: ["6-8"],
     difficulty: 1,
     allowReplay: true,
     randomizeAnswers: false,

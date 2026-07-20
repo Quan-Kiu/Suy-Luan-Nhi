@@ -44,17 +44,22 @@ test("content admin can override UI copy from the database", async ({ page }) =>
   await signIn(page, "content@demo.local", "/admin/content");
   await expect(page.getByRole("heading", { name: "Nội dung giao diện", exact: true })).toBeVisible();
 
-  const row = page.locator("article").filter({ hasText: "signIn.emailPlaceholder" });
+  await page.goto("/admin/content?namespace=auth&search=signIn.emailPlaceholder");
+  const namespace = page.getByLabel("Lọc theo khu vực");
+  await expect(namespace).toHaveValue("auth");
+  const row = page.locator("article").first();
   await expect(row).toBeVisible();
-  await row.locator("textarea").fill('"email-e2e@example.com"');
+  await row.locator("textarea").fill("email-e2e@example.com");
   await row.getByRole("button", { name: "Lưu nội dung" }).click();
-  await expect(row.getByText("Nội dung đã được cập nhật")).toBeVisible();
+  await expect(page.getByText("Đã lưu nội dung hiển thị")).toBeVisible();
 
-  const dashboardTitleRow = page.locator("article").filter({ hasText: "dashboard.title" });
+  await page.goto("/admin/content?namespace=admin&search=dashboard.title");
+  await expect(page.getByLabel("Lọc theo khu vực")).toHaveValue("admin");
+  const dashboardTitleRow = page.locator("article").first();
   await expect(dashboardTitleRow).toBeVisible();
-  await dashboardTitleRow.locator("textarea").fill('"Bảng điều hành E2E"');
+  await dashboardTitleRow.locator("textarea").fill("Bảng điều hành E2E");
   await dashboardTitleRow.getByRole("button", { name: "Lưu nội dung" }).click();
-  await expect(dashboardTitleRow.getByText("Nội dung đã được cập nhật")).toBeVisible();
+  await expect(page.getByText("Đã lưu nội dung hiển thị")).toBeVisible();
   await page.goto("/admin");
   await expect(page.getByRole("heading", { name: "Bảng điều hành E2E" })).toBeVisible();
 

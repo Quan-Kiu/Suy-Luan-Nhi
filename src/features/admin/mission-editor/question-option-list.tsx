@@ -2,6 +2,7 @@
 
 import { ArrowDown, ArrowUp, Plus, Trash2 } from "lucide-react";
 import { formControlClass } from "@/components/form/text-field";
+import { MediaUploadField } from "@/features/admin/media-upload-field";
 import { cn } from "@/lib/utils";
 
 export type EditorOption = {
@@ -98,12 +99,14 @@ export function QuestionOptionList({
                   placeholder="Nội dung hiển thị"
                   className={cn(formControlClass, "min-h-10 rounded-xl px-3")}
                 />
-                <input
-                  aria-label={`Hình minh họa ${title} ${index + 1}`}
-                  value={item.asset ?? ""}
-                  onChange={(event) => update(index, { asset: event.target.value || undefined })}
-                  placeholder="Đường dẫn hình minh họa (không bắt buộc)"
-                  className={cn(formControlClass, "min-h-10 rounded-xl px-3 text-xs")}
+                <MediaUploadField
+                  label={`Hình minh họa ${index + 1}`}
+                  value={item.asset}
+                  onChange={(url) => update(index, { asset: url, altText: item.label })}
+                  category="question-asset"
+                  altText={item.label || `${title} ${index + 1}`}
+                  description="Không bắt buộc. Chọn ảnh từ máy để hệ thống tải lên và tự gắn URL."
+                  compact
                 />
               </div>
               <div className="flex shrink-0 flex-col gap-1">

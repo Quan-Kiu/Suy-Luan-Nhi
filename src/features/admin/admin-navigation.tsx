@@ -1,5 +1,6 @@
 import {
   BarChart3,
+  BookOpen,
   ClipboardCheck,
   Database,
   FileText,
@@ -56,6 +57,13 @@ const navGroups = [
     labelKey: "navGroup.content",
     fallback: "Nội dung hiển thị",
     items: [
+      {
+        href: "/admin/resources",
+        labelKey: "nav.resources",
+        fallback: "Tài nguyên phụ huynh",
+        icon: BookOpen,
+        roles: allStaff,
+      },
       {
         href: "/admin/media",
         labelKey: "nav.media",

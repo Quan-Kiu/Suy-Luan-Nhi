@@ -1,0 +1,275 @@
+"use client";
+
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { Save } from "lucide-react";
+import { useRouter } from "next/navigation";
+import { useForm, useWatch } from "react-hook-form";
+import { toast } from "sonner";
+import { z } from "zod";
+import { adminResourcesApi, type AdminResourceInput, type AdminResourceItem } from "@/api/admin/resources";
+import { FormStatus, SubmitButton, TextField, TextareaField } from "@/components/form";
+import { ageGroupCodes, type AgeGroup } from "@/domain/age-groups";
+import { MediaUploadField } from "@/features/admin/media-upload-field";
+import {
+  parentResourceCategories,
+  parentResourceCategoryLabels,
+  parentResourceTypes,
+  parentResourceTypeLabels,
+} from "@/domain/parent-resources";
+import { useHydrated } from "@/hooks/use-hydrated";
+import { queryKeys } from "@/lib/query/keys";
+
+const schema = z
+  .object({
+    slug: z
+      .string()
+      .trim()
+      .min(3, "Mã đường dẫn cần ít nhất 3 ký tự")
+      .regex(/^[a-z0-9]+(?:-[a-z0-9]+)*$/, "Chỉ dùng chữ thường, số và dấu gạch ngang"),
+    title: z.string().trim().min(5, "Tiêu đề cần ít nhất 5 ký tự"),
+    excerpt: z.string().trim().min(10, "Tóm tắt cần ít nhất 10 ký tự").max(500),
+    content: z.string().trim().min(30, "Nội dung cần ít nhất 30 ký tự"),
+    resourceType: z.enum(parentResourceTypes),
+    category: z.enum(parentResourceCategories),
+    ageGroups: z.array(z.enum(ageGroupCodes)).min(1, "Chọn ít nhất một nhóm tuổi"),
+    coverUrl: z.string().trim().min(1, "Hãy chọn ảnh bìa"),
+    mediaUrl: z.string().trim(),
+    sortOrder: z.number().int().min(0).max(10_000),
+    status: z.enum(["draft", "published", "archived"]),
+  })
+  .superRefine((resource, context) => {
+    if (resource.resourceType === "video" && !resource.mediaUrl) {
+      context.addIssue({
+        code: "custom",
+        path: ["mediaUrl"],
+        message: "Hãy tải lên tệp video",
+      });
+    }
+  });
+
+type FormValues = z.infer<typeof schema>;
+const emptyResource: FormValues = {
+  slug: "",
+  title: "",
+  excerpt: "",
+  content: "",
+  resourceType: "article",
+  category: "companionship",
+  ageGroups: ["6-8"],
+  coverUrl: "",
+  mediaUrl: "",
+  sortOrder: 0,
+  status: "draft",
+};
+
+function toFormValues(resource?: AdminResourceItem | null): FormValues {
+  if (!resource) return emptyResource;
+  return {
+    slug: resource.slug,
+    title: resource.title,
+    excerpt: resource.excerpt,
+    content: resource.content,
+    resourceType: resource.resourceType,
+    category: resource.category,
+    ageGroups: resource.ageGroups,
+    coverUrl: resource.coverUrl ?? "",
+    mediaUrl: resource.mediaUrl ?? "",
+    sortOrder: resource.sortOrder,
+    status: resource.status,
+  };
+}
+
+export function ResourceEditorForm({ resource }: { resource?: AdminResourceItem | null }) {
+  const router = useRouter();
+  const queryClient = useQueryClient();
+  const interactive = useHydrated();
+  const form = useForm<FormValues>({
+    resolver: zodResolver(schema),
+    defaultValues: toFormValues(resource),
+  });
+  const mutation = useMutation({
+    mutationFn: (values: FormValues) => {
+      const input: AdminResourceInput = {
+        ...values,
+        mediaUrl: values.resourceType === "video" ? values.mediaUrl : null,
+      };
+      return resource ? adminResourcesApi.update(resource.id, input) : adminResourcesApi.create(input);
+    },
+    onSuccess: async (saved) => {
+      await queryClient.invalidateQueries({ queryKey: queryKeys.admin.resources });
+      toast.success(saved.status === "published" ? "Đã xuất bản tài nguyên" : "Đã lưu tài nguyên");
+      router.push(`/admin/resources/${saved.id}/edit`);
+      router.refresh();
+    },
+  });
+  const title = useWatch({ control: form.control, name: "title" });
+  const coverUrl = useWatch({ control: form.control, name: "coverUrl" });
+  const mediaUrl = useWatch({ control: form.control, name: "mediaUrl" });
+  const resourceType = useWatch({ control: form.control, name: "resourceType" });
+  const selectedAgeGroups = useWatch({ control: form.control, name: "ageGroups" });
+  function toggleAgeGroup(ageGroup: AgeGroup) {
+    const next = selectedAgeGroups.includes(ageGroup)
+      ? selectedAgeGroups.filter((item) => item !== ageGroup)
+      : [...selectedAgeGroups, ageGroup];
+    form.setValue("ageGroups", next, { shouldDirty: true, shouldValidate: true });
+  }
+
+  return (
+    <form
+      className="grid gap-5 xl:grid-cols-[minmax(0,1fr)_320px]"
+      onSubmit={form.handleSubmit((values) => mutation.mutate(values))}
+      aria-busy={!interactive || mutation.isPending}
+      noValidate
+    >
+      <fieldset disabled={!interactive || mutation.isPending} className="contents">
+        <div className="space-y-5">
+          <section className="rounded-2xl border bg-white p-5">
+            <h2 className="text-xl font-black">Nội dung bài đăng</h2>
+            <div className="mt-4 grid gap-4 md:grid-cols-2">
+              <TextField
+                label="Tiêu đề"
+                placeholder="Ví dụ: Cùng con luyện cách quan sát"
+                registration={form.register("title")}
+                error={form.formState.errors.title?.message}
+                className="md:col-span-2"
+              />
+              <TextField
+                label="Mã đường dẫn"
+                placeholder="cung-con-luyen-quan-sat"
+                registration={form.register("slug")}
+                error={form.formState.errors.slug?.message}
+              />
+              <MediaUploadField
+                label="Ảnh bìa"
+                value={coverUrl}
+                onChange={(url) =>
+                  form.setValue("coverUrl", url, { shouldDirty: true, shouldValidate: true })
+                }
+                category="resource-cover"
+                altText={title || "Ảnh bìa tài nguyên"}
+                error={form.formState.errors.coverUrl?.message}
+              />
+              {resourceType === "video" ? (
+                <div className="md:col-span-2">
+                  <MediaUploadField
+                    label="Tệp video"
+                    value={mediaUrl}
+                    onChange={(url) =>
+                      form.setValue("mediaUrl", url, { shouldDirty: true, shouldValidate: true })
+                    }
+                    category="video-guide"
+                    altText={title || "Video hướng dẫn phụ huynh"}
+                    accept="video/mp4,video/webm,video/quicktime"
+                    allowedKinds={["video"]}
+                    description="Chọn video từ máy. Tệp sẽ được tải lên kho lưu trữ và URL được gắn tự động."
+                    error={form.formState.errors.mediaUrl?.message}
+                  />
+                </div>
+              ) : null}
+            </div>
+            <div className="mt-4 space-y-4">
+              <TextareaField
+                label="Tóm tắt"
+                rows={3}
+                placeholder="Mô tả ngắn hiển thị trên thẻ tài nguyên."
+                registration={form.register("excerpt")}
+                error={form.formState.errors.excerpt?.message}
+              />
+              <TextareaField
+                label="Nội dung chi tiết"
+                rows={14}
+                placeholder="Viết nội dung rõ ràng, thực tế và phù hợp cho phụ huynh có con 6–12 tuổi."
+                registration={form.register("content")}
+                error={form.formState.errors.content?.message}
+              />
+            </div>
+          </section>
+        </div>
+        <aside className="space-y-5">
+          <section className="rounded-2xl border bg-white p-5">
+            <h2 className="text-lg font-black">Phân loại & hiển thị</h2>
+            <div className="mt-4 space-y-4">
+              <label className="block font-bold">
+                Loại tài nguyên
+                <select
+                  value={resourceType}
+                  onChange={(event) =>
+                    form.setValue("resourceType", event.target.value as FormValues["resourceType"], {
+                      shouldDirty: true,
+                      shouldValidate: true,
+                    })
+                  }
+                  className="mt-1 min-h-12 w-full rounded-xl border px-3"
+                >
+                  {parentResourceTypes.map((type) => (
+                    <option key={type} value={type}>
+                      {parentResourceTypeLabels[type]}
+                    </option>
+                  ))}
+                </select>
+              </label>
+              <label className="block font-bold">
+                Chủ đề
+                <select
+                  className="mt-1 min-h-12 w-full rounded-xl border px-3"
+                  {...form.register("category")}
+                >
+                  {parentResourceCategories.map((category) => (
+                    <option key={category} value={category}>
+                      {parentResourceCategoryLabels[category]}
+                    </option>
+                  ))}
+                </select>
+              </label>
+              <label className="block font-bold">
+                Trạng thái
+                <select className="mt-1 min-h-12 w-full rounded-xl border px-3" {...form.register("status")}>
+                  <option value="draft">Bản nháp</option>
+                  <option value="published">Đang hiển thị</option>
+                  <option value="archived">Đã lưu trữ</option>
+                </select>
+              </label>
+              <TextField
+                type="number"
+                label="Thứ tự hiển thị"
+                registration={form.register("sortOrder", { valueAsNumber: true })}
+                error={form.formState.errors.sortOrder?.message}
+              />
+            </div>
+          </section>
+          <section className="rounded-2xl border bg-white p-5">
+            <h2 className="text-lg font-black">Nhóm tuổi</h2>
+            <p className="mt-1 text-sm text-[#6f6558]">Chỉ hiển thị bài đăng cho các nhóm tuổi phù hợp.</p>
+            <div className="mt-4 space-y-2">
+              {ageGroupCodes.map((ageGroup) => (
+                <label
+                  key={ageGroup}
+                  className="flex min-h-12 items-center gap-3 rounded-xl border px-3 font-bold"
+                >
+                  <input
+                    type="checkbox"
+                    checked={selectedAgeGroups.includes(ageGroup)}
+                    onChange={() => toggleAgeGroup(ageGroup)}
+                    className="size-5 accent-[#b9470d]"
+                  />
+                  {ageGroup} tuổi
+                </label>
+              ))}
+            </div>
+            {form.formState.errors.ageGroups?.message ? (
+              <p role="alert" className="mt-2 text-sm font-bold text-red-700">
+                {form.formState.errors.ageGroups.message}
+              </p>
+            ) : null}
+          </section>
+          <FormStatus status={mutation.isError ? "error" : "idle"} message={mutation.error?.message} />
+          <SubmitButton pending={mutation.isPending} pendingLabel="Đang lưu...">
+            <Save size={18} className="mr-2 inline" />
+            {resource ? "Lưu thay đổi" : "Tạo tài nguyên"}
+          </SubmitButton>
+        </aside>
+      </fieldset>
+    </form>
+  );
+}

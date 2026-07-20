@@ -10,6 +10,7 @@ import { z } from "zod";
 import { worldsApi, type WorldInput, type WorldStatus } from "@/api/admin/worlds";
 import { FormStatus, SelectField, SubmitButton, TextareaField, TextField } from "@/components/form";
 import { contentText, useContent } from "@/content/client";
+import { MediaUploadField } from "@/features/admin/media-upload-field";
 import { queryKeys } from "@/lib/query/keys";
 
 const schema = z.object({
@@ -71,6 +72,7 @@ export function WorldForm({
   const router = useRouter();
   const queryClient = useQueryClient();
   const form = useForm<FormValues>({ resolver: zodResolver(schema), defaultValues: initial });
+  const title = useWatch({ control: form.control, name: "title" });
   const coverUrl = useWatch({ control: form.control, name: "coverUrl" });
   const mutation = useMutation({
     mutationFn: (values: FormValues) => {
@@ -168,10 +170,12 @@ export function WorldForm({
               error={form.formState.errors.slug?.message}
             />
           ) : null}
-          <TextField
-            label={contentText(content, "world.coverLabel", "Đường dẫn ảnh bìa")}
-            placeholder="/assets/cards/world-cover.png"
-            registration={form.register("coverUrl")}
+          <MediaUploadField
+            label={contentText(content, "world.coverLabel", "Ảnh bìa thế giới")}
+            value={coverUrl}
+            onChange={(url) => form.setValue("coverUrl", url, { shouldDirty: true, shouldValidate: true })}
+            category="world-cover"
+            altText={title || "Ảnh bìa thế giới"}
             error={form.formState.errors.coverUrl?.message}
           />
         </div>

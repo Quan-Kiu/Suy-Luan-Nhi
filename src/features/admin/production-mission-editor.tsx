@@ -36,6 +36,7 @@ export function ProductionMissionEditor({
   const router = useRouter();
   const queryClient = useQueryClient();
   const [activeQuestion, setActiveQuestion] = useState(0);
+  const [validationError, setValidationError] = useState(false);
   const form = useForm<AdminMissionDraft>({
     resolver: zodResolver(adminMissionDraftSchema) as Resolver<AdminMissionDraft>,
     defaultValues: initial,
@@ -48,8 +49,12 @@ export function ProductionMissionEditor({
   const saveMutation = useMutation({
     mutationFn: (draft: AdminMissionDraft) => adminMissionsApi.saveDraft(missionId, draft),
     onSuccess: async (result) => {
+      setValidationError(false);
+      form.reset(form.getValues());
       await queryClient.invalidateQueries({ queryKey: queryKeys.admin.missions });
-      toast.success(contentText(content, "missionEditor.saved", "Đã lưu bản nháp"));
+      toast.success(contentText(content, "missionEditor.saved", "Đã lưu bản nháp"), {
+        id: "mission-save-success",
+      });
       if (!missionId) {
         router.push(`/admin/missions/${result.id}/edit`);
       }
@@ -64,8 +69,12 @@ export function ProductionMissionEditor({
       return saved.id;
     },
     onSuccess: async (savedId) => {
+      setValidationError(false);
+      form.reset(form.getValues());
       await queryClient.invalidateQueries({ queryKey: queryKeys.admin.missions });
-      toast.success(contentText(content, "missionEditor.submitted", "Đã gửi nhiệm vụ đến người kiểm duyệt"));
+      toast.success(contentText(content, "missionEditor.submitted", "Đã gửi nhiệm vụ đến người kiểm duyệt"), {
+        id: "mission-submit-success",
+      });
       if (!missionId) router.push(`/admin/missions/${savedId}/edit`);
       router.refresh();
     },
@@ -74,12 +83,24 @@ export function ProductionMissionEditor({
   const pending = saveMutation.isPending || submitMutation.isPending;
   const mutationError = saveMutation.error ?? submitMutation.error;
 
+  function handleInvalid() {
+    toast.dismiss("mission-save-success");
+    toast.dismiss("mission-submit-success");
+    setValidationError(true);
+  }
+
   function saveDraft() {
-    void form.handleSubmit((draft) => saveMutation.mutate(draft))();
+    void form.handleSubmit((draft) => {
+      setValidationError(false);
+      saveMutation.mutate(draft);
+    }, handleInvalid)();
   }
 
   function submitReview() {
-    void form.handleSubmit((draft) => submitMutation.mutate(draft))();
+    void form.handleSubmit((draft) => {
+      setValidationError(false);
+      submitMutation.mutate(draft);
+    }, handleInvalid)();
   }
 
   return (
@@ -87,7 +108,10 @@ export function ProductionMissionEditor({
       <div className="grid gap-6 xl:grid-cols-[minmax(0,1fr)_370px]">
         <form
           className="min-w-0 space-y-5"
-          onSubmit={form.handleSubmit((draft) => saveMutation.mutate(draft))}
+          onSubmit={form.handleSubmit((draft) => {
+            setValidationError(false);
+            saveMutation.mutate(draft);
+          }, handleInvalid)}
           noValidate
         >
           <div className="rounded-2xl border bg-white p-4 sm:p-5">
@@ -133,10 +157,10 @@ export function ProductionMissionEditor({
           <MissionSafetySection />
 
           <FormStatus status={mutationError ? "error" : "idle"} message={mutationError?.message} />
-          {form.formState.isSubmitted && !form.formState.isValid ? (
+          {validationError ? (
             <FormStatus
               status="error"
-              message="Một số trường chưa hợp lệ. Hãy kiểm tra thông báo bên dưới từng trường."
+              message="Một số trường chưa hợp lệ. Bản nháp chưa được lưu; hãy kiểm tra thông báo bên dưới từng trường."
             />
           ) : null}
 

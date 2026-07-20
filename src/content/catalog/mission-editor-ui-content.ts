@@ -75,7 +75,7 @@ export const missionEditorContentEntries = defineContent("admin", {
   "missionEditor.reward": { value: "Phần thưởng", description: "Nhãn phần thưởng." },
   "missionEditor.noReward": { value: "Không có huy hiệu", description: "Tùy chọn không huy hiệu." },
   "missionEditor.minutes": { value: "Thời gian (phút)", description: "Nhãn thời lượng Mission." },
-  "missionEditor.cover": { value: "Đường dẫn ảnh bìa", description: "Nhãn ảnh bìa nhiệm vụ." },
+  "missionEditor.cover": { value: "Ảnh bìa nhiệm vụ", description: "Nhãn tải ảnh bìa nhiệm vụ." },
   "missionEditor.ageGroups": { value: "Nhóm tuổi", description: "Nhãn nhóm tuổi Mission." },
   "missionEditor.allowReplay": { value: "Cho phép chơi lại", description: "Nhãn chơi lại." },
   "missionEditor.randomize": { value: "Đổi thứ tự đáp án khi chơi", description: "Nhãn đổi thứ tự đáp án." },

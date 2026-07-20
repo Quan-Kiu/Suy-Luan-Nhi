@@ -4,10 +4,11 @@ import { useFormContext, useWatch } from "react-hook-form";
 import { CheckboxField, SelectField, TextareaField, TextField } from "@/components/form";
 import { Card } from "@/components/ui";
 import { contentText, useContent } from "@/content/client";
+import { MediaUploadField } from "@/features/admin/media-upload-field";
 import type { MissionEditorTaxonomy } from "@/features/admin/mission-editor/types";
 import type { AdminMissionDraft } from "@/modules/admin/schemas";
 
-const ageGroups = ["2-3", "4-5", "6-8"] as const;
+const ageGroups = ["6-8", "9-10", "11-12"] as const;
 
 function createSlug(value: string) {
   return value
@@ -23,6 +24,8 @@ function createSlug(value: string) {
 export function MissionBasicFields({ taxonomy }: { taxonomy: MissionEditorTaxonomy }) {
   const content = useContent("admin");
   const form = useFormContext<AdminMissionDraft>();
+  const title = useWatch({ control: form.control, name: "title" });
+  const coverUrl = useWatch({ control: form.control, name: "coverUrl" });
   const selectedAgeGroups = useWatch({ control: form.control, name: "ageGroups" });
   const secondarySkillIds = useWatch({ control: form.control, name: "secondarySkillIds" });
 
@@ -183,10 +186,12 @@ export function MissionBasicFields({ taxonomy }: { taxonomy: MissionEditorTaxono
             })}
             error={form.formState.errors.slug?.message}
           />
-          <TextField
-            label={contentText(content, "missionEditor.cover", "Đường dẫn ảnh bìa")}
-            placeholder="/assets/cards/mission-cover.png"
-            registration={form.register("coverUrl")}
+          <MediaUploadField
+            label={contentText(content, "missionEditor.cover", "Ảnh bìa nhiệm vụ")}
+            value={coverUrl}
+            onChange={(url) => form.setValue("coverUrl", url, { shouldDirty: true, shouldValidate: true })}
+            category="mission-cover"
+            altText={title || "Ảnh bìa nhiệm vụ"}
             error={form.formState.errors.coverUrl?.message}
           />
         </div>

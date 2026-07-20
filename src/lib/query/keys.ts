@@ -15,6 +15,7 @@ export const queryKeys = {
   admin: {
     content: ["admin", "content"] as const,
     media: ["admin", "media"] as const,
+    resources: ["admin", "resources"] as const,
     worlds: ["admin", "worlds"] as const,
     taxonomy: ["admin", "taxonomy"] as const,
     missions: ["admin", "missions"] as const,

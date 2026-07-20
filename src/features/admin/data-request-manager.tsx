@@ -3,8 +3,10 @@
 import { useMutation } from "@tanstack/react-query";
 import { CheckCircle2, LoaderCircle } from "lucide-react";
 import { useRouter } from "next/navigation";
+import { useState } from "react";
 import { toast } from "sonner";
 import { dataRequestsApi } from "@/api/admin/data-requests";
+import { ConfirmDialog } from "@/components/confirm-dialog";
 import { FormStatus } from "@/components/form";
 
 const typeLabels: Record<string, string> = {
@@ -32,9 +34,11 @@ type RequestItem = {
 
 export function DataRequestManager({ items }: { items: RequestItem[] }) {
   const router = useRouter();
+  const [deleteTarget, setDeleteTarget] = useState<RequestItem | null>(null);
   const mutation = useMutation({
     mutationFn: (requestId: string) => dataRequestsApi.process(requestId),
     onSuccess: () => {
+      setDeleteTarget(null);
       toast.success("Đã xử lý yêu cầu xóa dữ liệu");
       router.refresh();
     },
@@ -71,15 +75,7 @@ export function DataRequestManager({ items }: { items: RequestItem[] }) {
                         type="button"
                         disabled={pending}
                         aria-busy={pending}
-                        onClick={() => {
-                          if (
-                            window.confirm(
-                              "Xác nhận xóa dữ liệu gia đình? Hồ sơ của bé sẽ bị xóa và tài khoản sẽ không thể đăng nhập lại.",
-                            )
-                          ) {
-                            mutation.mutate(item.id);
-                          }
-                        }}
+                        onClick={() => setDeleteTarget(item)}
                         className="inline-flex items-center gap-2 rounded-xl bg-red-700 px-3 py-2 font-black text-white disabled:opacity-50"
                       >
                         <LoaderCircle size={16} className={pending ? "animate-spin" : undefined} />
@@ -98,6 +94,17 @@ export function DataRequestManager({ items }: { items: RequestItem[] }) {
         </table>
       </div>
       <FormStatus status={mutation.isError ? "error" : "idle"} message={mutation.error?.message} />
+      <ConfirmDialog
+        open={Boolean(deleteTarget)}
+        title="Xóa dữ liệu gia đình?"
+        description={`Toàn bộ hồ sơ trẻ và dữ liệu liên quan của ${deleteTarget?.parentDisplayName ?? "gia đình"} sẽ bị xóa. Tài khoản sẽ không thể đăng nhập lại sau khi xử lý.`}
+        confirmLabel="Xác nhận xóa dữ liệu"
+        pendingLabel="Đang xử lý..."
+        tone="danger"
+        pending={mutation.isPending}
+        onClose={() => setDeleteTarget(null)}
+        onConfirm={() => deleteTarget && mutation.mutate(deleteTarget.id)}
+      />
     </div>
   );
 }

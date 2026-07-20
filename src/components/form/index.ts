@@ -1,4 +1,5 @@
 export { CheckboxField } from "@/components/form/checkbox-field";
+export { ControlledCheckboxField } from "@/components/form/controlled-checkbox-field";
 export { ControlledSelectField } from "@/components/form/controlled-select-field";
 export { ControlledTextareaField } from "@/components/form/controlled-textarea-field";
 export { FieldShell } from "@/components/form/field-shell";

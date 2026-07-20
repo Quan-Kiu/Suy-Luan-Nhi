@@ -22,6 +22,7 @@ export function TextField({
   containerClassName,
   className,
   required,
+  autoComplete = "off",
   ...props
 }: Props) {
   const id = props.id ?? registration.name;
@@ -39,6 +40,7 @@ export function TextField({
         {...registration}
         id={id}
         required={required}
+        autoComplete={autoComplete}
         aria-invalid={Boolean(error)}
         aria-describedby={error ? `${id}-error` : description ? `${id}-description` : undefined}
         className={cn(formControlClass, className)}

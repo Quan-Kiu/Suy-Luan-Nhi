@@ -142,8 +142,9 @@ test("media follows upload, reviewer approval and owner deletion permissions", a
   await clearAuth(page);
   await signIn(page, "content@demo.local", "/admin/media");
   const deleteCard = page.locator("article").filter({ hasText: "e2e-pixel.png" });
-  page.once("dialog", (dialog) => dialog.accept());
   await deleteCard.getByLabel("Xóa tư liệu").click();
+  const deleteDialog = page.getByRole("alertdialog", { name: "Xóa tư liệu?" });
+  await deleteDialog.getByRole("button", { name: "Xóa tư liệu" }).click();
   await expect(deleteCard).toHaveCount(0);
   expect((await page.request.get(mediaUrl!)).status()).toBe(404);
 });

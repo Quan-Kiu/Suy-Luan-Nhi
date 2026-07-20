@@ -12,7 +12,7 @@ import { contentText, useContent } from "@/content/client";
 import { queryKeys } from "@/lib/query/keys";
 
 export type AgeGroupItem = {
-  code: "2-3" | "4-5" | "6-8";
+  code: "6-8" | "9-10" | "11-12";
   label: string;
   description: string;
   minAge: number;
@@ -46,12 +46,14 @@ export function AgeGroupForm({ item }: { item: AgeGroupItem }) {
     <form onSubmit={form.handleSubmit((values) => mutation.mutate(values))} className="space-y-3" noValidate>
       <strong>{item.code} tuổi</strong>
       <TextField
+        id={`age-label-${item.code}`}
         label={contentText(content, "taxonomy.ageLabel", "Tên nhóm tuổi")}
-        placeholder="Ví dụ: 4–5 tuổi"
+        placeholder="Ví dụ: 9–10 tuổi"
         registration={form.register("label")}
         error={form.formState.errors.label?.message}
       />
       <TextareaField
+        id={`age-description-${item.code}`}
         label={contentText(content, "taxonomy.ageDescription", "Mô tả nhóm tuổi")}
         rows={4}
         placeholder="Mô tả khả năng và dạng nhiệm vụ phù hợp"
@@ -59,6 +61,7 @@ export function AgeGroupForm({ item }: { item: AgeGroupItem }) {
         error={form.formState.errors.description?.message}
       />
       <CheckboxField
+        id={`age-active-${item.code}`}
         label={contentText(content, "taxonomy.active", "Đang sử dụng")}
         registration={form.register("active")}
       />

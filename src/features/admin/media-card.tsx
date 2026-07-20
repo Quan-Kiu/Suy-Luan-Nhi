@@ -3,9 +3,12 @@
 import { useMutation } from "@tanstack/react-query";
 import { CheckCircle2, LoaderCircle, Trash2, XCircle } from "lucide-react";
 import Image from "next/image";
+import { useState } from "react";
 import { mediaApi, type MediaItem } from "@/api/admin/media";
+import { ConfirmDialog } from "@/components/confirm-dialog";
 import { FormStatus } from "@/components/form";
 import { contentText, useContent } from "@/content/client";
+import { mediaCategoryLabels, type MediaCategory } from "@/domain/media";
 
 type Action = "approve" | "reject" | "delete";
 
@@ -29,6 +32,7 @@ export function MediaCard({
   onDeleted: (mediaId: string) => void;
 }) {
   const content = useContent("admin");
+  const [deleteOpen, setDeleteOpen] = useState(false);
   const mutation = useMutation({
     mutationFn: async (action: Action) => {
       if (action === "delete") {
@@ -39,8 +43,10 @@ export function MediaCard({
       return { action, updated } as const;
     },
     onSuccess: (result) => {
-      if (result.action === "delete") onDeleted(item.id);
-      else onUpdated(result.updated);
+      if (result.action === "delete") {
+        setDeleteOpen(false);
+        onDeleted(item.id);
+      } else onUpdated(result.updated);
     },
   });
 
@@ -55,6 +61,8 @@ export function MediaCard({
             alt={item.altText}
             className="object-contain"
           />
+        ) : item.type === "video" ? (
+          <video controls preload="metadata" src={item.url} className="h-full w-full object-contain" />
         ) : (
           <audio controls src={item.url} className="w-[90%]" />
         )}
@@ -65,9 +73,14 @@ export function MediaCard({
         </p>
         <p className="mt-1 line-clamp-2 text-xs text-[#806d54]">{item.altText}</p>
         <div className="mt-3 flex items-center justify-between gap-2">
-          <span className="rounded-full bg-[#f5f2ec] px-2 py-1 text-[10px] font-black">
-            {safetyStatusLabels[item.safetyStatus] ?? item.safetyStatus}
-          </span>
+          <div className="flex flex-wrap gap-1">
+            <span className="rounded-full bg-[#f5f2ec] px-2 py-1 text-[10px] font-black">
+              {mediaCategoryLabels[item.category as MediaCategory] ?? item.category}
+            </span>
+            <span className="rounded-full bg-[#f5f2ec] px-2 py-1 text-[10px] font-black">
+              {safetyStatusLabels[item.safetyStatus] ?? item.safetyStatus}
+            </span>
+          </div>
           <div className="flex gap-1">
             {canReview ? (
               <>
@@ -104,12 +117,7 @@ export function MediaCard({
                 type="button"
                 aria-label={contentText(content, "media.delete", "Xóa tư liệu")}
                 disabled={mutation.isPending}
-                onClick={() => {
-                  if (
-                    window.confirm(contentText(content, "media.deleteConfirm", "Xóa vĩnh viễn tư liệu này?"))
-                  )
-                    mutation.mutate("delete");
-                }}
+                onClick={() => setDeleteOpen(true)}
                 className="rounded-lg border p-2 text-red-700 disabled:opacity-50"
               >
                 {mutation.isPending && mutation.variables === "delete" ? (
@@ -127,10 +135,26 @@ export function MediaCard({
           className="mt-3"
         />
         <details className="mt-3 rounded-lg bg-[#f5f2ec] p-2 text-[10px]">
-          <summary className="cursor-pointer font-black">Đường dẫn kỹ thuật</summary>
-          <code className="mt-2 block break-all">{item.url}</code>
+          <summary className="cursor-pointer font-black">Thông tin lưu trữ</summary>
+          <p className="mt-2 font-bold">Provider: {item.storageProvider}</p>
+          <code className="mt-1 block break-all">{item.url}</code>
         </details>
       </div>
+      <ConfirmDialog
+        open={deleteOpen}
+        title="Xóa tư liệu?"
+        description={contentText(
+          content,
+          "media.deleteConfirm",
+          "Tư liệu sẽ bị xóa khỏi kho lưu trữ nếu chưa được dùng trong nhiệm vụ hoặc bài viết.",
+        )}
+        confirmLabel="Xóa tư liệu"
+        pendingLabel="Đang xóa..."
+        tone="danger"
+        pending={mutation.isPending && mutation.variables === "delete"}
+        onClose={() => setDeleteOpen(false)}
+        onConfirm={() => mutation.mutate("delete")}
+      />
     </article>
   );
 }
