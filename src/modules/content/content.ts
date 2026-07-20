@@ -70,6 +70,8 @@ export async function listContentEntries(filters: ContentEntryListFilters = {}) 
         category: storedEntry?.category ?? definition.category,
         valueType: storedEntry?.valueType ?? definition.valueType,
         value: (storedEntry?.value as ContentValue | undefined) ?? definition.value,
+        defaultValue: definition.value,
+        hasDefault: true,
         description: storedEntry?.description ?? definition.description,
         active: storedEntry?.active ?? true,
         source: storedEntry ? ("database" as const) : ("default" as const),
@@ -84,6 +86,8 @@ export async function listContentEntries(filters: ContentEntryListFilters = {}) 
       category: entry.category,
       valueType: entry.valueType,
       value: entry.value as ContentValue,
+      defaultValue: null,
+      hasDefault: false,
       description: entry.description ?? "Nội dung tùy chỉnh",
       active: entry.active,
       source: "database" as const,
@@ -157,6 +161,31 @@ export async function upsertContentEntry(
     resourceType: "content_entry",
     resourceId: `${input.namespace}:${input.key}:${input.locale}`,
     afterState: entry,
+  });
+  return entry;
+}
+
+export async function resetContentEntry(
+  actorId: string,
+  input: { namespace: string; key: string; locale: string },
+) {
+  const [entry] = await db
+    .delete(contentEntries)
+    .where(
+      and(
+        eq(contentEntries.namespace, input.namespace),
+        eq(contentEntries.key, input.key),
+        eq(contentEntries.locale, input.locale),
+      ),
+    )
+    .returning();
+  if (!entry) return null;
+  await db.insert(auditLogs).values({
+    actorId,
+    action: "content.reset",
+    resourceType: "content_entry",
+    resourceId: `${input.namespace}:${input.key}:${input.locale}`,
+    beforeState: entry,
   });
   return entry;
 }

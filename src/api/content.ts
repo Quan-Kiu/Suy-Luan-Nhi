@@ -18,6 +18,8 @@ export type ContentEntryListItem = {
   category: string;
   valueType: "text" | "number" | "boolean" | "json";
   value: ContentValue;
+  defaultValue: ContentValue;
+  hasDefault: boolean;
   description: string;
   active: boolean;
   source: "default" | "database";
@@ -55,5 +57,8 @@ export const contentApi = {
     active?: boolean;
   }) {
     return apiRequest({ url: "/api/admin/content", method: "PATCH", data: input });
+  },
+  reset(input: { namespace: string; key: string; locale: string }) {
+    return apiRequest({ url: "/api/admin/content", method: "DELETE", data: input });
   },
 };

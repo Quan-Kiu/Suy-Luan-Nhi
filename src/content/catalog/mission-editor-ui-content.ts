@@ -69,7 +69,7 @@ export const missionEditorContentEntries = defineContent("admin", {
   "missionEditor.subtitle": { value: "Câu giới thiệu ngắn", description: "Nhãn câu giới thiệu." },
   "missionEditor.shortDescription": { value: "Mô tả trên thẻ nhiệm vụ", description: "Nhãn mô tả nhiệm vụ." },
   "missionEditor.storyIntro": { value: "Câu chuyện mở đầu", description: "Nhãn câu chuyện mở đầu." },
-  "missionEditor.world": { value: "Thế giới nhiệm vụ", description: "Nhãn thế giới nhiệm vụ." },
+  "missionEditor.world": { value: "Chủ đề nhiệm vụ", description: "Nhãn chọn chủ đề nhiệm vụ." },
   "missionEditor.primarySkill": { value: "Kỹ năng chính", description: "Nhãn kỹ năng chính." },
   "missionEditor.secondarySkills": { value: "Kỹ năng phụ", description: "Nhãn kỹ năng phụ." },
   "missionEditor.reward": { value: "Phần thưởng", description: "Nhãn phần thưởng." },

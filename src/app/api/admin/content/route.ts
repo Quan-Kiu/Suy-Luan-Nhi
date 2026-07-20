@@ -4,7 +4,7 @@ import { contentValueTypes, type ContentValueType } from "@/domain/content-class
 import { requireApiRoles } from "@/auth/api";
 import { apiJson } from "@/lib/api-response";
 import { invalidateContentCache } from "@/lib/cache/invalidation";
-import { listContentEntries, upsertContentEntry } from "@/modules/content/content";
+import { listContentEntries, resetContentEntry, upsertContentEntry } from "@/modules/content/content";
 
 const contentValueSchema: z.ZodType<ContentValue> = z.lazy(() =>
   z.union([
@@ -17,10 +17,13 @@ const contentValueSchema: z.ZodType<ContentValue> = z.lazy(() =>
   ]),
 );
 
-const updateSchema = z.object({
+const identitySchema = z.object({
   namespace: z.string().trim().min(1).max(80),
   key: z.string().trim().min(1).max(160),
   locale: z.string().trim().min(2).max(12).default("vi"),
+});
+
+const updateSchema = identitySchema.extend({
   value: contentValueSchema,
   description: z.string().trim().max(500).optional(),
   active: z.boolean().default(true),
@@ -63,4 +66,23 @@ export async function PATCH(request: Request) {
   const entry = await upsertContentEntry(authResult.session.user.id, input.data);
   invalidateContentCache();
   return apiJson(entry);
+}
+
+export async function DELETE(request: Request) {
+  const authResult = await requireApiRoles(request, ["content_admin", "super_admin"]);
+  if ("error" in authResult) return authResult.error;
+  const input = identitySchema.safeParse(await request.json().catch(() => null));
+  if (!input.success) {
+    return apiJson(
+      {
+        code: "CONTENT_IDENTITY_INVALID",
+        message: "Không xác định được nội dung cần khôi phục",
+        issues: input.error.flatten(),
+      },
+      { status: 400 },
+    );
+  }
+  const entry = await resetContentEntry(authResult.session.user.id, input.data);
+  invalidateContentCache();
+  return apiJson({ reset: Boolean(entry) });
 }

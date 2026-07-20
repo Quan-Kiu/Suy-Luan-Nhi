@@ -17,7 +17,7 @@ export function contentCategoryFromKey(key: string) {
 
 export const contentTypeLabels: Record<ContentValueType, string> = {
   text: "Câu chữ",
-  number: "Số liệu",
-  boolean: "Bật/tắt",
-  json: "Dữ liệu cấu trúc",
+  number: "Giá trị số",
+  boolean: "Lựa chọn bật hoặc tắt",
+  json: "Nội dung nâng cao",
 };

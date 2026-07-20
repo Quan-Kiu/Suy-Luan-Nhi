@@ -8,9 +8,9 @@ export default async function Page() {
   return (
     <div className="space-y-6">
       <AdminPageHeader
-        eyebrow="Tài nguyên cho phụ huynh"
-        title="Tạo tài nguyên mới"
-        description="Soạn nội dung, chọn loại, chủ đề, nhóm tuổi và trạng thái hiển thị. Có thể lưu nháp trước khi xuất bản."
+        eyebrow="Gợi ý cho phụ huynh"
+        title="Viết nội dung cho phụ huynh"
+        description="Viết bài, hướng dẫn hoặc hoạt động bằng ngôn ngữ thực tế; chọn nhóm tuổi phù hợp và lưu nháp trước khi xuất bản."
         icon={BookPlus}
       />
       <ResourceEditorForm />

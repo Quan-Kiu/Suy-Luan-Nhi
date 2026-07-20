@@ -47,9 +47,9 @@ export default async function Page({
   return (
     <div className="space-y-6">
       <AdminPageHeader
-        eyebrow="Nội dung cho phụ huynh"
-        title="Quản lý tài nguyên"
-        description="Tạo, phân loại, xuất bản và lưu trữ các bài viết, hướng dẫn và tài liệu dành cho gia đình có trẻ 6–12 tuổi."
+        eyebrow="Đồng hành cùng gia đình"
+        title="Gợi ý cho phụ huynh"
+        description="Soạn, phân loại và xuất bản bài viết, hướng dẫn hoặc hoạt động giúp phụ huynh đồng hành cùng trẻ 6–12 tuổi."
         icon={BookOpen}
         actions={
           canEdit ? (
@@ -57,7 +57,7 @@ export default async function Page({
               href="/admin/resources/new"
               className="inline-flex min-h-11 items-center gap-2 rounded-xl bg-[#b9470d] px-4 font-black text-white shadow-[0_4px_0_#7f2e05]"
             >
-              <Plus size={18} /> Tạo tài nguyên mới
+              <Plus size={18} /> Viết nội dung mới
             </Link>
           ) : null
         }

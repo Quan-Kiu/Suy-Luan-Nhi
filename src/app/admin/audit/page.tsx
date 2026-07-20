@@ -19,8 +19,8 @@ export default async function Page({
     <div className="space-y-6">
       <AdminPageHeader
         eyebrow="Theo dõi hoạt động quản trị"
-        title="Nhật ký thay đổi"
-        description="Xem ai đã thay đổi nội dung, quyền truy cập hoặc cài đặt và thời điểm thay đổi. Thông tin kỹ thuật được thu gọn để dễ đọc hơn."
+        title="Lịch sử thay đổi"
+        description="Xem nội dung nào đã thay đổi, thay đổi lúc nào và do người quản trị hay hệ thống thực hiện. Chi tiết kỹ thuật chỉ mở khi cần kiểm tra sâu."
         icon={Database}
       />
       <form className="grid gap-3 rounded-2xl border bg-white p-4 md:grid-cols-[1fr_1fr_auto_auto]">
@@ -78,21 +78,24 @@ export default async function Page({
               </span>
             </div>
             <details className="mt-3 rounded-xl bg-[#f7f3eb] p-3 text-xs">
-              <summary className="cursor-pointer font-black">Xem thông tin kỹ thuật</summary>
+              <summary className="cursor-pointer font-black">Chi tiết dành cho đội kỹ thuật</summary>
               <dl className="mt-3 grid gap-2 sm:grid-cols-2">
                 <div>
-                  <dt className="font-bold">Mã đối tượng</dt>
-                  <dd className="break-all">{item.resourceId ?? "Không có"}</dd>
+                  <dt className="font-bold">Mã nội dung</dt>
+                  <dd className="font-mono break-all">{item.resourceId ?? "Không có"}</dd>
                 </div>
                 <div>
                   <dt className="font-bold">Mã người thực hiện</dt>
-                  <dd className="break-all">{item.actorId ?? "system"}</dd>
+                  <dd className="font-mono break-all">{item.actorId ?? "system"}</dd>
                 </div>
               </dl>
               {Object.keys(item.metadata).length ? (
-                <pre className="mt-3 overflow-x-auto rounded-lg bg-white p-3 whitespace-pre-wrap">
-                  {JSON.stringify(item.metadata, null, 2)}
-                </pre>
+                <details className="mt-3 rounded-lg bg-white p-3">
+                  <summary className="cursor-pointer font-bold">Xem dữ liệu gốc</summary>
+                  <pre className="mt-3 overflow-x-auto font-mono whitespace-pre-wrap">
+                    {JSON.stringify(item.metadata, null, 2)}
+                  </pre>
+                </details>
               ) : null}
             </details>
           </article>

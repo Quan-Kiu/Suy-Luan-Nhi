@@ -55,40 +55,40 @@ const navGroups = [
   },
   {
     labelKey: "navGroup.content",
-    fallback: "Nội dung hiển thị",
+    fallback: "Soạn nội dung",
     items: [
       {
         href: "/admin/resources",
         labelKey: "nav.resources",
-        fallback: "Tài nguyên phụ huynh",
+        fallback: "Gợi ý cho phụ huynh",
         icon: BookOpen,
         roles: allStaff,
       },
       {
         href: "/admin/media",
         labelKey: "nav.media",
-        fallback: "Hình ảnh & âm thanh",
+        fallback: "Thư viện tư liệu",
         icon: ImageIcon,
         roles: allStaff,
       },
       {
         href: "/admin/content",
         labelKey: "nav.content",
-        fallback: "Nội dung giao diện",
+        fallback: "Câu chữ hiển thị",
         icon: Languages,
         roles: allStaff,
       },
       {
         href: "/admin/worlds",
         labelKey: "nav.worlds",
-        fallback: "Thế giới nhiệm vụ",
+        fallback: "Chủ đề nhiệm vụ",
         icon: Layers3,
         roles: editors,
       },
       {
         href: "/admin/taxonomy",
         labelKey: "nav.taxonomy",
-        fallback: "Độ tuổi & kỹ năng",
+        fallback: "Nhóm tuổi & kỹ năng",
         icon: Tags,
         roles: editors,
       },
@@ -96,12 +96,12 @@ const navGroups = [
   },
   {
     labelKey: "navGroup.operations",
-    fallback: "Theo dõi & vận hành",
+    fallback: "Theo dõi hệ thống",
     items: [
       {
         href: "/admin/reports",
         labelKey: "nav.reports",
-        fallback: "Báo cáo",
+        fallback: "Tình hình sử dụng",
         icon: BarChart3,
         roles: allStaff,
       },
@@ -122,14 +122,14 @@ const navGroups = [
       {
         href: "/admin/audit",
         labelKey: "nav.audit",
-        fallback: "Nhật ký thay đổi",
+        fallback: "Lịch sử thay đổi",
         icon: Database,
         roles: allStaff,
       },
       {
         href: "/admin/settings",
         labelKey: "nav.settings",
-        fallback: "Cài đặt nâng cao",
+        fallback: "Cấu hình hệ thống",
         icon: Settings,
         roles: superAdmins,
       },

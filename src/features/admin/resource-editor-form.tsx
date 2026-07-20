@@ -19,6 +19,7 @@ import {
 } from "@/domain/parent-resources";
 import { useHydrated } from "@/hooks/use-hydrated";
 import { queryKeys } from "@/lib/query/keys";
+import { createSlug } from "@/lib/slug";
 
 const schema = z
   .object({
@@ -130,15 +131,16 @@ export function ResourceEditorForm({ resource }: { resource?: AdminResourceItem 
               <TextField
                 label="Tiêu đề"
                 placeholder="Ví dụ: Cùng con luyện cách quan sát"
-                registration={form.register("title")}
+                description="Dùng câu ngắn, rõ lợi ích và tránh thuật ngữ chuyên môn."
+                registration={form.register("title", {
+                  onChange: (event) => {
+                    if (!resource && !form.formState.dirtyFields.slug) {
+                      form.setValue("slug", createSlug(event.target.value), { shouldValidate: true });
+                    }
+                  },
+                })}
                 error={form.formState.errors.title?.message}
-                className="md:col-span-2"
-              />
-              <TextField
-                label="Mã đường dẫn"
-                placeholder="cung-con-luyen-quan-sat"
-                registration={form.register("slug")}
-                error={form.formState.errors.slug?.message}
+                containerClassName="md:col-span-2"
               />
               <MediaUploadField
                 label="Ảnh bìa"
@@ -183,6 +185,20 @@ export function ResourceEditorForm({ resource }: { resource?: AdminResourceItem 
                 registration={form.register("content")}
                 error={form.formState.errors.content?.message}
               />
+              <details className="rounded-2xl bg-[#f5f2ec] p-4">
+                <summary className="cursor-pointer text-sm font-black text-[#4f463b]">
+                  Thiết lập nâng cao
+                </summary>
+                <div className="mt-3 max-w-xl">
+                  <TextField
+                    label="Mã đường dẫn"
+                    placeholder="cung-con-luyen-quan-sat"
+                    description="Hệ thống tự tạo từ tiêu đề khi tạo mới. Chỉ sửa khi thật sự cần giữ một đường dẫn riêng."
+                    registration={form.register("slug")}
+                    error={form.formState.errors.slug?.message}
+                  />
+                </div>
+              </details>
             </div>
           </section>
         </div>
@@ -266,7 +282,7 @@ export function ResourceEditorForm({ resource }: { resource?: AdminResourceItem 
           <FormStatus status={mutation.isError ? "error" : "idle"} message={mutation.error?.message} />
           <SubmitButton pending={mutation.isPending} pendingLabel="Đang lưu...">
             <Save size={18} className="mr-2 inline" />
-            {resource ? "Lưu thay đổi" : "Tạo tài nguyên"}
+            {resource ? "Lưu thay đổi" : "Tạo bài đăng"}
           </SubmitButton>
         </aside>
       </fieldset>

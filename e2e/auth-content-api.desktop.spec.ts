@@ -40,30 +40,33 @@ test("cross-origin mutations are rejected with the shared error envelope", async
   expect(body.meta.requestId).toBeTruthy();
 });
 
-test("content admin can override UI copy from the database", async ({ page }) => {
+test("content admin can edit and restore plain-language interface copy", async ({ page }) => {
   await signIn(page, "content@demo.local", "/admin/content");
-  await expect(page.getByRole("heading", { name: "Nội dung giao diện", exact: true })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Chỉnh sửa câu chữ hiển thị", exact: true })).toBeVisible();
+  await expect(page.getByText("Chọn nơi cần sửa câu chữ")).toBeVisible();
 
   await page.goto("/admin/content?namespace=auth&search=signIn.emailPlaceholder");
-  const namespace = page.getByLabel("Lọc theo khu vực");
-  await expect(namespace).toHaveValue("auth");
+  await expect(page.getByLabel("Khu vực hiển thị")).toHaveValue("auth");
   const row = page.locator("article").first();
   await expect(row).toBeVisible();
-  await row.locator("textarea").fill("email-e2e@example.com");
-  await row.getByRole("button", { name: "Lưu nội dung" }).click();
-  await expect(page.getByText("Đã lưu nội dung hiển thị")).toBeVisible();
-
-  await page.goto("/admin/content?namespace=admin&search=dashboard.title");
-  await expect(page.getByLabel("Lọc theo khu vực")).toHaveValue("admin");
-  const dashboardTitleRow = page.locator("article").first();
-  await expect(dashboardTitleRow).toBeVisible();
-  await dashboardTitleRow.locator("textarea").fill("Bảng điều hành E2E");
-  await dashboardTitleRow.getByRole("button", { name: "Lưu nội dung" }).click();
-  await expect(page.getByText("Đã lưu nội dung hiển thị")).toBeVisible();
-  await page.goto("/admin");
-  await expect(page.getByRole("heading", { name: "Bảng điều hành E2E" })).toBeVisible();
+  await expect(row.getByText("Người dùng đang nhìn thấy")).toBeVisible();
+  await row.locator("summary").filter({ hasText: "Chỉnh sửa câu chữ" }).click();
+  await row.getByLabel("Câu chữ người dùng sẽ nhìn thấy").fill("email-e2e@example.com");
+  await row.getByRole("button", { name: "Lưu câu chữ" }).click();
+  await expect(page.getByText("Đã cập nhật câu chữ hiển thị")).toBeVisible();
 
   await page.context().clearCookies();
   await page.goto("/auth/sign-in");
   await expect(page.getByLabel("Email")).toHaveAttribute("placeholder", "email-e2e@example.com");
+
+  await signIn(page, "content@demo.local", "/admin/content?namespace=auth&search=signIn.emailPlaceholder");
+  const customized = page.locator("article").first();
+  await customized.locator("summary").filter({ hasText: "Chỉnh sửa câu chữ" }).click();
+  await customized.getByRole("button", { name: "Dùng nội dung mặc định" }).click();
+  await page.getByRole("button", { name: "Dùng nội dung mặc định", exact: true }).last().click();
+  await expect(page.getByText("Đã dùng lại nội dung mặc định")).toBeVisible();
+
+  await page.context().clearCookies();
+  await page.goto("/auth/sign-in");
+  await expect(page.getByLabel("Email")).toHaveAttribute("placeholder", "ba.me@example.com");
 });

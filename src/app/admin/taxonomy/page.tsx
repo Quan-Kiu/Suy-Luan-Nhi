@@ -15,9 +15,9 @@ export default async function Page() {
   return (
     <div className="space-y-6">
       <AdminPageHeader
-        eyebrow="Phân loại nội dung"
-        title="Độ tuổi & kỹ năng"
-        description="Quản lý các nhóm tuổi và tên kỹ năng dùng khi tạo nhiệm vụ, xem báo cáo và gửi gợi ý cho phụ huynh."
+        eyebrow="Nội dung dùng khi soạn nhiệm vụ"
+        title="Nhóm tuổi và kỹ năng"
+        description="Đặt tên và mô tả các nhóm tuổi, kỹ năng suy luận và thói quen tích cực theo cách người soạn và phụ huynh dễ hiểu."
         icon={Tags}
       />
       <TaxonomyManager ages={ages} skills={skillRows} />

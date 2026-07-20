@@ -19,13 +19,28 @@ export function SystemSettingsManager({ items }: { items: SystemSetting[] }) {
   }
 
   return (
-    <div className="space-y-4">
-      {rows.map((row) => (
-        <div key={row.key} className="rounded-2xl border bg-white p-4">
-          <SystemSettingForm item={row} onSaved={upsert} />
+    <div className="space-y-5">
+      {rows.length ? (
+        <div className="grid gap-4 xl:grid-cols-2">
+          {rows.map((row) => (
+            <article
+              key={row.key}
+              className="rounded-3xl border border-[#e5d8c2] bg-white p-5 shadow-[0_8px_24px_rgba(76,55,31,0.05)]"
+            >
+              <SystemSettingForm item={row} onSaved={upsert} />
+            </article>
+          ))}
         </div>
-      ))}
-      <div className="rounded-2xl border-2 border-dashed bg-white/70 p-4">
+      ) : (
+        <div className="rounded-3xl border border-dashed border-[#d9c9ae] bg-white p-8 text-center">
+          <p className="text-lg font-black text-[#342f28]">Chưa có cấu hình tùy chỉnh</p>
+          <p className="mt-2 text-sm leading-6 text-[#6f6558]">
+            Hệ thống đang dùng các giá trị mặc định trong mã nguồn. Chỉ thêm cấu hình khi có nhu cầu vận hành
+            rõ ràng.
+          </p>
+        </div>
+      )}
+      <div className="rounded-3xl border-2 border-dashed border-[#d9c9ae] bg-[#fffaf0] p-5">
         <CreateSystemSettingForm onCreated={upsert} />
       </div>
     </div>

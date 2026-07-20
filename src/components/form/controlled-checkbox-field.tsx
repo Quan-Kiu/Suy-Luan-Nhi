@@ -7,6 +7,7 @@ type Props<TValues extends FieldValues> = {
   label: React.ReactNode;
   description?: string;
   className?: string;
+  id?: string;
 };
 
 export function ControlledCheckboxField<TValues extends FieldValues>({
@@ -15,10 +16,12 @@ export function ControlledCheckboxField<TValues extends FieldValues>({
   label,
   description,
   className,
+  id,
 }: Props<TValues>) {
   const { field, fieldState } = useController({ control, name });
   return (
     <CheckboxField
+      id={id}
       label={label}
       description={description}
       checked={Boolean(field.value)}

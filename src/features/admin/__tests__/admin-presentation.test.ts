@@ -5,7 +5,7 @@ import { getPrimaryRole, getRoleLabel } from "@/features/admin/admin-role";
 describe("admin presentation helpers", () => {
   it("translates stored audit values into plain Vietnamese", () => {
     expect(friendlyLabel(auditActionLabels, "data.export_requested")).toBe("Yêu cầu tải xuống dữ liệu");
-    expect(friendlyLabel(auditActionLabels, "system_setting.updated")).toBe("Cập nhật cài đặt nâng cao");
+    expect(friendlyLabel(auditActionLabels, "system_setting.updated")).toBe("Cập nhật cấu hình hệ thống");
     expect(friendlyLabel(resourceTypeLabels, "child_profile")).toBe("Hồ sơ bé");
   });
 

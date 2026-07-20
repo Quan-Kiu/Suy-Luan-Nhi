@@ -12,9 +12,9 @@ export default async function Page() {
   return (
     <div className="space-y-6">
       <AdminPageHeader
-        eyebrow="Cấu trúc nội dung"
-        title="Thế giới nhiệm vụ"
-        description="Sắp xếp các nhóm nhiệm vụ mà trẻ nhìn thấy trên bản đồ, đồng thời quản lý tên, hình bìa và trạng thái hiển thị."
+        eyebrow="Nhóm nhiệm vụ trên bản đồ"
+        title="Chủ đề nhiệm vụ"
+        description="Sắp xếp các chủ đề mà bé nhìn thấy trên bản đồ, đồng thời quản lý tên, ảnh bìa và trạng thái hiển thị."
         icon={Layers3}
       />
       <WorldManager initial={items} />

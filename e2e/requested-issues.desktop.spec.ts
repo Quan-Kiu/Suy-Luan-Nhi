@@ -84,10 +84,10 @@ test.describe("requested issue regressions", () => {
   test("resource management is available in admin", async ({ page }) => {
     await signIn(page, "content@demo.local", "/admin/resources");
     await page.goto("/admin/resources");
-    await expect(page.getByRole("heading", { name: "Quản lý tài nguyên" })).toBeVisible();
-    await expect(page.getByRole("link", { name: "Tạo tài nguyên mới" })).toBeVisible();
+    await expect(page.getByRole("heading", { name: "Gợi ý cho phụ huynh" })).toBeVisible();
+    await expect(page.getByRole("link", { name: "Viết nội dung mới" })).toBeVisible();
     await expect(page.getByText(/^\d+ tài nguyên$/)).toBeVisible();
-    await page.getByRole("link", { name: "Tạo tài nguyên mới" }).click();
+    await page.getByRole("link", { name: "Viết nội dung mới" }).click();
     const select = page.getByLabel("Loại tài nguyên");
     const style = await select.evaluate((element) => {
       const computed = getComputedStyle(element);

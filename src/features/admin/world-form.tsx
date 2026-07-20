@@ -12,6 +12,7 @@ import { FormStatus, SelectField, SubmitButton, TextareaField, TextField } from 
 import { contentText, useContent } from "@/content/client";
 import { MediaUploadField } from "@/features/admin/media-upload-field";
 import { queryKeys } from "@/lib/query/keys";
+import { createSlug } from "@/lib/slug";
 
 const schema = z.object({
   slug: z
@@ -29,17 +30,6 @@ const schema = z.object({
 
 type FormValues = z.infer<typeof schema>;
 export type WorldItem = FormValues & { id: string };
-
-function createSlug(value: string) {
-  return value
-    .normalize("NFD")
-    .replace(/[\u0300-\u036f]/g, "")
-    .replace(/đ/gi, "d")
-    .toLowerCase()
-    .trim()
-    .replace(/[^a-z0-9]+/g, "-")
-    .replace(/^-+|-+$/g, "");
-}
 
 const statusLabels: Record<WorldStatus, string> = {
   draft: "Bản nháp",
@@ -71,6 +61,7 @@ export function WorldForm({
   const content = useContent("admin");
   const router = useRouter();
   const queryClient = useQueryClient();
+  const fieldPrefix = `world-${initial.id ?? "new"}`;
   const form = useForm<FormValues>({ resolver: zodResolver(schema), defaultValues: initial });
   const title = useWatch({ control: form.control, name: "title" });
   const coverUrl = useWatch({ control: form.control, name: "coverUrl" });
@@ -83,8 +74,8 @@ export function WorldForm({
       await queryClient.invalidateQueries({ queryKey: queryKeys.admin.worlds });
       toast.success(
         mode === "create"
-          ? contentText(content, "world.createSuccess", "Đã tạo thế giới nhiệm vụ")
-          : contentText(content, "world.updateSuccess", "Đã cập nhật thế giới nhiệm vụ"),
+          ? contentText(content, "world.createSuccess", "Đã thêm chủ đề nhiệm vụ")
+          : contentText(content, "world.updateSuccess", "Đã cập nhật chủ đề nhiệm vụ"),
       );
       if (mode === "create") {
         form.reset({ ...initial, sortOrder: initial.sortOrder + 1 });
@@ -106,7 +97,8 @@ export function WorldForm({
       ) : null}
       <div className="grid gap-3 md:grid-cols-2">
         <TextField
-          label={contentText(content, "world.titleLabel", "Tên thế giới")}
+          id={`${fieldPrefix}-title`}
+          label={contentText(content, "world.titleLabel", "Tên chủ đề")}
           placeholder="Ví dụ: Thám tử Quy luật"
           registration={form.register("title", {
             onChange: (event) => {
@@ -118,6 +110,7 @@ export function WorldForm({
           error={form.formState.errors.title?.message}
         />
         <TextField
+          id={`${fieldPrefix}-subtitle`}
           label={contentText(content, "world.subtitleLabel", "Câu giới thiệu ngắn")}
           placeholder="Ví dụ: Quan sát thật tinh"
           registration={form.register("subtitle")}
@@ -125,7 +118,8 @@ export function WorldForm({
         />
       </div>
       <TextareaField
-        label={contentText(content, "world.descriptionLabel", "Mô tả cho phụ huynh và trẻ")}
+        id={`${fieldPrefix}-description`}
+        label={contentText(content, "world.descriptionLabel", "Mô tả cho phụ huynh và bé")}
         placeholder="Giới thiệu trẻ sẽ khám phá điều gì trong thế giới này"
         rows={3}
         registration={form.register("description")}
@@ -133,12 +127,14 @@ export function WorldForm({
       />
       <div className="grid gap-3 md:grid-cols-3">
         <TextField
+          id={`${fieldPrefix}-sort-order`}
           type="number"
           label={contentText(content, "world.sortOrderLabel", "Vị trí trên bản đồ")}
           registration={form.register("sortOrder", { valueAsNumber: true })}
           error={form.formState.errors.sortOrder?.message}
         />
         <SelectField
+          id={`${fieldPrefix}-theme`}
           label={contentText(content, "world.themeLabel", "Màu chủ đề")}
           registration={form.register("themeColor")}
           options={[
@@ -149,6 +145,7 @@ export function WorldForm({
           ]}
         />
         <SelectField
+          id={`${fieldPrefix}-status`}
           label={contentText(content, "world.statusLabel", "Trạng thái hiển thị")}
           registration={form.register("status")}
           disabled={mode === "create"}
@@ -163,6 +160,7 @@ export function WorldForm({
         <div className="mt-3 grid gap-3 md:grid-cols-2">
           {mode === "create" ? (
             <TextField
+              id={`${fieldPrefix}-slug`}
               label={contentText(content, "world.slugLabel", "Mã đường dẫn")}
               placeholder="tham-tu-quy-luat"
               description="Hệ thống tự tạo từ tên; chỉ sửa khi thật sự cần."
@@ -171,11 +169,11 @@ export function WorldForm({
             />
           ) : null}
           <MediaUploadField
-            label={contentText(content, "world.coverLabel", "Ảnh bìa thế giới")}
+            label={contentText(content, "world.coverLabel", "Ảnh bìa chủ đề")}
             value={coverUrl}
             onChange={(url) => form.setValue("coverUrl", url, { shouldDirty: true, shouldValidate: true })}
             category="world-cover"
-            altText={title || "Ảnh bìa thế giới"}
+            altText={title || "Ảnh bìa chủ đề"}
             error={form.formState.errors.coverUrl?.message}
           />
         </div>
@@ -196,7 +194,7 @@ export function WorldForm({
         className="w-auto"
       >
         {mode === "create"
-          ? contentText(content, "world.create", "Tạo thế giới")
+          ? contentText(content, "world.create", "Thêm chủ đề")
           : contentText(content, "world.update", "Lưu")}
       </SubmitButton>
     </form>

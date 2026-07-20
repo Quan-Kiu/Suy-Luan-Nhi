@@ -13,7 +13,7 @@ test("admin uses plain-language navigation and a structured mission editor", asy
   await expect(page.getByRole("heading", { name: "Hôm nay cần làm gì?" })).toBeVisible();
   await expect(page.getByText("Biên tập nội dung", { exact: true })).toBeVisible();
   await expect(page.getByRole("link", { name: "Thành viên & quyền" })).toHaveCount(0);
-  await expect(page.getByRole("link", { name: "Cài đặt nâng cao" })).toHaveCount(0);
+  await expect(page.getByRole("link", { name: "Cấu hình hệ thống" })).toHaveCount(0);
 
   await page.getByRole("link", { name: "Tạo nhiệm vụ mới" }).first().click();
   await expect(page.getByRole("heading", { name: "Nhiệm vụ chưa đặt tên" })).toBeVisible();
@@ -76,36 +76,42 @@ test("parent is denied admin UI and mutations with the shared error envelope", a
 });
 test("content admin creates taxonomy and world content through the CMS", async ({ page }) => {
   await signIn(page, "content@demo.local", "/admin/worlds");
-  await expect(page.getByRole("heading", { name: "Thế giới nhiệm vụ", exact: true })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Chủ đề nhiệm vụ", exact: true })).toBeVisible();
 
-  const newWorld = page.locator("article").filter({ hasText: "Tạo thế giới nhiệm vụ mới" });
+  const newWorld = page.locator("article").filter({ hasText: "Thêm chủ đề nhiệm vụ" });
   await newWorld.getByPlaceholder("Ví dụ: Thám tử Quy luật").fill("Thế giới E2E");
   await newWorld.getByPlaceholder("Ví dụ: Quan sát thật tinh").fill("Kiểm thử vận hành");
   await newWorld
     .getByPlaceholder("Giới thiệu trẻ sẽ khám phá điều gì trong thế giới này")
     .fill("Thế giới được tạo từ browser test thực tế.");
   await newWorld.getByText("Thiết lập nâng cao").click();
-  await newWorld
-    .getByPlaceholder("/assets/cards/world-cover.png")
-    .fill("/assets/cards/world-card-detective-rules.png");
-  await newWorld.getByRole("button", { name: "Tạo thế giới" }).click();
-  await expect(page.getByText("Đã tạo thế giới nhiệm vụ")).toBeVisible();
+  await newWorld.locator('input[type="file"]').setInputFiles({
+    name: "world-cover.png",
+    mimeType: "image/png",
+    buffer: tinyPng,
+  });
+  await expect(newWorld.getByText(/URL đã được lấy tự động/)).toBeVisible();
+  await newWorld.getByRole("button", { name: "Thêm chủ đề" }).click();
+  await expect(page.getByText("Đã thêm chủ đề nhiệm vụ")).toBeVisible();
   await expect(
     page
-      .getByRole("article", { name: "Thế giới nhiệm vụ: Thế giới E2E" })
+      .getByRole("article", { name: "Chủ đề nhiệm vụ: Thế giới E2E" })
       .getByPlaceholder("Ví dụ: Thám tử Quy luật"),
   ).toHaveValue("Thế giới E2E");
 
   await page.goto("/admin/taxonomy");
-  const newSkill = page.getByRole("region", { name: "Tạo kỹ năng mới" });
-  await newSkill.getByPlaceholder("slug").fill("e2e-thinking");
-  await newSkill.getByPlaceholder("Tên kỹ năng").fill("Tư duy E2E");
-  await newSkill.getByPlaceholder("Mô tả").fill("Kỹ năng được tạo tự động để xác nhận CRUD taxonomy.");
-  await newSkill.getByPlaceholder("category").fill("thinking");
-  await newSkill.getByRole("button", { name: "Tạo" }).click();
-  await expect(page.getByText("Đã tạo kỹ năng")).toBeVisible();
+  const newSkill = page.getByRole("region", { name: "Thêm kỹ năng hoặc thói quen" });
+  await newSkill.getByPlaceholder("Ví dụ: Quan sát kỹ").fill("Tư duy E2E");
+  await newSkill
+    .getByPlaceholder("Ví dụ: Bé chú ý đến chi tiết và nhận ra tín hiệu quan trọng.")
+    .fill("Kỹ năng được tạo tự động để xác nhận luồng quản trị dễ hiểu.");
+  await newSkill.getByLabel("Nhóm kỹ năng").selectOption("thinking");
+  await newSkill.getByText("Thiết lập nâng cao").click();
+  await expect(newSkill.getByLabel("Mã nội bộ")).toHaveValue("tu-duy-e2e");
+  await newSkill.getByRole("button", { name: "Thêm kỹ năng" }).click();
+  await expect(page.getByText("Đã thêm kỹ năng")).toBeVisible();
   await expect(
-    page.getByRole("article", { name: "Kỹ năng: Tư duy E2E" }).getByPlaceholder("Tên kỹ năng"),
+    page.getByRole("article", { name: "Kỹ năng: Tư duy E2E" }).getByPlaceholder("Ví dụ: Quan sát kỹ"),
   ).toHaveValue("Tư duy E2E");
 });
 test("media follows upload, reviewer approval and owner deletion permissions", async ({ page }) => {
@@ -148,17 +154,43 @@ test("media follows upload, reviewer approval and owner deletion permissions", a
   await expect(deleteCard).toHaveCount(0);
   expect((await page.request.get(mediaUrl!)).status()).toBe(404);
 });
-test("super admin persists system settings and receives audit-safe responses", async ({ page }) => {
+test("resource editor creates technical URLs without asking ordinary editors to type them", async ({
+  page,
+}) => {
+  await signIn(page, "content@demo.local", "/admin/resources/new");
+  await expect(page.getByRole("heading", { name: "Viết nội dung cho phụ huynh" })).toBeVisible();
+  await page.getByPlaceholder("Ví dụ: Cùng con luyện cách quan sát").fill("Cùng con quan sát mỗi ngày");
+  const slug = page.locator('input[name="slug"]');
+  await expect(slug).toBeHidden();
+  await page.getByText("Thiết lập nâng cao").click();
+  await expect(slug).toHaveValue("cung-con-quan-sat-moi-ngay");
+});
+
+test("super admin changes common settings without editing raw JSON", async ({ page }) => {
   await signIn(page, "admin@demo.local", "/admin/settings");
-  await page.getByPlaceholder("Ví dụ: feature.enabled").fill("e2e.feature.enabled");
-  await page.locator("textarea").last().fill('{"enabled":true,"source":"browser-test"}');
-  await page.getByRole("button", { name: "Thêm cấu hình" }).click();
-  await expect(page.getByText("Đã lưu cấu hình")).toBeVisible();
-  await expect(page.getByText("e2e.feature.enabled")).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Cấu hình hệ thống" })).toBeVisible();
+  await expect(page.getByText("Kiểm tra tác động trước khi lưu")).toBeVisible();
+
+  const create = page.locator("form").filter({ hasText: "Thêm cấu hình mới" });
+  await create.getByLabel("Dạng cấu hình").selectOption("boolean");
+  await create.getByText("Thiết lập nâng cao").click();
+  await create.getByLabel("Mã cấu hình").fill("features.e2e-enabled");
+  await expect(create.getByLabel("Bật ngay sau khi tạo")).toBeChecked();
+  await create.getByRole("button", { name: "Thêm cấu hình" }).click();
+  await expect(page.getByText("Đã thêm cấu hình hệ thống")).toBeVisible();
+
+  const setting = page.locator("article").filter({ hasText: "Features e2e enabled" });
+  await expect(setting).toBeVisible();
+  await expect(setting.getByText("features.e2e-enabled")).toBeHidden();
+  await setting.getByText("Thông tin dành cho đội kỹ thuật").click();
+  await expect(setting.getByText("features.e2e-enabled")).toBeVisible();
+  await setting.getByLabel("Bật thiết lập này").uncheck();
+  await setting.getByRole("button", { name: "Lưu thay đổi" }).click();
+  await expect(page.getByText("Đã lưu cấu hình hệ thống")).toBeVisible();
 
   const response = await page.request.patch("/api/admin/settings", {
-    data: { key: "e2e.feature.enabled", value: { enabled: false } },
+    data: { key: "features.e2e-enabled", value: true },
   });
-  const data = await apiData<{ key: string; value: { enabled: boolean } }>(response);
-  expect(data).toMatchObject({ key: "e2e.feature.enabled", value: { enabled: false } });
+  const data = await apiData<{ key: string; value: boolean }>(response);
+  expect(data).toMatchObject({ key: "features.e2e-enabled", value: true });
 });

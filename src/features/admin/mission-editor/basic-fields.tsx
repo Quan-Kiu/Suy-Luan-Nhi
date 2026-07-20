@@ -7,19 +7,9 @@ import { contentText, useContent } from "@/content/client";
 import { MediaUploadField } from "@/features/admin/media-upload-field";
 import type { MissionEditorTaxonomy } from "@/features/admin/mission-editor/types";
 import type { AdminMissionDraft } from "@/modules/admin/schemas";
+import { createSlug } from "@/lib/slug";
 
 const ageGroups = ["6-8", "9-10", "11-12"] as const;
-
-function createSlug(value: string) {
-  return value
-    .normalize("NFD")
-    .replace(/[\u0300-\u036f]/g, "")
-    .replace(/đ/gi, "d")
-    .toLowerCase()
-    .trim()
-    .replace(/[^a-z0-9]+/g, "-")
-    .replace(/^-+|-+$/g, "");
-}
 
 export function MissionBasicFields({ taxonomy }: { taxonomy: MissionEditorTaxonomy }) {
   const content = useContent("admin");
