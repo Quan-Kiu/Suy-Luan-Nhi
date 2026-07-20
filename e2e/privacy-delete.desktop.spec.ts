@@ -1,5 +1,5 @@
 import { expect, test } from "@playwright/test";
-import { apiData, clearAuth, demoPassword, signIn } from "./helpers";
+import { apiData, clearAuth, demoPassword, signIn, unlockParentGate } from "./helpers";
 
 const email = "privacy@demo.local";
 const password = demoPassword;
@@ -10,7 +10,7 @@ test("family deletion request is parent-gated and super-admin anonymizes the acc
 
   const child = await apiData<{ id: string }>(
     await page.request.post("/api/children", {
-      data: { displayName: "Bé Xóa E2E", ageGroup: "4-5" },
+      data: { displayName: "Bé Xóa E2E", ageGroup: "6-8" },
     }),
   );
   await apiData(await page.request.post(`/api/children/${child.id}/select`));
@@ -22,9 +22,7 @@ test("family deletion request is parent-gated and super-admin anonymizes the acc
     success: false,
     error: { message: /Parent Gate/ },
   });
-  await page.goto("/parent");
-  await page.getByLabel("Kết quả phép tính").fill("23");
-  await page.getByRole("button", { name: /Mở khu vực phụ huynh/i }).click();
+  await unlockParentGate(page);
   await expect(page.getByRole("heading", { name: /Tuần của Bé Xóa E2E/i })).toBeVisible();
 
   const request = await apiData<{ id: string; status: string }>(
@@ -36,8 +34,11 @@ test("family deletion request is parent-gated and super-admin anonymizes the acc
   await signIn(page, "admin@demo.local", "/admin/data-requests");
   const row = page.locator("tr").filter({ hasText: email });
   await expect(row).toContainText("Đang chờ xử lý");
-  page.once("dialog", (dialog) => dialog.accept());
   await row.getByRole("button", { name: "Xử lý xóa" }).click();
+  await page
+    .getByRole("alertdialog", { name: "Xóa dữ liệu gia đình?" })
+    .getByRole("button", { name: "Xác nhận xóa dữ liệu" })
+    .click();
   const completedRow = page.locator("tr").filter({ hasText: "Đã xóa" });
   await expect(completedRow).toContainText("Đã hoàn thành");
 

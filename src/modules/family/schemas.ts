@@ -1,8 +1,9 @@
 import { z } from "zod";
+import { ageGroupCodes } from "@/domain/age-groups";
 
 export const createChildSchema = z.object({
   displayName: z.string().trim().min(1, "Hãy nhập tên thân mật").max(20, "Tên tối đa 20 ký tự"),
-  ageGroup: z.enum(["2-3", "4-5", "6-8"]),
+  ageGroup: z.enum(ageGroupCodes),
   avatarUrl: z.string().default("/assets/mascots/mascot-dog-bong-avatar.png"),
   mascotId: z.string().default("bong"),
 });

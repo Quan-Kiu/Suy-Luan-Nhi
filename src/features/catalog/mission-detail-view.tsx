@@ -10,23 +10,25 @@ export function MissionDetailView({ data, childId }: { data: Published; childId:
   const snapshot = data.version.snapshot as { questions?: unknown[]; secondarySkills?: string[] };
   return (
     <main className="paper-texture min-h-[calc(100vh-5rem)] px-5 pt-4 pb-8">
-      <div className="relative overflow-hidden rounded-[28px] border-2 border-[#d9bf91]">
-        <Image
-          src={data.mission.coverUrl}
-          width={760}
-          height={500}
-          priority
-          alt={data.mission.title}
-          className="h-72 w-full object-cover"
-        />
-        <div className="absolute top-4 left-4">
-          <Pill className="bg-[#55773a] text-white">{data.world.title}</Pill>
+      <Card className="overflow-hidden border-2 border-[#d9bf91] p-0">
+        <div className="relative">
+          <Image
+            src={data.mission.coverUrl}
+            width={760}
+            height={500}
+            priority
+            alt={data.mission.title}
+            className="block h-72 w-full object-cover"
+          />
+          <div className="absolute top-4 left-4">
+            <Pill className="bg-[#55773a] text-white">{data.world.title}</Pill>
+          </div>
         </div>
-      </div>
-      <Card className="relative mx-2 -mt-5 p-5 text-center">
-        <h1 className="text-4xl leading-none font-black">{data.mission.title}</h1>
-        <p className="mt-3 font-bold text-[#8a6b39]">{data.mission.subtitle}</p>
-        <p className="mt-4 leading-7 text-[#715f47]">{data.mission.storyIntro}</p>
+        <div className="relative -mt-px bg-white p-5 text-center">
+          <h1 className="text-4xl leading-none font-black">{data.mission.title}</h1>
+          <p className="mt-3 font-bold text-[#8a6b39]">{data.mission.subtitle}</p>
+          <p className="mt-4 leading-7 text-[#715f47]">{data.mission.storyIntro}</p>
+        </div>
       </Card>
       <div className="mt-4 grid grid-cols-3 gap-3">
         <Card className="p-3 text-center">
@@ -67,8 +69,8 @@ export function MissionDetailView({ data, childId }: { data: Published; childId:
       <Card className="mt-4 p-4">
         <p className="font-black">Thói quen tư duy</p>
         <div className="mt-3 flex flex-wrap gap-2">
-          {(snapshot.secondarySkills ?? []).map((skill) => (
-            <Pill key={skill}>{skill}</Pill>
+          {data.secondarySkills.map((skill) => (
+            <Pill key={skill.slug}>{skill.title}</Pill>
           ))}
         </div>
       </Card>

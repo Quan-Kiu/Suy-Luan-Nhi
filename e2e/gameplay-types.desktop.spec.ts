@@ -40,14 +40,21 @@ test("all five gameplay question renderers submit and persist correct answers", 
   await finishMission(page);
 
   await startMission(page, /Kệ đồ trong rừng/i);
-  const moveTreehouseDown = page.getByRole("button", { name: "Đưa Nhà cây xuống" });
-  await moveTreehouseDown.click();
-  await moveTreehouseDown.click();
+  const treehouseHandle = page.getByRole("button", { name: "Kéo Nhà cây để đổi vị trí" });
+  const backpackHandle = page.getByRole("button", { name: "Kéo Ba lô để đổi vị trí" });
+  const source = await treehouseHandle.boundingBox();
+  const target = await backpackHandle.boundingBox();
+  expect(source).toBeTruthy();
+  expect(target).toBeTruthy();
+  await page.mouse.move(source!.x + source!.width / 2, source!.y + source!.height / 2);
+  await page.mouse.down();
+  await page.mouse.move(target!.x + target!.width / 2, target!.y + target!.height / 2, { steps: 12 });
+  await page.mouse.up();
   await submitCorrect(page, /Câu tiếp theo/i);
 
-  await page.getByRole("button", { name: "Sách", exact: true }).click();
+  await page.getByRole("button", { name: /^Sách\./ }).click();
   await page.getByRole("button", { name: /Góc đọc sách/i }).click();
-  await page.getByRole("button", { name: "La bàn", exact: true }).click();
+  await page.getByRole("button", { name: /^La bàn\./ }).click();
   await page.getByRole("button", { name: /Túi khám phá/i }).click();
   await finishMission(page);
 

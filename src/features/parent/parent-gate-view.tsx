@@ -2,8 +2,17 @@ import Image from "next/image";
 import { contentText } from "@/content/resolve";
 import type { ContentDictionary } from "@/content/types";
 import { ParentGateForm } from "@/features/parent/parent-gate-form";
+import type { ParentMathChallenge } from "@/modules/family/parent-challenge";
 
-export function ParentGateView({ hasPin, content }: { hasPin: boolean; content: ContentDictionary }) {
+export function ParentGateView({
+  hasPin,
+  challenge,
+  content,
+}: {
+  hasPin: boolean;
+  challenge: ParentMathChallenge;
+  content: ContentDictionary;
+}) {
   return (
     <main className="paper-texture min-h-screen px-5 py-10">
       <div className="mx-auto max-w-md text-center">
@@ -25,7 +34,7 @@ export function ParentGateView({ hasPin, content }: { hasPin: boolean; content: 
           )}
         </p>
       </div>
-      <ParentGateForm hasPin={hasPin} />
+      <ParentGateForm hasPin={hasPin} challenge={challenge} />
     </main>
   );
 }

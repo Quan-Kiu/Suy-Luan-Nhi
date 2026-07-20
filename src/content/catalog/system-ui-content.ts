@@ -59,7 +59,8 @@ export const adminContentEntries = defineContent("admin", {
   },
   "media.uploadTitle": { value: "Tải tư liệu mới", description: "Tiêu đề form tải tư liệu." },
   "media.uploadDescription": {
-    value: "Ảnh tối đa 10MB, âm thanh tối đa 20MB. Hãy mô tả rõ nội dung để hỗ trợ khả năng tiếp cận.",
+    value:
+      "Ảnh tối đa 10MB, âm thanh tối đa 20MB, video tối đa 50MB. Hãy mô tả rõ nội dung để hỗ trợ khả năng tiếp cận.",
     description: "Hướng dẫn tải tư liệu.",
   },
   "media.altLabel": { value: "Mô tả nội dung tư liệu", description: "Nhãn mô tả tư liệu." },

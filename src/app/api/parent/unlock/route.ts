@@ -5,14 +5,24 @@ import { env } from "@/config/env";
 import { db } from "@/db/client";
 import { parentProfiles } from "@/db/schema";
 import { getOrCreateParentProfile } from "@/modules/family/family";
+import { verifyParentMathChallenge } from "@/modules/family/parent-challenge";
 import { grantParentGate } from "@/modules/family/parent-gate";
 import { verifyPin } from "@/modules/family/pin";
 
 export async function POST(request: Request) {
   const authResult = await requireApiRoles(request, ["parent", "super_admin"]);
   if ("error" in authResult) return authResult.error;
-  const body = (await request.json().catch(() => null)) as { answer?: unknown } | null;
+  const body = (await request.json().catch(() => null)) as {
+    answer?: unknown;
+    method?: unknown;
+    challengeToken?: unknown;
+  } | null;
   const answer = typeof body?.answer === "string" ? body.answer.trim() : "";
+  const method = body?.method === "pin" || body?.method === "math" ? body.method : null;
+  const challengeToken = typeof body?.challengeToken === "string" ? body.challengeToken : "";
+  if (!answer || !method) {
+    return apiJson({ message: "Thiếu phương thức hoặc câu trả lời xác nhận" }, { status: 400 });
+  }
   const parent = await getOrCreateParentProfile(authResult.session.user.id, authResult.session.user.name);
   if (parent.pinLockedUntil && parent.pinLockedUntil > new Date()) {
     return apiJson(
@@ -21,7 +31,10 @@ export async function POST(request: Request) {
     );
   }
 
-  const valid = parent.pinHash ? await verifyPin(answer, parent.pinHash) : answer === "23";
+  const valid =
+    method === "pin"
+      ? Boolean(parent.pinHash) && (await verifyPin(answer, parent.pinHash!))
+      : verifyParentMathChallenge(challengeToken, answer);
   if (!valid) {
     const attempts = parent.pinFailedAttempts + 1;
     const locked = attempts >= env.PARENT_GATE_MAX_ATTEMPTS;

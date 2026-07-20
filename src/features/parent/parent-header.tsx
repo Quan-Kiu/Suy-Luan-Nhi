@@ -1,7 +1,7 @@
 "use client";
 
 import { AnimatePresence, motion } from "motion/react";
-import { Bell, LogOut, Menu, UserRound, X } from "lucide-react";
+import { Bell, LogOut, Menu, Play, UserRound, X } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -59,8 +59,16 @@ export function ParentHeader({
           </p>
         </div>
         <Link
+          href="/missions"
+          prefetch={false}
+          className="ml-auto hidden min-h-10 items-center gap-2 rounded-full bg-[#b9470d] px-4 text-sm font-black text-white shadow-[0_3px_0_#7f2e05] sm:inline-flex"
+        >
+          <Play size={17} /> Khu vực của bé
+        </Link>
+        <Link
           href="/profiles"
-          className="ml-auto hidden rounded-full border border-[#eadfc9] px-3 py-2 text-sm font-bold sm:inline-flex"
+          prefetch={false}
+          className="hidden rounded-full border border-[#eadfc9] px-3 py-2 text-sm font-bold sm:inline-flex"
         >
           {contentText(content, "shell.changeChild", "Đổi bé")}
         </Link>
@@ -91,7 +99,17 @@ export function ParentHeader({
           >
             <div className="grid gap-1">
               <Link
+                href="/missions"
+                prefetch={false}
+                onClick={() => setOpen(false)}
+                className="flex min-h-12 items-center gap-3 rounded-2xl bg-[#fff0df] px-4 font-black text-[#9f3d0b]"
+              >
+                <Play size={19} />
+                Khu vực của bé
+              </Link>
+              <Link
                 href="/profiles"
+                prefetch={false}
                 onClick={() => setOpen(false)}
                 className="flex min-h-12 items-center gap-3 rounded-2xl px-4 font-black hover:bg-[#fff0df]"
               >

@@ -4,7 +4,7 @@ import type { CreateChildProfileInput } from "@/domain/schemas";
 export type ChildSummary = {
   id: string;
   displayName: string;
-  ageGroup: "2-3" | "4-5" | "6-8";
+  ageGroup: "6-8" | "9-10" | "11-12";
 };
 
 export const childrenApi = {

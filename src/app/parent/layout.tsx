@@ -5,6 +5,7 @@ import { ParentShell } from "@/features/parent/parent-shell";
 import { getContentNamespace } from "@/modules/content/content";
 import { getActiveChild } from "@/modules/family/active-child";
 import { getOrCreateParentProfile } from "@/modules/family/family";
+import { createParentMathChallenge } from "@/modules/family/parent-challenge";
 import { hasParentGate } from "@/modules/family/parent-gate";
 import { getUnreadNotificationCount } from "@/modules/parent/parent-data";
 
@@ -14,7 +15,13 @@ export default async function ParentLayout({ children }: { children: React.React
   const unlocked = await hasParentGate(parent.id);
 
   if (!unlocked) {
-    return <ParentGateView hasPin={Boolean(parent.pinHash)} content={content} />;
+    return (
+      <ParentGateView
+        hasPin={Boolean(parent.pinHash)}
+        challenge={createParentMathChallenge()}
+        content={content}
+      />
+    );
   }
 
   const active = await getActiveChild();

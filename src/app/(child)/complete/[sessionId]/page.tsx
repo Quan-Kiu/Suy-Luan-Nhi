@@ -70,9 +70,9 @@ export default async function Page({ params }: { params: Promise<{ sessionId: st
       </h2>
       <div className="mt-3 grid grid-cols-2 gap-2">
         {summary.thinkingHabits.map((habit) => (
-          <div key={habit} className="rounded-2xl border border-[#eadfc9] bg-white p-3 text-center">
+          <div key={habit.slug} className="rounded-2xl border border-[#eadfc9] bg-white p-3 text-center">
             <CheckCircle2 className="mx-auto text-[#658e4e]" />
-            <p className="mt-2 text-sm font-black">{habit}</p>
+            <p className="mt-2 text-sm font-black">{habit.title}</p>
           </div>
         ))}
       </div>

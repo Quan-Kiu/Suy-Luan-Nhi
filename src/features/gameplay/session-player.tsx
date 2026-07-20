@@ -13,12 +13,14 @@ import { HintPanel } from "@/features/gameplay/hint-panel";
 import { QuestionPlayer } from "@/features/gameplay/question-player";
 import { SessionProgress } from "@/features/gameplay/session-progress";
 import type { SessionView } from "@/features/gameplay/session-types";
+import { useSoundEffects } from "@/features/sound/sound-effects-provider";
 import { canSubmitQuestion, initialSubmission } from "@/features/gameplay/session-utils";
 import type { QuestionSubmission } from "@/modules/gameplay/question";
 
 export function SessionPlayer({ initialView }: { initialView: SessionView }) {
   const content = useContent("gameplay");
   const router = useRouter();
+  const sound = useSoundEffects();
   const [view, setView] = useState(initialView);
   const [value, setValue] = useState<QuestionSubmission | null>(() =>
     initialSubmission(initialView.question),
@@ -38,17 +40,24 @@ export function SessionPlayer({ initialView }: { initialView: SessionView }) {
       });
     },
     onSuccess: (result) => {
+      void sound.play(result.correct ? "game.correct" : "game.retry");
       setFeedback({ correct: result.correct, text: result.feedback });
       if (result.correct) setNextView(result);
     },
   });
   const hintMutation = useMutation({
     mutationFn: () => gameplayApi.requestHint(view.session.id, view.question.id),
-    onSuccess: (result) => setHint(result.hint.text),
+    onSuccess: (result) => {
+      void sound.play("game.hint");
+      setHint(result.hint.text);
+    },
   });
   const completeMutation = useMutation({
     mutationFn: () => gameplayApi.completeSession(view.session.id),
-    onSuccess: () => router.push(`/complete/${view.session.id}`),
+    onSuccess: () => {
+      void sound.play("mission.complete");
+      router.push(`/complete/${view.session.id}`);
+    },
   });
   const exitMutation = useMutation({
     mutationFn: () => gameplayApi.exitSession(view.session.id),

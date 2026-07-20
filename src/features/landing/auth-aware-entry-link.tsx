@@ -3,10 +3,9 @@
 import { ArrowRight } from "lucide-react";
 import Link from "next/link";
 import { useSession } from "@/auth/client";
-import { getAuthenticatedHome } from "@/auth/navigation";
-import { hasRole, staffRoles } from "@/auth/roles";
 import { contentText } from "@/content/resolve";
 import type { ContentDictionary } from "@/content/types";
+import { resolveLandingEntryState } from "@/features/landing/landing-entry-state";
 import { cn } from "@/lib/utils";
 
 export function AuthAwareEntryLink({
@@ -21,25 +20,52 @@ export function AuthAwareEntryLink({
   className?: string;
 }) {
   const session = useSession();
-  const role = session.data?.user.role;
-  const signedIn = Boolean(session.data?.user);
-  const staff = hasRole(role, staffRoles);
-  const href = signedIn ? getAuthenticatedHome(role) : compact ? "/auth/sign-in" : "/auth/sign-up";
-  const label = compact
-    ? signedIn
-      ? contentText(
-          content,
-          staff ? "header.admin" : "header.parent",
-          staff ? "Khu vực quản trị" : "Khu vực phụ huynh",
-        )
-      : contentText(content, "header.parent", "Khu vực phụ huynh")
-    : signedIn
-      ? contentText(
-          content,
-          staff ? "hero.adminCta" : "hero.parentCta",
-          staff ? "Mở trang quản trị" : "Vào khu vực phụ huynh",
-        )
-      : contentText(content, "hero.primaryCta", "Tạo hồ sơ cho bé");
+  const state = resolveLandingEntryState({
+    isPending: session.isPending,
+    isRefetching: session.isRefetching,
+    hasUser: Boolean(session.data?.user),
+    role: session.data?.user.role,
+  });
+
+  if (state === "loading") {
+    return (
+      <span
+        role="status"
+        aria-label="Đang đồng bộ quyền truy cập"
+        className={cn(
+          "animate-pulse border border-[#e4d5ba] bg-[#f1e8d8]",
+          compact ? "h-10 w-36 rounded-full" : "h-14 w-52 rounded-2xl",
+          className,
+        )}
+      />
+    );
+  }
+
+  const staff = state === "staff";
+  const parent = state === "parent";
+  const href = staff
+    ? "/admin"
+    : parent
+      ? "/parent"
+      : state === "forbidden"
+        ? "/auth/error?reason=forbidden"
+        : compact
+          ? "/auth/sign-in"
+          : "/auth/sign-up";
+  const label =
+    state === "forbidden"
+      ? "Kiểm tra quyền truy cập"
+      : compact
+        ? contentText(
+            content,
+            staff ? "header.admin" : "header.parent",
+            staff ? "Khu vực quản trị" : "Khu vực phụ huynh",
+          )
+        : contentText(
+            content,
+            staff ? "hero.adminCta" : parent ? "hero.parentCta" : "hero.primaryCta",
+            staff ? "Mở trang quản trị" : parent ? "Vào khu vực phụ huynh" : "Tạo hồ sơ cho bé",
+          );
 
   return (
     <Link

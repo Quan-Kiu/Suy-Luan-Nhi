@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { z } from "zod";
+import { ageGroupCodes } from "@/domain/age-groups";
 import { childrenApi, type ChildSummary } from "@/api/children";
 import { FormStatus, SelectField, SubmitButton, TextField } from "@/components/form";
 import { Card } from "@/components/ui";
@@ -15,7 +16,7 @@ import { queryKeys } from "@/lib/query/keys";
 
 const schema = z.object({
   displayName: z.string().trim().min(1, "Hãy nhập tên thân mật").max(20, "Tên tối đa 20 ký tự"),
-  ageGroup: z.enum(["2-3", "4-5", "6-8"]),
+  ageGroup: z.enum(ageGroupCodes),
 });
 
 type FormValues = z.infer<typeof schema>;

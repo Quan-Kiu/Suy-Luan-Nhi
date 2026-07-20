@@ -5,6 +5,7 @@ import { CheckCircle2, LockKeyhole } from "lucide-react";
 import { Card } from "@/components/ui";
 import { contentText } from "@/content/resolve";
 import type { ContentDictionary } from "@/content/types";
+import { LockedMissionAction } from "@/features/catalog/locked-mission-action";
 import type { MissionMapMission } from "@/features/catalog/mission-map-types";
 
 export function MissionCard({
@@ -78,6 +79,11 @@ export function MissionCard({
       {card}
     </Link>
   ) : (
-    <div className="h-full">{card}</div>
+    <LockedMissionAction
+      title={mission.title}
+      description={mission.unlockMessage ?? "Hoàn thành nhiệm vụ trước để tiếp tục."}
+    >
+      {card}
+    </LockedMissionAction>
   );
 }

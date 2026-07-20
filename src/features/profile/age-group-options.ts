@@ -1,8 +1,8 @@
 import { contentText } from "@/content/resolve";
 import type { ContentDictionary } from "@/content/types";
+import { ageGroupCodes, type AgeGroup } from "@/domain/age-groups";
 
-export const ageGroupCodes = ["2-3", "4-5", "6-8"] as const;
-export type AgeGroupCode = (typeof ageGroupCodes)[number];
+export type AgeGroupCode = AgeGroup;
 
 export function getAgeGroupOptions(content: ContentDictionary) {
   return ageGroupCodes.map((id) => ({

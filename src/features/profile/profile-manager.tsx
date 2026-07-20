@@ -3,8 +3,10 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { useState } from "react";
 import { toast } from "sonner";
 import { childrenApi } from "@/api/children";
+import { ConfirmDialog } from "@/components/confirm-dialog";
 import { FormStatus } from "@/components/form";
 import { contentText, useContent } from "@/content/client";
 import { ProfileCard, type ProfileListItem } from "@/features/profile/profile-card";
@@ -14,6 +16,7 @@ export function ProfileManager({ profiles }: { profiles: ProfileListItem[] }) {
   const content = useContent("profile");
   const router = useRouter();
   const queryClient = useQueryClient();
+  const [deleteTarget, setDeleteTarget] = useState<ProfileListItem | null>(null);
   const selectMutation = useMutation({
     mutationFn: (profile: ProfileListItem) => childrenApi.select(profile.id).then(() => profile),
     onSuccess: () => {
@@ -24,6 +27,7 @@ export function ProfileManager({ profiles }: { profiles: ProfileListItem[] }) {
   const deleteMutation = useMutation({
     mutationFn: (profile: ProfileListItem) => childrenApi.remove(profile.id).then(() => profile),
     onSuccess: async () => {
+      setDeleteTarget(null);
       await queryClient.invalidateQueries({ queryKey: queryKeys.children.all });
       toast.success(contentText(content, "list.deleteSuccess", "Đã ghi nhận yêu cầu xóa hồ sơ"));
       router.refresh();
@@ -50,14 +54,26 @@ export function ProfileManager({ profiles }: { profiles: ProfileListItem[] }) {
             pending={pending}
             labels={labels}
             onSelect={() => selectMutation.mutate(profile)}
-            onDelete={() => {
-              const message = `${profile.displayName}: ${contentText(content, "list.deleteConfirm", "Chuyển hồ sơ vào trạng thái chờ xóa?")}`;
-              if (window.confirm(message)) deleteMutation.mutate(profile);
-            }}
+            onDelete={() => setDeleteTarget(profile)}
           />
         );
       })}
       <FormStatus status={error ? "error" : "idle"} message={error?.message} />
+      <ConfirmDialog
+        open={Boolean(deleteTarget)}
+        title={`Xóa hồ sơ ${deleteTarget?.displayName ?? "bé"}?`}
+        description={contentText(
+          content,
+          "list.deleteConfirm",
+          "Hồ sơ sẽ được chuyển sang trạng thái chờ xóa để phụ huynh có thời gian xem lại.",
+        )}
+        confirmLabel="Chuyển sang chờ xóa"
+        pendingLabel="Đang xử lý..."
+        tone="danger"
+        pending={deleteMutation.isPending}
+        onClose={() => setDeleteTarget(null)}
+        onConfirm={() => deleteTarget && deleteMutation.mutate(deleteTarget)}
+      />
       <Link
         href="/onboarding"
         className="block rounded-2xl border-2 border-dashed border-[#d7c39d] bg-white/70 p-5 text-center font-black text-[#6d5738]"

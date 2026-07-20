@@ -46,7 +46,20 @@ export async function unlockParentGate(page: Page, answer?: string) {
 
   if (gateVisible) {
     const placeholder = await input.getAttribute("placeholder");
-    const gateAnswer = answer ?? (placeholder?.includes("PIN") ? "2468" : "23");
+    let gateAnswer = answer;
+    if (!gateAnswer && placeholder?.includes("PIN")) gateAnswer = "2468";
+    if (!gateAnswer) {
+      const prompt = await page
+        .locator("p")
+        .filter({ hasText: /\d+\s*[+-]\s*\d+\s*=\s*\?/ })
+        .first()
+        .textContent();
+      const match = prompt?.match(/(\d+)\s*([+-])\s*(\d+)/);
+      if (!match) throw new Error("Không đọc được phép toán Parent Gate");
+      const left = Number(match[1]);
+      const right = Number(match[3]);
+      gateAnswer = String(match[2] === "+" ? left + right : left - right);
+    }
     await input.fill(gateAnswer);
     await page.getByRole("button", { name: /Mở khu vực phụ huynh/i }).click();
   }

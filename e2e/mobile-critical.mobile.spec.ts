@@ -1,4 +1,5 @@
 import { expect, test } from "@playwright/test";
+import { apiData, getDemoChild, selectChild, signIn, unlockParentGate } from "./helpers";
 
 const password = "LocalDemo-2026!";
 
@@ -44,7 +45,7 @@ test("parent can log in, select a child and open the mission map on mobile", asy
   await page.getByRole("button", { name: "Đăng nhập", exact: true }).click();
   await page.waitForURL((url) => url.pathname === "/profiles");
 
-  await page.getByRole("button", { name: /Vào bản đồ cùng Bống/i }).click();
+  await page.getByRole("button", { name: "Vào bản đồ", exact: true }).first().click();
   await page.waitForURL(/\/missions$/);
   await expect(page.getByRole("heading", { name: /Bản đồ nhiệm vụ|Bống/i })).toBeVisible();
 
@@ -78,15 +79,13 @@ test("parent gate exposes a clear mobile placeholder", async ({ page }) => {
   await page.getByLabel("Mật khẩu").fill(password);
   await page.getByRole("button", { name: "Đăng nhập", exact: true }).click();
   await page.waitForURL((url) => url.pathname === "/profiles");
-  await page.getByRole("button", { name: /Vào bản đồ cùng Bống/i }).click();
+  await page.getByRole("button", { name: "Vào bản đồ", exact: true }).first().click();
   await page.waitForURL(/\/missions$/);
 
   await page.goto("/parent");
   const gateInput = page.getByLabel(/Kết quả phép tính|PIN phụ huynh/);
   await expect(gateInput).toHaveAttribute("placeholder", /Nhập kết quả|Nhập PIN/);
-  const placeholder = await gateInput.getAttribute("placeholder");
-  await gateInput.fill(placeholder?.includes("PIN") ? "2468" : "23");
-  await page.getByRole("button", { name: /Mở khu vực phụ huynh/i }).click();
+  await unlockParentGate(page);
 
   const parentHeader = page.getByTestId("parent-header");
   await expect(parentHeader).toBeVisible();
@@ -121,4 +120,46 @@ test("landing primary CTA routes an authenticated parent into the Parent Workspa
   await page.goto("/");
   const entryLink = page.getByRole("link", { name: "Vào khu vực phụ huynh" }).first();
   await expect(entryLink).toHaveAttribute("href", "/parent");
+});
+
+test("activity cards and date filters stay usable on mobile", async ({ page }) => {
+  await signIn(page, "parent@demo.local");
+  const child = await getDemoChild(page);
+  await selectChild(page, child.id);
+  await unlockParentGate(page);
+  await apiData(await page.request.post(`/api/children/${child.id}/reset-progress`));
+
+  await page.goto("/missions");
+  await page.getByRole("link", { name: /Thám tử dấu chân/i }).click();
+  await page.getByRole("button", { name: /Bắt đầu nhiệm vụ/i }).click();
+  await page.getByRole("button", { name: "Ngôi sao", exact: true }).click();
+  await page.getByRole("button", { name: /Kiểm tra đáp án/i }).click();
+  await page.getByRole("button", { name: /Câu tiếp theo/i }).click();
+  await page.getByRole("button", { name: "Dấu chân xanh", exact: true }).click();
+  await page.getByRole("button", { name: /Kiểm tra đáp án/i }).click();
+  await page.getByRole("button", { name: /Nhận huy hiệu/i }).click();
+
+  await unlockParentGate(page);
+  await page.goto("/parent/activity");
+  const from = page.getByLabel("Từ ngày");
+  const to = page.getByLabel("Đến ngày");
+  await expect(from).toHaveAttribute("placeholder", "dd/mm/yyyy");
+  await from.fill("01072026");
+  await expect(from).toHaveValue("01/07/2026");
+  await to.fill("31022026");
+  await page.getByRole("button", { name: "Lọc hoạt động" }).click();
+  await expect(page.getByText(/Ngày chưa hợp lệ\. Hãy nhập đúng định dạng/)).toBeVisible();
+
+  await to.fill("31072026");
+  await page.getByRole("button", { name: "Lọc hoạt động" }).click();
+  await page.waitForURL(/from=2026-07-01.*to=2026-07-31/);
+
+  const card = page.locator("[data-activity-card]").first();
+  await expect(card).toBeVisible();
+  await expect(card.locator("[data-activity-time]")).toHaveText(/^\d{2}:\d{2} · \d{2}\/\d{2}\/\d{4}$/);
+  await expect(card.locator("[data-activity-metrics] > span")).toHaveCount(3);
+  const hasHorizontalOverflow = await page.evaluate(
+    () => document.documentElement.scrollWidth > window.innerWidth + 1,
+  );
+  expect(hasHorizontalOverflow).toBe(false);
 });

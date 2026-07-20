@@ -21,7 +21,7 @@ export function CreateProfileForm() {
   const queryClient = useQueryClient();
   const form = useForm<CreateChildProfileInput>({
     resolver: zodResolver(createChildProfileSchema),
-    defaultValues: { displayName: "", ageGroup: "4-5" },
+    defaultValues: { displayName: "", ageGroup: "6-8" },
   });
   const selectedAgeGroup = useWatch({ control: form.control, name: "ageGroup" });
   const mutation = useMutation({

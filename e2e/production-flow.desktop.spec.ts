@@ -1,4 +1,5 @@
 import { expect, test, type Page } from "@playwright/test";
+import { unlockParentGate } from "./helpers";
 
 const password = "LocalDemo-2026!";
 
@@ -60,10 +61,7 @@ test("parent selects a real Child Profile, completes a DB mission and sees progr
   await expect(page.getByRole("heading", { name: "Tuyệt vời!" })).toBeVisible();
   await expect(page.getByText("Thám tử tinh mắt")).toBeVisible();
 
-  await page.goto("/parent");
-  await page.getByLabel(/Kết quả phép tính|PIN phụ huynh/).fill("23");
-  await page.getByRole("button", { name: /Mở khu vực phụ huynh/i }).click();
-  await expect(page.getByRole("heading", { name: /Tuần của Bống/i })).toBeVisible();
+  await unlockParentGate(page);
   await expect(page.getByText("Thám tử dấu chân").first()).toBeVisible();
 });
 
@@ -74,8 +72,8 @@ test("content admin submits an immutable version and reviewer publishes it", asy
   const listResponse = await page.request.get(
     "/api/admin/missions?search=Th%C3%A1m%20t%E1%BB%AD%20d%E1%BA%A5u%20ch%C3%A2n",
   );
-  const missions = await apiData<Array<{ id: string; title: string }>>(listResponse);
-  const source = missions.find((mission) => mission.title === "Thám tử dấu chân");
+  const missionPage = await apiData<{ items: Array<{ id: string; title: string }> }>(listResponse);
+  const source = missionPage.items.find((mission) => mission.title === "Thám tử dấu chân");
   expect(source).toBeTruthy();
 
   const duplicateResponse = await page.request.post(`/api/admin/missions/${source!.id}/duplicate`);

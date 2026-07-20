@@ -1,5 +1,5 @@
 import { expect, test } from "@playwright/test";
-import { apiData, getDemoChild, selectChild, signIn } from "./helpers";
+import { apiData, getDemoChild, selectChild, signIn, unlockParentGate } from "./helpers";
 
 test.describe.configure({ mode: "serial" });
 
@@ -8,10 +8,7 @@ test("parent creates, edits and soft-deletes a child profile through the UI", as
   const demoChild = await getDemoChild(page);
   await selectChild(page, demoChild.id);
 
-  await page.goto("/parent");
-  await page.getByLabel("Kết quả phép tính").fill("23");
-  await page.getByRole("button", { name: /Mở khu vực phụ huynh/i }).click();
-  await expect(page.getByRole("heading", { name: /Tuần của Bống/i })).toBeVisible();
+  await unlockParentGate(page);
 
   await page.goto("/onboarding");
   await page.getByLabel("Tên thân mật của bé").fill("Mít E2E");
@@ -22,12 +19,15 @@ test("parent creates, edits and soft-deletes a child profile through the UI", as
 
   await page.getByLabel("Chỉnh sửa Mít E2E").click();
   await page.getByLabel("Tên thân mật").fill("Mít Đã Sửa");
-  await page.getByLabel("Nhóm tuổi").selectOption("4-5");
+  await page.getByLabel("Nhóm tuổi").selectOption("6-8");
   await page.getByRole("button", { name: "Lưu thay đổi" }).click();
   await expect(page).toHaveURL(/\/profiles$/);
   await expect(page.getByRole("heading", { name: "Mít Đã Sửa" })).toBeVisible();
-  page.once("dialog", (dialog) => dialog.accept());
   await page.getByLabel("Xóa Mít Đã Sửa").click();
+  await page
+    .getByRole("alertdialog", { name: "Xóa hồ sơ Mít Đã Sửa?" })
+    .getByRole("button", { name: "Chuyển sang chờ xóa" })
+    .click();
   await expect(page.getByRole("heading", { name: "Mít Đã Sửa" })).toHaveCount(0);
 
   const children = await apiData<Array<{ displayName: string }>>(await page.request.get("/api/children"));
@@ -43,9 +43,7 @@ test("parent gate rejects a wrong answer, supports PIN and exports family data",
   await page.getByLabel("Kết quả phép tính").fill("99");
   await page.getByRole("button", { name: /Mở khu vực phụ huynh/i }).click();
   await expect(page.getByText("Câu trả lời chưa đúng, ba/mẹ thử lại nhé.")).toBeVisible();
-  await page.getByLabel("Kết quả phép tính").fill("23");
-  await page.getByRole("button", { name: /Mở khu vực phụ huynh/i }).click();
-  await expect(page.getByRole("heading", { name: /Tuần của Bống/i })).toBeVisible();
+  await unlockParentGate(page);
 
   await page.goto("/parent/settings");
   await page.getByPlaceholder("PIN mới").fill("2468");

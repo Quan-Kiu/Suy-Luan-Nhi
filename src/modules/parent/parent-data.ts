@@ -1,6 +1,8 @@
-import { and, desc, eq, gte, inArray, sql } from "drizzle-orm";
+import { and, asc, desc, eq, gte, inArray, sql } from "drizzle-orm";
 import { unstable_cache } from "next/cache";
 import { db } from "@/db/client";
+import type { AgeGroup } from "@/domain/age-groups";
+import type { ParentResourceCategory, ParentResourceType } from "@/domain/parent-resources";
 import { cacheTags } from "@/lib/cache/tags";
 import { buildSkillSummaries } from "@/modules/parent/skill-summary";
 import {
@@ -134,7 +136,7 @@ export async function getActivityHistory(
     .orderBy(desc(missionSessions.startedAt));
 }
 
-async function readSuggestions(ageGroup: "2-3" | "4-5" | "6-8") {
+async function readSuggestions(ageGroup: "6-8" | "9-10" | "11-12") {
   return db.query.conversationSuggestions.findMany({
     where: and(
       eq(conversationSuggestions.active, true),
@@ -149,11 +151,64 @@ export const getSuggestions = unstable_cache(readSuggestions, ["parent-suggestio
   revalidate: 3600,
 });
 
-async function readResources() {
-  return db.query.parentResources.findMany({
-    where: eq(parentResources.status, "published"),
-    orderBy: [parentResources.sortOrder],
-  });
+export type ParentResourceFilters = {
+  ageGroup: AgeGroup;
+  resourceType?: ParentResourceType;
+  category?: ParentResourceCategory;
+  search?: string;
+  page?: number;
+  pageSize?: number;
+};
+
+async function readResources(filters: ParentResourceFilters) {
+  const conditions = [
+    eq(parentResources.status, "published"),
+    sql`${parentResources.ageGroups} @> ${JSON.stringify([filters.ageGroup])}::jsonb`,
+  ];
+  if (filters.resourceType) conditions.push(eq(parentResources.resourceType, filters.resourceType));
+  if (filters.category) conditions.push(eq(parentResources.category, filters.category));
+  if (filters.search?.trim()) {
+    const search = filters.search.trim();
+    conditions.push(
+      sql`(${parentResources.title} ilike ${`%${search}%`} or ${parentResources.excerpt} ilike ${`%${search}%`})`,
+    );
+  }
+  const where = and(...conditions);
+  const pageSize = Math.min(24, Math.max(3, Math.trunc(filters.pageSize ?? 9)));
+  const page = Math.max(1, Math.trunc(filters.page ?? 1));
+  const [items, countRows, facetRows] = await Promise.all([
+    db.query.parentResources.findMany({
+      where,
+      orderBy: [asc(parentResources.sortOrder), desc(parentResources.publishedAt)],
+      limit: pageSize,
+      offset: (page - 1) * pageSize,
+    }),
+    db
+      .select({ count: sql<number>`count(*)::int` })
+      .from(parentResources)
+      .where(where),
+    db
+      .select({ resourceType: parentResources.resourceType, category: parentResources.category })
+      .from(parentResources)
+      .where(
+        and(
+          eq(parentResources.status, "published"),
+          sql`${parentResources.ageGroups} @> ${JSON.stringify([filters.ageGroup])}::jsonb`,
+        ),
+      ),
+  ]);
+  const total = countRows[0]?.count ?? 0;
+  return {
+    items,
+    total,
+    page,
+    pageSize,
+    totalPages: Math.max(1, Math.ceil(total / pageSize)),
+    facets: {
+      resourceTypes: [...new Set(facetRows.map((row) => row.resourceType))],
+      categories: [...new Set(facetRows.map((row) => row.category))].sort(),
+    },
+  };
 }
 
 export const getResources = unstable_cache(readResources, ["parent-resources"], {
