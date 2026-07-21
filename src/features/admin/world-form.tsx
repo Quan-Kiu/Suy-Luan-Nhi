@@ -125,7 +125,7 @@ export function WorldForm({
         registration={form.register("description")}
         error={form.formState.errors.description?.message}
       />
-      <div className="grid gap-3 md:grid-cols-3">
+      <div className="grid gap-3 xl:grid-cols-3">
         <TextField
           id={`${fieldPrefix}-sort-order`}
           type="number"
@@ -157,7 +157,7 @@ export function WorldForm({
       </div>
       <details className="rounded-xl bg-[#f7f3eb] p-3">
         <summary className="cursor-pointer text-sm font-black">Thiết lập nâng cao</summary>
-        <div className="mt-3 grid gap-3 md:grid-cols-2">
+        <div className="mt-3 grid gap-3 lg:grid-cols-2">
           {mode === "create" ? (
             <TextField
               id={`${fieldPrefix}-slug`}

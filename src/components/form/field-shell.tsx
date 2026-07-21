@@ -30,17 +30,18 @@ export function FieldShell({
         {required ? <span aria-hidden="true"> *</span> : null}
       </span>
       <span className="block">{children}</span>
-      <span
-        id={messageId}
-        role={error ? "alert" : undefined}
-        aria-hidden={message ? undefined : true}
-        className={cn(
-          "block min-h-5 text-sm leading-5 font-normal",
-          error ? "font-bold text-red-700" : "text-[#806d54]",
-        )}
-      >
-        {message ?? "\u00a0"}
-      </span>
+      {message ? (
+        <span
+          id={messageId}
+          role={error ? "alert" : undefined}
+          className={cn(
+            "block text-sm leading-5 font-normal",
+            error ? "font-bold text-red-700" : "text-[#806d54]",
+          )}
+        >
+          {message}
+        </span>
+      ) : null}
     </label>
   );
 }

@@ -7,7 +7,7 @@ export function WorldManager({ initial }: { initial: WorldItem[] }) {
   const content = useContent("admin");
   return (
     <div className="space-y-5">
-      <div className="grid gap-4 md:grid-cols-2">
+      <div className="grid gap-4 2xl:grid-cols-2">
         {initial.map((item) => (
           <article
             key={item.id}

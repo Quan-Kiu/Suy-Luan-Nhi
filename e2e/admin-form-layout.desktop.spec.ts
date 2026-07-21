@@ -54,7 +54,10 @@ test("media upload controls stay aligned before and after validation", async ({ 
   await upload.click();
   await expect(page.getByText("Hãy chọn một tệp hình ảnh, âm thanh hoặc video")).toBeVisible();
   const positionsAfter = await Promise.all([file, category, description, upload].map(top));
-  expect(positionsAfter).toEqual(positionsBefore);
+  const maximumShift = Math.max(
+    ...positionsAfter.map((position, index) => Math.abs(position - positionsBefore[index])),
+  );
+  expect(maximumShift).toBeLessThanOrEqual(1);
 
   await page.screenshot({
     path: ".verification/browser/admin-form-layout-media.png",

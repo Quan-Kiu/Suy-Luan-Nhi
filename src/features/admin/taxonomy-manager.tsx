@@ -15,7 +15,7 @@ export function TaxonomyManager({ ages, skills }: { ages: AgeGroupItem[]; skills
           Mỗi hồ sơ bé thuộc một nhóm tuổi. Mô tả nên nói rõ kiểu nhiệm vụ phù hợp, không đánh giá khả năng
           của trẻ.
         </p>
-        <div className="mt-4 grid gap-4 md:grid-cols-3">
+        <div className="mt-4 grid gap-4 md:grid-cols-2 xl:grid-cols-3">
           {ages.map((age) => (
             <article key={age.code} className="rounded-2xl border bg-white p-4">
               <AgeGroupForm item={age} />

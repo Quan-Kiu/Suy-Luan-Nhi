@@ -79,8 +79,8 @@ export function MediaUploadForm({ onUploaded }: { onUploaded: (item: MediaItem) 
           "Hãy viết mô tả ngắn để người dùng trình đọc màn hình hiểu nội dung.",
         )}
       </p>
-      <div className="mt-5 grid gap-x-3 gap-y-4 lg:grid-cols-[minmax(320px,1.25fr)_minmax(180px,0.45fr)_minmax(300px,1fr)_auto] lg:items-start">
-        <label className="grid content-start gap-2 font-bold">
+      <div className="mt-5 grid gap-x-3 gap-y-4 md:grid-cols-2 2xl:grid-cols-[minmax(320px,1.25fr)_minmax(180px,0.45fr)_minmax(300px,1fr)_auto] 2xl:items-start">
+        <label className="grid content-start gap-2 font-bold md:col-span-2 2xl:col-span-1">
           <span>Tệp hình ảnh, âm thanh hoặc video</span>
           <span className="relative flex min-h-12 items-stretch overflow-hidden rounded-2xl border-2 border-[#eadfc9] bg-[#fffdf8] transition outline-none focus-within:border-[#e9641a]">
             <span className="inline-flex shrink-0 items-center border-r border-[#eadfc9] bg-[#fff7e9] px-4 text-sm font-black text-[#5e4b34]">
@@ -131,11 +131,11 @@ export function MediaUploadForm({ onUploaded }: { onUploaded: (item: MediaItem) 
           registration={form.register("altText")}
           error={form.formState.errors.altText?.message}
         />
-        <div className="lg:pt-8">
+        <div className="md:col-span-2 2xl:col-span-1 2xl:pt-8">
           <SubmitButton
             pending={mutation.isPending}
             pendingLabel={contentText(content, "media.uploading", "Đang tải...")}
-            className="min-h-12 w-full lg:w-auto lg:min-w-32"
+            className="min-h-12 w-full 2xl:w-auto 2xl:min-w-32"
           >
             {contentText(content, "media.upload", "Chọn và tải lên")}
           </SubmitButton>
