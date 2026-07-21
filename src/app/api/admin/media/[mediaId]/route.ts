@@ -1,14 +1,35 @@
 import { apiJson } from "@/lib/api-response";
 import { requireApiRoles } from "@/auth/api";
 import { approveMedia, deleteMedia } from "@/modules/media/media";
+import { MediaInUseError } from "@/domain/media-deletion";
+import { MediaStorageError } from "@/modules/media/storage/errors";
+import { invalidateAdminMediaViews } from "@/lib/cache/invalidation";
 
 export async function DELETE(request: Request, { params }: { params: Promise<{ mediaId: string }> }) {
   const authResult = await requireApiRoles(request, ["content_admin", "super_admin"]);
   if ("error" in authResult) return authResult.error;
   const { mediaId } = await params;
-  return (await deleteMedia(mediaId, authResult.session.user.id))
-    ? apiJson({ deleted: true, resource: "media" })
-    : apiJson({ message: "Không tìm thấy media" }, { status: 404 });
+  try {
+    const deleted = await deleteMedia(mediaId, authResult.session.user.id);
+    if (!deleted) return apiJson({ message: "Không tìm thấy tệp" }, { status: 404 });
+    invalidateAdminMediaViews();
+    return apiJson({ deleted: true, resource: "media" });
+  } catch (error) {
+    if (error instanceof MediaInUseError) {
+      return apiJson(
+        { code: error.code, message: error.message, references: error.references },
+        { status: error.status },
+      );
+    }
+    if (error instanceof MediaStorageError) {
+      return apiJson({ code: error.code, message: error.message }, { status: error.status });
+    }
+    console.error("[api.admin.media.delete_failed]", error);
+    return apiJson(
+      { code: "MEDIA_DELETE_FAILED", message: "Không thể xóa tệp do lỗi hệ thống. Hãy thử lại." },
+      { status: 500 },
+    );
+  }
 }
 
 export async function PATCH(request: Request, { params }: { params: Promise<{ mediaId: string }> }) {

@@ -118,7 +118,12 @@ export const adminContentEntries = defineContent("admin", {
     description: "Thông báo sao chép liên kết thất bại.",
   },
   "media.delete": { value: "Xóa tệp", description: "Nhãn xóa tệp." },
+  "media.deleteSuccess": { value: "Đã xóa tệp", description: "Thông báo xóa tệp thành công." },
   "media.deleteConfirm": { value: "Xóa vĩnh viễn tệp này?", description: "Xác nhận xóa tệp." },
+  "media.deleteFeedbackConfirm": {
+    value: "Ảnh sẽ bị xóa khỏi góp ý đang đính kèm và không thể khôi phục.",
+    description: "Xác nhận xóa ảnh đính kèm khỏi góp ý hệ thống.",
+  },
   "settings.title": {
     value: "Cấu hình hệ thống",
     description: "Tiêu đề quản lý cấu hình vận hành hệ thống.",

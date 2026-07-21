@@ -12,6 +12,11 @@ import {
   systemFeedbackAttachments,
 } from "@/db/schema";
 import type { MediaCategory } from "@/domain/media";
+import {
+  getBlockingMediaReferences,
+  MediaInUseError,
+  type MediaReferenceCounts,
+} from "@/domain/media-deletion";
 import { deleteStoredMedia, storeMedia } from "@/modules/media/storage";
 import { MediaValidationError } from "@/modules/media/storage/errors";
 import { getImageUploadPolicy } from "@/modules/media/upload-policy";
@@ -131,28 +136,32 @@ export async function deleteMedia(mediaId: string, actorId: string | null) {
     })
     .from(mediaAssets)
     .where(eq(mediaAssets.id, mediaId));
-  if (
-    (references?.missionCovers ?? 0) +
-      (references?.badgeIcons ?? 0) +
-      (references?.worldCovers ?? 0) +
-      (references?.resourceMedia ?? 0) +
-      (references?.questionPayloads ?? 0) +
-      (references?.versionSnapshots ?? 0) +
-      (references?.feedbackAttachments ?? 0) >
-    0
-  ) {
-    throw new Error(
-      "Tệp đang được dùng trong nhiệm vụ, huy hiệu, chủ đề hoặc tài nguyên; hãy thay thế trước khi xóa",
-    );
-  }
+  const referenceCounts: MediaReferenceCounts = {
+    missionCovers: references?.missionCovers ?? 0,
+    badgeIcons: references?.badgeIcons ?? 0,
+    worldCovers: references?.worldCovers ?? 0,
+    resourceMedia: references?.resourceMedia ?? 0,
+    questionPayloads: references?.questionPayloads ?? 0,
+    versionSnapshots: references?.versionSnapshots ?? 0,
+    feedbackAttachments: references?.feedbackAttachments ?? 0,
+  };
+  const blockingReferences = getBlockingMediaReferences(referenceCounts);
+  if (blockingReferences.length) throw new MediaInUseError(blockingReferences);
+
   await deleteStoredMedia(asset.storageProvider, asset.storageKey, asset.storageMetadata);
-  await db.update(mediaAssets).set({ deletedAt: new Date() }).where(eq(mediaAssets.id, mediaId));
-  await db.insert(auditLogs).values({
-    actorId,
-    action: "media.deleted",
-    resourceType: "media_asset",
-    resourceId: mediaId,
-    beforeState: asset,
+  await db.transaction(async (tx) => {
+    if (referenceCounts.feedbackAttachments > 0) {
+      await tx.delete(systemFeedbackAttachments).where(eq(systemFeedbackAttachments.mediaAssetId, mediaId));
+    }
+    await tx.update(mediaAssets).set({ deletedAt: new Date() }).where(eq(mediaAssets.id, mediaId));
+    await tx.insert(auditLogs).values({
+      actorId,
+      action: "media.deleted",
+      resourceType: "media_asset",
+      resourceId: mediaId,
+      beforeState: asset,
+      metadata: { detachedFeedbackAttachments: referenceCounts.feedbackAttachments },
+    });
   });
   return true;
 }

@@ -49,3 +49,7 @@ export function invalidateTaxonomyCaches() {
 export function invalidateSystemSettingsViews() {
   revalidatePath("/", "layout");
 }
+export function invalidateAdminMediaViews() {
+  revalidatePath("/admin/media");
+  revalidatePath("/admin/feedback");
+}

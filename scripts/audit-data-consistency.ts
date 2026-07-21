@@ -15,10 +15,6 @@ const intentionallyLocalMutations = new Map<string, string>([
     "The feedback manager updates its TanStack Query cache; feedback is not exposed through a server cache.",
   ],
   [
-    "admin/media/[mediaId]/route.ts",
-    "Media CRUD updates the current client workspace and media lists are not server cached.",
-  ],
-  [
     "admin/media/route.ts",
     "Media creation returns the created asset directly and media lists are not server cached.",
   ],

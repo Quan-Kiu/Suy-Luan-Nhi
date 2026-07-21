@@ -1,6 +1,6 @@
 "use client";
 
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { Check, CheckCircle2, Copy, LoaderCircle, Trash2, XCircle } from "lucide-react";
 import Image from "next/image";
 import { useEffect, useRef, useState } from "react";
@@ -10,6 +10,7 @@ import { ConfirmDialog } from "@/components/confirm-dialog";
 import { FormStatus } from "@/components/form";
 import { contentText, useContent } from "@/content/client";
 import { mediaCategoryLabels, type MediaCategory } from "@/domain/media";
+import { queryKeys } from "@/lib/query/keys";
 
 type Action = "approve" | "reject" | "delete";
 
@@ -33,6 +34,7 @@ export function MediaCard({
   onDeleted: (mediaId: string) => void;
 }) {
   const content = useContent("admin");
+  const queryClient = useQueryClient();
   const [deleteOpen, setDeleteOpen] = useState(false);
   const [copied, setCopied] = useState(false);
   const copyResetTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -69,6 +71,8 @@ export function MediaCard({
       if (result.action === "delete") {
         setDeleteOpen(false);
         onDeleted(item.id);
+        toast.success(contentText(content, "media.deleteSuccess", "Đã xóa tệp"));
+        void queryClient.invalidateQueries({ queryKey: queryKeys.admin.feedback });
       } else onUpdated(result.updated);
     },
   });
@@ -183,11 +187,19 @@ export function MediaCard({
       <ConfirmDialog
         open={deleteOpen}
         title="Xóa tệp này?"
-        description={contentText(
-          content,
-          "media.deleteConfirm",
-          "Tệp sẽ bị xóa vĩnh viễn nếu chưa được dùng trong nhiệm vụ hoặc bài viết.",
-        )}
+        description={
+          item.category === "feedback-attachment"
+            ? contentText(
+                content,
+                "media.deleteFeedbackConfirm",
+                "Ảnh sẽ bị xóa khỏi góp ý đang đính kèm và không thể khôi phục.",
+              )
+            : contentText(
+                content,
+                "media.deleteConfirm",
+                "Tệp sẽ bị xóa vĩnh viễn nếu chưa được dùng trong nhiệm vụ hoặc bài viết.",
+              )
+        }
         confirmLabel="Xóa tệp"
         pendingLabel="Đang xóa..."
         tone="danger"
