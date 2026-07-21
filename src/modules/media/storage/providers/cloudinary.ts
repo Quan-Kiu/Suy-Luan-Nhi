@@ -17,11 +17,16 @@ function resourceType(input: ValidatedMedia) {
   return input.mediaType === "image" ? ("image" as const) : ("video" as const);
 }
 
-function toStorageError(error: UploadApiErrorResponse) {
+function toStorageError(
+  error: UploadApiErrorResponse,
+  context: { retriedWithoutPreset?: boolean } = {},
+) {
   const message = error.message || "Cloudinary upload failed";
   console.error("[media.cloudinary.upload_failed]", {
     httpCode: error.http_code,
+    name: error.name,
     message,
+    retriedWithoutPreset: context.retriedWithoutPreset ?? false,
   });
   if (/cloud_name is disabled/i.test(message)) {
     return new MediaStorageError(
@@ -35,26 +40,59 @@ function toStorageError(error: UploadApiErrorResponse) {
       { cause: error },
     );
   }
+  if (error.http_code === 403) {
+    return new MediaStorageError(
+      context.retriedWithoutPreset
+        ? "Cloudinary đang từ chối quyền tải lên. Hãy kiểm tra trạng thái tài khoản và quyền của API key."
+        : "Cloudinary đang từ chối quyền tải lên. Hãy kiểm tra upload preset và quyền của API key.",
+      { cause: error },
+    );
+  }
   return new MediaStorageError("Kho lưu trữ chưa sẵn sàng. Hãy thử lại sau.", { cause: error });
 }
 
-function upload(input: ValidatedMedia) {
+function uploadOnce(input: ValidatedMedia, includeUploadPreset: boolean) {
+  const uploadPreset = env.CLOUDINARY_UPLOAD_PRESET?.trim();
   return new Promise<UploadApiResponse>((resolve, reject) => {
     const stream = configureCloudinary().uploader.upload_stream(
       {
         resource_type: resourceType(input),
         folder: env.CLOUDINARY_FOLDER,
-        upload_preset: env.CLOUDINARY_UPLOAD_PRESET,
+        ...(includeUploadPreset && uploadPreset ? { upload_preset: uploadPreset } : {}),
         overwrite: false,
       },
       (error: UploadApiErrorResponse | undefined, result: UploadApiResponse | undefined) => {
-        if (error) reject(toStorageError(error));
+        if (error) reject(error);
         else if (!result) reject(new MediaStorageError("Cloudinary không trả về kết quả tải lên"));
         else resolve(result);
       },
     );
     stream.end(input.buffer);
   });
+}
+
+async function upload(input: ValidatedMedia) {
+  const hasUploadPreset = Boolean(env.CLOUDINARY_UPLOAD_PRESET?.trim());
+  try {
+    return await uploadOnce(input, hasUploadPreset);
+  } catch (error) {
+    if (error instanceof MediaStorageError) throw error;
+    const uploadError = error as UploadApiErrorResponse;
+    if (hasUploadPreset && uploadError.http_code === 403) {
+      console.warn("[media.cloudinary.retry_without_preset]", {
+        httpCode: uploadError.http_code,
+      });
+      try {
+        return await uploadOnce(input, false);
+      } catch (retryError) {
+        if (retryError instanceof MediaStorageError) throw retryError;
+        throw toStorageError(retryError as UploadApiErrorResponse, {
+          retriedWithoutPreset: true,
+        });
+      }
+    }
+    throw toStorageError(uploadError);
+  }
 }
 
 export const cloudinaryStorageProvider: StorageProvider = {
