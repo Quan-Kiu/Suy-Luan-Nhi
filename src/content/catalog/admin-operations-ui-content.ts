@@ -53,8 +53,12 @@ export const adminOperationsContentEntries = defineContent("admin", {
   "taxonomy.creating": { value: "Đang thêm...", description: "Trạng thái đang thêm kỹ năng." },
   "taxonomy.createSuccess": { value: "Đã thêm kỹ năng", description: "Thông báo thêm kỹ năng." },
   "review.commentLabel": { value: "Nhận xét cho người soạn", description: "Nhãn nhận xét kiểm duyệt." },
+  "review.commentDescription": {
+    value: "Không bắt buộc khi nội dung đạt yêu cầu; bắt buộc khi yêu cầu chỉnh sửa.",
+    description: "Giải thích khi nào nhận xét kiểm duyệt là bắt buộc.",
+  },
   "review.commentPlaceholder": {
-    value: "Nêu rõ lý do duyệt hoặc nội dung cần chỉnh sửa...",
+    value: "Ghi thêm giải thích hoặc nêu rõ nội dung cần chỉnh sửa...",
     description: "Placeholder nhận xét review.",
   },
   "review.approve": { value: "Nội dung đạt yêu cầu", description: "Nhãn duyệt nội dung." },
@@ -65,14 +69,25 @@ export const adminOperationsContentEntries = defineContent("admin", {
   "review.rejectSuccess": { value: "Đã trả lại để chỉnh sửa", description: "Thông báo trả lại phiên bản." },
   "review.publish": { value: "Xuất bản ngay", description: "Nhãn xuất bản phiên bản." },
   "review.publishing": { value: "Đang xuất bản...", description: "Nhãn khi xuất bản." },
+  "review.publishSuccessTitle": {
+    value: "Xuất bản thành công",
+    description: "Tiêu đề thông báo xuất bản thành công.",
+  },
   "review.publishSuccess": {
     value: "Nhiệm vụ đã được hiển thị cho trẻ",
-    description: "Thông báo xuất bản.",
+    description: "Chi tiết thông báo xuất bản.",
   },
   "review.scheduleTitle": { value: "Hoặc lên lịch xuất bản", description: "Tiêu đề lên lịch xuất bản." },
   "review.schedule": { value: "Lưu lịch xuất bản", description: "Nhãn lưu lịch xuất bản." },
   "review.scheduling": { value: "Đang lên lịch...", description: "Nhãn khi lên lịch." },
-  "review.scheduleSuccess": { value: "Đã lên lịch xuất bản", description: "Thông báo lên lịch." },
+  "review.scheduleSuccessTitle": {
+    value: "Đã lưu lịch xuất bản",
+    description: "Tiêu đề thông báo lưu lịch xuất bản.",
+  },
+  "review.scheduleSuccess": {
+    value: "Nhiệm vụ sẽ tự động hiển thị cho trẻ đúng thời gian đã chọn",
+    description: "Chi tiết thông báo lên lịch.",
+  },
   "dashboard.eyebrow": { value: "Trung tâm công việc", description: "Nhãn đầu trang tổng quan." },
   "dashboard.title": { value: "Hôm nay cần làm gì?", description: "Tiêu đề trang tổng quan." },
   "dashboard.description": {

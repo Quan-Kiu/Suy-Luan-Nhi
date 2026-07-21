@@ -116,3 +116,183 @@ select:not([multiple]) {
 select:not([multiple]):disabled {
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='20' height='20' viewBox='0 0 24 24' fill='none' stroke='%23a89a88' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
 }
+
+/* High-salience status feedback: readable at a glance without blocking work. */
+.app-toaster {
+  --width: 420px !important;
+}
+
+.app-toast {
+  min-height: 76px !important;
+  padding: 16px 48px 16px 20px !important;
+  align-items: flex-start !important;
+  gap: 13px !important;
+  border-width: 2px !important;
+  border-radius: 16px !important;
+  font-family: inherit !important;
+  box-shadow:
+    0 18px 48px rgba(63, 50, 31, 0.22),
+    0 5px 14px rgba(63, 50, 31, 0.14) !important;
+}
+
+.app-toast::before {
+  content: "";
+  position: absolute;
+  inset: 9px auto 9px 0;
+  width: 5px;
+  border-radius: 0 999px 999px 0;
+  background: currentColor;
+  opacity: 0.9;
+}
+
+.app-toast__content {
+  min-width: 0;
+  gap: 4px !important;
+  padding-top: 1px;
+}
+
+.app-toast__title {
+  color: inherit !important;
+  font-size: 15px !important;
+  font-weight: 900 !important;
+  line-height: 1.35 !important;
+  letter-spacing: -0.01em;
+}
+
+.app-toast__description {
+  color: inherit !important;
+  font-size: 13px !important;
+  font-weight: 650 !important;
+  line-height: 1.45 !important;
+  opacity: 0.82;
+}
+
+.app-toast__icon {
+  width: 38px !important;
+  height: 38px !important;
+  margin: 0 !important;
+  border-radius: 999px;
+  align-items: center !important;
+  justify-content: center !important;
+  color: white !important;
+  box-shadow: 0 5px 12px rgba(63, 50, 31, 0.2);
+}
+
+.app-toast__close {
+  top: 10px !important;
+  right: 10px !important;
+  left: auto !important;
+  width: 28px !important;
+  height: 28px !important;
+  transform: none !important;
+  border: 1px solid currentColor !important;
+  background: color-mix(in srgb, white 72%, transparent) !important;
+  color: inherit !important;
+  opacity: 0.72;
+}
+
+.app-toast__close:hover {
+  background: white !important;
+  opacity: 1;
+}
+
+.app-toast--success {
+  border-color: #3f9960 !important;
+  background: linear-gradient(135deg, #f1fff5 0%, #e3f7e9 100%) !important;
+  color: #14532d !important;
+}
+
+.app-toast--success .app-toast__icon {
+  background: #15803d !important;
+}
+
+.app-toast--error {
+  border-color: #d34d4d !important;
+  background: linear-gradient(135deg, #fff6f5 0%, #ffe7e4 100%) !important;
+  color: #8f1d1d !important;
+}
+
+.app-toast--error .app-toast__icon {
+  background: #c53030 !important;
+}
+
+.app-toast--warning {
+  border-color: #d39024 !important;
+  background: linear-gradient(135deg, #fffaf0 0%, #ffefc9 100%) !important;
+  color: #7a4707 !important;
+}
+
+.app-toast--warning .app-toast__icon {
+  background: #b86b08 !important;
+}
+
+.app-toast--info {
+  border-color: #4087ba !important;
+  background: linear-gradient(135deg, #f3fbff 0%, #e3f2fb 100%) !important;
+  color: #174f78 !important;
+}
+
+.app-toast--info .app-toast__icon {
+  background: #2474a8 !important;
+}
+
+.app-toast--loading,
+.app-toast[data-type="normal"],
+.app-toast[data-type="default"] {
+  border-color: #a8804a !important;
+  background: linear-gradient(135deg, #fffdf8 0%, #f7eedc 100%) !important;
+  color: #4e3b23 !important;
+}
+
+.app-toast--loading .app-toast__icon,
+.app-toast[data-type="normal"] .app-toast__icon,
+.app-toast[data-type="default"] .app-toast__icon {
+  background: #8b6230 !important;
+}
+
+.app-toast__spinner {
+  animation: app-toast-spin 0.9s linear infinite;
+}
+
+@keyframes app-toast-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes app-toast-attention {
+  0% {
+    filter: brightness(1.06);
+    box-shadow:
+      0 0 0 7px color-mix(in srgb, currentColor 14%, transparent),
+      0 18px 48px rgba(63, 50, 31, 0.22),
+      0 5px 14px rgba(63, 50, 31, 0.14);
+  }
+  100% {
+    filter: brightness(1);
+  }
+}
+
+.app-toast[data-mounted="true"][data-front="true"] {
+  animation: app-toast-attention 560ms ease-out;
+}
+
+@media (max-width: 600px) {
+  .app-toast {
+    min-height: 72px !important;
+    padding: 14px 44px 14px 16px !important;
+    border-radius: 14px !important;
+  }
+
+  .app-toast__icon {
+    width: 34px !important;
+    height: 34px !important;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .app-toast[data-mounted="true"][data-front="true"],
+  .app-toast__spinner {
+    animation: none !important;
+  }
+}

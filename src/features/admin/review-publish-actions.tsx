@@ -22,7 +22,11 @@ export function ReviewPublishActions({ missionId, versionId }: { missionId: stri
   const publishMutation = useMutation({
     mutationFn: () => reviewsApi.publish(missionId, versionId),
     onSuccess: () => {
-      toast.success(contentText(content, "review.publishSuccess", "Nhiệm vụ đã được hiển thị cho trẻ"));
+      toast.success(contentText(content, "review.publishSuccessTitle", "Xuất bản thành công"), {
+        description: contentText(content, "review.publishSuccess", "Nhiệm vụ đã được hiển thị cho trẻ"),
+        id: `mission-publish-${versionId}`,
+        duration: 8000,
+      });
       navigation.refresh();
     },
   });
@@ -30,7 +34,15 @@ export function ReviewPublishActions({ missionId, versionId }: { missionId: stri
     mutationFn: ({ scheduledFor }: FormValues) =>
       reviewsApi.schedule(missionId, versionId, new Date(scheduledFor).toISOString()),
     onSuccess: () => {
-      toast.success(contentText(content, "review.scheduleSuccess", "Đã lên lịch xuất bản"));
+      toast.success(contentText(content, "review.scheduleSuccessTitle", "Đã lưu lịch xuất bản"), {
+        description: contentText(
+          content,
+          "review.scheduleSuccess",
+          "Nhiệm vụ sẽ tự động hiển thị cho trẻ đúng thời gian đã chọn",
+        ),
+        id: `mission-schedule-${versionId}`,
+        duration: 8000,
+      });
       navigation.refresh();
     },
   });
