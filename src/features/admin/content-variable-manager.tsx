@@ -83,11 +83,14 @@ export function ContentVariableManager({ initial }: { initial: ContentVariableDe
               onValueChange={setPreviewText}
               description="Dùng các tag đang cấu hình để xem kết quả mẫu."
             />
-            <div className="rounded-2xl border bg-white p-4">
-              <p className="text-xs font-black tracking-wider text-[#8a6b39] uppercase">Kết quả xem trước</p>
-              <p className="mt-3 leading-7 font-bold">
-                {renderContentTemplatePreview(previewText, variables)}
-              </p>
+            <div className="grid content-start gap-2">
+              <span className="font-bold">Kết quả xem trước</span>
+              <div className="min-h-[96px] rounded-2xl border-2 border-[#eadfc9] bg-white px-4 py-3">
+                <p className="leading-7 font-bold">{renderContentTemplatePreview(previewText, variables)}</p>
+              </div>
+              <span className="min-h-5 text-sm leading-5 font-normal text-[#806d54]">
+                Tag được thay bằng dữ liệu xem trước của từng cấu hình.
+              </span>
             </div>
           </div>
         </Card>
@@ -121,7 +124,7 @@ export function ContentVariableManager({ initial }: { initial: ContentVariableDe
                     ) : null}
                   </div>
                 </div>
-                <div className="mt-4 grid gap-4 md:grid-cols-2">
+                <div className="mt-4 grid gap-4 lg:grid-cols-2">
                   <TextField
                     label="Tên tag"
                     placeholder="name"
@@ -201,8 +204,8 @@ export function ContentVariableManager({ initial }: { initial: ContentVariableDe
         </button>
 
         <FormStatus status={mutation.isError ? "error" : "idle"} message={mutation.error?.message} />
-        <div className="sticky bottom-4 flex justify-end rounded-2xl border bg-white/95 p-3 shadow-lg backdrop-blur">
-          <SubmitButton pending={mutation.isPending} pendingLabel="Đang lưu..." className="w-auto">
+        <div className="flex justify-end rounded-2xl border bg-white p-3 shadow-sm">
+          <SubmitButton pending={mutation.isPending} pendingLabel="Đang lưu..." className="w-full sm:w-auto">
             Lưu cấu hình tag
           </SubmitButton>
         </div>

@@ -1,6 +1,16 @@
 import type { ReactNode } from "react";
 import { cn } from "@/lib/utils";
 
+type FieldShellProps = {
+  id: string;
+  label: string;
+  description?: string;
+  error?: string;
+  required?: boolean;
+  className?: string;
+  children: ReactNode;
+};
+
 export function FieldShell({
   id,
   label,
@@ -9,34 +19,28 @@ export function FieldShell({
   required,
   className,
   children,
-}: {
-  id: string;
-  label: string;
-  description?: string;
-  error?: string;
-  required?: boolean;
-  className?: string;
-  children: ReactNode;
-}) {
-  const descriptionId = description ? `${id}-description` : undefined;
-  const errorId = error ? `${id}-error` : undefined;
+}: FieldShellProps) {
+  const message = error ?? description;
+  const messageId = error ? `${id}-error` : description ? `${id}-description` : undefined;
+
   return (
-    <label htmlFor={id} className={cn("block font-bold", className)}>
+    <label htmlFor={id} className={cn("grid content-start gap-2 font-bold", className)}>
       <span>
         {label}
         {required ? <span aria-hidden="true"> *</span> : null}
       </span>
-      {description ? (
-        <span id={descriptionId} className="mt-1 block text-sm font-normal text-[#806d54]">
-          {description}
-        </span>
-      ) : null}
-      <span className="mt-2 block">{children}</span>
-      {error ? (
-        <span id={errorId} role="alert" className="mt-1 block text-sm font-bold text-red-700">
-          {error}
-        </span>
-      ) : null}
+      <span className="block">{children}</span>
+      <span
+        id={messageId}
+        role={error ? "alert" : undefined}
+        aria-hidden={message ? undefined : true}
+        className={cn(
+          "block min-h-5 text-sm leading-5 font-normal",
+          error ? "font-bold text-red-700" : "text-[#806d54]",
+        )}
+      >
+        {message ?? "\u00a0"}
+      </span>
     </label>
   );
 }

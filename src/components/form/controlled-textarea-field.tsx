@@ -31,6 +31,7 @@ export function ControlledTextareaField({
         value={value}
         onChange={(event) => onValueChange(event.target.value)}
         aria-invalid={Boolean(error)}
+        aria-describedby={error ? `${id}-error` : description ? `${id}-description` : undefined}
         className={cn(formControlClass, "py-3", className)}
       />
     </FieldShell>

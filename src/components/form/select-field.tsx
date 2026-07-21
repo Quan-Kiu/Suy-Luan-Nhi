@@ -41,6 +41,7 @@ export function SelectField({
         id={id}
         required={required}
         aria-invalid={Boolean(error)}
+        aria-describedby={error ? `${id}-error` : description ? `${id}-description` : undefined}
         className={cn(formControlClass, className)}
       >
         {options.map((option) => (
