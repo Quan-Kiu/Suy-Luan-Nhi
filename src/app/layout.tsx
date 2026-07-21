@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import "./globals.css";
 import { Providers } from "@/components/providers";
+import "@/lib/validation/zod-locale";
 
 export const metadata: Metadata = {
   title: "Suy Luận Nhí",

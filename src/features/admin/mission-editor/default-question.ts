@@ -7,7 +7,7 @@ export function createDefaultQuestion(type: QuestionType, order: number): DraftQ
     instruction: "Hãy quan sát và trả lời nhé!",
     difficulty: 1,
     feedbackCorrect: "Tuyệt vời! Con đã tìm ra manh mối.",
-    feedbackIncorrect: "Chưa trúng thôi! Con thử nhìn lại nhé.",
+    feedbackIncorrect: "Chưa chính xác. Con thử nhìn lại nhé.",
     hints: [{ level: 1, text: "Con thử nhìn từng phần một nhé." }],
   };
   switch (type) {

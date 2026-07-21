@@ -37,7 +37,7 @@ export function SessionPlayer({ initialView }: { initialView: SessionView }) {
 
   const answerMutation = useMutation({
     mutationFn: () => {
-      if (value === null) throw new Error("Hãy chọn hoặc nhập đáp án trước");
+      if (value === null) throw new Error("Con chọn hoặc nhập câu trả lời trước nhé.");
       return gameplayApi.submitAnswer(view.session.id, view.question.id, {
         submission: value,
         responseTimeMs: Date.now() - startedAt,

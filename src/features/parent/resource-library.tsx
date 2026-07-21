@@ -64,22 +64,22 @@ export function ResourceLibrary({ initialData }: { initialData: ParentResourcePa
         className="grid gap-3 rounded-[24px] border border-[#eadfc9] bg-white/90 p-4 md:grid-cols-[minmax(220px,1fr)_180px_200px_auto_auto]"
       >
         <label className="relative">
-          <span className="sr-only">Tìm tài nguyên</span>
+          <span className="sr-only">Tìm bài viết</span>
           <Search className="absolute top-3 left-3 text-[#887b6c]" size={18} />
           <input
             value={draft.search}
             onChange={(event) => setDraft((current) => ({ ...current, search: event.target.value }))}
-            placeholder="Tìm hướng dẫn phù hợp"
+            placeholder="Tìm bài viết phù hợp"
             className="min-h-11 w-full rounded-xl border py-2 pr-3 pl-10"
           />
         </label>
         <select
           value={draft.resourceType}
           onChange={(event) => setDraft((current) => ({ ...current, resourceType: event.target.value }))}
-          aria-label="Lọc theo loại tài nguyên"
+          aria-label="Lọc theo loại bài viết"
           className="min-h-11 rounded-xl border px-3"
         >
-          <option value="">Mọi loại</option>
+          <option value="">Tất cả loại</option>
           {data.facets.resourceTypes.map((type) => (
             <option key={type} value={type}>
               {parentResourceTypeLabels[type as ParentResourceType] ?? type}
@@ -92,7 +92,7 @@ export function ResourceLibrary({ initialData }: { initialData: ParentResourcePa
           aria-label="Lọc theo chủ đề"
           className="min-h-11 rounded-xl border px-3"
         >
-          <option value="">Mọi chủ đề</option>
+          <option value="">Tất cả chủ đề</option>
           {data.facets.categories.map((category) => (
             <option key={category} value={category}>
               {parentResourceCategoryLabels[category as ParentResourceCategory] ?? category}
@@ -166,10 +166,7 @@ export function ResourceLibrary({ initialData }: { initialData: ParentResourcePa
           </div>
         ) : null}
         {data.totalPages > 1 ? (
-          <nav
-            aria-label="Phân trang tài nguyên phụ huynh"
-            className="mt-5 flex items-center justify-center gap-3"
-          >
+          <nav aria-label="Chuyển trang bài viết" className="mt-5 flex items-center justify-center gap-3">
             <button
               type="button"
               disabled={filters.page <= 1 || query.isFetching}

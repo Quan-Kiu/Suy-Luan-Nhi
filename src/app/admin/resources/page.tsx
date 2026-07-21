@@ -48,8 +48,8 @@ export default async function Page({
     <div className="space-y-6">
       <AdminPageHeader
         eyebrow="Đồng hành cùng gia đình"
-        title="Gợi ý cho phụ huynh"
-        description="Soạn, phân loại và xuất bản bài viết, hướng dẫn hoặc hoạt động giúp phụ huynh đồng hành cùng trẻ 6–12 tuổi."
+        title="Bài viết cho phụ huynh"
+        description="Soạn và sắp xếp bài viết, hướng dẫn hoặc hoạt động để phụ huynh đồng hành cùng bé 6–12 tuổi."
         icon={BookOpen}
         actions={
           canEdit ? (
@@ -57,7 +57,7 @@ export default async function Page({
               href="/admin/resources/new"
               className="inline-flex min-h-11 items-center gap-2 rounded-xl bg-[#b9470d] px-4 font-black text-white shadow-[0_4px_0_#7f2e05]"
             >
-              <Plus size={18} /> Viết nội dung mới
+              <Plus size={18} /> Viết bài mới
             </Link>
           ) : null
         }

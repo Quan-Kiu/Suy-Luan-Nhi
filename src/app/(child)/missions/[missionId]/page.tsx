@@ -1,15 +1,22 @@
 import { notFound, redirect } from "next/navigation";
 import { MissionDetailView } from "@/features/catalog/mission-detail-view";
 import { getCachedMissionMap, getCachedPublishedMission } from "@/modules/catalog/catalog-cache";
+import { getContentVariableDefinitions } from "@/modules/content/content-variables";
 import { getActiveChild } from "@/modules/family/active-child";
+
 export default async function Page({ params }: { params: Promise<{ missionId: string }> }) {
   const active = await getActiveChild();
   if (!active) redirect("/onboarding");
   const { missionId } = await params;
-  const data = await getCachedPublishedMission(missionId);
+  const [data, map, templateVariables] = await Promise.all([
+    getCachedPublishedMission(missionId),
+    getCachedMissionMap(active.child),
+    getContentVariableDefinitions(),
+  ]);
   if (!data) notFound();
-  const map = await getCachedMissionMap(active.child);
-  const access = map.worlds.flatMap((w) => w.missions).find((m) => m.id === data.mission.id);
+  const access = map.worlds
+    .flatMap((world) => world.missions)
+    .find((mission) => mission.id === data.mission.id);
   if (!access?.unlocked) redirect("/missions");
-  return <MissionDetailView data={data} childId={active.child.id} />;
+  return <MissionDetailView data={data} child={active.child} templateVariables={templateVariables} />;
 }

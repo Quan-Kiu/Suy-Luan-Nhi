@@ -6,6 +6,7 @@ import { MotionConfig } from "motion/react";
 import { useState } from "react";
 import { Toaster } from "sonner";
 import { createAppQueryClient } from "@/lib/query/client";
+import "@/lib/validation/zod-locale";
 
 export function Providers({ children }: { children: React.ReactNode }) {
   const [queryClient] = useState(createAppQueryClient);

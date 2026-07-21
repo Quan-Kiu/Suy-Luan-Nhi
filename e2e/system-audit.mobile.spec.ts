@@ -23,7 +23,7 @@ test("parent and child mobile routes pass runtime UX checks", async ({ page }, t
   expect(missionHref).toBeTruthy();
   await auditRoute(page, testInfo, missionHref!, "mobile-child-mission-detail");
 
-  await page.getByRole("button", { name: /Bắt đầu nhiệm vụ/i }).click();
+  await page.getByRole("button", { name: /Bắt đầu chơi/i }).click();
   await page.waitForURL(/\/play\//);
   await auditRoute(page, testInfo, new URL(page.url()).pathname, "mobile-child-gameplay", {
     screenshot: false,

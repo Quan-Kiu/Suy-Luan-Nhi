@@ -2,7 +2,7 @@ export const ageGroupSeeds = [
   {
     code: "6-8",
     label: "6–8 tuổi",
-    description: "Quan sát, quy luật, phân loại và suy luận trực quan.",
+    description: "Nhìn hình, tìm quy luật đơn giản, phân nhóm và nối các manh mối gần gũi.",
     minAge: 6,
     maxAge: 8,
     sortOrder: 1,
@@ -10,7 +10,7 @@ export const ageGroupSeeds = [
   {
     code: "9-10",
     label: "9–10 tuổi",
-    description: "Suy luận nhiều bước, nguyên nhân – kết quả và chiến lược giải quyết vấn đề.",
+    description: "Kết nối nhiều manh mối, hiểu vì sao một việc xảy ra và thử nhiều cách giải.",
     minAge: 9,
     maxAge: 10,
     sortOrder: 2,
@@ -18,7 +18,7 @@ export const ageGroupSeeds = [
   {
     code: "11-12",
     label: "11–12 tuổi",
-    description: "Logic nâng cao, kiểm chứng giả thuyết và giải quyết tình huống phức hợp.",
+    description: "Giải thích cách nghĩ, kiểm tra lại điều mình đoán và xử lý tình huống có nhiều bước.",
     minAge: 11,
     maxAge: 12,
     sortOrder: 3,
@@ -32,8 +32,8 @@ export const safetyChecklistDefinitions = [
   },
   {
     key: "hintsSupportive",
-    label: "Gợi ý có tính hỗ trợ",
-    defaultNote: "Gợi ý giúp bé quan sát và thử lại, không tiết lộ đáp án ngay.",
+    label: "Gợi ý giúp bé tự nghĩ tiếp",
+    defaultNote: "Gợi ý cho bé một bước nhỏ để tự tìm tiếp, không nói đáp án ngay.",
   },
   {
     key: "feedbackPositive",
@@ -42,17 +42,18 @@ export const safetyChecklistDefinitions = [
   },
   {
     key: "noProhibitedClaims",
-    label: "Không có tuyên bố bị cấm",
-    defaultNote: "Không có nội dung y tế, chẩn đoán hoặc cam kết phát triển quá mức.",
+    label: "Không hứa hẹn quá mức",
+    defaultNote:
+      "Không nói nội dung có thể chẩn đoán, chữa bệnh hoặc bảo đảm bé sẽ phát triển theo một mức cụ thể.",
   },
   {
     key: "noExternalLinks",
-    label: "Không có liên kết ngoài",
-    defaultNote: "Trải nghiệm của trẻ không dẫn sang website hoặc dịch vụ bên ngoài.",
+    label: "Không đưa bé sang trang khác",
+    defaultNote: "Khu vực của bé không mở website hoặc dịch vụ bên ngoài.",
   },
   {
     key: "languageAndImagesSafe",
-    label: "Ngôn ngữ và hình ảnh an toàn",
-    defaultNote: "Hình ảnh, âm thanh và từ ngữ đã được kiểm tra an toàn.",
+    label: "Từ ngữ, hình ảnh và âm thanh phù hợp",
+    defaultNote: "Từ ngữ, hình ảnh và âm thanh đều phù hợp với trẻ.",
   },
 ] as const;

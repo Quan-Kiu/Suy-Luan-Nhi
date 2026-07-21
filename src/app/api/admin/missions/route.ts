@@ -1,6 +1,10 @@
 import { apiJson } from "@/lib/api-response";
 import { requireApiRoles } from "@/auth/api";
 import { adminMissionDraftSchema } from "@/modules/admin/schemas";
+import {
+  missionTemplateIssueMessage,
+  validateMissionTemplateVariables,
+} from "@/modules/admin/mission-template-variables";
 import { createAdminMission, listAdminMissions } from "@/modules/admin/mission-admin";
 
 export async function GET(request: Request) {
@@ -26,6 +30,16 @@ export async function POST(request: Request) {
     return apiJson(
       { message: input.error.issues[0]?.message, issues: input.error.flatten() },
       { status: 400 },
+    );
+  }
+  const templateValidation = await validateMissionTemplateVariables(input.data);
+  if (templateValidation.issues.length) {
+    return apiJson(
+      {
+        message: missionTemplateIssueMessage(templateValidation.issues),
+        issues: templateValidation.issues,
+      },
+      { status: 422 },
     );
   }
   try {

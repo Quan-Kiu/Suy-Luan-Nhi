@@ -1,12 +1,17 @@
 "use client";
 
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQuery } from "@tanstack/react-query";
 import { CheckCircle2, FileAudio, ImageIcon, LoaderCircle, UploadCloud, Video } from "lucide-react";
 import Image from "next/image";
 import { useId, useRef } from "react";
 import { toast } from "sonner";
 import { mediaApi } from "@/api/admin/media";
+import {
+  getImageUploadPolicySummary,
+  validateImageFileForCategory,
+} from "@/features/admin/media-file-validation";
 import type { MediaCategory } from "@/domain/media";
+import { queryKeys } from "@/lib/query/keys";
 import { cn } from "@/lib/utils";
 
 type MediaKind = "image" | "audio" | "video";
@@ -56,22 +61,31 @@ export function MediaUploadField({
   altText,
   accept = defaultAccept,
   allowedKinds = ["image"],
-  description = "Chọn tệp từ máy. Hệ thống sẽ tải lên kho lưu trữ và tự điền URL.",
+  description = "Chọn tệp từ máy. Hệ thống sẽ tự tải lên và gắn vào nội dung.",
   error,
   compact = false,
 }: Props) {
   const inputId = useId();
   const inputRef = useRef<HTMLInputElement>(null);
+  const policiesQuery = useQuery({
+    queryKey: queryKeys.admin.mediaUploadPolicies,
+    queryFn: mediaApi.getUploadPolicies,
+    staleTime: 5 * 60 * 1000,
+  });
+  const policySummary = getImageUploadPolicySummary(category, policiesQuery.data);
   const mutation = useMutation({
-    mutationFn: (file: File) => mediaApi.upload(file, altText.trim() || label, category),
+    mutationFn: async (file: File) => {
+      await validateImageFileForCategory(file, category, policiesQuery.data);
+      return mediaApi.upload(file, altText.trim() || label, category);
+    },
     onSuccess: (item) => {
       if (!allowedKinds.includes(item.type)) {
-        toast.error("Loại tệp không phù hợp với trường này");
+        toast.error("Tệp này chưa đúng loại cần dùng. Hãy chọn tệp khác.");
         return;
       }
       onChange(item.url);
       if (inputRef.current) inputRef.current.value = "";
-      toast.success("Đã tải tệp và gắn vào nội dung");
+      toast.success("Đã thêm tệp vào nội dung");
     },
   });
   const KindIcon = allowedKinds.includes("video")
@@ -106,13 +120,17 @@ export function MediaUploadField({
         accept={accept}
         className="sr-only"
         onChange={(event) => {
-          const file = event.target.files?.[0];
+          const file = event.currentTarget.files?.[0];
+          event.currentTarget.value = "";
           if (file) mutation.mutate(file);
         }}
       />
+      {policySummary ? (
+        <p className="text-xs font-bold text-[#6f6558]">Yêu cầu đối với ảnh: {policySummary}.</p>
+      ) : null}
       {value ? (
         <p className="flex items-center gap-2 text-xs font-bold break-all text-green-700">
-          <CheckCircle2 size={15} className="shrink-0" /> URL đã được lấy tự động: {value}
+          <CheckCircle2 size={15} className="shrink-0" /> Tệp đã được gắn tự động vào nội dung.
         </p>
       ) : (
         <p className="flex items-center gap-2 text-xs text-[#806d54]">

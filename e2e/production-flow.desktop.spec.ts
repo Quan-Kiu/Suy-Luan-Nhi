@@ -46,17 +46,17 @@ test("parent selects a real Child Profile, completes a DB mission and sees progr
   expect(selectResponse.ok()).toBeTruthy();
 
   await page.goto("/missions");
-  await expect(page.getByRole("heading", { name: /Bản đồ nhiệm vụ|Bống/i })).toBeVisible();
+  await expect(page.getByRole("heading", { name: child.displayName, exact: true })).toBeVisible();
   await page.getByRole("link", { name: /Thám tử dấu chân/i }).click();
-  await page.getByRole("button", { name: /Bắt đầu nhiệm vụ/i }).click();
+  await page.getByRole("button", { name: /Bắt đầu chơi/i }).click();
 
   await page.getByRole("button", { name: "Ngôi sao", exact: true }).click();
-  await page.getByRole("button", { name: /Kiểm tra đáp án/i }).click();
+  await page.getByRole("button", { name: /Xem con làm đúng chưa/i }).click();
   await expect(page.getByText("Tuyệt vời!", { exact: true })).toBeVisible();
   await page.getByRole("button", { name: /Câu tiếp theo/i }).click();
 
   await page.getByRole("button", { name: "Dấu chân xanh", exact: true }).click();
-  await page.getByRole("button", { name: /Kiểm tra đáp án/i }).click();
+  await page.getByRole("button", { name: /Xem con làm đúng chưa/i }).click();
   await page.getByRole("button", { name: /Nhận huy hiệu/i }).click();
   await expect(page.getByRole("heading", { name: "Tuyệt vời!" })).toBeVisible();
   await expect(page.getByText("Thám tử tinh mắt")).toBeVisible();
@@ -87,16 +87,28 @@ test("content admin submits an immutable version and reviewer publishes it", asy
   const reviewHref = await reviewLink.getAttribute("href");
   expect(reviewHref).toMatch(/^\/admin\/reviews\//);
   await page.goto(reviewHref!);
-  await page
-    .getByLabel("Nhận xét cho người soạn")
-    .fill("Nội dung, phản hồi và kiểm tra an toàn đã đạt yêu cầu.");
-  await page.getByRole("button", { name: /Nội dung đạt yêu cầu/i }).click();
-  await expect(page.getByRole("button", { name: /Xuất bản ngay/i })).toBeVisible();
-  await page.getByRole("button", { name: /Xuất bản ngay/i }).click();
+  await expect(page.getByLabel("Lời nhắn cho người soạn")).toHaveValue("");
+  await page.getByRole("button", { name: /Gửi lại để sửa/i }).click();
+  await expect(page.getByText("Hãy ghi ít nhất 4 ký tự để người soạn biết cần sửa gì")).toBeVisible();
+  await page.getByRole("button", { name: /Đạt yêu cầu/i }).click();
+  await expect(page.getByText("Hãy ghi ít nhất 4 ký tự để người soạn biết cần sửa gì")).toHaveCount(0);
+  await expect(page.getByRole("button", { name: /Cho bé xem ngay/i })).toBeVisible();
+  await page.getByRole("button", { name: /Cho bé xem ngay/i }).click();
   await expect(page.getByText("Đang hiển thị", { exact: true })).toBeVisible();
 
   await signOutByClearingSession(page);
-  await signIn(page, "content@demo.local", "/admin/missions");
+  await signIn(page, "content@demo.local", `/admin/missions/${duplicate.id}/edit`);
+  await expect(page.getByRole("heading", { name: "Các lần đã gửi" })).toBeVisible();
+  await expect(page.getByText(/Lần gửi \d+/).first()).toBeVisible();
+
+  const titleField = page.getByRole("textbox", { name: /^Tên nhiệm vụ/ });
+  await titleField.fill(`${duplicate.title} - thay đổi chưa lưu`);
+  await page.getByRole("button", { name: "Dùng lại nội dung này" }).first().click();
+  await expect(page.getByRole("alertdialog")).toContainText("Các thay đổi chưa lưu sẽ mất");
+  await page.getByRole("alertdialog").getByRole("button", { name: "Dùng lại nội dung này" }).click();
+  await expect(page.getByText(/Đã tạo bản nháp từ lần gửi \d+/)).toBeVisible();
+  await expect(titleField).toHaveValue(duplicate.title);
+
   const archiveResponse = await page.request.post(`/api/admin/missions/${duplicate.id}/archive`);
   expect(archiveResponse.ok()).toBeTruthy();
 });

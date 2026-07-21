@@ -1,10 +1,12 @@
 import {
   BarChart3,
   BookOpen,
+  Braces,
   ClipboardCheck,
   Database,
   FileText,
   Gauge,
+  House,
   ImageIcon,
   Languages,
   Layers3,
@@ -36,6 +38,13 @@ const navGroups = [
         icon: Gauge,
         roles: allStaff,
         exact: true,
+      },
+      {
+        href: "/parent",
+        labelKey: "nav.parentArea",
+        fallback: "Khu vực phụ huynh",
+        icon: House,
+        roles: superAdmins,
       },
       {
         href: "/admin/missions",
@@ -74,9 +83,16 @@ const navGroups = [
       {
         href: "/admin/content",
         labelKey: "nav.content",
-        fallback: "Câu chữ hiển thị",
+        fallback: "Nội dung hiển thị",
         icon: Languages,
         roles: allStaff,
+      },
+      {
+        href: "/admin/content-variables",
+        labelKey: "nav.contentVariables",
+        fallback: "Biến trong nội dung",
+        icon: Braces,
+        roles: superAdmins,
       },
       {
         href: "/admin/worlds",
@@ -194,7 +210,7 @@ export function AdminNavigation({ pathname, role, content, onNavigate, ariaLabel
         <ol className="mt-2 space-y-1.5 leading-5">
           <li>1. Soạn và lưu nội dung.</li>
           <li>2. Kiểm tra an toàn cho trẻ.</li>
-          <li>3. Người kiểm duyệt xác nhận trước khi hiển thị.</li>
+          <li>3. Một người khác kiểm tra trước khi cho bé xem.</li>
         </ol>
       </div>
     </nav>

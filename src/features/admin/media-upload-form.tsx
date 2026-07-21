@@ -1,14 +1,20 @@
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useMutation } from "@tanstack/react-query";
-import { useForm } from "react-hook-form";
+import { useMutation, useQuery } from "@tanstack/react-query";
+import { useRef } from "react";
+import { useForm, useWatch } from "react-hook-form";
 import { toast } from "sonner";
 import { z } from "zod";
 import { mediaApi, type MediaItem } from "@/api/admin/media";
 import { FormStatus, SubmitButton, TextField } from "@/components/form";
 import { contentText, useContent } from "@/content/client";
 import { mediaCategories, mediaCategoryLabels } from "@/domain/media";
+import {
+  getImageUploadPolicySummary,
+  validateImageFileForCategory,
+} from "@/features/admin/media-file-validation";
+import { queryKeys } from "@/lib/query/keys";
 
 const schema = z.object({
   file: z.custom<FileList>(
@@ -27,13 +33,31 @@ export function MediaUploadForm({ onUploaded }: { onUploaded: (item: MediaItem) 
     resolver: zodResolver(schema),
     defaultValues: { category: "general", altText: "" },
   });
+  const fileInputRef = useRef<HTMLInputElement | null>(null);
+  const fileRegistration = form.register("file");
+  const category = useWatch({ control: form.control, name: "category" });
+  const policiesQuery = useQuery({
+    queryKey: queryKeys.admin.mediaUploadPolicies,
+    queryFn: mediaApi.getUploadPolicies,
+    staleTime: 5 * 60 * 1000,
+  });
+  const policySummary = getImageUploadPolicySummary(category, policiesQuery.data);
+  function resetFileInput() {
+    form.resetField("file");
+    if (fileInputRef.current) fileInputRef.current.value = "";
+  }
   const mutation = useMutation({
-    mutationFn: ({ file, altText, category }: FormValues) => mediaApi.upload(file[0], altText, category),
+    mutationFn: async ({ file, altText, category }: FormValues) => {
+      await validateImageFileForCategory(file[0], category, policiesQuery.data);
+      return mediaApi.upload(file[0], altText, category);
+    },
     onSuccess: (item) => {
       onUploaded(item);
       form.reset();
-      toast.success(contentText(content, "media.uploadSuccess", "Đã tải tư liệu lên thư viện"));
+      if (fileInputRef.current) fileInputRef.current.value = "";
+      toast.success(contentText(content, "media.uploadSuccess", "Đã thêm vào thư viện"));
     },
+    onError: resetFileInput,
   });
 
   return (
@@ -42,12 +66,14 @@ export function MediaUploadForm({ onUploaded }: { onUploaded: (item: MediaItem) 
       onSubmit={form.handleSubmit((values) => mutation.mutate(values))}
       noValidate
     >
-      <h2 className="text-xl font-black">{contentText(content, "media.uploadTitle", "Tải tư liệu mới")}</h2>
+      <h2 className="text-xl font-black">
+        {contentText(content, "media.uploadTitle", "Thêm hình ảnh, âm thanh hoặc video")}
+      </h2>
       <p className="mt-1 text-sm text-[#806d54]">
         {contentText(
           content,
           "media.uploadDescription",
-          "Hãy mô tả rõ hình ảnh, âm thanh hoặc video để hỗ trợ khả năng tiếp cận.",
+          "Hãy viết mô tả ngắn để người dùng trình đọc màn hình hiểu nội dung.",
         )}
       </p>
       <div className="mt-4 grid gap-3 lg:grid-cols-[minmax(260px,1fr)_190px_minmax(260px,1fr)_auto] lg:items-end">
@@ -57,8 +83,19 @@ export function MediaUploadForm({ onUploaded }: { onUploaded: (item: MediaItem) 
             type="file"
             accept="image/png,image/jpeg,image/webp,image/gif,image/avif,audio/mpeg,audio/wav,audio/ogg,video/mp4,video/webm,video/quicktime"
             className="mt-1 min-h-12 w-full rounded-xl border p-2"
-            {...form.register("file")}
+            name={fileRegistration.name}
+            onBlur={fileRegistration.onBlur}
+            onChange={fileRegistration.onChange}
+            ref={(element) => {
+              fileRegistration.ref(element);
+              fileInputRef.current = element;
+            }}
           />
+          {policySummary ? (
+            <span className="mt-1 block text-xs font-bold text-[#6f6558]">
+              Yêu cầu đối với ảnh: {policySummary}.
+            </span>
+          ) : null}
           {form.formState.errors.file ? (
             <span role="alert" className="mt-1 block text-sm text-red-700">
               {form.formState.errors.file.message}
@@ -66,7 +103,7 @@ export function MediaUploadForm({ onUploaded }: { onUploaded: (item: MediaItem) 
           ) : null}
         </label>
         <label className="block font-bold">
-          Nhóm tư liệu
+          Loại nội dung
           <select className="mt-1 min-h-12 w-full rounded-xl border px-3" {...form.register("category")}>
             {mediaCategories.map((category) => (
               <option key={category} value={category}>
@@ -76,8 +113,8 @@ export function MediaUploadForm({ onUploaded }: { onUploaded: (item: MediaItem) 
           </select>
         </label>
         <TextField
-          label={contentText(content, "media.altLabel", "Mô tả nội dung tư liệu")}
-          placeholder={contentText(content, "media.altPlaceholder", "Mô tả hình ảnh, âm thanh hoặc video")}
+          label={contentText(content, "media.altLabel", "Mô tả cho người không xem được nội dung")}
+          placeholder={contentText(content, "media.altPlaceholder", "Ví dụ: Bống cầm kính lúp bên cây")}
           registration={form.register("altText")}
           error={form.formState.errors.altText?.message}
         />
@@ -86,7 +123,7 @@ export function MediaUploadForm({ onUploaded }: { onUploaded: (item: MediaItem) 
           pendingLabel={contentText(content, "media.uploading", "Đang tải...")}
           className="md:w-auto"
         >
-          {contentText(content, "media.upload", "Tải lên")}
+          {contentText(content, "media.upload", "Chọn và tải lên")}
         </SubmitButton>
       </div>
       <FormStatus

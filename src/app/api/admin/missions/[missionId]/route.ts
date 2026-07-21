@@ -1,6 +1,10 @@
 import { apiJson } from "@/lib/api-response";
 import { requireApiRoles } from "@/auth/api";
 import { adminMissionDraftSchema } from "@/modules/admin/schemas";
+import {
+  missionTemplateIssueMessage,
+  validateMissionTemplateVariables,
+} from "@/modules/admin/mission-template-variables";
 import { getAdminMission, updateAdminMission } from "@/modules/admin/mission-admin";
 
 export async function GET(request: Request, { params }: { params: Promise<{ missionId: string }> }) {
@@ -22,6 +26,16 @@ export async function PATCH(request: Request, { params }: { params: Promise<{ mi
     );
   }
   const { missionId } = await params;
+  const templateValidation = await validateMissionTemplateVariables(input.data);
+  if (templateValidation.issues.length) {
+    return apiJson(
+      {
+        message: missionTemplateIssueMessage(templateValidation.issues),
+        issues: templateValidation.issues,
+      },
+      { status: 422 },
+    );
+  }
   try {
     const mission = await updateAdminMission(missionId, input.data, authResult.session.user.id);
     return mission ? apiJson(mission) : apiJson({ message: "Không tìm thấy nhiệm vụ" }, { status: 404 });

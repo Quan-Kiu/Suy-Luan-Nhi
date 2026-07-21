@@ -18,7 +18,9 @@ import {
   safetyChecklistEntries,
   skills,
 } from "@/db/schema";
-import { safetyKeys, type AdminMissionDraft } from "@/modules/admin/schemas";
+import { adminMissionDraftSchema, safetyKeys, type AdminMissionDraft } from "@/modules/admin/schemas";
+import { validateMissionTemplateVariables } from "@/modules/admin/mission-template-variables";
+import { parseMissionSnapshot } from "@/modules/catalog/snapshot";
 import { playableQuestionSchema } from "@/modules/gameplay/question";
 
 export type AdminMissionFilters = {
@@ -300,7 +302,18 @@ export async function createAdminMission(input: AdminMissionDraft, actorId: stri
   });
 }
 
-export async function updateAdminMission(missionId: string, input: AdminMissionDraft, actorId: string) {
+type UpdateMissionOptions = {
+  historyComment?: string;
+  auditAction?: string;
+  auditMetadata?: Record<string, unknown>;
+};
+
+export async function updateAdminMission(
+  missionId: string,
+  input: AdminMissionDraft,
+  actorId: string,
+  options: UpdateMissionOptions = {},
+) {
   const current = await getAdminMission(missionId);
   if (!current) return null;
   return db.transaction(async (tx) => {
@@ -332,16 +345,22 @@ export async function updateAdminMission(missionId: string, input: AdminMissionD
       .where(eq(missions.id, missionId))
       .returning();
     await replaceMissionContent(tx, missionId, input, actorId);
-    await tx
-      .insert(reviewHistories)
-      .values({ missionId, action: "updated", actorId, beforeState: current.draft, afterState: input });
+    await tx.insert(reviewHistories).values({
+      missionId,
+      action: "updated",
+      actorId,
+      comment: options.historyComment,
+      beforeState: current.draft,
+      afterState: input,
+    });
     await tx.insert(auditLogs).values({
       actorId,
-      action: "mission.updated",
+      action: options.auditAction ?? "mission.updated",
       resourceType: "mission",
       resourceId: missionId,
       beforeState: current.draft,
       afterState: input,
+      metadata: options.auditMetadata ?? {},
     });
     return updated;
   });
@@ -390,6 +409,8 @@ export async function buildMissionSnapshot(missionId: string) {
     coverUrl: current.draft.coverUrl,
     rewardBadge: badge?.slug,
     difficulty: current.draft.difficulty,
+    allowReplay: current.draft.allowReplay,
+    randomizeAnswers: current.draft.randomizeAnswers,
     questions: current.draft.questions.map((question, index) => ({
       ...question,
       id: question.id ?? crypto.randomUUID(),
@@ -397,6 +418,80 @@ export async function buildMissionSnapshot(missionId: string) {
     })),
     safetyChecklist: current.draft.safety,
   };
+}
+
+export async function restoreMissionVersion(missionId: string, versionId: string, actorId: string) {
+  const current = await getAdminMission(missionId);
+  if (!current) return { error: "not_found" } as const;
+  const version = current.versions.find((item) => item.id === versionId);
+  if (!version) return { error: "not_found" } as const;
+
+  const snapshotResult = (() => {
+    try {
+      return { snapshot: parseMissionSnapshot(version.snapshot) } as const;
+    } catch {
+      return { error: "invalid_snapshot" } as const;
+    }
+  })();
+  if ("error" in snapshotResult) return snapshotResult;
+  const snapshot = snapshotResult.snapshot;
+
+  const [worldRows, skillRows, badgeRows] = await Promise.all([
+    db.select().from(missionWorlds),
+    db.select().from(skills),
+    db.select().from(badges),
+  ]);
+  const world = snapshot.worldId
+    ? worldRows.find((item) => item.id === snapshot.worldId)
+    : worldRows.find((item) => item.slug === snapshot.worldSlug);
+  const primarySkill = skillRows.find((item) => item.slug === snapshot.primarySkill);
+  const secondarySkillIds = snapshot.secondarySkills.map(
+    (slug) => skillRows.find((item) => item.slug === slug)?.id,
+  );
+  const rewardBadgeId = snapshot.rewardBadge
+    ? badgeRows.find((item) => item.slug === snapshot.rewardBadge)?.id
+    : null;
+
+  if (
+    !world ||
+    !primarySkill ||
+    secondarySkillIds.some((id) => !id) ||
+    (snapshot.rewardBadge && !rewardBadgeId)
+  ) {
+    return { error: "taxonomy_missing" } as const;
+  }
+
+  const draftResult = adminMissionDraftSchema.safeParse({
+    slug: snapshot.slug,
+    worldId: world.id,
+    title: snapshot.title,
+    subtitle: snapshot.subtitle,
+    shortDescription: snapshot.shortDescription,
+    storyIntro: snapshot.storyIntro,
+    estimatedMinutes: snapshot.estimatedMinutes,
+    primarySkillId: primarySkill.id,
+    secondarySkillIds,
+    rewardBadgeId,
+    coverUrl: snapshot.coverUrl,
+    ageGroups: snapshot.ageGroups,
+    difficulty: snapshot.difficulty,
+    allowReplay: snapshot.allowReplay ?? current.draft.allowReplay,
+    randomizeAnswers: snapshot.randomizeAnswers ?? current.draft.randomizeAnswers,
+    questions: snapshot.questions,
+    safety: Object.fromEntries(safetyKeys.map((key) => [key, snapshot.safetyChecklist[key] ?? false])),
+  });
+  if (!draftResult.success) return { error: "invalid_snapshot" } as const;
+
+  const restored = await updateAdminMission(missionId, draftResult.data, actorId, {
+    historyComment: `Khôi phục từ lần gửi ${version.versionNumber}`,
+    auditAction: "mission.version_restored",
+    auditMetadata: {
+      sourceVersionId: version.id,
+      sourceVersionNumber: version.versionNumber,
+    },
+  });
+  if (!restored) return { error: "not_found" } as const;
+  return { mission: restored, draft: draftResult.data, versionNumber: version.versionNumber } as const;
 }
 
 function collectReferencedUrls(value: unknown, urls = new Set<string>()) {
@@ -433,6 +528,10 @@ export async function submitMissionForReview(missionId: string, actorId: string)
   const current = await getAdminMission(missionId);
   if (!current) return { error: "not_found" } as const;
   if (!safetyKeys.every((key) => current.draft.safety[key])) return { error: "safety_incomplete" } as const;
+  const templateValidation = await validateMissionTemplateVariables(current.draft);
+  if (templateValidation.issues.length) {
+    return { error: "template_variables_invalid", issues: templateValidation.issues } as const;
+  }
   const snapshot = await buildMissionSnapshot(missionId);
   if (!snapshot) return { error: "not_found" } as const;
   const unapprovedMedia = await findUnapprovedReferencedMedia(snapshot);
@@ -509,6 +608,7 @@ export async function approveMissionVersion(
   reviewerId: string,
   comment: string,
 ) {
+  const normalizedComment = comment.trim() || null;
   const version = await db.query.missionVersions.findFirst({
     where: and(
       eq(missionVersions.id, versionId),
@@ -520,22 +620,31 @@ export async function approveMissionVersion(
   return db.transaction(async (tx) => {
     const [approved] = await tx
       .update(missionVersions)
-      .set({ status: "approved", reviewedBy: reviewerId, reviewComment: comment, reviewedAt: new Date() })
+      .set({
+        status: "approved",
+        reviewedBy: reviewerId,
+        reviewComment: normalizedComment,
+        reviewedAt: new Date(),
+      })
       .where(eq(missionVersions.id, versionId))
       .returning();
     await tx
       .update(missions)
       .set({ status: "approved", updatedBy: reviewerId, updatedAt: new Date() })
       .where(eq(missions.id, missionId));
-    await tx
-      .insert(reviewHistories)
-      .values({ missionId, missionVersionId: versionId, action: "approved", actorId: reviewerId, comment });
+    await tx.insert(reviewHistories).values({
+      missionId,
+      missionVersionId: versionId,
+      action: "approved",
+      actorId: reviewerId,
+      comment: normalizedComment,
+    });
     await tx.insert(auditLogs).values({
       actorId: reviewerId,
       action: "mission.approved",
       resourceType: "mission_version",
       resourceId: versionId,
-      afterState: { comment },
+      afterState: { comment: normalizedComment },
     });
     return approved;
   });

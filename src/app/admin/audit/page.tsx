@@ -18,9 +18,9 @@ export default async function Page({
   return (
     <div className="space-y-6">
       <AdminPageHeader
-        eyebrow="Theo dõi hoạt động quản trị"
-        title="Lịch sử thay đổi"
-        description="Xem nội dung nào đã thay đổi, thay đổi lúc nào và do người quản trị hay hệ thống thực hiện. Chi tiết kỹ thuật chỉ mở khi cần kiểm tra sâu."
+        eyebrow="Ai đã làm gì"
+        title="Các thay đổi gần đây"
+        description="Xem nội dung nào đã được sửa, sửa lúc nào và do ai thực hiện. Thông tin kỹ thuật chỉ hiện khi bạn chủ động mở."
         icon={Database}
       />
       <form className="grid gap-3 rounded-2xl border bg-white p-4 md:grid-cols-[1fr_1fr_auto_auto]">
@@ -44,7 +44,7 @@ export default async function Page({
           <input
             name="action"
             defaultValue={filters.action}
-            placeholder="Ví dụ: tạo, cập nhật, xuất bản"
+            placeholder="Ví dụ: tạo, sửa, cho bé xem"
             className="min-h-11 w-full rounded-xl border px-3"
           />
         </label>
@@ -78,7 +78,7 @@ export default async function Page({
               </span>
             </div>
             <details className="mt-3 rounded-xl bg-[#f7f3eb] p-3 text-xs">
-              <summary className="cursor-pointer font-black">Chi tiết dành cho đội kỹ thuật</summary>
+              <summary className="cursor-pointer font-black">Thông tin kỹ thuật</summary>
               <dl className="mt-3 grid gap-2 sm:grid-cols-2">
                 <div>
                   <dt className="font-bold">Mã nội dung</dt>
@@ -91,7 +91,7 @@ export default async function Page({
               </dl>
               {Object.keys(item.metadata).length ? (
                 <details className="mt-3 rounded-lg bg-white p-3">
-                  <summary className="cursor-pointer font-bold">Xem dữ liệu gốc</summary>
+                  <summary className="cursor-pointer font-bold">Xem dữ liệu chi tiết</summary>
                   <pre className="mt-3 overflow-x-auto font-mono whitespace-pre-wrap">
                     {JSON.stringify(item.metadata, null, 2)}
                   </pre>

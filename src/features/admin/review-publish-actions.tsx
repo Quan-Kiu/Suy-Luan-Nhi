@@ -12,7 +12,7 @@ import { FormStatus, SubmitButton, TextField } from "@/components/form";
 import { contentText, useContent } from "@/content/client";
 import { usePendingRouter } from "@/hooks/use-pending-router";
 
-const schema = z.object({ scheduledFor: z.string().min(1, "Hãy chọn thời gian xuất bản") });
+const schema = z.object({ scheduledFor: z.string().min(1, "Hãy chọn thời gian hiển thị") });
 type FormValues = z.infer<typeof schema>;
 
 export function ReviewPublishActions({ missionId, versionId }: { missionId: string; versionId: string }) {
@@ -22,8 +22,12 @@ export function ReviewPublishActions({ missionId, versionId }: { missionId: stri
   const publishMutation = useMutation({
     mutationFn: () => reviewsApi.publish(missionId, versionId),
     onSuccess: () => {
-      toast.success(contentText(content, "review.publishSuccessTitle", "Xuất bản thành công"), {
-        description: contentText(content, "review.publishSuccess", "Nhiệm vụ đã được hiển thị cho trẻ"),
+      toast.success(contentText(content, "review.publishSuccessTitle", "Đã cho bé xem"), {
+        description: contentText(
+          content,
+          "review.publishSuccess",
+          "Nhiệm vụ đã xuất hiện trong khu vực của bé",
+        ),
         id: `mission-publish-${versionId}`,
         duration: 8000,
       });
@@ -34,11 +38,11 @@ export function ReviewPublishActions({ missionId, versionId }: { missionId: stri
     mutationFn: ({ scheduledFor }: FormValues) =>
       reviewsApi.schedule(missionId, versionId, new Date(scheduledFor).toISOString()),
     onSuccess: () => {
-      toast.success(contentText(content, "review.scheduleSuccessTitle", "Đã lưu lịch xuất bản"), {
+      toast.success(contentText(content, "review.scheduleSuccessTitle", "Đã lưu thời gian hiển thị"), {
         description: contentText(
           content,
           "review.scheduleSuccess",
-          "Nhiệm vụ sẽ tự động hiển thị cho trẻ đúng thời gian đã chọn",
+          "Nhiệm vụ sẽ tự động xuất hiện cho bé vào thời gian đã chọn",
         ),
         id: `mission-schedule-${versionId}`,
         duration: 8000,
@@ -51,13 +55,13 @@ export function ReviewPublishActions({ missionId, versionId }: { missionId: stri
     <div className="space-y-3">
       <AsyncButton
         pending={publishMutation.isPending || navigation.isPending}
-        pendingLabel={contentText(content, "review.publishing", "Đang xuất bản...")}
+        pendingLabel={contentText(content, "review.publishing", "Đang đưa nội dung lên...")}
         onClick={() => publishMutation.mutate()}
         disabled={scheduleMutation.isPending || navigation.isPending}
         className="w-full bg-[#517d3f] shadow-none"
       >
         <Rocket size={18} className="mr-2 inline" />
-        {contentText(content, "review.publish", "Xuất bản ngay")}
+        {contentText(content, "review.publish", "Cho bé xem ngay")}
       </AsyncButton>
       <form
         onSubmit={form.handleSubmit((values) => scheduleMutation.mutate(values))}
@@ -66,18 +70,18 @@ export function ReviewPublishActions({ missionId, versionId }: { missionId: stri
       >
         <TextField
           type="datetime-local"
-          label={contentText(content, "review.scheduleTitle", "Hoặc lên lịch xuất bản")}
+          label={contentText(content, "review.scheduleTitle", "Hoặc chọn thời gian hiển thị")}
           registration={form.register("scheduledFor")}
           error={form.formState.errors.scheduledFor?.message}
           className="bg-white font-normal"
         />
         <SubmitButton
           pending={scheduleMutation.isPending || navigation.isPending}
-          pendingLabel={contentText(content, "review.scheduling", "Đang lên lịch...")}
+          pendingLabel={contentText(content, "review.scheduling", "Đang lưu thời gian...")}
           disabled={publishMutation.isPending || navigation.isPending}
           className="mt-3 border border-[#517d3f] bg-white text-[#4d743b] shadow-none"
         >
-          {contentText(content, "review.schedule", "Lưu lịch xuất bản")}
+          {contentText(content, "review.schedule", "Lưu thời gian hiển thị")}
         </SubmitButton>
       </form>
       <FormStatus

@@ -138,7 +138,7 @@ export function MediaLibrary({ initialData, canReview, canUpload, canDelete }: P
         }}
       >
         <label className="relative">
-          <span className="sr-only">Tìm tư liệu</span>
+          <span className="sr-only">Tìm hình ảnh, âm thanh hoặc video</span>
           <Search className="absolute top-3 left-3 text-[#887b6c]" size={18} />
           <input
             value={draft.search}
@@ -163,7 +163,7 @@ export function MediaLibrary({ initialData, canReview, canUpload, canDelete }: P
           </select>
         </label>
         <label>
-          <span className="sr-only">Lọc theo nhóm tư liệu</span>
+          <span className="sr-only">Lọc theo loại nội dung</span>
           <select
             value={draft.category}
             onChange={(event) => setDraft((current) => ({ ...current, category: event.target.value }))}
@@ -284,7 +284,7 @@ export function MediaLibrary({ initialData, canReview, canUpload, canDelete }: P
             </div>
           ) : null}
           {data.totalPages > 1 ? (
-            <nav aria-label="Phân trang tư liệu" className="flex items-center justify-center gap-3">
+            <nav aria-label="Chuyển trang thư viện" className="flex items-center justify-center gap-3">
               <button
                 type="button"
                 disabled={filters.page <= 1 || query.isFetching}

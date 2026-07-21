@@ -11,7 +11,7 @@ import { FormStatus, TextareaField } from "@/components/form";
 import { contentText, useContent } from "@/content/client";
 import { usePendingRouter } from "@/hooks/use-pending-router";
 
-const schema = z.object({ comment: z.string().trim().min(4, "Vui lòng ghi nhận xét ít nhất 4 ký tự") });
+const schema = z.object({ comment: z.string().trim().max(2000, "Lời nhắn không được quá 2000 ký tự") });
 type FormValues = z.infer<typeof schema>;
 type Action = "approve" | "reject";
 
@@ -25,7 +25,7 @@ export function ReviewDecisionForm({ missionId, versionId }: { missionId: string
     onSuccess: (action) => {
       toast.success(
         action === "approve"
-          ? contentText(content, "review.approveSuccess", "Đã duyệt phiên bản")
+          ? contentText(content, "review.approveSuccess", "Đã xác nhận nội dung đạt yêu cầu")
           : contentText(content, "review.rejectSuccess", "Đã trả lại để chỉnh sửa"),
       );
       navigation.refresh();
@@ -33,18 +33,34 @@ export function ReviewDecisionForm({ missionId, versionId }: { missionId: string
   });
 
   function submit(action: Action) {
-    void form.handleSubmit((values) => mutation.mutate({ ...values, action }))();
+    form.clearErrors("comment");
+    if (action === "reject" && form.getValues("comment").trim().length < 4) {
+      form.setError(
+        "comment",
+        { type: "manual", message: "Hãy ghi ít nhất 4 ký tự để người soạn biết cần sửa gì" },
+        { shouldFocus: true },
+      );
+      return;
+    }
+    void form.handleSubmit((values) =>
+      mutation.mutate({ ...values, comment: values.comment.trim(), action }),
+    )();
   }
 
   return (
     <form className="space-y-3" onSubmit={(event) => event.preventDefault()} noValidate>
       <TextareaField
-        label={contentText(content, "review.commentLabel", "Nhận xét cho người soạn")}
+        label={contentText(content, "review.commentLabel", "Lời nhắn cho người soạn")}
         rows={5}
+        description={contentText(
+          content,
+          "review.commentDescription",
+          "Có thể để trống khi nội dung đã ổn. Nếu cần sửa, hãy ghi rõ phần nào và nên sửa thế nào.",
+        )}
         placeholder={contentText(
           content,
           "review.commentPlaceholder",
-          "Nêu rõ lý do duyệt hoặc nội dung cần chỉnh sửa...",
+          "Nêu rõ phần cần sửa và cách sửa mong muốn...",
         )}
         registration={form.register("comment")}
         error={form.formState.errors.comment?.message}
@@ -59,8 +75,8 @@ export function ReviewDecisionForm({ missionId, versionId }: { missionId: string
         >
           <CheckCircle2 size={18} />
           {(mutation.isPending || navigation.isPending) && mutation.variables?.action === "approve"
-            ? contentText(content, "review.approving", "Đang duyệt...")
-            : contentText(content, "review.approve", "Nội dung đạt yêu cầu")}
+            ? contentText(content, "review.approving", "Đang xác nhận...")
+            : contentText(content, "review.approve", "Đạt yêu cầu")}
         </button>
         <button
           type="button"
@@ -72,7 +88,7 @@ export function ReviewDecisionForm({ missionId, versionId }: { missionId: string
           <XCircle size={18} />
           {(mutation.isPending || navigation.isPending) && mutation.variables?.action === "reject"
             ? contentText(content, "review.rejecting", "Đang trả lại...")
-            : contentText(content, "review.reject", "Yêu cầu chỉnh sửa")}
+            : contentText(content, "review.reject", "Gửi lại để sửa")}
         </button>
       </div>
       <FormStatus status={mutation.isError ? "error" : "idle"} message={mutation.error?.message} />

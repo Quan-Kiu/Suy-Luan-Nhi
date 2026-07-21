@@ -34,6 +34,7 @@ export function EditProfileForm({ child }: { child: ChildSummary }) {
     onSuccess: async () => {
       await queryClient.invalidateQueries({ queryKey: queryKeys.children.all });
       toast.success(contentText(content, "edit.success", "Đã cập nhật hồ sơ"));
+      navigation.refresh();
       navigation.push("/profiles");
     },
   });

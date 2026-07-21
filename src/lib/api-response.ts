@@ -1,3 +1,5 @@
+import "@/lib/validation/zod-locale";
+
 export type ApiMeta = {
   requestId: string;
   timestamp: string;

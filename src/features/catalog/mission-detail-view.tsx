@@ -1,13 +1,35 @@
 import Image from "next/image";
 import { Clock3, Gift, Lightbulb } from "lucide-react";
 import { Card, Pill } from "@/components/ui";
+import { renderContentTemplate, type ContentVariableDefinition } from "@/domain/content-variables";
 import { StartMissionButton } from "@/features/catalog/start-mission-button";
 
 type Published = NonNullable<
   Awaited<ReturnType<typeof import("@/modules/catalog/catalog").getPublishedMission>>
 >;
-export function MissionDetailView({ data, childId }: { data: Published; childId: string }) {
+
+type MissionChild = {
+  id: string;
+  displayName?: string | null;
+  ageGroup?: string | null;
+  currentRank?: string | null;
+};
+
+export function MissionDetailView({
+  data,
+  child,
+  templateVariables,
+}: {
+  data: Published;
+  child: MissionChild;
+  templateVariables: ContentVariableDefinition[];
+}) {
   const snapshot = data.version.snapshot as { questions?: unknown[]; secondarySkills?: string[] };
+  const context = { child };
+  const title = renderContentTemplate(data.mission.title, templateVariables, context);
+  const subtitle = renderContentTemplate(data.mission.subtitle, templateVariables, context);
+  const storyIntro = renderContentTemplate(data.mission.storyIntro, templateVariables, context);
+
   return (
     <main className="paper-texture min-h-[calc(100vh-5rem)] px-5 pt-4 pb-8">
       <Card className="overflow-hidden border-2 border-[#d9bf91] p-0">
@@ -17,7 +39,7 @@ export function MissionDetailView({ data, childId }: { data: Published; childId:
             width={760}
             height={500}
             priority
-            alt={data.mission.title}
+            alt={title}
             className="block h-72 w-full object-cover"
           />
           <div className="absolute top-4 left-4">
@@ -25,9 +47,9 @@ export function MissionDetailView({ data, childId }: { data: Published; childId:
           </div>
         </div>
         <div className="relative -mt-px bg-white p-5 text-center">
-          <h1 className="text-4xl leading-none font-black">{data.mission.title}</h1>
-          <p className="mt-3 font-bold text-[#8a6b39]">{data.mission.subtitle}</p>
-          <p className="mt-4 leading-7 text-[#715f47]">{data.mission.storyIntro}</p>
+          <h1 className="text-4xl leading-none font-black">{title}</h1>
+          <p className="mt-3 font-bold text-[#8a6b39]">{subtitle}</p>
+          <p className="mt-4 leading-7 text-[#715f47]">{storyIntro}</p>
         </div>
       </Card>
       <div className="mt-4 grid grid-cols-3 gap-3">
@@ -58,8 +80,7 @@ export function MissionDetailView({ data, childId }: { data: Published; childId:
           />
           <div>
             <p className="flex items-center gap-2 text-xs font-black tracking-wider text-[#9a5f0e] uppercase">
-              <Gift size={16} />
-              Phần thưởng
+              <Gift size={16} /> Phần thưởng
             </p>
             <p className="mt-1 text-xl font-black">{data.badge.name}</p>
             <p className="text-sm text-[#806d54]">{data.badge.description}</p>
@@ -75,7 +96,7 @@ export function MissionDetailView({ data, childId }: { data: Published; childId:
         </div>
       </Card>
       <div className="mt-5">
-        <StartMissionButton childId={childId} missionId={data.mission.id} />
+        <StartMissionButton childId={child.id} missionId={data.mission.id} />
       </div>
     </main>
   );

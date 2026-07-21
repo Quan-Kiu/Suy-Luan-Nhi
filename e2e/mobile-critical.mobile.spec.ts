@@ -131,12 +131,12 @@ test("activity cards and date filters stay usable on mobile", async ({ page }) =
 
   await page.goto("/missions");
   await page.getByRole("link", { name: /Thám tử dấu chân/i }).click();
-  await page.getByRole("button", { name: /Bắt đầu nhiệm vụ/i }).click();
+  await page.getByRole("button", { name: /Bắt đầu chơi/i }).click();
   await page.getByRole("button", { name: "Ngôi sao", exact: true }).click();
-  await page.getByRole("button", { name: /Kiểm tra đáp án/i }).click();
+  await page.getByRole("button", { name: /Xem con làm đúng chưa/i }).click();
   await page.getByRole("button", { name: /Câu tiếp theo/i }).click();
   await page.getByRole("button", { name: "Dấu chân xanh", exact: true }).click();
-  await page.getByRole("button", { name: /Kiểm tra đáp án/i }).click();
+  await page.getByRole("button", { name: /Xem con làm đúng chưa/i }).click();
   await page.getByRole("button", { name: /Nhận huy hiệu/i }).click();
 
   await unlockParentGate(page);

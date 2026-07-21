@@ -12,9 +12,15 @@ export async function POST(request: Request, { params }: { params: Promise<{ mis
         message:
           result.error === "safety_incomplete"
             ? "Checklist an toàn chưa hoàn tất"
-            : "Không tìm thấy nhiệm vụ",
+            : result.error === "template_variables_invalid"
+              ? "Nội dung đang dùng tag chưa được Super Admin bật hoặc không tồn tại"
+              : "Không tìm thấy nhiệm vụ",
+        ...(result.error === "template_variables_invalid" ? { issues: result.issues } : {}),
       },
-      { status: result.error === "safety_incomplete" ? 422 : 404 },
+      {
+        status:
+          result.error === "safety_incomplete" || result.error === "template_variables_invalid" ? 422 : 404,
+      },
     );
   return apiJson(result);
 }

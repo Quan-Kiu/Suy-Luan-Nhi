@@ -26,7 +26,7 @@ export default async function Page() {
     <div className="space-y-6">
       <AdminPageHeader
         eyebrow="Quyền riêng tư gia đình"
-        title="Yêu cầu dữ liệu"
+        title="Xuất và xóa dữ liệu"
         description="Theo dõi yêu cầu tải xuống hoặc xóa dữ liệu. Yêu cầu xóa cần quản trị viên xác nhận và mọi thao tác đều được ghi lại."
         icon={ShieldCheck}
       />

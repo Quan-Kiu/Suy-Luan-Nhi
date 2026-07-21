@@ -99,7 +99,7 @@ export function ResourceEditorForm({ resource }: { resource?: AdminResourceItem 
     },
     onSuccess: async (saved) => {
       await queryClient.invalidateQueries({ queryKey: queryKeys.admin.resources });
-      toast.success(saved.status === "published" ? "Đã xuất bản tài nguyên" : "Đã lưu tài nguyên");
+      toast.success(saved.status === "published" ? "Bài viết đã được hiển thị" : "Đã lưu bài viết");
       navigation.push(`/admin/resources/${saved.id}/edit`);
     },
   });
@@ -163,7 +163,7 @@ export function ResourceEditorForm({ resource }: { resource?: AdminResourceItem 
                     altText={title || "Video hướng dẫn phụ huynh"}
                     accept="video/mp4,video/webm,video/quicktime"
                     allowedKinds={["video"]}
-                    description="Chọn video từ máy. Tệp sẽ được tải lên kho lưu trữ và URL được gắn tự động."
+                    description="Chọn video từ máy. Hệ thống sẽ tự tải lên và gắn vào bài viết."
                     error={form.formState.errors.mediaUrl?.message}
                   />
                 </div>
@@ -203,7 +203,7 @@ export function ResourceEditorForm({ resource }: { resource?: AdminResourceItem 
         </div>
         <aside className="space-y-5">
           <section className="rounded-2xl border bg-white p-5">
-            <h2 className="text-lg font-black">Phân loại & hiển thị</h2>
+            <h2 className="text-lg font-black">Bài này dành cho ai?</h2>
             <div className="mt-4 space-y-4">
               <label className="block font-bold">
                 Loại tài nguyên
@@ -242,7 +242,7 @@ export function ResourceEditorForm({ resource }: { resource?: AdminResourceItem 
                 <select className="mt-1 min-h-12 w-full rounded-xl border px-3" {...form.register("status")}>
                   <option value="draft">Bản nháp</option>
                   <option value="published">Đang hiển thị</option>
-                  <option value="archived">Đã lưu trữ</option>
+                  <option value="archived">Đã cất</option>
                 </select>
               </label>
               <TextField
@@ -255,7 +255,9 @@ export function ResourceEditorForm({ resource }: { resource?: AdminResourceItem 
           </section>
           <section className="rounded-2xl border bg-white p-5">
             <h2 className="text-lg font-black">Nhóm tuổi</h2>
-            <p className="mt-1 text-sm text-[#6f6558]">Chỉ hiển thị bài đăng cho các nhóm tuổi phù hợp.</p>
+            <p className="mt-1 text-sm text-[#6f6558]">
+              Chỉ cho các gia đình có bé trong nhóm tuổi phù hợp xem bài này.
+            </p>
             <div className="mt-4 space-y-2">
               {ageGroupCodes.map((ageGroup) => (
                 <label

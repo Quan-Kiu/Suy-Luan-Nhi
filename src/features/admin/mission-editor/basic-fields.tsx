@@ -1,17 +1,25 @@
 "use client";
 
-import { useFormContext, useWatch } from "react-hook-form";
-import { CheckboxField, SelectField, TextareaField, TextField } from "@/components/form";
+import { Controller, useFormContext, useWatch } from "react-hook-form";
+import { CheckboxField, SelectField, TextField } from "@/components/form";
 import { Card } from "@/components/ui";
 import { contentText, useContent } from "@/content/client";
+import type { ContentVariableDefinition } from "@/domain/content-variables";
+import { ContentTemplateField } from "@/features/admin/content-template-field";
 import { MediaUploadField } from "@/features/admin/media-upload-field";
 import type { MissionEditorTaxonomy } from "@/features/admin/mission-editor/types";
-import type { AdminMissionDraft } from "@/modules/admin/schemas";
 import { createSlug } from "@/lib/slug";
+import type { AdminMissionDraft } from "@/modules/admin/schemas";
 
 const ageGroups = ["6-8", "9-10", "11-12"] as const;
 
-export function MissionBasicFields({ taxonomy }: { taxonomy: MissionEditorTaxonomy }) {
+export function MissionBasicFields({
+  taxonomy,
+  templateVariables,
+}: {
+  taxonomy: MissionEditorTaxonomy;
+  templateVariables: ContentVariableDefinition[];
+}) {
   const content = useContent("admin");
   const form = useFormContext<AdminMissionDraft>();
   const title = useWatch({ control: form.control, name: "title" });
@@ -34,47 +42,87 @@ export function MissionBasicFields({ taxonomy }: { taxonomy: MissionEditorTaxono
         {contentText(content, "missionEditor.basicTitle", "1. Nội dung hiển thị")}
       </h2>
       <p className="mt-1 text-sm text-[#6f6558]">
-        Nhập những gì trẻ và phụ huynh sẽ nhìn thấy khi chọn nhiệm vụ.
+        Nhập những gì trẻ và phụ huynh sẽ nhìn thấy. Có thể dùng tag để gọi tên bé hoặc chèn dữ liệu hồ sơ.
       </p>
       <div className="mt-4 grid gap-4 md:grid-cols-2">
-        <TextField
-          label={contentText(content, "missionEditor.title", "Tên nhiệm vụ")}
-          placeholder="Ví dụ: Thám tử dấu chân"
-          description="Tên ngắn, dễ hiểu và gợi cảm giác khám phá."
-          registration={form.register("title", {
-            onChange: (event) => {
-              if (!form.formState.dirtyFields.slug) {
-                form.setValue("slug", createSlug(event.target.value), { shouldValidate: true });
-              }
-            },
-          })}
-          error={form.formState.errors.title?.message}
-          containerClassName="md:col-span-2"
+        <Controller
+          control={form.control}
+          name="title"
+          render={({ field }) => (
+            <ContentTemplateField
+              id="mission-title"
+              label={contentText(content, "missionEditor.title", "Tên nhiệm vụ")}
+              placeholder="Ví dụ: Thám tử dấu chân"
+              description="Tên ngắn, dễ hiểu và gợi cảm giác khám phá."
+              value={field.value}
+              onBlur={field.onBlur}
+              onValueChange={(value) => {
+                field.onChange(value);
+                if (!form.formState.dirtyFields.slug) {
+                  form.setValue("slug", createSlug(value.replace(/{{.*?}}/g, "")), { shouldValidate: true });
+                }
+              }}
+              variables={templateVariables}
+              error={form.formState.errors.title?.message}
+              containerClassName="md:col-span-2"
+            />
+          )}
         />
-        <TextField
-          label={contentText(content, "missionEditor.subtitle", "Câu giới thiệu ngắn")}
-          placeholder="Ví dụ: Quan sát thật tinh"
-          description="Hiển thị ngay dưới tên nhiệm vụ."
-          registration={form.register("subtitle")}
-          error={form.formState.errors.subtitle?.message}
-          containerClassName="md:col-span-2"
+        <Controller
+          control={form.control}
+          name="subtitle"
+          render={({ field }) => (
+            <ContentTemplateField
+              id="mission-subtitle"
+              label={contentText(content, "missionEditor.subtitle", "Câu giới thiệu ngắn")}
+              placeholder="Ví dụ: {{name}} cùng quan sát thật tinh nhé"
+              description="Hiển thị ngay dưới tên nhiệm vụ."
+              value={field.value}
+              onBlur={field.onBlur}
+              onValueChange={field.onChange}
+              variables={templateVariables}
+              error={form.formState.errors.subtitle?.message}
+              containerClassName="md:col-span-2"
+            />
+          )}
         />
-        <TextField
-          label={contentText(content, "missionEditor.shortDescription", "Mô tả trên thẻ nhiệm vụ")}
-          placeholder="Bé sẽ làm gì trong nhiệm vụ này?"
-          description="Viết một câu giúp phụ huynh và trẻ hiểu nhanh nội dung."
-          registration={form.register("shortDescription")}
-          error={form.formState.errors.shortDescription?.message}
-          containerClassName="md:col-span-2"
+        <Controller
+          control={form.control}
+          name="shortDescription"
+          render={({ field }) => (
+            <ContentTemplateField
+              id="mission-short-description"
+              label={contentText(content, "missionEditor.shortDescription", "Mô tả trên thẻ nhiệm vụ")}
+              placeholder="{{name}} sẽ làm gì trong nhiệm vụ này?"
+              description="Viết một câu giúp phụ huynh và trẻ hiểu nhanh nội dung."
+              value={field.value}
+              onBlur={field.onBlur}
+              onValueChange={field.onChange}
+              variables={templateVariables}
+              error={form.formState.errors.shortDescription?.message}
+              containerClassName="md:col-span-2"
+            />
+          )}
         />
-        <TextareaField
-          label={contentText(content, "missionEditor.storyIntro", "Câu chuyện mở đầu")}
-          placeholder="Kể ngắn gọn tình huống để bé muốn bắt đầu khám phá..."
-          description="Dùng ngôn ngữ tích cực, đơn giản và phù hợp nhóm tuổi."
-          rows={5}
-          registration={form.register("storyIntro")}
-          error={form.formState.errors.storyIntro?.message}
-          containerClassName="md:col-span-2"
+        <Controller
+          control={form.control}
+          name="storyIntro"
+          render={({ field }) => (
+            <ContentTemplateField
+              id="mission-story-intro"
+              label={contentText(content, "missionEditor.storyIntro", "Câu chuyện mở đầu")}
+              placeholder="Kể ngắn gọn tình huống để {{name}} muốn bắt đầu khám phá..."
+              description="Dùng ngôn ngữ tích cực, đơn giản và phù hợp nhóm tuổi."
+              value={field.value}
+              onBlur={field.onBlur}
+              onValueChange={field.onChange}
+              variables={templateVariables}
+              error={form.formState.errors.storyIntro?.message}
+              multiline
+              rows={5}
+              containerClassName="md:col-span-2"
+            />
+          )}
         />
         <SelectField
           label={contentText(content, "missionEditor.world", "Thế giới")}
@@ -112,6 +160,7 @@ export function MissionBasicFields({ taxonomy }: { taxonomy: MissionEditorTaxono
           options={[1, 2, 3, 4, 5].map((value) => ({ value: String(value), label: `Mức ${value}` }))}
         />
       </div>
+
       <fieldset className="mt-4">
         <legend className="text-sm font-black">
           {contentText(content, "missionEditor.ageGroups", "Nhóm tuổi")}
@@ -166,7 +215,7 @@ export function MissionBasicFields({ taxonomy }: { taxonomy: MissionEditorTaxono
         </p>
         <div className="mt-4 grid gap-4 md:grid-cols-2">
           <TextField
-            label={contentText(content, "missionEditor.slug", "Mã đường dẫn")}
+            label={contentText(content, "missionEditor.slug", "Mã đường dẫn (nâng cao)")}
             placeholder="tham-tu-dau-chan"
             description="Dùng trong đường dẫn nội bộ và không hiển thị cho trẻ."
             registration={form.register("slug", {

@@ -2,6 +2,7 @@ import { env } from "@/config/env";
 import { cloudinaryStorageProvider } from "@/modules/media/storage/providers/cloudinary";
 import { localStorageProvider, readLocalMedia } from "@/modules/media/storage/providers/local";
 import { s3StorageProvider } from "@/modules/media/storage/providers/s3";
+import type { ImageUploadPolicy } from "@/domain/media-upload-policy";
 import type { StorageProviderName } from "@/modules/media/storage/types";
 import { validateMedia } from "@/modules/media/storage/validation";
 
@@ -11,8 +12,8 @@ const providers = {
   cloudinary: cloudinaryStorageProvider,
 } as const;
 
-export async function storeMedia(file: File) {
-  const validated = await validateMedia(file);
+export async function storeMedia(file: File, options: { imagePolicy?: ImageUploadPolicy } = {}) {
+  const validated = await validateMedia(file, options);
   return providers[env.STORAGE_DRIVER].upload(validated);
 }
 

@@ -35,6 +35,16 @@ export type AdminMissionPage = {
   totalPages: number;
 };
 
+export type AdminMissionVersionSummary = {
+  id: string;
+  versionNumber: number;
+  status: AdminMissionListItem["status"];
+  reviewComment: string | null;
+  createdAt: string;
+  reviewedAt: string | null;
+  publishedAt: string | null;
+};
+
 function missionListQuery(filters: AdminMissionListFilters) {
   const params = new URLSearchParams();
   if (filters.status) params.set("status", filters.status);
@@ -59,6 +69,16 @@ export const adminMissionsApi = {
   },
   submit(missionId: string) {
     return apiRequest({ url: `/api/admin/missions/${missionId}/submit`, method: "POST" });
+  },
+  restoreVersion(missionId: string, versionId: string) {
+    return apiRequest<{
+      mission: { id: string; status: string };
+      draft: AdminMissionDraft;
+      versionNumber: number;
+    }>({
+      url: `/api/admin/missions/${missionId}/versions/${versionId}/restore`,
+      method: "POST",
+    });
   },
   duplicate(missionId: string) {
     return apiRequest<{ id: string }>({

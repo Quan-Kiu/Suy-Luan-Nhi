@@ -1,16 +1,12 @@
 "use client";
 
 import { ArrowDown, ArrowUp, Trash2 } from "lucide-react";
-import { useFormContext, useWatch } from "react-hook-form";
-import {
-  ControlledSelectField,
-  ControlledTextareaField,
-  SelectField,
-  TextareaField,
-  TextField,
-} from "@/components/form";
+import { Controller, useFormContext, useWatch } from "react-hook-form";
+import { ControlledSelectField, SelectField } from "@/components/form";
 import { Card } from "@/components/ui";
 import { contentText, useContent } from "@/content/client";
+import type { ContentVariableDefinition } from "@/domain/content-variables";
+import { ContentTemplateField } from "@/features/admin/content-template-field";
 import { questionTypeLabelKeys, questionTypes } from "@/features/admin/mission-editor/constants";
 import { QuestionConfigurationEditor } from "@/features/admin/mission-editor/question-configuration-editor";
 import type { QuestionType } from "@/features/admin/mission-editor/types";
@@ -18,10 +14,10 @@ import type { AdminMissionDraft } from "@/modules/admin/schemas";
 
 const typeFallbacks: Record<QuestionType, string> = {
   single_choice: "Chọn một đáp án",
-  pattern_sequence: "Chuỗi quy luật",
-  drag_drop: "Kéo/thả vào vị trí",
-  fill_answer: "Điền đáp án",
-  sorting: "Sắp xếp thứ tự",
+  pattern_sequence: "Tìm hình tiếp theo",
+  drag_drop: "Kéo vào đúng chỗ",
+  fill_answer: "Nhập câu trả lời",
+  sorting: "Xếp theo thứ tự",
 };
 
 type Props = {
@@ -32,6 +28,7 @@ type Props = {
   onTypeChange: (type: QuestionType) => void;
   onMove: (direction: -1 | 1) => void;
   onRemove: () => void;
+  templateVariables: ContentVariableDefinition[];
 };
 
 export function MissionQuestionEditor({
@@ -42,6 +39,7 @@ export function MissionQuestionEditor({
   onTypeChange,
   onMove,
   onRemove,
+  templateVariables,
 }: Props) {
   const content = useContent("admin");
   const form = useFormContext<AdminMissionDraft>();
@@ -54,10 +52,7 @@ export function MissionQuestionEditor({
       .filter(Boolean)
       .slice(0, 3)
       .map((hintText, hintIndex) => ({ level: hintIndex + 1, text: hintText }));
-    form.setValue(`questions.${index}.hints` as const, hints, {
-      shouldDirty: true,
-      shouldValidate: true,
-    });
+    form.setValue(`questions.${index}.hints` as const, hints, { shouldDirty: true, shouldValidate: true });
   }
 
   return (
@@ -102,7 +97,7 @@ export function MissionQuestionEditor({
       {active ? (
         <div className="mt-4 grid gap-4 md:grid-cols-2">
           <ControlledSelectField
-            label={contentText(content, "missionEditor.questionType", "Loại câu hỏi")}
+            label={contentText(content, "missionEditor.questionType", "Bé sẽ trả lời bằng cách nào?")}
             value={question.type}
             onValueChange={(value) => onTypeChange(value as QuestionType)}
             options={questionTypes.map((type) => ({
@@ -111,48 +106,101 @@ export function MissionQuestionEditor({
             }))}
           />
           <SelectField
-            label={contentText(content, "missionEditor.difficulty", "Độ khó")}
+            label={contentText(content, "missionEditor.difficulty", "Mức độ")}
             registration={form.register(`questions.${index}.difficulty` as const, { valueAsNumber: true })}
             options={[1, 2, 3, 4, 5].map((value) => ({ value: String(value), label: `Mức ${value}` }))}
           />
-          <TextField
-            label={contentText(content, "missionEditor.prompt", "Câu hỏi")}
-            placeholder="Ví dụ: Hình nào xuất hiện tiếp theo?"
-            registration={form.register(`questions.${index}.prompt` as const)}
-            error={errors?.prompt?.message}
-            containerClassName="md:col-span-2"
+          <Controller
+            control={form.control}
+            name={`questions.${index}.prompt` as const}
+            render={({ field }) => (
+              <ContentTemplateField
+                id={`question-${index}-prompt`}
+                label={contentText(content, "missionEditor.prompt", "Câu hỏi dành cho bé")}
+                placeholder="Ví dụ: {{name}} chọn hình nào xuất hiện tiếp theo?"
+                value={field.value}
+                onBlur={field.onBlur}
+                onValueChange={field.onChange}
+                variables={templateVariables}
+                error={errors?.prompt?.message}
+                containerClassName="md:col-span-2"
+              />
+            )}
           />
-          <TextField
-            label={contentText(content, "missionEditor.instruction", "Hướng dẫn")}
-            placeholder="Hướng dẫn ngắn, rõ và phù hợp độ tuổi"
-            registration={form.register(`questions.${index}.instruction` as const)}
-            error={errors?.instruction?.message}
-            containerClassName="md:col-span-2"
+          <Controller
+            control={form.control}
+            name={`questions.${index}.instruction` as const}
+            render={({ field }) => (
+              <ContentTemplateField
+                id={`question-${index}-instruction`}
+                label={contentText(content, "missionEditor.instruction", "Lời hướng dẫn")}
+                placeholder="{{name}} hãy nhìn kỹ rồi chọn một đáp án."
+                value={field.value}
+                onBlur={field.onBlur}
+                onValueChange={field.onChange}
+                variables={templateVariables}
+                error={errors?.instruction?.message}
+                containerClassName="md:col-span-2"
+              />
+            )}
           />
           <div className="md:col-span-2">
-            <QuestionConfigurationEditor key={question.type} index={index} />
+            <QuestionConfigurationEditor
+              key={question.type}
+              index={index}
+              templateVariables={templateVariables}
+            />
           </div>
-          <ControlledTextareaField
-            label={contentText(content, "missionEditor.hints", "Gợi ý, mỗi dòng là một cấp")}
-            rows={4}
+          <ContentTemplateField
+            id={`question-${index}-hints`}
+            label={contentText(content, "missionEditor.hints", "Các gợi ý, mỗi dòng một gợi ý")}
             value={question.hints.map((hint) => hint.text).join("\n")}
             onValueChange={updateHints}
+            variables={templateVariables}
             error={errors?.hints?.message}
+            multiline
+            rows={4}
             containerClassName="md:col-span-2"
           />
-          <TextareaField
-            label={contentText(content, "missionEditor.correctFeedback", "Phản hồi đúng")}
-            rows={3}
-            placeholder="Phản hồi tích cực khi bé trả lời đúng"
-            registration={form.register(`questions.${index}.feedbackCorrect` as const)}
-            error={errors?.feedbackCorrect?.message}
+          <Controller
+            control={form.control}
+            name={`questions.${index}.feedbackCorrect` as const}
+            render={({ field }) => (
+              <ContentTemplateField
+                id={`question-${index}-correct-feedback`}
+                label={contentText(content, "missionEditor.correctFeedback", "Lời khen khi bé trả lời đúng")}
+                placeholder="Tuyệt vời, {{name}} đã tìm đúng manh mối rồi!"
+                value={field.value}
+                onBlur={field.onBlur}
+                onValueChange={field.onChange}
+                variables={templateVariables}
+                error={errors?.feedbackCorrect?.message}
+                multiline
+                rows={3}
+              />
+            )}
           />
-          <TextareaField
-            label={contentText(content, "missionEditor.incorrectFeedback", "Phản hồi chưa đúng")}
-            rows={3}
-            placeholder="Khuyến khích bé thử lại, không tạo áp lực"
-            registration={form.register(`questions.${index}.feedbackIncorrect` as const)}
-            error={errors?.feedbackIncorrect?.message}
+          <Controller
+            control={form.control}
+            name={`questions.${index}.feedbackIncorrect` as const}
+            render={({ field }) => (
+              <ContentTemplateField
+                id={`question-${index}-incorrect-feedback`}
+                label={contentText(
+                  content,
+                  "missionEditor.incorrectFeedback",
+                  "Lời nhắc khi bé chưa trả lời đúng",
+                )}
+                placeholder="Chưa chính xác, {{name}} nhìn lại rồi thử lần nữa nhé."
+                value={field.value}
+                onBlur={field.onBlur}
+                onValueChange={field.onChange}
+                variables={templateVariables}
+                error={errors?.feedbackIncorrect?.message}
+                multiline
+                rows={3}
+              />
+            )}
           />
         </div>
       ) : (

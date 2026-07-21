@@ -11,7 +11,7 @@ export default async function Page() {
     <div className="space-y-6">
       <AdminPageHeader
         eyebrow="Quản lý quyền truy cập"
-        title="Thành viên & phân quyền"
+        title="Tài khoản quản trị"
         description="Xem tài khoản quản trị, giao đúng vai trò và tạm ngưng quyền truy cập khi cần. Mọi thay đổi đều được ghi lại."
         icon={Users}
       />

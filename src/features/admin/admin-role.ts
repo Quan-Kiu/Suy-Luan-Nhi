@@ -5,7 +5,7 @@ const rolePriority: AppRole[] = ["super_admin", "reviewer", "content_admin", "pa
 const roleLabels: Record<AppRole, string> = {
   parent: "Phụ huynh",
   content_admin: "Biên tập nội dung",
-  reviewer: "Người kiểm duyệt",
+  reviewer: "Người kiểm tra nội dung",
   super_admin: "Quản trị viên",
 };
 

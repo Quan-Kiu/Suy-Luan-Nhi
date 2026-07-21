@@ -36,24 +36,28 @@ test("Kenney sounds follow gameplay events", async ({ page }) => {
   await expectSound(page, "mission-locked.ogg");
 
   await page.getByRole("link", { name: /Thám tử dấu chân/i }).click();
-  await page.getByRole("button", { name: /Bắt đầu nhiệm vụ/i }).click();
-  await page.getByRole("button", { name: /Cho con một gợi ý/i }).click();
+  await page.getByRole("button", { name: /Bắt đầu chơi/i }).click();
+  await page.getByRole("button", { name: /Gợi ý cho con/i }).click();
   await expectSound(page, "hint-reveal.ogg");
 
   await page.getByRole("button", { name: "Mặt trăng", exact: true }).click();
   await expectSound(page, "ui-select-1.ogg");
-  await page.getByRole("button", { name: /Kiểm tra đáp án/i }).click();
+  await page.getByRole("button", { name: /Xem con làm đúng chưa/i }).click();
   await expectSound(page, "answer-retry.ogg");
+  await expect(page.getByText("Chưa chính xác", { exact: true })).toBeVisible();
+  const retryButton = page.getByRole("button", { name: /Thử lại/i });
+  await expect(retryButton).toHaveAttribute("class", /border-\[#d99539\]/);
+  await expect(retryButton).not.toHaveAttribute("class", /green|6c9951/i);
 
-  await page.getByRole("button", { name: /Thử lại/i }).click();
+  await retryButton.click();
   await page.getByRole("button", { name: "Ngôi sao", exact: true }).click();
   await expectSound(page, "ui-select-2.ogg");
-  await page.getByRole("button", { name: /Kiểm tra đáp án/i }).click();
+  await page.getByRole("button", { name: /Xem con làm đúng chưa/i }).click();
   await expectSound(page, "answer-correct.ogg");
 
   await page.getByRole("button", { name: /Câu tiếp theo/i }).click();
   await page.getByRole("button", { name: "Dấu chân xanh", exact: true }).click();
-  await page.getByRole("button", { name: /Kiểm tra đáp án/i }).click();
+  await page.getByRole("button", { name: /Xem con làm đúng chưa/i }).click();
   await page.getByRole("button", { name: /Nhận huy hiệu/i }).click();
   await expect(page).toHaveURL(/\/complete\//);
   await expect.poll(() => playedSounds(page)).toContain("/audio/sfx/original/mission-complete-chime.ogg");

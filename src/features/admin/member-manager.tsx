@@ -9,7 +9,7 @@ export function MemberManager({ items, currentUserId }: { items: MemberItem[]; c
         <thead className="bg-[#f7f3eb] text-left">
           <tr>
             <th className="p-3">Thành viên</th>
-            <th className="p-3">Role</th>
+            <th className="p-3">Vai trò</th>
             <th className="p-3">Email</th>
             <th className="p-3">Trạng thái</th>
             <th className="p-3">Thao tác</th>

@@ -64,7 +64,7 @@ const categoryLabels: Record<string, string> = {
   activity: "Lịch sử hoạt động",
   brand: "Tên và giới thiệu",
   completion: "Hoàn thành nhiệm vụ",
-  content: "Câu chữ hiển thị",
+  content: "Nội dung hiển thị",
   create: "Tạo mới",
   dashboard: "Trang tổng quan",
   edit: "Chỉnh sửa",

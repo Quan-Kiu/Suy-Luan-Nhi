@@ -2,14 +2,14 @@ import type { PlayableQuestion } from "@/modules/gameplay/question";
 
 export const skillSeeds = [
   ["observe", "Quan sát", "Nhìn kỹ chi tiết và nhận ra tín hiệu quan trọng.", "thinking"],
-  ["pattern", "Nhận diện quy luật", "Tìm phần lặp lại và dự đoán bước tiếp theo.", "thinking"],
-  ["retry", "Biết thử lại", "Thay đổi cách làm sau một lần chưa trúng.", "habit"],
+  ["pattern", "Tìm quy luật", "Nhìn phần lặp lại và đoán điều xuất hiện tiếp theo.", "thinking"],
+  ["retry", "Thử lại theo cách khác", "Không bỏ cuộc; đổi cách làm khi lần đầu chưa đúng.", "habit"],
   ["compare", "So sánh", "Tìm điểm giống và khác giữa các lựa chọn.", "thinking"],
   ["check", "Tự kiểm tra", "Dừng lại và kiểm tra lời giải của mình.", "habit"],
-  ["cause", "Nguyên nhân – kết quả", "Hiểu điều gì xảy ra trước và điều gì xảy ra sau.", "thinking"],
+  ["cause", "Hiểu vì sao", "Nối việc xảy ra trước với chuyện xảy ra sau.", "thinking"],
   ["classify", "Phân loại", "Nhóm các đồ vật theo đặc điểm chung.", "thinking"],
   ["sequence", "Sắp xếp trình tự", "Đặt sự kiện theo một thứ tự hợp lý.", "thinking"],
-  ["problem-solving", "Giải quyết vấn đề", "Thử nhiều manh mối để tìm một cách giải hợp lý.", "thinking"],
+  ["problem-solving", "Tìm cách giải", "Kết hợp nhiều manh mối để chọn cách giải hợp lý.", "thinking"],
 ] as const;
 
 export const worldSeeds = [
@@ -25,7 +25,7 @@ export const worldSeeds = [
   },
   {
     slug: "cause-train",
-    title: "Chuyến tàu Nguyên nhân",
+    title: "Chuyến tàu Vì sao",
     subtitle: "Điều gì xảy ra trước?",
     description: "Theo đoàn tàu khám phá nguyên nhân, kết quả và thứ tự của các sự kiện.",
     sortOrder: 2,
@@ -45,8 +45,8 @@ export const worldSeeds = [
   },
   {
     slug: "logic-laughs",
-    title: "Truyện Cười Logic",
-    subtitle: "Cười và nghĩ",
+    title: "Chuyện vui hợp lý",
+    subtitle: "Cười rồi tìm cách giải",
     description: "Chọn lời giải hợp lý cho những tình huống ngộ nghĩnh và bất ngờ.",
     sortOrder: 4,
     themeColor: "orange",
@@ -66,12 +66,12 @@ const baseQuestion = (
   prompt,
   instruction,
   difficulty: order,
-  feedbackCorrect: "Tuyệt vời! Con đã tìm ra manh mối rồi.",
-  feedbackIncorrect: "Chưa trúng thôi! Con thử nhìn lại từng chi tiết nhé.",
+  feedbackCorrect: "Tuyệt vời! Con tìm đúng manh mối rồi.",
+  feedbackIncorrect: "Chưa đúng thôi! Con nhìn lại từng chi tiết rồi thử một lần nữa nhé.",
   hints: [
-    { level: 1, text: "Con dừng lại và nhìn từng phần một nhé." },
-    { level: 2, text: "Thử tìm điều đang lặp lại hoặc điều xảy ra trước." },
-    { level: 3, text: "Loại những lựa chọn không khớp với manh mối rõ nhất." },
+    { level: 1, text: "Con nhìn từng phần một nhé." },
+    { level: 2, text: "Tìm phần đang lặp lại hoặc xem chuyện gì xảy ra trước." },
+    { level: 3, text: "Bỏ qua lựa chọn không khớp với manh mối rõ nhất." },
   ],
 });
 
@@ -297,10 +297,10 @@ export const missionSeeds: MissionSeed[] = [
   {
     slug: "rainy-picnic",
     worldSlug: "cause-train",
-    title: "Buổi picnic có mưa",
+    title: "Buổi dã ngoại gặp mưa",
     subtitle: "Vì sao mọi người mở ô?",
-    shortDescription: "Tìm nguyên nhân và kết quả trong một buổi dã ngoại.",
-    storyIntro: "Mây kéo đến khi cả nhóm đang picnic. Con giúp đoàn tàu nối đúng những điều xảy ra nhé.",
+    shortDescription: "Tìm vì sao một việc xảy ra trong buổi dã ngoại.",
+    storyIntro: "Mây kéo đến khi cả nhóm đang đi dã ngoại. Con giúp nối đúng những điều xảy ra nhé.",
     estimatedMinutes: 5,
     ageGroups: ["6-8"],
     primarySkill: "cause",
@@ -543,9 +543,9 @@ export const missionSeeds: MissionSeed[] = [
   {
     slug: "picnic-order",
     worldSlug: "logic-laughs",
-    title: "Bữa picnic lộn xộn",
+    title: "Bữa ăn ngoài trời lộn xộn",
     subtitle: "Xếp lại câu chuyện cho hợp lý",
-    shortDescription: "Sắp xếp và tìm hành động phù hợp trong bữa picnic.",
+    shortDescription: "Sắp xếp và tìm hành động phù hợp trong bữa ăn ngoài trời.",
     storyIntro: "Bống đã đặt chiếc bánh lên khăn trước khi trải khăn. Cả nhóm cười và nhờ con xếp lại nhé!",
     estimatedMinutes: 6,
     ageGroups: ["6-8", "9-10", "11-12"],
@@ -556,7 +556,7 @@ export const missionSeeds: MissionSeed[] = [
     difficulty: 2,
     questions: [
       {
-        ...baseQuestion(1, "sorting", "Xếp các bước picnic", "Trải khăn, đặt đồ ăn, rồi cùng ăn."),
+        ...baseQuestion(1, "sorting", "Xếp các bước chuẩn bị", "Trải khăn, đặt đồ ăn, rồi cùng ăn."),
         type: "sorting",
         payload: {
           items: [option("eat", "Cùng ăn"), option("food", "Đặt đồ ăn"), option("blanket", "Trải khăn")],

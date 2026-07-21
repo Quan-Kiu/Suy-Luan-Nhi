@@ -9,7 +9,10 @@ import {
   parentResources,
   questions,
 } from "@/db/schema";
+import type { MediaCategory } from "@/domain/media";
 import { deleteStoredMedia, storeMedia } from "@/modules/media/storage";
+import { MediaValidationError } from "@/modules/media/storage/errors";
+import { getImageUploadPolicy } from "@/modules/media/upload-policy";
 
 export type MediaListFilters = {
   type?: "image" | "audio" | "video";
@@ -73,9 +76,12 @@ export async function listMedia(filters: MediaListFilters = {}) {
   };
 }
 
-export async function uploadMedia(file: File, altText: string, category: string, actorId: string) {
-  if (!altText.trim()) throw new Error("Alt text là bắt buộc để đảm bảo khả năng tiếp cận");
-  const stored = await storeMedia(file);
+export async function uploadMedia(file: File, altText: string, category: MediaCategory, actorId: string) {
+  if (!altText.trim()) {
+    throw new MediaValidationError("Mô tả hình ảnh là bắt buộc để đảm bảo khả năng tiếp cận");
+  }
+  const imagePolicy = await getImageUploadPolicy(category);
+  const stored = await storeMedia(file, { imagePolicy });
   const [asset] = await db
     .insert(mediaAssets)
     .values({

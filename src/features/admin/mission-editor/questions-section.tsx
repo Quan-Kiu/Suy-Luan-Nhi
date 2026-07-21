@@ -7,13 +7,16 @@ import { createDefaultQuestion } from "@/features/admin/mission-editor/default-q
 import { MissionQuestionEditor } from "@/features/admin/mission-editor/question-editor";
 import type { QuestionType } from "@/features/admin/mission-editor/types";
 import type { AdminMissionDraft } from "@/modules/admin/schemas";
+import type { ContentVariableDefinition } from "@/domain/content-variables";
 
 export function MissionQuestionsSection({
   activeQuestion,
   onActiveQuestionChange,
+  templateVariables,
 }: {
   activeQuestion: number;
   onActiveQuestionChange: (index: number) => void;
+  templateVariables: ContentVariableDefinition[];
 }) {
   const content = useContent("admin");
   const form = useFormContext<AdminMissionDraft>();
@@ -80,6 +83,7 @@ export function MissionQuestionsSection({
           onTypeChange={(type) => replaceQuestion(index, type)}
           onMove={(direction) => moveQuestion(index, direction)}
           onRemove={() => removeQuestion(index)}
+          templateVariables={templateVariables}
         />
       ))}
     </section>

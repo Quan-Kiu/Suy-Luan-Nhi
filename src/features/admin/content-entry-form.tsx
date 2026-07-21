@@ -110,7 +110,7 @@ export function ContentEntryForm({
           queryKey: queryKeys.content.namespace(item.namespace, item.locale),
         }),
       ]);
-      toast.success("Đã cập nhật câu chữ hiển thị");
+      toast.success("Đã lưu câu chữ mới");
     },
   });
   const resetMutation = useMutation({
@@ -127,7 +127,7 @@ export function ContentEntryForm({
           queryKey: queryKeys.content.namespace(item.namespace, item.locale),
         }),
       ]);
-      toast.success("Đã dùng lại nội dung mặc định");
+      toast.success("Đã dùng lại câu chữ ban đầu");
     },
   });
 
@@ -175,7 +175,7 @@ export function ContentEntryForm({
         >
           {fieldError ? (
             <div role="alert" className="rounded-xl border border-red-200 bg-red-50 p-3 text-sm text-red-800">
-              <p className="font-black">Có nội dung cần kiểm tra</p>
+              <p className="font-black">Cần kiểm tra lại câu chữ</p>
               <a href={`#${fieldId}`} className="mt-1 inline-block font-bold underline">
                 {fieldError}
               </a>
@@ -217,7 +217,7 @@ export function ContentEntryForm({
 
           {item.source === "database" && item.hasDefault ? (
             <div className="rounded-xl bg-[#f5f2ec] p-3">
-              <p className="text-xs font-black tracking-wide text-[#756b60] uppercase">Nội dung mặc định</p>
+              <p className="text-xs font-black tracking-wide text-[#756b60] uppercase">Câu chữ ban đầu</p>
               <p className="mt-1 text-sm leading-6 whitespace-pre-wrap text-[#4f463b]">
                 {contentPreviewText(item.defaultValue)}
               </p>
@@ -233,7 +233,7 @@ export function ContentEntryForm({
                 onClick={() => setResetOpen(true)}
                 className="inline-flex min-h-11 items-center justify-center gap-2 rounded-xl border border-[#d9c9ae] bg-white px-4 font-black text-[#5f5548] disabled:opacity-50"
               >
-                <RotateCcw size={17} /> Dùng nội dung mặc định
+                <RotateCcw size={17} /> Dùng lại câu chữ ban đầu
               </button>
             ) : (
               <span />
@@ -243,7 +243,7 @@ export function ContentEntryForm({
               disabled={!interactive || !form.formState.isDirty}
               pendingLabel="Đang lưu thay đổi..."
             >
-              Lưu câu chữ
+              Lưu nội dung
             </SubmitButton>
           </div>
         </form>
@@ -251,10 +251,10 @@ export function ContentEntryForm({
 
       <ConfirmDialog
         open={resetOpen}
-        title="Dùng lại nội dung mặc định?"
-        description="Nội dung đã tùy chỉnh sẽ được bỏ. Sản phẩm sẽ dùng lại câu chữ mặc định trong mã nguồn."
-        confirmLabel="Dùng nội dung mặc định"
-        pendingLabel="Đang khôi phục..."
+        title="Dùng lại câu chữ ban đầu?"
+        description="Câu chữ đang dùng sẽ được bỏ. Ứng dụng sẽ quay lại câu chữ ban đầu."
+        confirmLabel="Dùng lại câu chữ ban đầu"
+        pendingLabel="Đang dùng lại..."
         pending={resetMutation.isPending}
         onConfirm={() => resetMutation.mutate()}
         onClose={() => setResetOpen(false)}

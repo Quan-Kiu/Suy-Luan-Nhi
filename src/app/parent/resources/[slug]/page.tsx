@@ -1,5 +1,5 @@
 import Image from "next/image";
-import { notFound } from "next/navigation";
+import { notFound, redirect } from "next/navigation";
 import { requireParent } from "@/auth/session";
 import { Card, Pill } from "@/components/ui";
 import {
@@ -13,6 +13,9 @@ import { getResource } from "@/modules/parent/parent-data";
 export default async function Page({ params }: { params: Promise<{ slug: string }> }) {
   await requireParent();
   const { slug } = await params;
+  if (slug === "dong-hanh-khi-be-chua-trung") {
+    redirect("/parent/resources/dong-hanh-khi-be-chua-tra-loi-dung");
+  }
   const item = await getResource(slug);
   if (!item) notFound();
   return (

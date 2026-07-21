@@ -15,9 +15,9 @@ export default async function Page() {
   return (
     <div className="space-y-6">
       <AdminPageHeader
-        eyebrow="Tư liệu dùng trong nhiệm vụ"
-        title="Hình ảnh & âm thanh"
-        description="Tải lên, xem lại và xác nhận tư liệu phù hợp trước khi dùng trong nội dung dành cho trẻ."
+        eyebrow="Thư viện dùng trong nhiệm vụ"
+        title="Hình ảnh, âm thanh và video"
+        description="Thêm, xem lại và xác nhận hình ảnh, âm thanh hoặc video phù hợp trước khi cho bé sử dụng."
         icon={ImageIcon}
       />
       <MediaLibrary

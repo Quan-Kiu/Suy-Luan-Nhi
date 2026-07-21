@@ -3,6 +3,8 @@
 import { useFormContext, useWatch } from "react-hook-form";
 import { ControlledSelectField, ControlledTextareaField } from "@/components/form";
 import { formControlClass } from "@/components/form/text-field";
+import type { ContentVariableDefinition } from "@/domain/content-variables";
+import { ContentTemplateField } from "@/features/admin/content-template-field";
 import { QuestionOptionList, type EditorOption } from "@/features/admin/mission-editor/question-option-list";
 import type { DraftQuestion } from "@/features/admin/mission-editor/types";
 import type { AdminMissionDraft } from "@/modules/admin/schemas";
@@ -16,7 +18,13 @@ function normalizeOptions(items: EditorOption[]) {
   }));
 }
 
-export function QuestionConfigurationEditor({ index }: { index: number }) {
+export function QuestionConfigurationEditor({
+  index,
+  templateVariables,
+}: {
+  index: number;
+  templateVariables: ContentVariableDefinition[];
+}) {
   const form = useFormContext<AdminMissionDraft>();
   const question = useWatch({ control: form.control, name: `questions.${index}` as const });
 
@@ -30,6 +38,7 @@ export function QuestionConfigurationEditor({ index }: { index: number }) {
     return (
       <QuestionOptionList
         title="Các lựa chọn"
+        templateVariables={templateVariables}
         items={question.payload.options}
         minItems={2}
         addLabel="Thêm lựa chọn"
@@ -53,7 +62,8 @@ export function QuestionConfigurationEditor({ index }: { index: number }) {
     return (
       <div className="space-y-4">
         <QuestionOptionList
-          title="Chuỗi hình"
+          title="Các hình theo thứ tự"
+          templateVariables={templateVariables}
           items={question.payload.sequence}
           minItems={3}
           addLabel="Thêm mảnh"
@@ -84,7 +94,8 @@ export function QuestionConfigurationEditor({ index }: { index: number }) {
           }}
         />
         <QuestionOptionList
-          title="Đáp án để bé chọn"
+          title="Các hình bé có thể chọn"
+          templateVariables={templateVariables}
           items={question.payload.options}
           minItems={2}
           addLabel="Thêm đáp án"
@@ -107,22 +118,21 @@ export function QuestionConfigurationEditor({ index }: { index: number }) {
   if (question.type === "fill_answer") {
     return (
       <div className="grid gap-4 md:grid-cols-2">
-        <label className="space-y-2 text-sm font-black">
-          <span>Gợi ý trong ô trả lời</span>
-          <input
-            value={question.payload.placeholder ?? ""}
-            onChange={(event) =>
-              replace({
-                ...question,
-                payload: { ...question.payload, placeholder: event.target.value || undefined },
-              })
-            }
-            placeholder="Ví dụ: Nhập tên đồ vật"
-            className={formControlClass}
-          />
-        </label>
+        <ContentTemplateField
+          label="Chữ gợi ý trong ô trả lời"
+          value={question.payload.placeholder ?? ""}
+          onValueChange={(value) =>
+            replace({
+              ...question,
+              payload: { ...question.payload, placeholder: value || undefined },
+            })
+          }
+          variables={templateVariables}
+          placeholder="Ví dụ: {{name}} nhập tên đồ vật"
+          showHint={false}
+        />
         <ControlledSelectField
-          label="Kiểu câu trả lời"
+          label="Bé sẽ nhập"
           value={question.payload.inputMode}
           onValueChange={(inputMode) =>
             replace({
@@ -136,7 +146,7 @@ export function QuestionConfigurationEditor({ index }: { index: number }) {
           ]}
         />
         <ControlledTextareaField
-          label="Các đáp án được chấp nhận"
+          label="Những cách trả lời được tính là đúng"
           description="Mỗi dòng là một cách trả lời đúng, ví dụ: ô / cái ô / chiếc ô."
           rows={5}
           value={question.correctAnswer.join("\n")}
@@ -157,7 +167,8 @@ export function QuestionConfigurationEditor({ index }: { index: number }) {
   if (question.type === "sorting") {
     return (
       <QuestionOptionList
-        title="Các bước theo đúng thứ tự"
+        title="Các bước theo thứ tự đúng"
+        templateVariables={templateVariables}
         items={question.payload.items}
         minItems={2}
         addLabel="Thêm bước"
@@ -180,7 +191,8 @@ export function QuestionConfigurationEditor({ index }: { index: number }) {
     return (
       <div className="space-y-4">
         <QuestionOptionList
-          title="Các mảnh để kéo"
+          title="Các mảnh bé sẽ kéo"
+          templateVariables={templateVariables}
           items={items}
           minItems={1}
           addLabel="Thêm mảnh"
@@ -198,7 +210,8 @@ export function QuestionConfigurationEditor({ index }: { index: number }) {
           }}
         />
         <QuestionOptionList
-          title="Các vị trí nhận mảnh"
+          title="Các chỗ bé sẽ thả mảnh"
+          templateVariables={templateVariables}
           items={slots}
           minItems={1}
           addLabel="Thêm vị trí"
@@ -231,8 +244,8 @@ export function QuestionConfigurationEditor({ index }: { index: number }) {
           }}
         />
         <fieldset className="rounded-2xl border bg-[#fffdf8] p-4">
-          <legend className="px-1 text-sm font-black">Ghép đáp án đúng</legend>
-          <p className="mt-1 text-sm text-[#6f6558]">Chọn mảnh phù hợp cho từng vị trí.</p>
+          <legend className="px-1 text-sm font-black">Chọn mảnh đúng cho từng chỗ</legend>
+          <p className="mt-1 text-sm text-[#6f6558]">Chọn mảnh cần đặt vào từng chỗ.</p>
           <div className="mt-3 grid gap-3 md:grid-cols-2">
             {slots.map((slot) => (
               <label key={slot.id} className="space-y-2 text-sm font-bold">

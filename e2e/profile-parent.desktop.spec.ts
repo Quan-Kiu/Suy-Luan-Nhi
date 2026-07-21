@@ -13,7 +13,7 @@ test("parent creates, edits and soft-deletes a child profile through the UI", as
   await page.goto("/onboarding");
   await page.getByLabel("Tên thân mật của bé").fill("Mít E2E");
   await page.getByText("6–8 tuổi", { exact: true }).click();
-  await page.getByRole("button", { name: /Bắt đầu chế độ bé/i }).click();
+  await page.getByRole("button", { name: /Tạo hồ sơ và bắt đầu/i }).click();
   await expect(page).toHaveURL(/\/profiles$/);
   await expect(page.getByRole("heading", { name: "Mít E2E" })).toBeVisible();
 
@@ -58,7 +58,7 @@ test("parent gate rejects a wrong answer, supports PIN and exports family data",
 
   await page.goto("/parent/settings");
   const downloadPromise = page.waitForEvent("download");
-  await page.getByRole("button", { name: "Yêu cầu xuất dữ liệu" }).click();
+  await page.getByRole("button", { name: "Tạo bản sao dữ liệu" }).click();
   const download = await downloadPromise;
   expect(download.suggestedFilename()).toMatch(/^suy-luan-nhi-export-.*\.json$/);
   const stream = await download.createReadStream();

@@ -31,7 +31,7 @@ export function AuthAwareEntryLink({
     return (
       <span
         role="status"
-        aria-label="Đang đồng bộ quyền truy cập"
+        aria-label="Đang kiểm tra tài khoản..."
         className={cn(
           "animate-pulse border border-[#e4d5ba] bg-[#f1e8d8]",
           compact ? "h-10 w-36 rounded-full" : "h-14 w-52 rounded-2xl",

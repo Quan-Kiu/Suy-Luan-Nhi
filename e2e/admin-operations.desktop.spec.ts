@@ -12,8 +12,8 @@ test("admin uses plain-language navigation and a structured mission editor", asy
   await signIn(page, "content@demo.local", "/admin");
   await expect(page.getByRole("heading", { name: "Hôm nay cần làm gì?" })).toBeVisible();
   await expect(page.getByText("Biên tập nội dung", { exact: true })).toBeVisible();
-  await expect(page.getByRole("link", { name: "Thành viên & quyền" })).toHaveCount(0);
-  await expect(page.getByRole("link", { name: "Cấu hình hệ thống" })).toHaveCount(0);
+  await expect(page.getByRole("link", { name: "Tài khoản quản trị" })).toHaveCount(0);
+  await expect(page.getByRole("link", { name: "Cài đặt nâng cao" })).toHaveCount(0);
 
   await page.getByRole("link", { name: "Tạo nhiệm vụ mới" }).first().click();
   await expect(page.getByRole("heading", { name: "Nhiệm vụ chưa đặt tên" })).toBeVisible();
@@ -28,15 +28,15 @@ test("admin uses plain-language navigation and a structured mission editor", asy
 
 test("admin actions and protected pages match the signed-in role", async ({ page }) => {
   await signIn(page, "content@demo.local", "/admin");
-  await expect(page.getByRole("link", { name: /bản nháp đang soạn/i })).toBeVisible();
-  await expect(page.getByRole("link", { name: "Duyệt nội dung" })).toHaveCount(0);
+  await expect(page.getByRole("link", { name: /bản nháp cần làm tiếp/i })).toBeVisible();
+  await expect(page.getByRole("link", { name: "Nội dung chờ kiểm tra" })).toHaveCount(0);
   await page.goto("/admin/reviews");
   await expect(page).toHaveURL(/\/auth\/error\?reason=forbidden/);
 
   await clearAuth(page);
   await signIn(page, "reviewer@demo.local", "/admin");
-  await expect(page.getByText("Người kiểm duyệt", { exact: true })).toBeVisible();
-  await expect(page.getByRole("link", { name: "Duyệt nội dung" })).toBeVisible();
+  await expect(page.getByText("Người kiểm tra nội dung", { exact: true })).toBeVisible();
+  await expect(page.getByRole("link", { name: "Nội dung chờ kiểm tra" })).toBeVisible();
   await expect(page.getByRole("link", { name: "Tạo nhiệm vụ mới" })).toHaveCount(0);
 
   await page.goto("/admin/missions");
@@ -90,7 +90,7 @@ test("content admin creates taxonomy and world content through the CMS", async (
     mimeType: "image/png",
     buffer: tinyPng,
   });
-  await expect(newWorld.getByText(/URL đã được lấy tự động/)).toBeVisible();
+  await expect(newWorld.getByText(/Tệp đã được gắn tự động vào nội dung/)).toBeVisible();
   await newWorld.getByRole("button", { name: "Thêm chủ đề" }).click();
   await expect(page.getByText("Đã thêm chủ đề nhiệm vụ")).toBeVisible();
   await expect(
@@ -105,7 +105,7 @@ test("content admin creates taxonomy and world content through the CMS", async (
   await newSkill
     .getByPlaceholder("Ví dụ: Bé chú ý đến chi tiết và nhận ra tín hiệu quan trọng.")
     .fill("Kỹ năng được tạo tự động để xác nhận luồng quản trị dễ hiểu.");
-  await newSkill.getByLabel("Nhóm kỹ năng").selectOption("thinking");
+  await newSkill.getByLabel("Loại kỹ năng").selectOption("thinking");
   await newSkill.getByText("Thiết lập nâng cao").click();
   await expect(newSkill.getByLabel("Mã nội bộ")).toHaveValue("tu-duy-e2e");
   await newSkill.getByRole("button", { name: "Thêm kỹ năng" }).click();
@@ -121,9 +121,9 @@ test("media follows upload, reviewer approval and owner deletion permissions", a
     mimeType: "image/png",
     buffer: tinyPng,
   });
-  await page.getByPlaceholder("Mô tả hình ảnh hoặc âm thanh").fill("Điểm ảnh dùng cho kiểm thử media");
-  await page.getByRole("button", { name: "Tải lên" }).click();
-  await expect(page.getByText("Đã tải tư liệu lên thư viện")).toBeVisible();
+  await page.getByPlaceholder("Ví dụ: Bống cầm kính lúp bên cây").fill("Điểm ảnh dùng cho kiểm thử media");
+  await page.getByRole("button", { name: "Chọn và tải lên" }).click();
+  await expect(page.getByText("Đã thêm vào thư viện")).toBeVisible();
   const uploadedCard = page.locator("article").filter({ hasText: "e2e-pixel.png" });
   await expect(uploadedCard).toContainText("Chờ kiểm tra");
   const mediaUrl = (await uploadedCard.locator("code").textContent())?.trim();
@@ -141,16 +141,16 @@ test("media follows upload, reviewer approval and owner deletion permissions", a
   await clearAuth(page);
   await signIn(page, "reviewer@demo.local", "/admin/media");
   const reviewCard = page.locator("article").filter({ hasText: "e2e-pixel.png" });
-  await reviewCard.getByLabel("Duyệt tư liệu").click();
-  await expect(reviewCard).toContainText("Đã duyệt");
-  await expect(reviewCard.getByLabel("Xóa tư liệu")).toHaveCount(0);
+  await reviewCard.getByLabel("Đánh dấu phù hợp").click();
+  await expect(reviewCard).toContainText("Đã kiểm tra");
+  await expect(reviewCard.getByLabel("Xóa tệp")).toHaveCount(0);
 
   await clearAuth(page);
   await signIn(page, "content@demo.local", "/admin/media");
   const deleteCard = page.locator("article").filter({ hasText: "e2e-pixel.png" });
-  await deleteCard.getByLabel("Xóa tư liệu").click();
-  const deleteDialog = page.getByRole("alertdialog", { name: "Xóa tư liệu?" });
-  await deleteDialog.getByRole("button", { name: "Xóa tư liệu" }).click();
+  await deleteCard.getByLabel("Xóa tệp").click();
+  const deleteDialog = page.getByRole("alertdialog", { name: "Xóa tệp này?" });
+  await deleteDialog.getByRole("button", { name: "Xóa tệp" }).click();
   await expect(deleteCard).toHaveCount(0);
   expect((await page.request.get(mediaUrl!)).status()).toBe(404);
 });
@@ -158,7 +158,7 @@ test("resource editor creates technical URLs without asking ordinary editors to 
   page,
 }) => {
   await signIn(page, "content@demo.local", "/admin/resources/new");
-  await expect(page.getByRole("heading", { name: "Viết nội dung cho phụ huynh" })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Viết bài cho phụ huynh" })).toBeVisible();
   await page.getByPlaceholder("Ví dụ: Cùng con luyện cách quan sát").fill("Cùng con quan sát mỗi ngày");
   const slug = page.locator('input[name="slug"]');
   await expect(slug).toBeHidden();
@@ -168,16 +168,38 @@ test("resource editor creates technical URLs without asking ordinary editors to 
 
 test("super admin changes common settings without editing raw JSON", async ({ page }) => {
   await signIn(page, "admin@demo.local", "/admin/settings");
-  await expect(page.getByRole("heading", { name: "Cấu hình hệ thống" })).toBeVisible();
-  await expect(page.getByText("Kiểm tra tác động trước khi lưu")).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Cài đặt nâng cao", exact: true })).toBeVisible();
+  await expect(
+    page.getByText("Chỉ thay đổi khi bạn hiểu rõ cài đặt này ảnh hưởng đến phần nào của hệ thống."),
+  ).toBeVisible();
 
-  const create = page.locator("form").filter({ hasText: "Thêm cấu hình mới" });
-  await create.getByLabel("Dạng cấu hình").selectOption("boolean");
+  const uploadPolicies = page.locator("section").filter({
+    has: page.getByRole("heading", { name: "Giới hạn tải ảnh theo từng nội dung" }),
+  });
+  await expect(uploadPolicies.getByRole("group")).toHaveCount(5);
+  const missionCoverPolicy = uploadPolicies.getByRole("group", { name: "Ảnh bìa nhiệm vụ" });
+  const maxSizeInput = missionCoverPolicy.getByLabel("Dung lượng tối đa (MB)");
+  await expect(maxSizeInput).toHaveValue("5");
+  await maxSizeInput.click();
+  await maxSizeInput.press("Control+A");
+  await maxSizeInput.press("4");
+  await expect(maxSizeInput).toHaveValue("4");
+  await missionCoverPolicy.getByLabel("Kiểm tra chiều rộng và chiều cao").check();
+  await missionCoverPolicy.getByLabel("Rộng tối thiểu (px)").fill("800");
+  await uploadPolicies.getByRole("button", { name: "Lưu giới hạn tải ảnh" }).click();
+  await expect(page.getByText("Đã lưu giới hạn tải ảnh")).toBeVisible();
+  const policies = await apiData<Record<string, { maxSizeMb: number; minWidth: number | null }>>(
+    await page.request.get("/api/admin/media/policies"),
+  );
+  expect(policies["mission-cover"]).toMatchObject({ maxSizeMb: 4, minWidth: 800 });
+
+  const create = page.locator("form").filter({ hasText: "Thêm cài đặt nâng cao" });
+  await create.getByLabel("Dạng cài đặt").selectOption("boolean");
   await create.getByText("Thiết lập nâng cao").click();
-  await create.getByLabel("Mã cấu hình").fill("features.e2e-enabled");
+  await create.getByLabel("Mã cài đặt").fill("features.e2e-enabled");
   await expect(create.getByLabel("Bật ngay sau khi tạo")).toBeChecked();
-  await create.getByRole("button", { name: "Thêm cấu hình" }).click();
-  await expect(page.getByText("Đã thêm cấu hình hệ thống")).toBeVisible();
+  await create.getByRole("button", { name: "Thêm cài đặt" }).click();
+  await expect(page.getByText("Đã thêm cài đặt")).toBeVisible();
 
   const setting = page.locator("article").filter({ hasText: "Features e2e enabled" });
   await expect(setting).toBeVisible();
@@ -186,7 +208,7 @@ test("super admin changes common settings without editing raw JSON", async ({ pa
   await expect(setting.getByText("features.e2e-enabled")).toBeVisible();
   await setting.getByLabel("Bật thiết lập này").uncheck();
   await setting.getByRole("button", { name: "Lưu thay đổi" }).click();
-  await expect(page.getByText("Đã lưu cấu hình hệ thống")).toBeVisible();
+  await expect(page.getByText("Đã lưu cài đặt")).toBeVisible();
 
   const response = await page.request.patch("/api/admin/settings", {
     data: { key: "features.e2e-enabled", value: true },

@@ -14,8 +14,8 @@ export default function GlobalError({ reset }: { error: Error & { digest?: strin
           }}
         >
           <section style={{ maxWidth: 440, textAlign: "center" }}>
-            <h1>Hệ thống đang cần một lần thử lại</h1>
-            <p>Không có dữ liệu nhạy cảm nào được hiển thị trong thông báo lỗi.</p>
+            <h1>Ứng dụng đang gặp chút trục trặc</h1>
+            <p>Thông tin của gia đình vẫn được bảo vệ. Hãy tải lại trang.</p>
             <button onClick={reset} style={{ padding: "12px 20px", borderRadius: 12, fontWeight: 700 }}>
               Tải lại ứng dụng
             </button>

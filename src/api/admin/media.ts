@@ -1,5 +1,6 @@
 import { apiRequest } from "@/lib/api/client";
 import type { MediaCategory } from "@/domain/media";
+import type { ImageUploadPolicies } from "@/domain/media-upload-policy";
 
 export type MediaItem = {
   id: string;
@@ -39,6 +40,9 @@ export type MediaPage = {
 };
 
 export const mediaApi = {
+  getUploadPolicies() {
+    return apiRequest<ImageUploadPolicies>({ url: "/api/admin/media/policies", method: "GET" });
+  },
   list(filters: MediaListFilters = {}) {
     return apiRequest<MediaPage>({ url: "/api/admin/media", method: "GET", params: filters });
   },

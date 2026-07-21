@@ -1,6 +1,11 @@
 import { describe, expect, it } from "vitest";
 import { adminResourceSchema } from "@/modules/admin/resource-admin";
-import { adminMissionDraftSchema, safetyKeys } from "@/modules/admin/schemas";
+import {
+  adminMissionDraftSchema,
+  reviewApprovalSchema,
+  reviewRejectionSchema,
+  safetyKeys,
+} from "@/modules/admin/schemas";
 
 const base = {
   slug: "mission-demo",
@@ -46,6 +51,33 @@ describe("adminMissionDraftSchema", () => {
   });
   it("rejects an invalid slug", () => {
     expect(adminMissionDraftSchema.safeParse({ ...base, slug: "Mission Demo" }).success).toBe(false);
+  });
+
+  it("returns clear Vietnamese messages for mission fields", () => {
+    const result = adminMissionDraftSchema.safeParse({
+      ...base,
+      subtitle: "a",
+      questions: [{ ...base.questions[0], prompt: "a" }],
+    });
+    expect(result.success).toBe(false);
+    if (result.success) return;
+
+    const messages = new Map(result.error.issues.map((issue) => [issue.path.join("."), issue.message]));
+    expect(messages.get("subtitle")).toBe("Câu giới thiệu cần ít nhất 3 ký tự");
+    expect(messages.get("questions.0.prompt")).toBe("Câu hỏi cần ít nhất 4 ký tự");
+  });
+});
+
+describe("review decision schemas", () => {
+  it("allows approval without a comment", () => {
+    expect(reviewApprovalSchema.parse({ comment: "" })).toEqual({ comment: "" });
+    expect(reviewApprovalSchema.parse({})).toEqual({ comment: "" });
+  });
+
+  it("requires a useful comment when requesting changes", () => {
+    expect(reviewRejectionSchema.safeParse({ comment: "" }).success).toBe(false);
+    expect(reviewRejectionSchema.safeParse({ comment: "abc" }).success).toBe(false);
+    expect(reviewRejectionSchema.safeParse({ comment: "Cần sửa phần gợi ý" }).success).toBe(true);
   });
 });
 

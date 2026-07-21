@@ -7,13 +7,21 @@ const tinyPng = Buffer.from(
 );
 
 test.describe("follow-up issue regressions", () => {
-  test("invalid mission save never shows a success notification", async ({ page }) => {
+  test("invalid mission save uses clear Vietnamese and never shows success", async ({ page }) => {
     await signIn(page, "content@demo.local", "/admin/missions/new");
     let saveRequests = 0;
     page.on("request", (request) => {
       if (request.method() === "POST" && request.url().endsWith("/api/admin/missions")) saveRequests += 1;
     });
-    await page.getByRole("button", { name: "Lưu để tiếp tục sau" }).first().click();
+
+    const subtitle = page.getByPlaceholder("Ví dụ: Quan sát thật tinh");
+    await expect(subtitle).toBeEditable();
+    await subtitle.fill("a");
+    await expect(subtitle).toHaveValue("a");
+    await expect(page.getByText("Câu giới thiệu cần ít nhất 3 ký tự")).toBeVisible();
+    await expect(page.getByText(/Too small|expected string/i)).toHaveCount(0);
+
+    await page.getByRole("button", { name: "Lưu và làm tiếp sau" }).first().click();
     await expect(page.getByText(/Bản nháp chưa được lưu/)).toBeVisible();
     await expect(page.getByText("Đã lưu bản nháp")).toHaveCount(0);
     expect(saveRequests).toBe(0);
@@ -51,9 +59,12 @@ test.describe("follow-up issue regressions", () => {
     await selectChild(page, child.id);
     await unlockParentGate(page);
     await page.goto("/parent/resources/dong-hanh-khi-be-chua-trung");
+    await expect(page).toHaveURL(/dong-hanh-khi-be-chua-tra-loi-dung$/);
+    await expect(page.getByRole("heading", { name: "Khi bé chưa trả lời đúng" })).toBeVisible();
     await expect(page.getByText("Đồng hành", { exact: true })).toBeVisible();
     await expect(page.getByText("Hướng dẫn", { exact: true })).toBeVisible();
     await expect(page.getByText("companionship", { exact: true })).toHaveCount(0);
+    await expect(page.getByText(/chưa (?:trúng|chúng)/i)).toHaveCount(0);
   });
 
   test("mission cover and title render inside one bordered card", async ({ page }) => {

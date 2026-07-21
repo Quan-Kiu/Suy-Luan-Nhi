@@ -47,7 +47,7 @@ export function MissionMapPage() {
         <LoadingState label="Đang mở bản đồ nhiệm vụ..." />
       ) : missionMapQuery.isError ? (
         <ErrorState
-          title="Chưa thể mở bản đồ nhiệm vụ"
+          title="Chưa mở được bản đồ. Hãy thử lại."
           description={missionMapQuery.error.message}
           onRetry={() => void missionMapQuery.refetch()}
         />

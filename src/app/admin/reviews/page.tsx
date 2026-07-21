@@ -14,11 +14,11 @@ export default async function Page() {
     <div className="space-y-6">
       <AdminPageHeader
         eyebrow={contentText(content, "reviews.eyebrow", "Kiểm tra nội dung")}
-        title={contentText(content, "reviews.title", "Danh sách chờ kiểm duyệt")}
+        title={contentText(content, "reviews.title", "Nhiệm vụ đang chờ kiểm tra")}
         description={contentText(
           content,
           "reviews.description",
-          "Mở từng nhiệm vụ để xem như trẻ sẽ thấy, kiểm tra an toàn rồi duyệt hoặc ghi rõ phần cần chỉnh sửa.",
+          "Mở từng nhiệm vụ để xem như bé sẽ thấy, kiểm tra độ an toàn rồi xác nhận đạt yêu cầu hoặc ghi rõ phần cần sửa.",
         )}
         icon={ClipboardCheck}
       />
@@ -48,12 +48,12 @@ export default async function Page() {
               <h2 className="mt-3 text-xl font-black">{item.title}</h2>
               <p className="text-sm text-[#806d54]">{item.worldTitle}</p>
               <p className="mt-3 text-xs text-[#806d54]">
-                {contentTemplate(content, "reviews.submittedAt", "Được gửi lúc {time}", {
+                {contentTemplate(content, "reviews.submittedAt", "Gửi lúc {time}", {
                   time: item.version.createdAt.toLocaleString("vi-VN"),
                 })}
               </p>
               <span className="mt-4 inline-flex items-center gap-1 text-sm font-black text-[#bd4910]">
-                Mở để kiểm duyệt <ArrowRight size={16} />
+                Mở để kiểm tra <ArrowRight size={16} />
               </span>
             </div>
           </Link>
@@ -61,7 +61,7 @@ export default async function Page() {
       </div>
       {!items.length ? (
         <div className="mt-6 rounded-2xl border bg-white p-10 text-center text-[#806d54]">
-          {contentText(content, "reviews.empty", "Không có nhiệm vụ đang chờ duyệt.")}
+          {contentText(content, "reviews.empty", "Hiện không có nhiệm vụ nào cần kiểm tra.")}
         </div>
       ) : null}
     </div>

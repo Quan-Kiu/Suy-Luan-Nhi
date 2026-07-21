@@ -42,7 +42,7 @@ test("cross-origin mutations are rejected with the shared error envelope", async
 
 test("content admin can edit and restore plain-language interface copy", async ({ page }) => {
   await signIn(page, "content@demo.local", "/admin/content");
-  await expect(page.getByRole("heading", { name: "Chỉnh sửa câu chữ hiển thị", exact: true })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Sửa câu chữ trong ứng dụng", exact: true })).toBeVisible();
   await expect(page.getByText("Chọn nơi cần sửa câu chữ")).toBeVisible();
 
   await page.goto("/admin/content?namespace=auth&search=signIn.emailPlaceholder");
@@ -52,8 +52,8 @@ test("content admin can edit and restore plain-language interface copy", async (
   await expect(row.getByText("Người dùng đang nhìn thấy")).toBeVisible();
   await row.locator("summary").filter({ hasText: "Chỉnh sửa câu chữ" }).click();
   await row.getByLabel("Câu chữ người dùng sẽ nhìn thấy").fill("email-e2e@example.com");
-  await row.getByRole("button", { name: "Lưu câu chữ" }).click();
-  await expect(page.getByText("Đã cập nhật câu chữ hiển thị")).toBeVisible();
+  await row.getByRole("button", { name: "Lưu nội dung" }).click();
+  await expect(page.getByText("Đã lưu câu chữ mới")).toBeVisible();
 
   await page.context().clearCookies();
   await page.goto("/auth/sign-in");
@@ -62,9 +62,9 @@ test("content admin can edit and restore plain-language interface copy", async (
   await signIn(page, "content@demo.local", "/admin/content?namespace=auth&search=signIn.emailPlaceholder");
   const customized = page.locator("article").first();
   await customized.locator("summary").filter({ hasText: "Chỉnh sửa câu chữ" }).click();
-  await customized.getByRole("button", { name: "Dùng nội dung mặc định" }).click();
-  await page.getByRole("button", { name: "Dùng nội dung mặc định", exact: true }).last().click();
-  await expect(page.getByText("Đã dùng lại nội dung mặc định")).toBeVisible();
+  await customized.getByRole("button", { name: "Dùng lại câu chữ ban đầu" }).click();
+  await page.getByRole("button", { name: "Dùng lại câu chữ ban đầu", exact: true }).last().click();
+  await expect(page.getByText("Đã dùng lại câu chữ ban đầu")).toBeVisible();
 
   await page.context().clearCookies();
   await page.goto("/auth/sign-in");

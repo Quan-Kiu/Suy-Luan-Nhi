@@ -13,9 +13,9 @@ export type MediaCategory = (typeof mediaCategories)[number];
 export const mediaCategoryLabels: Record<MediaCategory, string> = {
   general: "Dùng chung",
   "mission-cover": "Ảnh bìa nhiệm vụ",
-  "world-cover": "Ảnh bìa thế giới",
-  "question-asset": "Tư liệu câu hỏi",
-  "resource-cover": "Ảnh bìa tài nguyên",
+  "world-cover": "Ảnh bìa chủ đề",
+  "question-asset": "Hình dùng trong câu hỏi",
+  "resource-cover": "Ảnh bìa bài viết",
   "audio-guide": "Âm thanh hướng dẫn",
   "video-guide": "Video hướng dẫn",
 };

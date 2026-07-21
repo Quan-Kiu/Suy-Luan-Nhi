@@ -4,18 +4,18 @@ import { apiData, getDemoChild, selectChild, signIn, unlockParentGate } from "./
 async function startMission(page: Page, name: RegExp) {
   await page.goto("/missions");
   await page.getByRole("link", { name }).click();
-  await page.getByRole("button", { name: /Bắt đầu nhiệm vụ/i }).click();
+  await page.getByRole("button", { name: /Bắt đầu chơi/i }).click();
   await expect(page).toHaveURL(/\/play\//);
 }
 
 async function submitCorrect(page: Page, nextLabel: RegExp) {
-  await page.getByRole("button", { name: /Kiểm tra đáp án/i }).click();
+  await page.getByRole("button", { name: /Xem con làm đúng chưa/i }).click();
   await expect(page.getByText("Tuyệt vời!", { exact: true })).toBeVisible();
   await page.getByRole("button", { name: nextLabel }).click();
 }
 
 async function finishMission(page: Page) {
-  await page.getByRole("button", { name: /Kiểm tra đáp án/i }).click();
+  await page.getByRole("button", { name: /Xem con làm đúng chưa/i }).click();
   await expect(page.getByText("Tuyệt vời!", { exact: true })).toBeVisible();
   await page.getByRole("button", { name: /Nhận huy hiệu/i }).click();
   await expect(page).toHaveURL(/\/complete\//);

@@ -1,5 +1,6 @@
 import { and, eq, sql } from "drizzle-orm";
 import { db } from "@/db/client";
+import { renderContentTemplate } from "@/domain/content-variables";
 import {
   activitySummaries,
   analyticsEvents,
@@ -16,10 +17,14 @@ import {
 import { getMissionMap, getPublishedMission } from "@/modules/catalog/catalog";
 import { parseMissionSnapshot } from "@/modules/catalog/snapshot";
 import { resolveSkillLabels } from "@/modules/catalog/skill-labels";
+import { renderQuestionTemplate } from "@/lib/content/render-question-template";
 import { getOwnedChild } from "@/modules/family/family";
+import { getContentVariableDefinitions } from "@/modules/content/content-variables";
 import { evaluateQuestion, type QuestionSubmission } from "@/modules/gameplay/question";
 
-function sanitizeQuestion(question: ReturnType<typeof parseMissionSnapshot>["questions"][number]) {
+type SnapshotQuestion = ReturnType<typeof parseMissionSnapshot>["questions"][number];
+
+function sanitizeQuestion(question: SnapshotQuestion) {
   const { correctAnswer, ...safeQuestion } = question;
   void correctAnswer;
   return safeQuestion;
@@ -27,7 +32,7 @@ function sanitizeQuestion(question: ReturnType<typeof parseMissionSnapshot>["que
 
 async function getOwnedSession(userId: string, sessionId: string) {
   const rows = await db
-    .select({ session: missionSessions, parent: parentProfiles, mission: missions })
+    .select({ session: missionSessions, parent: parentProfiles, mission: missions, child: childProfiles })
     .from(missionSessions)
     .innerJoin(missions, eq(missionSessions.missionId, missions.id))
     .innerJoin(childProfiles, eq(missionSessions.childProfileId, childProfiles.id))
@@ -112,7 +117,10 @@ export async function getSessionView(userId: string, sessionId: string) {
   });
   if (!version) return { error: "version_not_found" } as const;
   const snapshot = parseMissionSnapshot(version.snapshot);
+  const templateVariables = await getContentVariableDefinitions();
+  const templateContext = { child: owned.child };
   const question = snapshot.questions[owned.session.currentQuestionIndex] ?? snapshot.questions.at(-1)!;
+  const renderedQuestion = renderQuestionTemplate(question, templateVariables, templateContext);
   const state = await db.query.sessionQuestionStates.findFirst({
     where: and(
       eq(sessionQuestionStates.sessionId, sessionId),
@@ -124,11 +132,11 @@ export async function getSessionView(userId: string, sessionId: string) {
     mission: {
       id: owned.mission.id,
       slug: owned.mission.slug,
-      title: snapshot.title,
+      title: renderContentTemplate(snapshot.title, templateVariables, templateContext),
       rewardBadge: snapshot.rewardBadge,
       coverUrl: snapshot.coverUrl,
     },
-    question: sanitizeQuestion(question),
+    question: sanitizeQuestion(renderedQuestion),
     questionState: state ?? null,
     progress: {
       current: Math.min(owned.session.currentQuestionIndex + 1, snapshot.questions.length),
@@ -146,6 +154,8 @@ export async function requestHint(userId: string, sessionId: string, questionId:
   });
   if (!version) return { error: "not_found" } as const;
   const snapshot = parseMissionSnapshot(version.snapshot);
+  const templateVariables = await getContentVariableDefinitions();
+  const templateContext = { child: owned.child };
   const question = snapshot.questions.find((item) => item.id === questionId);
   if (!question) return { error: "question_not_found" } as const;
   const state = await db.query.sessionQuestionStates.findFirst({
@@ -176,8 +186,12 @@ export async function requestHint(userId: string, sessionId: string, questionId:
       });
     });
   }
+  const hint = question.hints[Math.max(0, nextLevel - 1)];
   return {
-    hint: question.hints[Math.max(0, nextLevel - 1)],
+    hint: {
+      ...hint,
+      text: renderContentTemplate(hint.text, templateVariables, templateContext),
+    },
     level: nextLevel,
     exhausted: nextLevel >= question.hints.length,
   } as const;
@@ -211,6 +225,8 @@ export async function submitAnswer(input: {
   });
   if (!version) return { error: "version_not_found" } as const;
   const snapshot = parseMissionSnapshot(version.snapshot);
+  const templateVariables = await getContentVariableDefinitions();
+  const templateContext = { child: owned.child };
   const expectedQuestion = snapshot.questions[owned.session.currentQuestionIndex];
   if (!expectedQuestion || expectedQuestion.id !== input.questionId) {
     return { error: "question_not_current" } as const;
@@ -309,7 +325,11 @@ export async function submitAnswer(input: {
   return {
     correct,
     awarded: transactionResult.awarded,
-    feedback: correct ? expectedQuestion.feedbackCorrect : expectedQuestion.feedbackIncorrect,
+    feedback: renderContentTemplate(
+      correct ? expectedQuestion.feedbackCorrect : expectedQuestion.feedbackIncorrect,
+      templateVariables,
+      templateContext,
+    ),
     ...view,
   } as const;
 }
@@ -335,6 +355,9 @@ export async function completeMission(userId: string, sessionId: string) {
   });
   if (!version) return { error: "version_not_found" } as const;
   const snapshot = parseMissionSnapshot(version.snapshot);
+  const templateVariables = await getContentVariableDefinitions();
+  const templateContext = { child: owned.child };
+  const renderedMissionTitle = renderContentTemplate(snapshot.title, templateVariables, templateContext);
   const states = await db.query.sessionQuestionStates.findMany({
     where: eq(sessionQuestionStates.sessionId, sessionId),
   });
@@ -400,7 +423,7 @@ export async function completeMission(userId: string, sessionId: string) {
       childProfileId: owned.session.childProfileId,
       type: "mission_completed",
       title: "Nhiệm vụ đã hoàn thành",
-      body: `Bé vừa hoàn thành “${snapshot.title}” và luyện kỹ năng ${snapshot.primarySkill}.`,
+      body: `Bé vừa hoàn thành “${renderedMissionTitle}” và luyện kỹ năng ${snapshot.primarySkill}.`,
     });
     await tx.insert(analyticsEvents).values({
       eventName: "mission_completed",
@@ -460,6 +483,8 @@ export async function getCompletionSummary(userId: string, sessionId: string) {
   });
   if (!version) return null;
   const snapshot = parseMissionSnapshot(version.snapshot);
+  const templateVariables = await getContentVariableDefinitions();
+  const templateContext = { child: owned.child };
   const [badge, thinkingHabits] = await Promise.all([
     owned.mission.rewardBadgeId
       ? db.query.badges.findFirst({ where: eq(badges.id, owned.mission.rewardBadgeId) })
@@ -471,7 +496,7 @@ export async function getCompletionSummary(userId: string, sessionId: string) {
     mission: {
       id: owned.mission.id,
       slug: owned.mission.slug,
-      title: snapshot.title,
+      title: renderContentTemplate(snapshot.title, templateVariables, templateContext),
       coverUrl: snapshot.coverUrl,
     },
     badge,

@@ -182,7 +182,7 @@ export function ContentManager({ initialData, initialFilters: providedFilters = 
 
       {!canEdit ? (
         <section className="rounded-2xl border border-blue-200 bg-blue-50 p-4 text-sm leading-6 text-blue-900">
-          <p className="font-black">Bạn đang xem ở chế độ kiểm tra</p>
+          <p className="font-black">Bạn chỉ có thể xem, chưa thể sửa</p>
           <p className="mt-1">
             Bạn có thể tìm và đối chiếu câu chữ. Chỉ người phụ trách biên tập hoặc quản trị viên mới có thể
             thay đổi nội dung.
@@ -267,14 +267,14 @@ export function ContentManager({ initialData, initialFilters: providedFilters = 
               </select>
             </label>
             <label>
-              <span className="mb-2 block text-sm font-black text-[#3f392f]">Dạng nội dung</span>
+              <span className="mb-2 block text-sm font-black text-[#3f392f]">Loại câu chữ</span>
               <select
                 name="valueType"
                 value={draft.valueType}
                 onChange={(event) => setDraft((current) => ({ ...current, valueType: event.target.value }))}
                 className="min-h-12 w-full rounded-2xl border-2 border-[#eadfc9] bg-white px-4 outline-none focus:border-[#e9641a]"
               >
-                <option value="">Tất cả dạng nội dung</option>
+                <option value="">Tất cả loại câu chữ</option>
                 {data.facets.valueTypes.map((valueType) => (
                   <option key={valueType} value={valueType}>
                     {contentTypeLabels[valueType as ContentValueType] ?? "Nội dung"}
@@ -335,7 +335,7 @@ export function ContentManager({ initialData, initialFilters: providedFilters = 
 
         {query.isError ? (
           <div role="alert" className="rounded-3xl border border-red-200 bg-red-50 p-6 text-red-900">
-            <p className="text-lg font-black">Chưa tải được danh sách nội dung</p>
+            <p className="text-lg font-black">Chưa tải được danh sách câu chữ</p>
             <p className="mt-2 text-sm leading-6">
               Kiểm tra kết nối rồi thử tải lại. Các thay đổi trước đó không bị mất.
             </p>
@@ -438,7 +438,7 @@ export function ContentManager({ initialData, initialFilters: providedFilters = 
 
         {data.totalPages > 1 ? (
           <nav
-            aria-label="Chuyển trang nội dung"
+            aria-label="Chuyển trang câu chữ"
             className="flex flex-wrap items-center justify-center gap-3 pt-2"
           >
             <button

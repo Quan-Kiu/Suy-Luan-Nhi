@@ -88,7 +88,7 @@ export function CreateSkillForm() {
           />
           <SelectField
             id="new-skill-category"
-            label={contentText(content, "taxonomy.skillCategory", "Nhóm kỹ năng")}
+            label={contentText(content, "taxonomy.skillCategory", "Loại kỹ năng")}
             description="Chọn cách nội dung này được dùng trong báo cáo và khi soạn nhiệm vụ."
             registration={form.register("category")}
             options={categoryOptions}

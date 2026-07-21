@@ -70,7 +70,7 @@ export function SkillForm({ item }: { item: SkillItem }) {
         />
         <SelectField
           id={`skill-${item.id}-category`}
-          label={contentText(content, "taxonomy.skillCategory", "Nhóm kỹ năng")}
+          label={contentText(content, "taxonomy.skillCategory", "Loại kỹ năng")}
           description="Chọn kỹ năng suy luận hoặc thói quen tích cực."
           registration={form.register("category")}
           error={form.formState.errors.category?.message}

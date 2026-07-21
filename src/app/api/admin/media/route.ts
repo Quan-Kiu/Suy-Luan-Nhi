@@ -2,6 +2,7 @@ import { apiJson } from "@/lib/api-response";
 import { requireApiRoles } from "@/auth/api";
 import { listMedia, uploadMedia } from "@/modules/media/media";
 import { mediaCategories, type MediaCategory } from "@/domain/media";
+import { isMediaUploadError } from "@/modules/media/storage/errors";
 
 export async function GET(request: Request) {
   const authResult = await requireApiRoles(request, ["content_admin", "reviewer", "super_admin"]);
@@ -45,9 +46,13 @@ export async function POST(request: Request) {
   try {
     return apiJson(await uploadMedia(file, altText, category, authResult.session.user.id), { status: 201 });
   } catch (error) {
+    if (isMediaUploadError(error)) {
+      return apiJson({ code: error.code, message: error.message }, { status: error.status });
+    }
+    console.error("[api.admin.media.upload_failed]", error);
     return apiJson(
-      { message: error instanceof Error ? error.message : "Không thể tải tệp" },
-      { status: 400 },
+      { code: "MEDIA_UPLOAD_FAILED", message: "Không thể tải tệp do lỗi hệ thống. Hãy thử lại." },
+      { status: 500 },
     );
   }
 }

@@ -1,33 +1,52 @@
 import { z } from "zod";
 
 export const questionOptionSchema = z.object({
-  id: z.string().trim().min(1),
-  label: z.string().trim().min(1),
-  asset: z.string().trim().min(1).optional(),
-  altText: z.string().trim().min(1).optional(),
+  id: z.string().trim().min(1, "Mã lựa chọn không được để trống"),
+  label: z.string().trim().min(1, "Nội dung lựa chọn không được để trống"),
+  asset: z.string().trim().min(1, "Đường dẫn hình minh họa không hợp lệ").optional(),
+  altText: z.string().trim().min(1, "Mô tả hình minh họa không được để trống").optional(),
 });
 
 export const questionHintSchema = z.object({
-  level: z.number().int().min(1).max(3),
-  text: z.string().trim().min(4),
+  level: z
+    .number("Cấp gợi ý cần là một số")
+    .int("Cấp gợi ý cần là số nguyên")
+    .min(1, "Cấp gợi ý thấp nhất là 1")
+    .max(3, "Cấp gợi ý cao nhất là 3"),
+  text: z.string().trim().min(4, "Mỗi gợi ý cần ít nhất 4 ký tự"),
 });
 
 const commonQuestionFields = {
-  id: z.string().uuid(),
-  order: z.number().int().positive(),
-  prompt: z.string().trim().min(4),
-  instruction: z.string().trim().min(4),
-  difficulty: z.number().int().min(1).max(5),
-  feedbackCorrect: z.string().trim().min(4),
-  feedbackIncorrect: z.string().trim().min(4),
-  hints: z.array(questionHintSchema).min(1).max(3),
+  id: z.string().uuid("Mã câu hỏi không hợp lệ"),
+  order: z
+    .number("Thứ tự câu hỏi cần là một số")
+    .int("Thứ tự câu hỏi cần là số nguyên")
+    .positive("Thứ tự câu hỏi cần lớn hơn 0"),
+  prompt: z.string().trim().min(4, "Câu hỏi cần ít nhất 4 ký tự"),
+  instruction: z.string().trim().min(4, "Lời hướng dẫn cần ít nhất 4 ký tự"),
+  difficulty: z
+    .number("Mức độ câu hỏi cần là một số")
+    .int("Mức độ câu hỏi cần là số nguyên")
+    .min(1, "Mức độ câu hỏi thấp nhất là 1")
+    .max(5, "Mức độ câu hỏi cao nhất là 5"),
+  feedbackCorrect: z.string().trim().min(4, "Lời khen cần ít nhất 4 ký tự"),
+  feedbackIncorrect: z.string().trim().min(4, "Lời nhắc cần ít nhất 4 ký tự"),
+  hints: z
+    .array(questionHintSchema)
+    .min(1, "Hãy thêm ít nhất 1 gợi ý")
+    .max(3, "Chỉ được thêm tối đa 3 gợi ý"),
 };
 
 export const singleChoiceQuestionSchema = z.object({
   ...commonQuestionFields,
   type: z.literal("single_choice"),
-  payload: z.object({ options: z.array(questionOptionSchema).min(2).max(8) }),
-  correctAnswer: z.string().trim().min(1),
+  payload: z.object({
+    options: z
+      .array(questionOptionSchema)
+      .min(2, "Cần ít nhất 2 lựa chọn")
+      .max(8, "Chỉ được thêm tối đa 8 lựa chọn"),
+  }),
+  correctAnswer: z.string().trim().min(1, "Hãy chọn đáp án đúng"),
 });
 
 export const patternSequenceQuestionSchema = z.object({
@@ -40,28 +59,34 @@ export const patternSequenceQuestionSchema = z.object({
           missing: z.boolean().optional(),
         }),
       )
-      .min(3)
-      .max(12),
-    options: z.array(questionOptionSchema).min(2).max(8),
+      .min(3, "Chuỗi quy luật cần ít nhất 3 mảnh")
+      .max(12, "Chuỗi quy luật chỉ được có tối đa 12 mảnh"),
+    options: z
+      .array(questionOptionSchema)
+      .min(2, "Cần ít nhất 2 đáp án để bé lựa chọn")
+      .max(8, "Chỉ được thêm tối đa 8 đáp án"),
   }),
-  correctAnswer: z.string().trim().min(1),
+  correctAnswer: z.string().trim().min(1, "Hãy chọn đáp án đúng"),
 });
 
 export const dragDropQuestionSchema = z.object({
   ...commonQuestionFields,
   type: z.literal("drag_drop"),
   payload: z.object({
-    items: z.array(questionOptionSchema).min(1).max(10),
+    items: z
+      .array(questionOptionSchema)
+      .min(1, "Hãy thêm ít nhất 1 mảnh để bé kéo")
+      .max(10, "Chỉ được thêm tối đa 10 mảnh"),
     slots: z
       .array(
         z.object({
-          id: z.string().trim().min(1),
-          label: z.string().trim().min(1),
-          asset: z.string().trim().min(1).optional(),
+          id: z.string().trim().min(1, "Mã vị trí không được để trống"),
+          label: z.string().trim().min(1, "Tên vị trí không được để trống"),
+          asset: z.string().trim().min(1, "Đường dẫn hình minh họa không hợp lệ").optional(),
         }),
       )
-      .min(1)
-      .max(10),
+      .min(1, "Hãy thêm ít nhất 1 vị trí để thả mảnh")
+      .max(10, "Chỉ được thêm tối đa 10 vị trí"),
   }),
   correctAnswer: z.record(z.string(), z.string()),
 });
@@ -70,17 +95,28 @@ export const fillAnswerQuestionSchema = z.object({
   ...commonQuestionFields,
   type: z.literal("fill_answer"),
   payload: z.object({
-    placeholder: z.string().trim().min(1).optional(),
+    placeholder: z.string().trim().min(1, "Chữ gợi ý không được để trống").optional(),
     inputMode: z.enum(["text", "numeric"]).default("text"),
   }),
-  correctAnswer: z.array(z.string().trim().min(1)).min(1).max(20),
+  correctAnswer: z
+    .array(z.string().trim().min(1, "Câu trả lời đúng không được để trống"))
+    .min(1, "Hãy nhập ít nhất 1 cách trả lời đúng")
+    .max(20, "Chỉ được nhập tối đa 20 cách trả lời đúng"),
 });
 
 export const sortingQuestionSchema = z.object({
   ...commonQuestionFields,
   type: z.literal("sorting"),
-  payload: z.object({ items: z.array(questionOptionSchema).min(2).max(12) }),
-  correctAnswer: z.array(z.string().trim().min(1)).min(2).max(12),
+  payload: z.object({
+    items: z
+      .array(questionOptionSchema)
+      .min(2, "Cần ít nhất 2 bước để sắp xếp")
+      .max(12, "Chỉ được thêm tối đa 12 bước"),
+  }),
+  correctAnswer: z
+    .array(z.string().trim().min(1, "Mã bước không được để trống"))
+    .min(2, "Đáp án sắp xếp cần ít nhất 2 bước")
+    .max(12, "Đáp án sắp xếp chỉ được có tối đa 12 bước"),
 });
 
 const playableQuestionBaseSchema = z.discriminatedUnion("type", [

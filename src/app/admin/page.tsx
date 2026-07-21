@@ -75,7 +75,7 @@ export default async function Page() {
   const metrics = [
     { label: "Nhiệm vụ đang hiển thị", value: publishedCount, icon: ClipboardCheck },
     { label: "Bản nháp đang soạn", value: draftCount, icon: FilePlus2 },
-    { label: "Phiên chơi trong 30 ngày", value: data.sessions30d, icon: MonitorDot },
+    { label: "Lượt chơi trong 30 ngày", value: data.sessions30d, icon: MonitorDot },
     { label: "Hồ sơ bé đang hoạt động", value: data.children, icon: Users },
   ];
   return (
@@ -130,7 +130,9 @@ export default async function Page() {
           <div className="flex flex-wrap items-center justify-between gap-3">
             <div>
               <h2 className="text-xl font-black">{t("dashboard.contentStatus", "Tiến độ nội dung")}</h2>
-              <p className="mt-1 text-sm text-[#6f6558]">Theo dõi nhiệm vụ từ lúc soạn đến khi hiển thị.</p>
+              <p className="mt-1 text-sm text-[#6f6558]">
+                Xem mỗi nhiệm vụ đang được soạn, chờ kiểm tra hay đã hiển thị cho bé.
+              </p>
             </div>
             <Link
               href="/admin/missions"
@@ -163,7 +165,9 @@ export default async function Page() {
           <div className="flex items-center justify-between gap-3">
             <div>
               <h2 className="text-xl font-black">{t("dashboard.recentAudit", "Thay đổi gần đây")}</h2>
-              <p className="mt-1 text-sm text-[#6f6558]">Các thao tác mới nhất trong khu vực quản trị.</p>
+              <p className="mt-1 text-sm text-[#6f6558]">
+                Những thay đổi mới nhất do người quản trị hoặc hệ thống thực hiện.
+              </p>
             </div>
             <Pill>{Math.min(data.recentAudit.length, 5)} thay đổi</Pill>
           </div>

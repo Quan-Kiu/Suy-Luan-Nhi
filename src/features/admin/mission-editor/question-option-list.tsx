@@ -1,9 +1,9 @@
 "use client";
 
 import { ArrowDown, ArrowUp, Plus, Trash2 } from "lucide-react";
-import { formControlClass } from "@/components/form/text-field";
+import type { ContentVariableDefinition } from "@/domain/content-variables";
+import { ContentTemplateField } from "@/features/admin/content-template-field";
 import { MediaUploadField } from "@/features/admin/media-upload-field";
-import { cn } from "@/lib/utils";
 
 export type EditorOption = {
   id: string;
@@ -24,6 +24,7 @@ type Props = {
   onChange: (items: EditorOption[]) => void;
   onCorrectChange?: (id: string) => void;
   onMissingChange?: (id: string) => void;
+  templateVariables: ContentVariableDefinition[];
 };
 
 function nextId(items: EditorOption[]) {
@@ -42,6 +43,7 @@ export function QuestionOptionList({
   onChange,
   onCorrectChange,
   onMissingChange,
+  templateVariables,
 }: Props) {
   function update(index: number, patch: Partial<EditorOption>) {
     onChange(items.map((item, itemIndex) => (itemIndex === index ? { ...item, ...patch } : item)));
@@ -90,14 +92,13 @@ export function QuestionOptionList({
                 </label>
               ) : null}
               <div className="min-w-0 flex-1 space-y-2">
-                <input
-                  aria-label={`${title} ${index + 1}`}
+                <ContentTemplateField
+                  label={`${title} ${index + 1}`}
                   value={item.label}
-                  onChange={(event) =>
-                    update(index, { label: event.target.value, altText: event.target.value })
-                  }
+                  onValueChange={(value) => update(index, { label: value, altText: value })}
+                  variables={templateVariables}
                   placeholder="Nội dung hiển thị"
-                  className={cn(formControlClass, "min-h-10 rounded-xl px-3")}
+                  showHint={false}
                 />
                 <MediaUploadField
                   label={`Hình minh họa ${index + 1}`}
@@ -105,7 +106,7 @@ export function QuestionOptionList({
                   onChange={(url) => update(index, { asset: url, altText: item.label })}
                   category="question-asset"
                   altText={item.label || `${title} ${index + 1}`}
-                  description="Không bắt buộc. Chọn ảnh từ máy để hệ thống tải lên và tự gắn URL."
+                  description="Không bắt buộc. Chọn ảnh từ máy, hệ thống sẽ tự tải lên và gắn vào nội dung."
                   compact
                 />
               </div>

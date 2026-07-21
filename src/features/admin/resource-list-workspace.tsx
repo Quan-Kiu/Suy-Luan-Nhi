@@ -120,12 +120,12 @@ export function ResourceListWorkspace({
         }}
       >
         <label className="relative">
-          <span className="sr-only">Tìm tài nguyên</span>
+          <span className="sr-only">Tìm bài viết</span>
           <Search className="absolute top-3 left-3 text-[#887b6c]" size={18} />
           <input
             value={draft.search}
             onChange={(event) => setDraft((current) => ({ ...current, search: event.target.value }))}
-            placeholder="Tìm theo tiêu đề hoặc mã đường dẫn"
+            placeholder="Tìm theo tiêu đề"
             className="min-h-11 w-full rounded-xl border py-2 pr-3 pl-10"
           />
         </label>
@@ -145,13 +145,13 @@ export function ResourceListWorkspace({
           </select>
         </label>
         <label>
-          <span className="sr-only">Lọc loại tài nguyên</span>
+          <span className="sr-only">Lọc theo loại bài viết</span>
           <select
             value={draft.resourceType}
             onChange={(event) => setDraft((current) => ({ ...current, resourceType: event.target.value }))}
             className="min-h-11 w-full rounded-xl border px-3"
           >
-            <option value="">Mọi loại</option>
+            <option value="">Tất cả loại</option>
             {parentResourceTypes.map((type) => (
               <option key={type} value={type}>
                 {parentResourceTypeLabels[type]}
@@ -160,13 +160,13 @@ export function ResourceListWorkspace({
           </select>
         </label>
         <label>
-          <span className="sr-only">Lọc chủ đề</span>
+          <span className="sr-only">Lọc theo chủ đề</span>
           <select
             value={draft.category}
             onChange={(event) => setDraft((current) => ({ ...current, category: event.target.value }))}
             className="min-h-11 w-full rounded-xl border px-3"
           >
-            <option value="">Mọi chủ đề</option>
+            <option value="">Tất cả chủ đề</option>
             {parentResourceCategories.map((category) => (
               <option key={category} value={category}>
                 {parentResourceCategoryLabels[category]}
@@ -181,7 +181,7 @@ export function ResourceListWorkspace({
             onChange={(event) => setDraft((current) => ({ ...current, ageGroup: event.target.value }))}
             className="min-h-11 w-full rounded-xl border px-3"
           >
-            <option value="">Mọi độ tuổi</option>
+            <option value="">Tất cả nhóm tuổi</option>
             {ageGroupCodes.map((ageGroup) => (
               <option key={ageGroup} value={ageGroup}>
                 {ageGroup} tuổi
@@ -314,7 +314,7 @@ export function ResourceListWorkspace({
             </div>
           ) : null}
           {data.totalPages > 1 ? (
-            <nav aria-label="Phân trang tài nguyên" className="flex items-center justify-center gap-3">
+            <nav aria-label="Chuyển trang bài viết" className="flex items-center justify-center gap-3">
               <button
                 type="button"
                 disabled={filters.page <= 1 || query.isFetching}
@@ -340,7 +340,7 @@ export function ResourceListWorkspace({
       </section>
       <ConfirmDialog
         open={Boolean(archiveTarget)}
-        title="Lưu trữ tài nguyên?"
+        title="Cất bài viết này?"
         description={`“${archiveTarget?.title ?? "Tài nguyên"}” sẽ ngừng hiển thị cho phụ huynh nhưng vẫn được giữ trong hệ thống.`}
         confirmLabel="Lưu trữ"
         pendingLabel="Đang lưu trữ..."

@@ -29,7 +29,7 @@ export function FeedbackPanel({
       <p className={`text-xl font-black ${correct ? "text-green-700" : "text-[#b75e13]"}`}>
         {correct
           ? contentText(content, "feedback.correctTitle", "Tuyệt vời!")
-          : contentText(content, "feedback.retryTitle", "Chưa trúng thôi!")}
+          : contentText(content, "feedback.retryTitle", "Chưa chính xác")}
       </p>
       <p className="mt-1">{text}</p>
       {correct ? (
@@ -47,7 +47,7 @@ export function FeedbackPanel({
         <button
           type="button"
           onClick={onRetry}
-          className="mt-4 min-h-12 w-full rounded-2xl bg-[#6c9951] font-black text-white"
+          className="mt-4 min-h-12 w-full rounded-2xl border-2 border-[#d99539] bg-white font-black text-[#8a4b12] shadow-[0_4px_0_#e7c48f] transition-colors hover:bg-[#fff8e8] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#b75e13]"
         >
           {contentText(content, "actions.retry", "Thử lại")}
         </button>

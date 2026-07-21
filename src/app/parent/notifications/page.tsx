@@ -10,7 +10,9 @@ export default async function Page() {
   return (
     <>
       <h1 className="text-3xl font-black">Thông báo</h1>
-      <p className="mt-2 mb-5 text-[#786348]">Các cập nhật quan trọng về hành trình của bé và hệ thống.</p>
+      <p className="mt-2 mb-5 text-[#786348]">
+        Những thông tin mới về hoạt động của bé và các thay đổi quan trọng trong ứng dụng.
+      </p>
       <NotificationList items={items} />
     </>
   );

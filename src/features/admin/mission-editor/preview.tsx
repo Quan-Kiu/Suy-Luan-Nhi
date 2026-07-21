@@ -4,21 +4,33 @@ import Image from "next/image";
 import { useFormContext, useWatch } from "react-hook-form";
 import { Card } from "@/components/ui";
 import { contentText, useContent } from "@/content/client";
+import type { ContentVariableDefinition } from "@/domain/content-variables";
+import { renderQuestionTemplate } from "@/lib/content/render-question-template";
 import { AdminQuestionPreview } from "@/features/admin/admin-question-preview";
 import type { AdminMissionDraft } from "@/modules/admin/schemas";
 import type { PlayableQuestion } from "@/modules/gameplay/question";
 
-export function MissionEditorPreview({ activeQuestion }: { activeQuestion: number }) {
+export function MissionEditorPreview({
+  activeQuestion,
+  templateVariables,
+}: {
+  activeQuestion: number;
+  templateVariables: ContentVariableDefinition[];
+}) {
   const content = useContent("admin");
   const form = useFormContext<AdminMissionDraft>();
   const coverUrl = useWatch({ control: form.control, name: "coverUrl" });
   const questions = useWatch({ control: form.control, name: "questions" });
   const question = questions[Math.min(activeQuestion, questions.length - 1)];
   const previewQuestion = question
-    ? ({
-        ...question,
-        id: question.id ?? "550e8400-e29b-41d4-a716-446655440000",
-      } as PlayableQuestion)
+    ? renderQuestionTemplate(
+        {
+          ...question,
+          id: question.id ?? "550e8400-e29b-41d4-a716-446655440000",
+        } as PlayableQuestion,
+        templateVariables.map((variable) => ({ ...variable, fallback: variable.example })),
+        { child: null },
+      )
     : null;
 
   return (
@@ -42,27 +54,23 @@ export function MissionEditorPreview({ activeQuestion }: { activeQuestion: numbe
           ) : null}
         </Card>
         <Card className="p-4">
-          <p className="font-black">
-            {contentText(content, "missionEditor.previewRules", "Điều gì xảy ra sau khi soạn?")}
+          <p className="font-black">Tag trong bản xem trước</p>
+          <p className="mt-2 text-sm leading-6 text-[#746b60]">
+            Bản xem trước dùng dữ liệu mẫu do Super Admin cấu hình. Khi bé sử dụng, hệ thống mới thay bằng dữ
+            liệu trong hồ sơ đang chọn.
           </p>
-          <ol className="mt-3 space-y-3 text-sm text-[#746b60]">
-            <li>
-              <strong className="text-[#342f28]">1. Lưu bản nháp:</strong> Bạn có thể quay lại chỉnh sửa bất
-              cứ lúc nào.
-            </li>
-            <li>
-              <strong className="text-[#342f28]">2. Gửi kiểm duyệt:</strong> Một người khác sẽ kiểm tra nội
-              dung và an toàn.
-            </li>
-            <li>
-              <strong className="text-[#342f28]">3. Chỉnh sửa nếu cần:</strong> Nhận xét sẽ nêu rõ phần cần
-              thay đổi.
-            </li>
-            <li>
-              <strong className="text-[#342f28]">4. Hiển thị cho trẻ:</strong> Chỉ nội dung đã được duyệt mới
-              được xuất bản.
-            </li>
-          </ol>
+          <div className="mt-3 flex flex-wrap gap-2">
+            {templateVariables
+              .filter((item) => item.enabled)
+              .map((item) => (
+                <span
+                  key={item.key}
+                  className="rounded-full bg-[#fff0df] px-3 py-1 text-xs font-black text-[#9b5615]"
+                >
+                  {`{{${item.key}}}`} → {item.example}
+                </span>
+              ))}
+          </div>
         </Card>
       </div>
     </aside>

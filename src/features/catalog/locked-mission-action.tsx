@@ -19,13 +19,13 @@ export function LockedMissionAction({
       className="block h-full w-full text-left"
       onClick={() => {
         void sound.play("mission.locked");
-        toast.error("Nhiệm vụ chưa mở", {
+        toast.error("Nhiệm vụ này chưa mở", {
           id: `locked-mission-${title}`,
           description,
           duration: 5000,
         });
       }}
-      aria-label={`${title}. Nhiệm vụ chưa mở. ${description}`}
+      aria-label={`${title}. Nhiệm vụ này chưa mở. ${description}`}
     >
       {children}
     </button>

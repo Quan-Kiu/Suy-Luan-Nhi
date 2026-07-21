@@ -47,7 +47,7 @@ export function MemberRow({ item, currentUserId }: { item: MemberItem; currentUs
         >
           <option value="parent">Phụ huynh</option>
           <option value="content_admin">Biên tập nội dung</option>
-          <option value="reviewer">Người kiểm duyệt</option>
+          <option value="reviewer">Người kiểm tra nội dung</option>
           <option value="super_admin">Quản trị viên</option>
         </select>
       </td>

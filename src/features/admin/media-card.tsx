@@ -14,8 +14,8 @@ type Action = "approve" | "reject" | "delete";
 
 const safetyStatusLabels: Record<string, string> = {
   pending: "Chờ kiểm tra",
-  approved: "Đã duyệt",
-  rejected: "Không phù hợp",
+  approved: "Đã kiểm tra",
+  rejected: "Cần thay",
 };
 
 export function MediaCard({
@@ -86,7 +86,7 @@ export function MediaCard({
               <>
                 <button
                   type="button"
-                  aria-label={contentText(content, "media.approve", "Duyệt tư liệu")}
+                  aria-label={contentText(content, "media.approve", "Đánh dấu phù hợp")}
                   disabled={mutation.isPending}
                   onClick={() => mutation.mutate("approve")}
                   className="rounded-lg border p-2 text-green-700 disabled:opacity-50"
@@ -99,7 +99,7 @@ export function MediaCard({
                 </button>
                 <button
                   type="button"
-                  aria-label={contentText(content, "media.reject", "Đánh dấu tư liệu không phù hợp")}
+                  aria-label={contentText(content, "media.reject", "Đánh dấu cần thay")}
                   disabled={mutation.isPending}
                   onClick={() => mutation.mutate("reject")}
                   className="rounded-lg border p-2 text-red-700 disabled:opacity-50"
@@ -115,7 +115,7 @@ export function MediaCard({
             {canDelete ? (
               <button
                 type="button"
-                aria-label={contentText(content, "media.delete", "Xóa tư liệu")}
+                aria-label={contentText(content, "media.delete", "Xóa tệp")}
                 disabled={mutation.isPending}
                 onClick={() => setDeleteOpen(true)}
                 className="rounded-lg border p-2 text-red-700 disabled:opacity-50"
@@ -135,20 +135,20 @@ export function MediaCard({
           className="mt-3"
         />
         <details className="mt-3 rounded-lg bg-[#f5f2ec] p-2 text-[10px]">
-          <summary className="cursor-pointer font-black">Thông tin lưu trữ</summary>
-          <p className="mt-2 font-bold">Provider: {item.storageProvider}</p>
+          <summary className="cursor-pointer font-black">Thông tin tệp</summary>
+          <p className="mt-2 font-bold">Nơi lưu: {item.storageProvider}</p>
           <code className="mt-1 block break-all">{item.url}</code>
         </details>
       </div>
       <ConfirmDialog
         open={deleteOpen}
-        title="Xóa tư liệu?"
+        title="Xóa tệp này?"
         description={contentText(
           content,
           "media.deleteConfirm",
-          "Tư liệu sẽ bị xóa khỏi kho lưu trữ nếu chưa được dùng trong nhiệm vụ hoặc bài viết.",
+          "Tệp sẽ bị xóa vĩnh viễn nếu chưa được dùng trong nhiệm vụ hoặc bài viết.",
         )}
-        confirmLabel="Xóa tư liệu"
+        confirmLabel="Xóa tệp"
         pendingLabel="Đang xóa..."
         tone="danger"
         pending={mutation.isPending && mutation.variables === "delete"}

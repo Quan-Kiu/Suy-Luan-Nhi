@@ -17,7 +17,7 @@ function renderForm() {
 describe("CreateProfileForm", () => {
   it("shows a field error before sending an empty nickname", async () => {
     renderForm();
-    await userEvent.click(screen.getByRole("button", { name: /bắt đầu chế độ bé/i }));
+    await userEvent.click(screen.getByRole("button", { name: /tạo hồ sơ và bắt đầu/i }));
     expect(await screen.findByText("Hãy nhập tên thân mật")).toBeInTheDocument();
   });
 

@@ -136,7 +136,7 @@ export function MissionListWorkspace({ initialData, initialFilters, worlds, canE
           />
         </label>
         <label>
-          <span className="sr-only">Lọc theo thế giới nhiệm vụ</span>
+          <span className="sr-only">Lọc theo chủ đề</span>
           <select
             value={draft.worldId}
             onChange={(event) => setDraft((current) => ({ ...current, worldId: event.target.value }))}

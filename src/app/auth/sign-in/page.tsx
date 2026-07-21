@@ -5,7 +5,7 @@ export default function Page() {
   return (
     <AuthShell
       title="Đăng nhập"
-      subtitle="Quản lý hồ sơ gia đình và tiếp tục hành trình của bé trên mọi thiết bị."
+      subtitle="Đăng nhập để xem hồ sơ gia đình và tiếp tục hoạt động của bé trên thiết bị này."
     >
       <Suspense>
         <SignInForm />

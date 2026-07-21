@@ -39,7 +39,7 @@ export function DataRequestManager({ items }: { items: RequestItem[] }) {
     mutationFn: (requestId: string) => dataRequestsApi.process(requestId),
     onSuccess: () => {
       setDeleteTarget(null);
-      toast.success("Đã xử lý yêu cầu xóa dữ liệu");
+      toast.success("Đã hoàn tất yêu cầu xóa dữ liệu");
       navigation.refresh();
     },
   });
@@ -96,7 +96,7 @@ export function DataRequestManager({ items }: { items: RequestItem[] }) {
       <FormStatus status={mutation.isError ? "error" : "idle"} message={mutation.error?.message} />
       <ConfirmDialog
         open={Boolean(deleteTarget)}
-        title="Xóa dữ liệu gia đình?"
+        title="Xác nhận đã xóa dữ liệu gia đình?"
         description={`Toàn bộ hồ sơ trẻ và dữ liệu liên quan của ${deleteTarget?.parentDisplayName ?? "gia đình"} sẽ bị xóa. Tài khoản sẽ không thể đăng nhập lại sau khi xử lý.`}
         confirmLabel="Xác nhận xóa dữ liệu"
         pendingLabel="Đang xử lý..."

@@ -54,7 +54,7 @@ export function SystemSettingForm({
         enabled: kind === "boolean" ? Boolean(saved.value) : false,
       });
       onSaved(saved);
-      toast.success("Đã lưu cấu hình hệ thống");
+      toast.success("Đã lưu cài đặt");
     },
   });
   const status = mutation.isError ? "error" : mutation.isSuccess ? "success" : "idle";
@@ -112,12 +112,12 @@ export function SystemSettingForm({
         <summary className="cursor-pointer font-black text-[#4f463b]">
           Thông tin dành cho đội kỹ thuật
         </summary>
-        <p className="mt-2 font-mono break-all">Mã cấu hình: {item.key}</p>
+        <p className="mt-2 font-mono break-all">Mã cài đặt: {item.key}</p>
         <p className="mt-1">Cập nhật gần nhất: {new Date(item.updatedAt).toLocaleString("vi-VN")}</p>
       </details>
 
       <FormStatus status={status} message={statusMessage} />
-      <SubmitButton pending={mutation.isPending} pendingLabel="Đang lưu cấu hình..." className="w-auto">
+      <SubmitButton pending={mutation.isPending} pendingLabel="Đang lưu..." className="w-auto">
         Lưu thay đổi
       </SubmitButton>
     </form>

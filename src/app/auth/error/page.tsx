@@ -5,8 +5,8 @@ import { SwitchAccountButton } from "@/features/auth/switch-account-button";
 export default function Page() {
   return (
     <AuthShell
-      title="Không có quyền truy cập"
-      subtitle="Tài khoản hiện tại không có quyền mở khu vực này. Hãy dùng tài khoản quản trị phù hợp."
+      title="Tài khoản này chưa được phép vào đây"
+      subtitle="Hãy đăng nhập bằng tài khoản quản trị đã được cấp quyền cho khu vực này."
     >
       <div className="space-y-3">
         <SwitchAccountButton />

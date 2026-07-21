@@ -1,11 +1,15 @@
 import { requireRoles } from "@/auth/session";
 import { ProductionMissionEditor } from "@/features/admin/production-mission-editor";
 import { getAdminTaxonomy } from "@/modules/admin/mission-admin";
+import { getContentVariableDefinitions } from "@/modules/content/content-variables";
 import type { AdminMissionDraft } from "@/modules/admin/schemas";
 
 export default async function Page() {
   await requireRoles(["content_admin", "super_admin"]);
-  const taxonomy = await getAdminTaxonomy();
+  const [taxonomy, templateVariables] = await Promise.all([
+    getAdminTaxonomy(),
+    getContentVariableDefinitions(),
+  ]);
   const initial: AdminMissionDraft = {
     slug: "",
     worldId: taxonomy.worlds[0].id,
@@ -38,7 +42,7 @@ export default async function Page() {
         correctAnswer: "a",
         difficulty: 1,
         feedbackCorrect: "Tuyệt vời! Con đã quan sát rất kỹ.",
-        feedbackIncorrect: "Chưa trúng thôi! Con thử nhìn lại nhé.",
+        feedbackIncorrect: "Chưa chính xác. Con thử nhìn lại nhé.",
         hints: [{ level: 1, text: "Con thử so sánh hai lựa chọn." }],
       },
     ],
@@ -51,5 +55,7 @@ export default async function Page() {
       languageAndImagesSafe: false,
     },
   };
-  return <ProductionMissionEditor initial={initial} taxonomy={taxonomy} />;
+  return (
+    <ProductionMissionEditor initial={initial} taxonomy={taxonomy} templateVariables={templateVariables} />
+  );
 }

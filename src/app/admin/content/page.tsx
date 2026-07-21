@@ -36,7 +36,7 @@ export default async function Page({
     <div className="space-y-6">
       <AdminPageHeader
         eyebrow="Câu chữ người dùng nhìn thấy"
-        title="Chỉnh sửa câu chữ hiển thị"
+        title="Sửa câu chữ trong ứng dụng"
         description="Chọn khu vực, tìm đúng câu chữ và chỉnh sửa bằng ngôn ngữ gần gũi. Thông tin kỹ thuật được ẩn đi để bạn tập trung vào nội dung."
         icon={Languages}
       />

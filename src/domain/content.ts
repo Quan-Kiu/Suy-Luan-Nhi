@@ -112,7 +112,7 @@ export const footprintMission: Mission = {
         "Dãy mới đã bắt đầu bằng cây xanh, vậy tiếp theo là ngôi sao.",
       ],
       feedbackCorrect: "Bé quan sát rất kỹ! Mảnh tiếp theo đúng là ngôi sao.",
-      feedbackIncorrect: "Chưa trúng thôi! Con nhìn lại thứ tự ba hình đầu nhé.",
+      feedbackIncorrect: "Chưa chính xác. Con nhìn lại thứ tự ba hình đầu nhé.",
     },
   ],
 };

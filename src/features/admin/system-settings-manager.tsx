@@ -33,7 +33,7 @@ export function SystemSettingsManager({ items }: { items: SystemSetting[] }) {
         </div>
       ) : (
         <div className="rounded-3xl border border-dashed border-[#d9c9ae] bg-white p-8 text-center">
-          <p className="text-lg font-black text-[#342f28]">Chưa có cấu hình tùy chỉnh</p>
+          <p className="text-lg font-black text-[#342f28]">Chưa có cài đặt nào được thay đổi</p>
           <p className="mt-2 text-sm leading-6 text-[#6f6558]">
             Hệ thống đang dùng các giá trị mặc định trong mã nguồn. Chỉ thêm cấu hình khi có nhu cầu vận hành
             rõ ràng.

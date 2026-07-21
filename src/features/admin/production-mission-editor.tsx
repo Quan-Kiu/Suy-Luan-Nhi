@@ -7,7 +7,7 @@ import Link from "next/link";
 import { useState } from "react";
 import { FormProvider, useForm, useWatch, type Resolver } from "react-hook-form";
 import { toast } from "sonner";
-import { adminMissionsApi } from "@/api/admin/missions";
+import { adminMissionsApi, type AdminMissionVersionSummary } from "@/api/admin/missions";
 import { FormStatus } from "@/components/form";
 import { Button } from "@/components/ui";
 import { contentText, useContent } from "@/content/client";
@@ -16,9 +16,11 @@ import { MissionEditorPreview } from "@/features/admin/mission-editor/preview";
 import { MissionQuestionsSection } from "@/features/admin/mission-editor/questions-section";
 import { MissionSafetySection } from "@/features/admin/mission-editor/safety-section";
 import { MissionStatusBadge } from "@/features/admin/mission-status-badge";
+import { MissionVersionHistory } from "@/features/admin/mission-version-history";
 import type { MissionEditorTaxonomy } from "@/features/admin/mission-editor/types";
 import { usePendingRouter } from "@/hooks/use-pending-router";
 import { queryKeys } from "@/lib/query/keys";
+import type { ContentVariableDefinition } from "@/domain/content-variables";
 import { adminMissionDraftSchema, type AdminMissionDraft } from "@/modules/admin/schemas";
 
 export function ProductionMissionEditor({
@@ -26,11 +28,15 @@ export function ProductionMissionEditor({
   taxonomy,
   missionId,
   status = "draft",
+  versions = [],
+  templateVariables,
 }: {
   initial: AdminMissionDraft;
   taxonomy: MissionEditorTaxonomy;
+  templateVariables: ContentVariableDefinition[];
   missionId?: string;
   status?: string;
+  versions?: AdminMissionVersionSummary[];
 }) {
   const content = useContent("admin");
   const navigation = usePendingRouter();
@@ -73,7 +79,7 @@ export function ProductionMissionEditor({
       setValidationError(false);
       form.reset(form.getValues());
       await queryClient.invalidateQueries({ queryKey: queryKeys.admin.missions });
-      toast.success(contentText(content, "missionEditor.submitted", "Đã gửi nhiệm vụ đến người kiểm duyệt"), {
+      toast.success(contentText(content, "missionEditor.submitted", "Đã gửi nhiệm vụ để kiểm tra"), {
         id: "mission-submit-success",
       });
       if (!missionId) {
@@ -147,32 +153,36 @@ export function ProductionMissionEditor({
                   <Save size={16} className="mr-2 inline" />
                   {saveMutation.isPending || navigation.isPending
                     ? contentText(content, "missionEditor.saving", "Đang lưu...")
-                    : contentText(content, "missionEditor.saveDraft", "Lưu để tiếp tục sau")}
+                    : contentText(content, "missionEditor.saveDraft", "Lưu và làm tiếp sau")}
                 </Button>
               </div>
             </div>
           </div>
 
-          <MissionBasicFields taxonomy={taxonomy} />
+          <MissionBasicFields taxonomy={taxonomy} templateVariables={templateVariables} />
           <MissionQuestionsSection
             activeQuestion={activeQuestion}
             onActiveQuestionChange={setActiveQuestion}
+            templateVariables={templateVariables}
           />
           <MissionSafetySection />
+          {missionId ? <MissionVersionHistory missionId={missionId} versions={versions} /> : null}
 
           <FormStatus status={mutationError ? "error" : "idle"} message={mutationError?.message} />
           {validationError ? (
             <FormStatus
               status="error"
-              message="Một số trường chưa hợp lệ. Bản nháp chưa được lưu; hãy kiểm tra thông báo bên dưới từng trường."
+              message="Một số mục còn thiếu hoặc chưa đúng nên bản nháp chưa được lưu. Hãy xem lời nhắc bên dưới từng mục."
             />
           ) : null}
 
           <div className="flex flex-wrap items-center justify-between gap-3 rounded-2xl border bg-white p-4 shadow-sm">
             <div>
-              <p className="text-sm font-black">Hoàn tất nội dung theo thứ tự từ trên xuống.</p>
+              <p className="text-sm font-black">Điền lần lượt các phần từ trên xuống.</p>
               <p className="text-xs text-[#6f6558]">
-                {allSafe ? "Đã đủ điều kiện gửi kiểm duyệt." : "Cần xác nhận đủ 6 mục an toàn trước khi gửi."}
+                {allSafe
+                  ? "Đã đủ điều kiện để gửi kiểm tra."
+                  : "Hãy xác nhận đủ 6 mục an toàn trước khi gửi."}
               </p>
             </div>
             <div className="flex flex-wrap gap-2">
@@ -180,7 +190,7 @@ export function ProductionMissionEditor({
                 <Save size={18} className="mr-2 inline" />
                 {saveMutation.isPending || navigation.isPending
                   ? contentText(content, "missionEditor.saving", "Đang lưu...")
-                  : contentText(content, "missionEditor.saveDraft", "Lưu để tiếp tục sau")}
+                  : contentText(content, "missionEditor.saveDraft", "Lưu và làm tiếp sau")}
               </Button>
               <button
                 type="button"
@@ -192,13 +202,13 @@ export function ProductionMissionEditor({
                 <Send size={18} className="mr-2 inline" />
                 {submitMutation.isPending || navigation.isPending
                   ? contentText(content, "missionEditor.submitting", "Đang gửi...")
-                  : contentText(content, "missionEditor.submit", "Gửi người kiểm duyệt")}
+                  : contentText(content, "missionEditor.submit", "Gửi để kiểm tra")}
               </button>
             </div>
           </div>
         </form>
 
-        <MissionEditorPreview activeQuestion={activeQuestion} />
+        <MissionEditorPreview activeQuestion={activeQuestion} templateVariables={templateVariables} />
       </div>
     </FormProvider>
   );

@@ -18,6 +18,8 @@ export const missionSnapshotSchema = z.object({
   coverUrl: z.string().min(1),
   rewardBadge: z.string().optional(),
   difficulty: z.number().int().min(1).max(5),
+  allowReplay: z.boolean().optional(),
+  randomizeAnswers: z.boolean().optional(),
   questions: z.array(playableQuestionSchema).min(1),
   safetyChecklist: z.record(z.string(), z.boolean()),
 });

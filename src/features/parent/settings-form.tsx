@@ -128,7 +128,7 @@ export function SettingsForm({ initial, childId }: { initial: Settings; childId:
           <ControlledCheckboxField
             control={form.control}
             name="privacySettings.analytics"
-            label={contentText(content, "settings.analyticsTitle", "Phân tích sản phẩm tối giản")}
+            label={contentText(content, "settings.analyticsTitle", "Dữ liệu giúp cải thiện ứng dụng")}
             description={contentText(
               content,
               "settings.analyticsDescription",

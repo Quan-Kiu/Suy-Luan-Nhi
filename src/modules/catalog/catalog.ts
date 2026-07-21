@@ -10,8 +10,10 @@ import {
   worldAgeGroups,
 } from "@/db/schema";
 import type { AgeGroup } from "@/domain/age-groups";
+import { renderContentTemplate } from "@/domain/content-variables";
 import { parseMissionSnapshot } from "@/modules/catalog/snapshot";
 import { resolveSkillLabels } from "@/modules/catalog/skill-labels";
+import { getContentVariableDefinitions } from "@/modules/content/content-variables";
 
 type PublishedMissionRow = {
   mission: typeof missions.$inferSelect;
@@ -51,8 +53,13 @@ async function publishedMissionRows() {
     .orderBy(asc(missions.createdAt));
 }
 
-export async function getMissionMap(child: { id: string; ageGroup: AgeGroup }) {
-  const [worlds, rows] = await Promise.all([
+export async function getMissionMap(child: {
+  id: string;
+  ageGroup: AgeGroup;
+  displayName?: string | null;
+  currentRank?: string | null;
+}) {
+  const [worlds, rows, templateVariables] = await Promise.all([
     db
       .select({
         id: missionWorlds.id,
@@ -69,10 +76,18 @@ export async function getMissionMap(child: { id: string; ageGroup: AgeGroup }) {
       .where(and(eq(missionWorlds.status, "published"), eq(worldAgeGroups.ageGroup, child.ageGroup)))
       .orderBy(asc(missionWorlds.sortOrder)),
     publishedMissionRows(),
+    getContentVariableDefinitions(),
   ]);
+  const templateContext = { child };
   const missionRows = rows
     .map(publishedListItem)
-    .filter((mission) => mission.ageGroups.includes(child.ageGroup));
+    .filter((mission) => mission.ageGroups.includes(child.ageGroup))
+    .map((mission) => ({
+      ...mission,
+      title: renderContentTemplate(mission.title, templateVariables, templateContext),
+      subtitle: renderContentTemplate(mission.subtitle, templateVariables, templateContext),
+      shortDescription: renderContentTemplate(mission.shortDescription, templateVariables, templateContext),
+    }));
 
   const missionIds = missionRows.map((mission) => mission.id);
   const completedRows = missionIds.length

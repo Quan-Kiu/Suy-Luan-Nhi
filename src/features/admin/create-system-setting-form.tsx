@@ -25,7 +25,7 @@ const schema = z.object({
   key: z
     .string()
     .trim()
-    .min(3, "Mã cấu hình cần ít nhất 3 ký tự")
+    .min(3, "Mã cài đặt cần ít nhất 3 ký tự")
     .regex(/^[a-z0-9_.-]+$/, "Mã chỉ gồm chữ thường, số, dấu chấm, gạch ngang hoặc gạch dưới"),
   kind: z.enum(systemSettingKinds),
   text: z.string(),
@@ -50,7 +50,7 @@ export function CreateSystemSettingForm({ onCreated }: { onCreated: (item: Syste
     onSuccess: (saved) => {
       onCreated(saved);
       form.reset({ key: "", kind: "boolean", text: "", enabled: true });
-      toast.success("Đã thêm cấu hình hệ thống");
+      toast.success("Đã thêm cài đặt");
     },
   });
   return (
@@ -60,7 +60,7 @@ export function CreateSystemSettingForm({ onCreated }: { onCreated: (item: Syste
           <Plus size={19} />
         </span>
         <div>
-          <h2 className="font-black text-[#342f28]">Thêm cấu hình mới</h2>
+          <h2 className="font-black text-[#342f28]">Thêm cài đặt nâng cao</h2>
           <p className="mt-1 text-sm leading-6 text-[#6f6558]">
             Chọn dạng giá trị trước. Mã kỹ thuật được đặt trong phần nâng cao để tránh nhập nhầm.
           </p>
@@ -69,8 +69,8 @@ export function CreateSystemSettingForm({ onCreated }: { onCreated: (item: Syste
 
       <SelectField
         id="new-setting-kind"
-        label="Dạng cấu hình"
-        description="Chọn cách người quản trị sẽ nhập và hiểu giá trị này."
+        label="Dạng cài đặt"
+        description="Chọn loại nội dung phù hợp với cài đặt này."
         registration={form.register("kind")}
         options={kindOptions}
         error={form.formState.errors.kind?.message}
@@ -82,7 +82,7 @@ export function CreateSystemSettingForm({ onCreated }: { onCreated: (item: Syste
           control={form.control}
           name="enabled"
           label="Bật ngay sau khi tạo"
-          description="Bỏ chọn nếu cấu hình mới cần ở trạng thái tắt."
+          description="Bỏ chọn nếu cài đặt mới chưa nên hoạt động."
         />
       ) : kind === "structured" ? (
         <TextareaField
@@ -90,7 +90,7 @@ export function CreateSystemSettingForm({ onCreated }: { onCreated: (item: Syste
           label="Nội dung nâng cao"
           rows={7}
           placeholder='Ví dụ: { "limit": 10 }'
-          description="Chỉ dùng khi một cấu hình cần nhiều giá trị liên quan."
+          description="Chỉ dùng khi cài đặt này cần nhiều giá trị liên quan."
           registration={form.register("text")}
           error={form.formState.errors.text?.message}
           className="font-mono text-sm"
@@ -111,9 +111,9 @@ export function CreateSystemSettingForm({ onCreated }: { onCreated: (item: Syste
         <div className="mt-3">
           <TextField
             id="new-setting-key"
-            label="Mã cấu hình"
+            label="Mã cài đặt"
             placeholder="features.exampleEnabled"
-            description="Mã phải khớp với phần hệ thống sẽ đọc cấu hình này. Không đổi sau khi đã sử dụng."
+            description="Mã dành cho hệ thống. Không đổi sau khi cài đặt đã được sử dụng."
             registration={form.register("key")}
             error={form.formState.errors.key?.message}
           />
@@ -121,8 +121,8 @@ export function CreateSystemSettingForm({ onCreated }: { onCreated: (item: Syste
       </details>
 
       <FormStatus status={mutation.isError ? "error" : "idle"} message={mutation.error?.message} />
-      <SubmitButton pending={mutation.isPending} pendingLabel="Đang thêm cấu hình..." className="w-auto">
-        Thêm cấu hình
+      <SubmitButton pending={mutation.isPending} pendingLabel="Đang thêm..." className="w-auto">
+        Thêm cài đặt
       </SubmitButton>
     </form>
   );

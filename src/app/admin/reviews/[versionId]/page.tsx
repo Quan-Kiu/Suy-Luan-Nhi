@@ -62,11 +62,11 @@ export default async function Page({ params }: { params: Promise<{ versionId: st
               <AdminQuestionPreview question={question} />
               <div className="mt-4 grid gap-3 sm:grid-cols-2">
                 <div className="rounded-xl bg-green-50 p-3 text-sm">
-                  <strong className="block text-green-800">Phản hồi đúng</strong>
+                  <strong className="block text-green-800">Lời khen khi bé trả lời đúng</strong>
                   {question.feedbackCorrect}
                 </div>
                 <div className="rounded-xl bg-amber-50 p-3 text-sm">
-                  <strong className="block text-amber-800">Phản hồi thử lại</strong>
+                  <strong className="block text-amber-800">Lời nhắc khi bé chưa trả lời đúng</strong>
                   {question.feedbackIncorrect}
                 </div>
               </div>
@@ -78,7 +78,7 @@ export default async function Page({ params }: { params: Promise<{ versionId: st
         </div>
         <aside className="space-y-4">
           <Card className="sticky top-20 p-5">
-            <h2 className="text-xl font-black">Kiểm tra trước khi quyết định</h2>
+            <h2 className="text-xl font-black">Kiểm tra trước khi xác nhận</h2>
             <p className="mt-1 text-sm leading-6 text-[#6f6558]">
               Các mục bên dưới do người soạn tự xác nhận. Hãy đối chiếu lại với nội dung đang xem.
             </p>
@@ -100,7 +100,7 @@ export default async function Page({ params }: { params: Promise<{ versionId: st
               />
               {result.version.reviewComment ? (
                 <p className="mt-4 rounded-xl bg-[#f5f2ec] p-3 text-sm">
-                  <strong className="block">Nhận xét đã lưu</strong>
+                  <strong className="block">Lời nhắn đã lưu</strong>
                   {result.version.reviewComment}
                 </p>
               ) : null}
