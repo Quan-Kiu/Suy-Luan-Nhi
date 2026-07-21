@@ -2,6 +2,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { beforeEach, describe, expect, it, vi } from "vitest";
+import { EmailVerificationResultDialog } from "@/features/auth/email-verification-result-dialog";
 import { SignInForm } from "@/features/auth/sign-in-form";
 import { SignUpForm } from "@/features/auth/sign-up-form";
 
@@ -43,6 +44,17 @@ beforeEach(() => {
 });
 
 describe("authentication verification UX", () => {
+  it("shows a success modal after the verification callback", () => {
+    renderWithQuery(<EmailVerificationResultDialog result="success" continueHref="/profiles" />);
+
+    expect(screen.getByRole("dialog")).toBeInTheDocument();
+    expect(screen.getByRole("heading", { name: "Xác minh email thành công" })).toBeInTheDocument();
+    expect(
+      screen.getByText("Email của ba/mẹ đã được xác minh. Tài khoản đã sẵn sàng để sử dụng."),
+    ).toBeInTheDocument();
+    expect(screen.getByRole("link", { name: /Tiếp tục/ })).toHaveAttribute("href", "/profiles");
+  });
+
   it("opens the verification dialog instead of exposing the English server error", async () => {
     mocks.signInEmail.mockResolvedValue({
       data: null,
@@ -74,7 +86,7 @@ describe("authentication verification UX", () => {
 
     expect(mocks.sendVerificationEmail).toHaveBeenCalledWith({
       email: "pending@example.com",
-      callbackURL: "/profiles",
+      callbackURL: "/auth/verify-email?next=%2Fprofiles",
       fetchOptions: { credentials: "omit" },
     });
   });
@@ -94,6 +106,12 @@ describe("authentication verification UX", () => {
 
     expect(await screen.findByText("Xác minh email để hoàn tất")).toBeInTheDocument();
     expect(screen.getByText("new@example.com")).toBeInTheDocument();
+    expect(mocks.signUpEmail).toHaveBeenCalledWith({
+      name: "Nguyễn Minh",
+      email: "new@example.com",
+      password: "StrongPass123!",
+      callbackURL: "/auth/verify-email?next=%2Fprofiles",
+    });
     expect(mocks.push).not.toHaveBeenCalled();
   });
 });

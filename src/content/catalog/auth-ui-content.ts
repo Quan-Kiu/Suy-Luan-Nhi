@@ -116,6 +116,44 @@ export const authContentEntries = defineContent("auth", {
   "verification.retry": { value: "Tôi đã xác minh, đăng nhập lại", description: "Nút thử đăng nhập lại." },
   "verification.later": { value: "Để sau", description: "Nút đóng modal xác minh." },
   "verification.close": { value: "Đóng", description: "Nhãn đóng modal xác minh." },
+  "verification.successTitle": {
+    value: "Xác minh email thành công",
+    description: "Tiêu đề modal khi xác minh email thành công.",
+  },
+  "verification.successDescription": {
+    value: "Email của ba/mẹ đã được xác minh. Tài khoản đã sẵn sàng để sử dụng.",
+    description: "Mô tả modal khi xác minh email thành công.",
+  },
+  "verification.expiredTitle": {
+    value: "Liên kết xác minh đã hết hạn",
+    description: "Tiêu đề modal khi liên kết xác minh hết hạn.",
+  },
+  "verification.expiredDescription": {
+    value: "Liên kết này đã quá thời hạn. Hãy đăng nhập để yêu cầu một email xác minh mới.",
+    description: "Mô tả modal khi liên kết xác minh hết hạn.",
+  },
+  "verification.invalidTitle": {
+    value: "Liên kết xác minh không hợp lệ",
+    description: "Tiêu đề modal khi liên kết xác minh không hợp lệ.",
+  },
+  "verification.invalidDescription": {
+    value: "Liên kết này không còn dùng được. Hãy đăng nhập để gửi lại email xác minh.",
+    description: "Mô tả modal khi liên kết xác minh không dùng được.",
+  },
+  "verification.errorTitle": {
+    value: "Chưa thể xác minh email",
+    description: "Tiêu đề modal khi xác minh email gặp lỗi khác.",
+  },
+  "verification.errorDescription": {
+    value: "Hệ thống chưa thể hoàn tất xác minh. Hãy đăng nhập và thử gửi lại email xác minh.",
+    description: "Mô tả modal khi xác minh email gặp lỗi khác.",
+  },
+  "verification.continue": { value: "Tiếp tục", description: "Nút tiếp tục sau khi xác minh email." },
+  "verification.signInAgain": {
+    value: "Đăng nhập để gửi lại",
+    description: "Nút đăng nhập để yêu cầu email xác minh mới.",
+  },
+  "verification.home": { value: "Về trang chủ", description: "Nút về trang chủ trong modal xác minh." },
   "errors.invalidCredentials": {
     value: "Email hoặc mật khẩu chưa đúng. Hãy kiểm tra và thử lại.",
     description: "Lỗi sai thông tin đăng nhập.",

@@ -2,6 +2,7 @@
 
 import { useMutation } from "@tanstack/react-query";
 import { authClient } from "@/auth/client";
+import { buildEmailVerificationCallback } from "@/auth/email-verification";
 import { contentText, useContent } from "@/content/client";
 import { getAuthErrorMessage, toAuthFlowError } from "@/features/auth/auth-errors";
 
@@ -11,7 +12,7 @@ export function useVerificationResend(email: string, callbackURL = "/profiles") 
     mutationFn: async () => {
       const result = await authClient.sendVerificationEmail({
         email,
-        callbackURL,
+        callbackURL: buildEmailVerificationCallback(callbackURL),
         fetchOptions: { credentials: "omit" },
       });
       if (result.error) throw toAuthFlowError(result.error, "VERIFICATION_SEND_FAILED");

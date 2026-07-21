@@ -8,6 +8,7 @@ import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import type { z } from "zod";
 import { signUp } from "@/auth/client";
+import { buildEmailVerificationCallback } from "@/auth/email-verification";
 import { FormStatus, SubmitButton, TextField } from "@/components/form";
 import { contentText, useContent } from "@/content/client";
 import { getAuthErrorMessage, toAuthFlowError } from "@/features/auth/auth-errors";
@@ -26,7 +27,10 @@ export function SignUpForm() {
   const mutation = useMutation({
     mutationFn: async ({ confirmPassword: _, ...values }: z.infer<typeof signUpSchema>) => {
       void _;
-      const result = await signUp.email({ ...values, callbackURL: "/profiles" });
+      const result = await signUp.email({
+        ...values,
+        callbackURL: buildEmailVerificationCallback("/profiles"),
+      });
       if (result.error) throw toAuthFlowError(result.error, "SIGN_UP_FAILED");
       return result.data;
     },
