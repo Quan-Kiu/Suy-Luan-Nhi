@@ -71,7 +71,6 @@ export function ResourceListWorkspace({
     queryFn: () => adminResourcesApi.list(filters),
     initialData: isInitial ? initialData : undefined,
     placeholderData: keepPreviousData,
-    staleTime: 30_000,
   });
   const archiveMutation = useMutation({
     mutationFn: (resourceId: string) => adminResourcesApi.archive(resourceId),

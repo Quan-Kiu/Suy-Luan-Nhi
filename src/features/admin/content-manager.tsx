@@ -94,7 +94,6 @@ export function ContentManager({ initialData, initialFilters: providedFilters = 
     queryFn: () => contentApi.listAdmin(filters),
     initialData: isInitial ? initialData : undefined,
     placeholderData: keepPreviousData,
-    staleTime: 30_000,
   });
   const data = query.data ?? initialData;
   const hasFilters = Boolean(filters.namespace || filters.category || filters.valueType || filters.search);

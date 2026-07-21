@@ -87,7 +87,6 @@ export function MissionListWorkspace({ initialData, initialFilters, worlds, canE
     queryFn: () => adminMissionsApi.list(filters),
     initialData: initialKey ? initialData : undefined,
     placeholderData: keepPreviousData,
-    staleTime: 30_000,
   });
   const data = query.data ?? initialData;
   const hasFilters = Boolean(filters.search || filters.status || filters.worldId);

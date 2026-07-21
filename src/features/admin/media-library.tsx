@@ -61,7 +61,6 @@ export function MediaLibrary({ initialData, canReview, canUpload, canDelete }: P
     queryFn: () => mediaApi.list(filters),
     initialData: isInitial ? initialData : undefined,
     placeholderData: keepPreviousData,
-    staleTime: 30_000,
   });
   const data = query.data ?? initialData;
   function updateCurrentPage(updater: (page: MediaPage) => MediaPage) {
