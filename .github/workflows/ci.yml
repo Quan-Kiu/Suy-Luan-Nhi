@@ -26,6 +26,7 @@ jobs:
 
     env:
       DATABASE_URL: postgresql://sln@127.0.0.1:5432/sln
+      E2E_DATABASE_URL: postgresql://sln@127.0.0.1:5432/sln_e2e
       BETTER_AUTH_URL: http://127.0.0.1:3100
       BETTER_AUTH_SECRET: ci-only-secret-with-at-least-thirty-two-characters
       AUTH_REQUIRE_EMAIL_VERIFICATION: "false"
