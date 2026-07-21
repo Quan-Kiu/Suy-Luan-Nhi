@@ -2,6 +2,12 @@
 
 Ứng dụng nhiệm vụ suy luận an toàn cho trẻ, gồm Child App, Parent Workspace và Content Operations CMS. Hệ thống dùng PostgreSQL thật, Better Auth, immutable content versions, transactional Mission Sessions và media storage có lớp kiểm duyệt.
 
+## Demo nhanh
+
+[![Xem video demo Suy Luận Nhí](docs/assets/demo/suy-luan-nhi-demo-cover.jpg)](docs/assets/demo/suy-luan-nhi-demo.mp4)
+
+Video 46 giây đi qua luồng chính: trang giới thiệu → đăng nhập phụ huynh → chọn hồ sơ bé → bản đồ và trải nghiệm nhiệm vụ → khu vực phụ huynh → quản trị nội dung.
+
 ## Công nghệ
 
 - Next.js App Router, React, TypeScript, Tailwind CSS
