@@ -158,6 +158,7 @@ export function SettingsForm({ initial, childId }: { initial: Settings; childId:
         <SubmitButton
           pending={saveMutation.isPending || navigation.isPending}
           pendingLabel={contentText(content, "settings.saving", "Đang lưu...")}
+          className="w-full justify-self-start sm:w-auto"
         >
           {contentText(content, "settings.save", "Lưu cài đặt")}
         </SubmitButton>
