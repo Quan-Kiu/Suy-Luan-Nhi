@@ -68,6 +68,6 @@ describe("SoundEffectsProvider", () => {
   it("keeps celebration sounds muted when celebration effects are disabled", async () => {
     renderSound("mission.complete", true, false);
     await userEvent.click(screen.getByRole("button", { name: "Play" }));
-    expect(MockAudio.instances.some((item) => item.src.endsWith("mission-complete.ogg"))).toBe(false);
+    expect(MockAudio.instances.some((item) => item.src.endsWith("mission-complete-chime.ogg"))).toBe(false);
   });
 });

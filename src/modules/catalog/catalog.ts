@@ -1,4 +1,5 @@
 import { and, asc, eq, inArray, isNotNull, ne, sql } from "drizzle-orm";
+import { unstable_cache } from "next/cache";
 import { db } from "@/db/client";
 import {
   badges,
@@ -10,6 +11,7 @@ import {
   worldAgeGroups,
 } from "@/db/schema";
 import type { AgeGroup } from "@/domain/age-groups";
+import { cacheTags } from "@/lib/cache/tags";
 import { parseMissionSnapshot } from "@/modules/catalog/snapshot";
 import { resolveSkillLabels } from "@/modules/catalog/skill-labels";
 
@@ -51,7 +53,7 @@ async function publishedMissionRows() {
     .orderBy(asc(missions.createdAt));
 }
 
-export async function getMissionMap(child: { id: string; ageGroup: AgeGroup }) {
+async function readMissionMap(child: { id: string; ageGroup: AgeGroup }) {
   const [worlds, rows] = await Promise.all([
     db
       .select({
@@ -127,7 +129,14 @@ export async function getMissionMap(child: { id: string; ageGroup: AgeGroup }) {
   return { child, worlds: worldsWithMissions };
 }
 
-export async function getPublishedMission(identifier: string) {
+export function getMissionMap(child: { id: string; ageGroup: AgeGroup }) {
+  return unstable_cache(() => readMissionMap(child), ["child-mission-map", child.id, child.ageGroup], {
+    tags: [cacheTags.publishedCatalog, cacheTags.childMissionMap(child.id)],
+    revalidate: 5 * 60,
+  })();
+}
+
+async function readPublishedMission(identifier: string) {
   const identifierCondition =
     identifier.includes("-") && identifier.length === 36
       ? eq(missions.id, identifier)
@@ -172,6 +181,13 @@ export async function getPublishedMission(identifier: string) {
     badge,
     secondarySkills: await resolveSkillLabels(snapshot.secondarySkills),
   };
+}
+
+export function getPublishedMission(identifier: string) {
+  return unstable_cache(() => readPublishedMission(identifier), ["published-mission", identifier], {
+    tags: [cacheTags.publishedCatalog],
+    revalidate: 60 * 60,
+  })();
 }
 
 export async function listPublishedWorlds() {

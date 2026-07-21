@@ -75,8 +75,8 @@ export const soundEffectRegistry = {
     cooldownMs: 500,
   },
   "mission.complete": {
-    sources: ["/audio/sfx/kenney/mission-complete.ogg"],
-    volume: 0.48,
+    sources: ["/audio/sfx/original/mission-complete-chime.ogg"],
+    volume: 0.44,
     category: "celebration",
     cooldownMs: 1_000,
   },

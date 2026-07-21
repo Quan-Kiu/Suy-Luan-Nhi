@@ -75,7 +75,7 @@ export function MissionCard({
   );
 
   return mission.unlocked ? (
-    <Link className="block h-full" href={`/missions/${mission.slug}`}>
+    <Link className="block h-full" href={`/missions/${mission.slug}`} prefetch={true}>
       {card}
     </Link>
   ) : (

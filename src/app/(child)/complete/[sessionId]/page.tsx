@@ -87,6 +87,7 @@ export default async function Page({ params }: { params: Promise<{ sessionId: st
       </Card>
       <Link
         href="/missions"
+        prefetch={true}
         className="wood-button mt-5 flex min-h-14 items-center justify-center gap-2 rounded-2xl font-black text-white"
       >
         <Home size={20} />

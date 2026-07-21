@@ -1,6 +1,10 @@
 import { apiJson } from "@/lib/api-response";
 import { requireApiRoles } from "@/auth/api";
-import { invalidateParentDashboard, invalidateParentNotifications } from "@/lib/cache/invalidation";
+import {
+  invalidateChildMissionMap,
+  invalidateParentDashboard,
+  invalidateParentNotifications,
+} from "@/lib/cache/invalidation";
 import { completeMission, getSessionCacheContext } from "@/modules/gameplay/session";
 export async function POST(request: Request, { params }: { params: Promise<{ sessionId: string }> }) {
   const authResult = await requireApiRoles(request, ["parent", "super_admin"]);
@@ -19,6 +23,7 @@ export async function POST(request: Request, { params }: { params: Promise<{ ses
       { status: result.error === "not_complete" ? 409 : 404 },
     );
   if (cacheContext) {
+    invalidateChildMissionMap(cacheContext.childId);
     invalidateParentDashboard(cacheContext.childId);
     invalidateParentNotifications(cacheContext.parentProfileId);
   }

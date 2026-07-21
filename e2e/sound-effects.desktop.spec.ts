@@ -56,7 +56,7 @@ test("Kenney sounds follow gameplay events", async ({ page }) => {
   await page.getByRole("button", { name: /Kiểm tra đáp án/i }).click();
   await page.getByRole("button", { name: /Nhận huy hiệu/i }).click();
   await expect(page).toHaveURL(/\/complete\//);
-  await expectSound(page, "mission-complete.ogg");
+  await expect.poll(() => playedSounds(page)).toContain("/audio/sfx/original/mission-complete-chime.ogg");
 });
 
 test("disabling sound in parent settings prevents playback", async ({ page }) => {

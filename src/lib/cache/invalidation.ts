@@ -18,3 +18,11 @@ export function invalidateParentDashboard(childId: string) {
 export function invalidateParentNotifications(parentProfileId: string) {
   revalidateTag(cacheTags.parentNotifications(parentProfileId), expireImmediately);
 }
+
+export function invalidateChildMissionMap(childId: string) {
+  revalidateTag(cacheTags.childMissionMap(childId), expireImmediately);
+}
+
+export function invalidatePublishedCatalog() {
+  revalidateTag(cacheTags.publishedCatalog, expireImmediately);
+}
