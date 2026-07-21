@@ -2,12 +2,12 @@
 
 import { useMutation } from "@tanstack/react-query";
 import { CheckCircle2, LoaderCircle } from "lucide-react";
-import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { toast } from "sonner";
 import { dataRequestsApi } from "@/api/admin/data-requests";
 import { ConfirmDialog } from "@/components/confirm-dialog";
 import { FormStatus } from "@/components/form";
+import { usePendingRouter } from "@/hooks/use-pending-router";
 
 const typeLabels: Record<string, string> = {
   export: "Tải xuống dữ liệu",
@@ -33,14 +33,14 @@ type RequestItem = {
 };
 
 export function DataRequestManager({ items }: { items: RequestItem[] }) {
-  const router = useRouter();
+  const navigation = usePendingRouter();
   const [deleteTarget, setDeleteTarget] = useState<RequestItem | null>(null);
   const mutation = useMutation({
     mutationFn: (requestId: string) => dataRequestsApi.process(requestId),
     onSuccess: () => {
       setDeleteTarget(null);
       toast.success("Đã xử lý yêu cầu xóa dữ liệu");
-      router.refresh();
+      navigation.refresh();
     },
   });
 
@@ -59,7 +59,7 @@ export function DataRequestManager({ items }: { items: RequestItem[] }) {
           </thead>
           <tbody>
             {items.map((item) => {
-              const pending = mutation.isPending && mutation.variables === item.id;
+              const pending = navigation.isPending || (mutation.isPending && mutation.variables === item.id);
               return (
                 <tr key={item.id} className="border-t">
                   <td className="p-3 font-black">{typeLabels[item.type] ?? item.type}</td>
@@ -101,7 +101,7 @@ export function DataRequestManager({ items }: { items: RequestItem[] }) {
         confirmLabel="Xác nhận xóa dữ liệu"
         pendingLabel="Đang xử lý..."
         tone="danger"
-        pending={mutation.isPending}
+        pending={mutation.isPending || navigation.isPending}
         onClose={() => setDeleteTarget(null)}
         onConfirm={() => deleteTarget && mutation.mutate(deleteTarget.id)}
       />

@@ -3,7 +3,6 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import Image from "next/image";
-import { useRouter } from "next/navigation";
 import { useForm, useWatch } from "react-hook-form";
 import { toast } from "sonner";
 import { z } from "zod";
@@ -11,6 +10,7 @@ import { worldsApi, type WorldInput, type WorldStatus } from "@/api/admin/worlds
 import { FormStatus, SelectField, SubmitButton, TextareaField, TextField } from "@/components/form";
 import { contentText, useContent } from "@/content/client";
 import { MediaUploadField } from "@/features/admin/media-upload-field";
+import { usePendingRouter } from "@/hooks/use-pending-router";
 import { queryKeys } from "@/lib/query/keys";
 import { createSlug } from "@/lib/slug";
 
@@ -59,7 +59,7 @@ export function WorldForm({
   initial: FormValues & { id?: string };
 }) {
   const content = useContent("admin");
-  const router = useRouter();
+  const navigation = usePendingRouter();
   const queryClient = useQueryClient();
   const fieldPrefix = `world-${initial.id ?? "new"}`;
   const form = useForm<FormValues>({ resolver: zodResolver(schema), defaultValues: initial });
@@ -80,7 +80,7 @@ export function WorldForm({
       if (mode === "create") {
         form.reset({ ...initial, sortOrder: initial.sortOrder + 1 });
       }
-      router.refresh();
+      navigation.refresh();
     },
   });
 
@@ -185,7 +185,7 @@ export function WorldForm({
         }
       />
       <SubmitButton
-        pending={mutation.isPending}
+        pending={mutation.isPending || navigation.isPending}
         pendingLabel={
           mode === "create"
             ? contentText(content, "world.creating", "Đang tạo...")

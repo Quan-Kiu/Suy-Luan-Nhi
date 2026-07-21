@@ -1,23 +1,22 @@
 "use client";
 
-import { useRouter } from "next/navigation";
-import { signOut } from "@/auth/client";
+import { LoaderCircle } from "lucide-react";
 import { Button } from "@/components/ui";
+import { useSignOutNavigation } from "@/features/auth/use-sign-out-navigation";
 
 export function SwitchAccountButton({ callbackUrl = "/admin" }: { callbackUrl?: string }) {
-  const router = useRouter();
+  const signOutFlow = useSignOutNavigation(`/auth/sign-in?callbackUrl=${encodeURIComponent(callbackUrl)}`);
 
   return (
     <Button
       type="button"
       className="w-full"
-      onClick={async () => {
-        await signOut();
-        router.push(`/auth/sign-in?callbackUrl=${encodeURIComponent(callbackUrl)}`);
-        router.refresh();
-      }}
+      disabled={signOutFlow.pending}
+      aria-busy={signOutFlow.pending}
+      onClick={() => void signOutFlow.signOutAndNavigate()}
     >
-      Đăng nhập bằng tài khoản khác
+      {signOutFlow.pending ? <LoaderCircle size={18} className="mr-2 inline animate-spin" /> : null}
+      {signOutFlow.pending ? "Đang chuyển tài khoản..." : "Đăng nhập bằng tài khoản khác"}
     </Button>
   );
 }

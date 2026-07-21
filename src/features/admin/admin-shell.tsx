@@ -1,15 +1,15 @@
 "use client";
 
 import { AnimatePresence, motion } from "motion/react";
-import { LogOut, Menu, X } from "lucide-react";
+import { LoaderCircle, LogOut, Menu, X } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
-import { usePathname, useRouter } from "next/navigation";
+import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
-import { signOut } from "@/auth/client";
 import { contentText, useContent } from "@/content/client";
 import { AdminNavigation } from "@/features/admin/admin-navigation";
 import { getRoleLabel } from "@/features/admin/admin-role";
+import { useSignOutNavigation } from "@/features/auth/use-sign-out-navigation";
 
 export function AdminShell({
   children,
@@ -22,7 +22,7 @@ export function AdminShell({
 }) {
   const content = useContent("admin");
   const pathname = usePathname();
-  const router = useRouter();
+  const signOutFlow = useSignOutNavigation("/");
   const [menuOpen, setMenuOpen] = useState(false);
   const roleLabel = getRoleLabel(role);
 
@@ -81,14 +81,12 @@ export function AdminShell({
           <button
             type="button"
             aria-label={contentText(content, "shell.logout", "Đăng xuất")}
-            onClick={async () => {
-              await signOut();
-              router.push("/");
-              router.refresh();
-            }}
+            disabled={signOutFlow.pending}
+            aria-busy={signOutFlow.pending}
+            onClick={() => void signOutFlow.signOutAndNavigate()}
             className="grid size-10 place-items-center rounded-full border"
           >
-            <LogOut size={18} />
+            {signOutFlow.pending ? <LoaderCircle size={18} className="animate-spin" /> : <LogOut size={18} />}
           </button>
         </div>
       </header>

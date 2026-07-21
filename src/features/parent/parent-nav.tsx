@@ -1,10 +1,10 @@
 "use client";
 
-import { BarChart3, Bell, BookOpen, Home, Lightbulb, LogOut, Settings } from "lucide-react";
+import { BarChart3, Bell, BookOpen, Home, Lightbulb, LoaderCircle, LogOut, Settings } from "lucide-react";
 import Link from "next/link";
-import { usePathname, useRouter } from "next/navigation";
-import { signOut } from "@/auth/client";
+import { usePathname } from "next/navigation";
 import { contentText, useContent } from "@/content/client";
+import { useSignOutNavigation } from "@/features/auth/use-sign-out-navigation";
 import { cn } from "@/lib/utils";
 
 const items = [
@@ -40,7 +40,7 @@ function isActive(pathname: string, href: string, exact: boolean) {
 export function ParentNav({ unread = 0 }: { unread?: number }) {
   const content = useContent("parent");
   const pathname = usePathname();
-  const router = useRouter();
+  const signOutFlow = useSignOutNavigation("/");
   const links = items.map((item) => ({ ...item, label: contentText(content, item.labelKey, item.fallback) }));
 
   return (
@@ -74,15 +74,13 @@ export function ParentNav({ unread = 0 }: { unread?: number }) {
           </Link>
           <button
             type="button"
-            onClick={async () => {
-              await signOut();
-              router.push("/");
-              router.refresh();
-            }}
+            disabled={signOutFlow.pending}
+            aria-busy={signOutFlow.pending}
+            onClick={() => void signOutFlow.signOutAndNavigate()}
             className="grid size-10 place-items-center rounded-full border"
             aria-label={contentText(content, "nav.logout", "Đăng xuất")}
           >
-            <LogOut size={18} />
+            {signOutFlow.pending ? <LoaderCircle size={18} className="animate-spin" /> : <LogOut size={18} />}
           </button>
         </div>
       </nav>

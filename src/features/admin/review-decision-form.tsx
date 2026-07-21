@@ -3,13 +3,13 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation } from "@tanstack/react-query";
 import { CheckCircle2, XCircle } from "lucide-react";
-import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { z } from "zod";
 import { reviewsApi } from "@/api/admin/reviews";
 import { FormStatus, TextareaField } from "@/components/form";
 import { contentText, useContent } from "@/content/client";
+import { usePendingRouter } from "@/hooks/use-pending-router";
 
 const schema = z.object({ comment: z.string().trim().min(4, "Vui lòng ghi nhận xét ít nhất 4 ký tự") });
 type FormValues = z.infer<typeof schema>;
@@ -17,7 +17,7 @@ type Action = "approve" | "reject";
 
 export function ReviewDecisionForm({ missionId, versionId }: { missionId: string; versionId: string }) {
   const content = useContent("admin");
-  const router = useRouter();
+  const navigation = usePendingRouter();
   const form = useForm<FormValues>({ resolver: zodResolver(schema), defaultValues: { comment: "" } });
   const mutation = useMutation({
     mutationFn: ({ action, comment }: FormValues & { action: Action }) =>
@@ -28,7 +28,7 @@ export function ReviewDecisionForm({ missionId, versionId }: { missionId: string
           ? contentText(content, "review.approveSuccess", "Đã duyệt phiên bản")
           : contentText(content, "review.rejectSuccess", "Đã trả lại để chỉnh sửa"),
       );
-      router.refresh();
+      navigation.refresh();
     },
   });
 
@@ -53,22 +53,24 @@ export function ReviewDecisionForm({ missionId, versionId }: { missionId: string
         <button
           type="button"
           onClick={() => submit("approve")}
-          disabled={mutation.isPending}
+          disabled={mutation.isPending || navigation.isPending}
+          aria-busy={mutation.isPending || navigation.isPending}
           className="inline-flex min-h-11 items-center gap-2 rounded-xl bg-[#517d3f] px-4 font-black text-white disabled:opacity-50"
         >
           <CheckCircle2 size={18} />
-          {mutation.isPending && mutation.variables.action === "approve"
+          {(mutation.isPending || navigation.isPending) && mutation.variables?.action === "approve"
             ? contentText(content, "review.approving", "Đang duyệt...")
             : contentText(content, "review.approve", "Nội dung đạt yêu cầu")}
         </button>
         <button
           type="button"
           onClick={() => submit("reject")}
-          disabled={mutation.isPending}
+          disabled={mutation.isPending || navigation.isPending}
+          aria-busy={mutation.isPending || navigation.isPending}
           className="inline-flex min-h-11 items-center gap-2 rounded-xl bg-red-700 px-4 font-black text-white disabled:opacity-50"
         >
           <XCircle size={18} />
-          {mutation.isPending && mutation.variables.action === "reject"
+          {(mutation.isPending || navigation.isPending) && mutation.variables?.action === "reject"
             ? contentText(content, "review.rejecting", "Đang trả lại...")
             : contentText(content, "review.reject", "Yêu cầu chỉnh sửa")}
         </button>

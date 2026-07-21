@@ -66,11 +66,11 @@ function DraggableItem({
       aria-pressed={selected}
       aria-label={`${item.label}. Kéo đến nhóm phù hợp hoặc chọn rồi chạm vào nhóm.`}
       className={cn(
-        "relative min-h-28 rounded-[22px] border-2 bg-white p-3 text-center font-black shadow-sm transition",
+        "relative min-h-28 cursor-grab rounded-[22px] border-2 bg-white p-3 text-center font-black shadow-sm transition active:cursor-grabbing",
         "focus-visible:outline-4 focus-visible:outline-[#f5b557]",
         selected ? "border-[#e9641a] bg-[#fff2df] ring-4 ring-[#f5b557]/30" : "border-[#eadfc9]",
         assigned && "opacity-35",
-        draggable.isDragging && "z-10 opacity-45 shadow-xl",
+        draggable.isDragging && "z-10 cursor-grabbing opacity-45 shadow-xl",
       )}
     >
       <GripVertical className="absolute top-2 right-2 text-[#a08d70]" size={17} aria-hidden />
@@ -110,7 +110,7 @@ function DroppableSlot({
         type="button"
         disabled={disabled || (!selectedItemId && !item)}
         onClick={onAssign}
-        className="min-w-0 text-left disabled:cursor-default"
+        className="min-w-0 text-left disabled:cursor-not-allowed"
       >
         <strong className="block text-base">{slot.label}</strong>
         <small className="mt-1 block leading-5 text-[#6f604b]">

@@ -2,7 +2,6 @@
 
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { toast } from "sonner";
 import { childrenApi } from "@/api/children";
@@ -10,18 +9,18 @@ import { ConfirmDialog } from "@/components/confirm-dialog";
 import { FormStatus } from "@/components/form";
 import { contentText, useContent } from "@/content/client";
 import { ProfileCard, type ProfileListItem } from "@/features/profile/profile-card";
+import { usePendingRouter } from "@/hooks/use-pending-router";
 import { queryKeys } from "@/lib/query/keys";
 
 export function ProfileManager({ profiles }: { profiles: ProfileListItem[] }) {
   const content = useContent("profile");
-  const router = useRouter();
+  const navigation = usePendingRouter();
   const queryClient = useQueryClient();
   const [deleteTarget, setDeleteTarget] = useState<ProfileListItem | null>(null);
   const selectMutation = useMutation({
     mutationFn: (profile: ProfileListItem) => childrenApi.select(profile.id).then(() => profile),
     onSuccess: () => {
-      router.push("/missions");
-      router.refresh();
+      navigation.push("/missions");
     },
   });
   const deleteMutation = useMutation({
@@ -30,7 +29,7 @@ export function ProfileManager({ profiles }: { profiles: ProfileListItem[] }) {
       setDeleteTarget(null);
       await queryClient.invalidateQueries({ queryKey: queryKeys.children.all });
       toast.success(contentText(content, "list.deleteSuccess", "Đã ghi nhận yêu cầu xóa hồ sơ"));
-      router.refresh();
+      navigation.refresh();
     },
   });
   const labels = {
@@ -45,6 +44,7 @@ export function ProfileManager({ profiles }: { profiles: ProfileListItem[] }) {
     <div className="space-y-4">
       {profiles.map((profile) => {
         const pending =
+          navigation.isPending ||
           (selectMutation.isPending && selectMutation.variables.id === profile.id) ||
           (deleteMutation.isPending && deleteMutation.variables.id === profile.id);
         return (
@@ -70,7 +70,7 @@ export function ProfileManager({ profiles }: { profiles: ProfileListItem[] }) {
         confirmLabel="Chuyển sang chờ xóa"
         pendingLabel="Đang xử lý..."
         tone="danger"
-        pending={deleteMutation.isPending}
+        pending={deleteMutation.isPending || navigation.isPending}
         onClose={() => setDeleteTarget(null)}
         onConfirm={() => deleteTarget && deleteMutation.mutate(deleteTarget)}
       />

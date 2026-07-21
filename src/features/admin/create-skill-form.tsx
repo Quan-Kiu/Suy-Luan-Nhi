@@ -3,13 +3,13 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { Plus } from "lucide-react";
-import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { z } from "zod";
 import { taxonomyApi } from "@/api/admin/taxonomy";
 import { FormStatus, SelectField, SubmitButton, TextareaField, TextField } from "@/components/form";
 import { contentText, useContent } from "@/content/client";
+import { usePendingRouter } from "@/hooks/use-pending-router";
 import { queryKeys } from "@/lib/query/keys";
 import { createSlug } from "@/lib/slug";
 
@@ -33,7 +33,7 @@ const categoryOptions = [
 
 export function CreateSkillForm() {
   const content = useContent("admin");
-  const router = useRouter();
+  const navigation = usePendingRouter();
   const queryClient = useQueryClient();
   const form = useForm<FormValues>({
     resolver: zodResolver(schema),
@@ -45,7 +45,7 @@ export function CreateSkillForm() {
       await queryClient.invalidateQueries({ queryKey: queryKeys.admin.taxonomy });
       form.reset();
       toast.success(contentText(content, "taxonomy.createSuccess", "Đã thêm kỹ năng"));
-      router.refresh();
+      navigation.refresh();
     },
   });
   return (
@@ -119,7 +119,7 @@ export function CreateSkillForm() {
         </details>
         <FormStatus status={mutation.isError ? "error" : "idle"} message={mutation.error?.message} />
         <SubmitButton
-          pending={mutation.isPending}
+          pending={mutation.isPending || navigation.isPending}
           pendingLabel={contentText(content, "taxonomy.creating", "Đang thêm...")}
           className="w-auto"
         >

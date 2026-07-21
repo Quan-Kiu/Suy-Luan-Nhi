@@ -3,7 +3,6 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useForm } from "react-hook-form";
-import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { toast } from "sonner";
 import { childrenApi } from "@/api/children";
@@ -16,6 +15,7 @@ import { contentText, useContent } from "@/content/client";
 import { type ParentSettingsFormValues, parentSettingsSchema } from "@/features/parent/settings-schema";
 import { SettingsSection } from "@/features/parent/settings-section";
 import { useHydrated } from "@/hooks/use-hydrated";
+import { usePendingRouter } from "@/hooks/use-pending-router";
 import { queryKeys } from "@/lib/query/keys";
 
 type Settings = {
@@ -42,7 +42,7 @@ function normalizeSettings(initial: Settings): ParentSettingsFormValues {
 export function SettingsForm({ initial, childId }: { initial: Settings; childId: string }) {
   const content = useContent("parent");
   const queryClient = useQueryClient();
-  const router = useRouter();
+  const navigation = usePendingRouter();
   const interactive = useHydrated();
   const [confirmAction, setConfirmAction] = useState<"reset" | "delete" | null>(null);
   const form = useForm<ParentSettingsFormValues>({
@@ -55,7 +55,7 @@ export function SettingsForm({ initial, childId }: { initial: Settings; childId:
     onSuccess: async () => {
       form.setValue("pin", "");
       await queryClient.invalidateQueries({ queryKey: queryKeys.parent.settings });
-      router.refresh();
+      navigation.refresh();
       toast.success(contentText(content, "settings.saved", "Đã lưu cài đặt"));
     },
   });
@@ -85,12 +85,14 @@ export function SettingsForm({ initial, childId }: { initial: Settings; childId:
 
   return (
     <form
-      className="space-y-5"
       onSubmit={form.handleSubmit((values) => saveMutation.mutate(values))}
-      aria-busy={!interactive || saveMutation.isPending}
+      aria-busy={!interactive || saveMutation.isPending || navigation.isPending}
       noValidate
     >
-      <fieldset disabled={!interactive || saveMutation.isPending} className="contents">
+      <fieldset
+        disabled={!interactive || saveMutation.isPending || navigation.isPending}
+        className="grid gap-5"
+      >
         <SettingsSection title={contentText(content, "settings.audioTitle", "Âm thanh")}>
           <ControlledCheckboxField
             control={form.control}
@@ -154,7 +156,7 @@ export function SettingsForm({ initial, childId }: { initial: Settings; childId:
 
         <FormStatus status={saveMutation.isError ? "error" : "idle"} message={saveMutation.error?.message} />
         <SubmitButton
-          pending={saveMutation.isPending}
+          pending={saveMutation.isPending || navigation.isPending}
           pendingLabel={contentText(content, "settings.saving", "Đang lưu...")}
         >
           {contentText(content, "settings.save", "Lưu cài đặt")}

@@ -76,7 +76,7 @@ function SortableRow({
         type="button"
         disabled={disabled}
         aria-label={`Kéo ${item.label} để đổi vị trí`}
-        className="touch-none rounded-lg p-1 text-[#9a876d] focus-visible:outline-4 focus-visible:outline-[#f5b557] disabled:opacity-40"
+        className="cursor-grab touch-none rounded-lg p-1 text-[#9a876d] focus-visible:outline-4 focus-visible:outline-[#f5b557] active:cursor-grabbing disabled:cursor-not-allowed disabled:opacity-40"
         {...sortable.attributes}
         {...sortable.listeners}
       >

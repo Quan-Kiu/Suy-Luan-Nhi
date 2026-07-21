@@ -3,7 +3,6 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation } from "@tanstack/react-query";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
@@ -14,10 +13,11 @@ import { contentText, useContent } from "@/content/client";
 import { getAuthErrorMessage, toAuthFlowError } from "@/features/auth/auth-errors";
 import { EmailVerificationStep } from "@/features/auth/email-verification-step";
 import { signUpSchema } from "@/features/auth/schemas";
+import { usePendingRouter } from "@/hooks/use-pending-router";
 
 export function SignUpForm() {
   const content = useContent("auth");
-  const router = useRouter();
+  const navigation = usePendingRouter();
   const [verificationEmail, setVerificationEmail] = useState<string | null>(null);
   const form = useForm<z.infer<typeof signUpSchema>>({
     resolver: zodResolver(signUpSchema),
@@ -36,8 +36,7 @@ export function SignUpForm() {
         return;
       }
       toast.success(contentText(content, "signUp.success", "Tài khoản đã được tạo"));
-      router.push("/profiles");
-      router.refresh();
+      navigation.push("/profiles");
     },
   });
 
@@ -102,7 +101,7 @@ export function SignUpForm() {
       </p>
       <FormStatus status={errorMessage ? "error" : "idle"} message={errorMessage} />
       <SubmitButton
-        pending={mutation.isPending}
+        pending={mutation.isPending || navigation.isPending}
         pendingLabel={contentText(content, "signUp.submitting", "Đang tạo...")}
       >
         {contentText(content, "signUp.submit", "Tạo tài khoản phụ huynh")}

@@ -1,13 +1,13 @@
 "use client";
 
 import { AnimatePresence, motion } from "motion/react";
-import { ArrowLeft, LogOut, Menu, ShieldCheck, UserRound, X } from "lucide-react";
+import { ArrowLeft, LoaderCircle, LogOut, Menu, ShieldCheck, UserRound, X } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
-import { usePathname, useRouter } from "next/navigation";
+import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
-import { signOut } from "@/auth/client";
 import { contentText, useContent } from "@/content/client";
+import { useSignOutNavigation } from "@/features/auth/use-sign-out-navigation";
 import { cn } from "@/lib/utils";
 
 const navigation = [
@@ -31,7 +31,7 @@ function getBackHref(pathname: string) {
 export function ChildHeader() {
   const content = useContent("child");
   const pathname = usePathname();
-  const router = useRouter();
+  const signOutFlow = useSignOutNavigation("/");
   const [open, setOpen] = useState(false);
   const backHref = getBackHref(pathname);
 
@@ -44,16 +44,10 @@ export function ChildHeader() {
     return () => document.removeEventListener("keydown", closeOnEscape);
   }, [open]);
 
-  async function handleSignOut() {
-    await signOut();
-    router.push("/");
-    router.refresh();
-  }
-
   return (
     <header
       data-testid="child-header"
-      className="relative z-40 flex h-20 items-center justify-between border-b border-[#eadfc9]/80 bg-[#fffaf0]/95 px-5 backdrop-blur"
+      className="sticky top-0 z-50 flex h-20 items-center justify-between border-b border-[#eadfc9]/80 bg-[#fffaf0]/95 px-5 shadow-[0_6px_18px_rgba(73,52,25,0.06)] backdrop-blur"
     >
       <div className="flex min-w-0 items-center gap-1">
         {backHref ? (
@@ -65,7 +59,12 @@ export function ChildHeader() {
             <ArrowLeft size={20} />
           </Link>
         ) : null}
-        <Link href="/missions" className="flex min-w-0 items-center gap-2" aria-label="Bản đồ nhiệm vụ">
+        <Link
+          href="/missions"
+          prefetch={true}
+          className="flex min-w-0 items-center gap-2"
+          aria-label="Bản đồ nhiệm vụ"
+        >
           <Image
             src="/assets/mascots/brand-logo-detective-head.png"
             width={982}
@@ -118,6 +117,7 @@ export function ChildHeader() {
                     <Link
                       key={href}
                       href={href}
+                      prefetch={true}
                       onClick={() => setOpen(false)}
                       className={cn(
                         "flex min-h-12 items-center gap-3 rounded-2xl px-4 font-black",
@@ -131,11 +131,19 @@ export function ChildHeader() {
                 })}
                 <button
                   type="button"
-                  onClick={handleSignOut}
+                  disabled={signOutFlow.pending}
+                  aria-busy={signOutFlow.pending}
+                  onClick={() => void signOutFlow.signOutAndNavigate()}
                   className="flex min-h-12 items-center gap-3 rounded-2xl px-4 text-left font-black text-red-700 hover:bg-red-50"
                 >
-                  <LogOut size={19} />
-                  {contentText(content, "header.logout", "Đăng xuất")}
+                  {signOutFlow.pending ? (
+                    <LoaderCircle size={19} className="animate-spin" />
+                  ) : (
+                    <LogOut size={19} />
+                  )}
+                  {signOutFlow.pending
+                    ? "Đang đăng xuất..."
+                    : contentText(content, "header.logout", "Đăng xuất")}
                 </button>
               </div>
             </motion.nav>

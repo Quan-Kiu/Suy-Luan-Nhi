@@ -1,14 +1,13 @@
 "use client";
 
 import { AnimatePresence, motion } from "motion/react";
-import { Bell, LogOut, Menu, Play, UserRound, X } from "lucide-react";
+import { Bell, LoaderCircle, LogOut, Menu, Play, UserRound, X } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
-import { signOut } from "@/auth/client";
 import { contentTemplate, contentText } from "@/content/resolve";
 import type { ContentDictionary } from "@/content/types";
+import { useSignOutNavigation } from "@/features/auth/use-sign-out-navigation";
 
 export function ParentHeader({
   childName,
@@ -19,7 +18,7 @@ export function ParentHeader({
   unread: number;
   content: ContentDictionary;
 }) {
-  const router = useRouter();
+  const signOutFlow = useSignOutNavigation("/");
   const [open, setOpen] = useState(false);
 
   useEffect(() => {
@@ -30,12 +29,6 @@ export function ParentHeader({
     document.addEventListener("keydown", closeOnEscape);
     return () => document.removeEventListener("keydown", closeOnEscape);
   }, [open]);
-
-  async function handleSignOut() {
-    await signOut();
-    router.push("/");
-    router.refresh();
-  }
 
   return (
     <header
@@ -131,11 +124,17 @@ export function ParentHeader({
               </Link>
               <button
                 type="button"
-                onClick={handleSignOut}
+                disabled={signOutFlow.pending}
+                aria-busy={signOutFlow.pending}
+                onClick={() => void signOutFlow.signOutAndNavigate()}
                 className="flex min-h-12 items-center gap-3 rounded-2xl px-4 text-left font-black text-red-700 hover:bg-red-50"
               >
-                <LogOut size={19} />
-                {contentText(content, "nav.logout", "Đăng xuất")}
+                {signOutFlow.pending ? (
+                  <LoaderCircle size={19} className="animate-spin" />
+                ) : (
+                  <LogOut size={19} />
+                )}
+                {signOutFlow.pending ? "Đang đăng xuất..." : contentText(content, "nav.logout", "Đăng xuất")}
               </button>
             </div>
           </motion.nav>

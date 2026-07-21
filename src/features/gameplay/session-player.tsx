@@ -1,13 +1,14 @@
 "use client";
 
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { Lightbulb, LoaderCircle, LogOut } from "lucide-react";
-import { useRouter } from "next/navigation";
 import { useState } from "react";
+import { catalogApi } from "@/api/catalog";
 import { gameplayApi } from "@/api/gameplay";
 import { FormStatus } from "@/components/form";
 import { Button } from "@/components/ui";
 import { contentText, useContent } from "@/content/client";
+import { useActiveChild } from "@/features/child/active-child-context";
 import { FeedbackPanel } from "@/features/gameplay/feedback-panel";
 import { HintPanel } from "@/features/gameplay/hint-panel";
 import { QuestionPlayer } from "@/features/gameplay/question-player";
@@ -15,12 +16,16 @@ import { SessionProgress } from "@/features/gameplay/session-progress";
 import type { SessionView } from "@/features/gameplay/session-types";
 import { useSoundEffects } from "@/features/sound/sound-effects-provider";
 import { canSubmitQuestion, initialSubmission } from "@/features/gameplay/session-utils";
+import { usePendingRouter } from "@/hooks/use-pending-router";
+import { queryKeys } from "@/lib/query/keys";
 import type { QuestionSubmission } from "@/modules/gameplay/question";
 
 export function SessionPlayer({ initialView }: { initialView: SessionView }) {
   const content = useContent("gameplay");
-  const router = useRouter();
+  const navigation = usePendingRouter();
   const sound = useSoundEffects();
+  const activeChild = useActiveChild();
+  const queryClient = useQueryClient();
   const [view, setView] = useState(initialView);
   const [value, setValue] = useState<QuestionSubmission | null>(() =>
     initialSubmission(initialView.question),
@@ -56,12 +61,21 @@ export function SessionPlayer({ initialView }: { initialView: SessionView }) {
     mutationFn: () => gameplayApi.completeSession(view.session.id),
     onSuccess: () => {
       void sound.play("mission.complete");
-      router.push(`/complete/${view.session.id}`);
+      if (activeChild) {
+        const queryKey = queryKeys.children.missionMap(activeChild.id);
+        void queryClient.invalidateQueries({ queryKey });
+        void queryClient.prefetchQuery({
+          queryKey,
+          queryFn: () => catalogApi.getMissionMap(activeChild.id),
+          staleTime: 5 * 60_000,
+        });
+      }
+      navigation.push(`/complete/${view.session.id}`);
     },
   });
   const exitMutation = useMutation({
     mutationFn: () => gameplayApi.exitSession(view.session.id),
-    onSuccess: () => router.push("/missions"),
+    onSuccess: () => navigation.push("/missions"),
   });
 
   const mutationError =
@@ -134,7 +148,7 @@ export function SessionPlayer({ initialView }: { initialView: SessionView }) {
           correct={feedback.correct}
           text={feedback.text}
           completeReady={Boolean(nextView?.completeReady)}
-          completing={completeMutation.isPending}
+          completing={completeMutation.isPending || navigation.isPending}
           content={content}
           onContinue={continueNext}
           onRetry={retryQuestion}
@@ -161,12 +175,16 @@ export function SessionPlayer({ initialView }: { initialView: SessionView }) {
       <button
         type="button"
         onClick={() => exitMutation.mutate()}
-        disabled={exitMutation.isPending}
-        aria-busy={exitMutation.isPending}
+        disabled={exitMutation.isPending || navigation.isPending}
+        aria-busy={exitMutation.isPending || navigation.isPending}
         className="mt-6 flex w-full items-center justify-center gap-2 text-sm font-bold text-[#806d54] disabled:opacity-50"
       >
-        {exitMutation.isPending ? <LoaderCircle size={16} className="animate-spin" /> : <LogOut size={16} />}
-        {exitMutation.isPending
+        {exitMutation.isPending || navigation.isPending ? (
+          <LoaderCircle size={16} className="animate-spin" />
+        ) : (
+          <LogOut size={16} />
+        )}
+        {exitMutation.isPending || navigation.isPending
           ? contentText(content, "actions.exiting", "Đang lưu tiến độ...")
           : contentText(content, "actions.exit", "Dừng và lưu tiến độ")}
       </button>

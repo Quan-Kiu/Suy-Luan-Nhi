@@ -3,7 +3,6 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation } from "@tanstack/react-query";
 import { Rocket } from "lucide-react";
-import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { z } from "zod";
@@ -11,19 +10,20 @@ import { reviewsApi } from "@/api/admin/reviews";
 import { AsyncButton } from "@/components/async-button";
 import { FormStatus, SubmitButton, TextField } from "@/components/form";
 import { contentText, useContent } from "@/content/client";
+import { usePendingRouter } from "@/hooks/use-pending-router";
 
 const schema = z.object({ scheduledFor: z.string().min(1, "Hãy chọn thời gian xuất bản") });
 type FormValues = z.infer<typeof schema>;
 
 export function ReviewPublishActions({ missionId, versionId }: { missionId: string; versionId: string }) {
   const content = useContent("admin");
-  const router = useRouter();
+  const navigation = usePendingRouter();
   const form = useForm<FormValues>({ resolver: zodResolver(schema), defaultValues: { scheduledFor: "" } });
   const publishMutation = useMutation({
     mutationFn: () => reviewsApi.publish(missionId, versionId),
     onSuccess: () => {
       toast.success(contentText(content, "review.publishSuccess", "Nhiệm vụ đã được hiển thị cho trẻ"));
-      router.refresh();
+      navigation.refresh();
     },
   });
   const scheduleMutation = useMutation({
@@ -31,17 +31,17 @@ export function ReviewPublishActions({ missionId, versionId }: { missionId: stri
       reviewsApi.schedule(missionId, versionId, new Date(scheduledFor).toISOString()),
     onSuccess: () => {
       toast.success(contentText(content, "review.scheduleSuccess", "Đã lên lịch xuất bản"));
-      router.refresh();
+      navigation.refresh();
     },
   });
 
   return (
     <div className="space-y-3">
       <AsyncButton
-        pending={publishMutation.isPending}
+        pending={publishMutation.isPending || navigation.isPending}
         pendingLabel={contentText(content, "review.publishing", "Đang xuất bản...")}
         onClick={() => publishMutation.mutate()}
-        disabled={scheduleMutation.isPending}
+        disabled={scheduleMutation.isPending || navigation.isPending}
         className="w-full bg-[#517d3f] shadow-none"
       >
         <Rocket size={18} className="mr-2 inline" />
@@ -60,9 +60,9 @@ export function ReviewPublishActions({ missionId, versionId }: { missionId: stri
           className="bg-white font-normal"
         />
         <SubmitButton
-          pending={scheduleMutation.isPending}
+          pending={scheduleMutation.isPending || navigation.isPending}
           pendingLabel={contentText(content, "review.scheduling", "Đang lên lịch...")}
-          disabled={publishMutation.isPending}
+          disabled={publishMutation.isPending || navigation.isPending}
           className="mt-3 border border-[#517d3f] bg-white text-[#4d743b] shadow-none"
         >
           {contentText(content, "review.schedule", "Lưu lịch xuất bản")}

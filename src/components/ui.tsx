@@ -17,7 +17,7 @@ export function Button({ className, ...props }: ButtonHTMLAttributes<HTMLButtonE
   return (
     <button
       className={cn(
-        "min-h-12 rounded-2xl bg-[#b9470d] px-5 py-3 font-extrabold text-white shadow-[0_8px_0_#7f2e05] transition hover:-translate-y-0.5 hover:brightness-105 active:translate-y-1 active:shadow-none disabled:cursor-not-allowed disabled:opacity-50",
+        "min-h-12 cursor-pointer rounded-2xl bg-[#b9470d] px-5 py-3 font-extrabold text-white shadow-[0_8px_0_#7f2e05] transition hover:-translate-y-0.5 hover:brightness-105 active:translate-y-1 active:shadow-none disabled:cursor-not-allowed disabled:opacity-50 aria-busy:cursor-progress",
         className,
       )}
       {...props}

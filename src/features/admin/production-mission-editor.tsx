@@ -4,7 +4,6 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { ArrowLeft, Save, Send } from "lucide-react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { FormProvider, useForm, useWatch, type Resolver } from "react-hook-form";
 import { toast } from "sonner";
@@ -18,6 +17,7 @@ import { MissionQuestionsSection } from "@/features/admin/mission-editor/questio
 import { MissionSafetySection } from "@/features/admin/mission-editor/safety-section";
 import { MissionStatusBadge } from "@/features/admin/mission-status-badge";
 import type { MissionEditorTaxonomy } from "@/features/admin/mission-editor/types";
+import { usePendingRouter } from "@/hooks/use-pending-router";
 import { queryKeys } from "@/lib/query/keys";
 import { adminMissionDraftSchema, type AdminMissionDraft } from "@/modules/admin/schemas";
 
@@ -33,7 +33,7 @@ export function ProductionMissionEditor({
   status?: string;
 }) {
   const content = useContent("admin");
-  const router = useRouter();
+  const navigation = usePendingRouter();
   const queryClient = useQueryClient();
   const [activeQuestion, setActiveQuestion] = useState(0);
   const [validationError, setValidationError] = useState(false);
@@ -56,9 +56,10 @@ export function ProductionMissionEditor({
         id: "mission-save-success",
       });
       if (!missionId) {
-        router.push(`/admin/missions/${result.id}/edit`);
+        navigation.push(`/admin/missions/${result.id}/edit`);
+      } else {
+        navigation.refresh();
       }
-      router.refresh();
     },
   });
 
@@ -75,12 +76,15 @@ export function ProductionMissionEditor({
       toast.success(contentText(content, "missionEditor.submitted", "Đã gửi nhiệm vụ đến người kiểm duyệt"), {
         id: "mission-submit-success",
       });
-      if (!missionId) router.push(`/admin/missions/${savedId}/edit`);
-      router.refresh();
+      if (!missionId) {
+        navigation.push(`/admin/missions/${savedId}/edit`);
+      } else {
+        navigation.refresh();
+      }
     },
   });
 
-  const pending = saveMutation.isPending || submitMutation.isPending;
+  const pending = saveMutation.isPending || submitMutation.isPending || navigation.isPending;
   const mutationError = saveMutation.error ?? submitMutation.error;
 
   function handleInvalid() {
@@ -137,11 +141,11 @@ export function ProductionMissionEditor({
                 <Button
                   type="submit"
                   disabled={pending}
-                  aria-busy={saveMutation.isPending}
+                  aria-busy={saveMutation.isPending || navigation.isPending}
                   className="min-h-10 rounded-xl px-4 py-2 text-sm shadow-[0_4px_0_#bd4910]"
                 >
                   <Save size={16} className="mr-2 inline" />
-                  {saveMutation.isPending
+                  {saveMutation.isPending || navigation.isPending
                     ? contentText(content, "missionEditor.saving", "Đang lưu...")
                     : contentText(content, "missionEditor.saveDraft", "Lưu để tiếp tục sau")}
                 </Button>
@@ -174,7 +178,7 @@ export function ProductionMissionEditor({
             <div className="flex flex-wrap gap-2">
               <Button type="button" onClick={saveDraft} disabled={pending}>
                 <Save size={18} className="mr-2 inline" />
-                {saveMutation.isPending
+                {saveMutation.isPending || navigation.isPending
                   ? contentText(content, "missionEditor.saving", "Đang lưu...")
                   : contentText(content, "missionEditor.saveDraft", "Lưu để tiếp tục sau")}
               </Button>
@@ -182,11 +186,11 @@ export function ProductionMissionEditor({
                 type="button"
                 onClick={submitReview}
                 disabled={pending || !allSafe}
-                aria-busy={submitMutation.isPending}
+                aria-busy={submitMutation.isPending || navigation.isPending}
                 className="min-h-12 rounded-2xl bg-[#517d3f] px-5 font-black text-white disabled:cursor-not-allowed disabled:opacity-40"
               >
                 <Send size={18} className="mr-2 inline" />
-                {submitMutation.isPending
+                {submitMutation.isPending || navigation.isPending
                   ? contentText(content, "missionEditor.submitting", "Đang gửi...")
                   : contentText(content, "missionEditor.submit", "Gửi người kiểm duyệt")}
               </button>

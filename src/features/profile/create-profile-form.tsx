@@ -3,7 +3,6 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import Image from "next/image";
-import { useRouter } from "next/navigation";
 import { useForm, useWatch } from "react-hook-form";
 import { toast } from "sonner";
 import { childrenApi } from "@/api/children";
@@ -13,11 +12,12 @@ import { contentText, useContent } from "@/content/client";
 import { createChildProfileSchema, type CreateChildProfileInput } from "@/domain/schemas";
 import { AgeGroupCardsField } from "@/features/profile/age-group-cards-field";
 import { getAgeGroupOptions } from "@/features/profile/age-group-options";
+import { usePendingRouter } from "@/hooks/use-pending-router";
 import { queryKeys } from "@/lib/query/keys";
 
 export function CreateProfileForm() {
   const content = useContent("profile");
-  const router = useRouter();
+  const navigation = usePendingRouter();
   const queryClient = useQueryClient();
   const form = useForm<CreateChildProfileInput>({
     resolver: zodResolver(createChildProfileSchema),
@@ -31,8 +31,7 @@ export function CreateProfileForm() {
       toast.success(
         `${profile.displayName}: ${contentText(content, "create.success", "Hồ sơ đã sẵn sàng!")}`,
       );
-      router.push("/profiles");
-      router.refresh();
+      navigation.push("/profiles");
     },
   });
 
@@ -80,7 +79,7 @@ export function CreateProfileForm() {
       </Card>
       <FormStatus status={mutation.isError ? "error" : "idle"} message={mutation.error?.message} />
       <SubmitButton
-        pending={mutation.isPending}
+        pending={mutation.isPending || navigation.isPending}
         pendingLabel={contentText(content, "create.submitting", "Đang tạo hồ sơ...")}
       >
         {contentText(content, "create.submit", "Bắt đầu chế độ bé →")}

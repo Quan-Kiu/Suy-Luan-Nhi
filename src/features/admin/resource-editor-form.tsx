@@ -3,7 +3,6 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { Save } from "lucide-react";
-import { useRouter } from "next/navigation";
 import { useForm, useWatch } from "react-hook-form";
 import { toast } from "sonner";
 import { z } from "zod";
@@ -18,6 +17,7 @@ import {
   parentResourceTypeLabels,
 } from "@/domain/parent-resources";
 import { useHydrated } from "@/hooks/use-hydrated";
+import { usePendingRouter } from "@/hooks/use-pending-router";
 import { queryKeys } from "@/lib/query/keys";
 import { createSlug } from "@/lib/slug";
 
@@ -82,7 +82,7 @@ function toFormValues(resource?: AdminResourceItem | null): FormValues {
 }
 
 export function ResourceEditorForm({ resource }: { resource?: AdminResourceItem | null }) {
-  const router = useRouter();
+  const navigation = usePendingRouter();
   const queryClient = useQueryClient();
   const interactive = useHydrated();
   const form = useForm<FormValues>({
@@ -100,8 +100,7 @@ export function ResourceEditorForm({ resource }: { resource?: AdminResourceItem 
     onSuccess: async (saved) => {
       await queryClient.invalidateQueries({ queryKey: queryKeys.admin.resources });
       toast.success(saved.status === "published" ? "Đã xuất bản tài nguyên" : "Đã lưu tài nguyên");
-      router.push(`/admin/resources/${saved.id}/edit`);
-      router.refresh();
+      navigation.push(`/admin/resources/${saved.id}/edit`);
     },
   });
   const title = useWatch({ control: form.control, name: "title" });
@@ -120,10 +119,10 @@ export function ResourceEditorForm({ resource }: { resource?: AdminResourceItem 
     <form
       className="grid gap-5 xl:grid-cols-[minmax(0,1fr)_320px]"
       onSubmit={form.handleSubmit((values) => mutation.mutate(values))}
-      aria-busy={!interactive || mutation.isPending}
+      aria-busy={!interactive || mutation.isPending || navigation.isPending}
       noValidate
     >
-      <fieldset disabled={!interactive || mutation.isPending} className="contents">
+      <fieldset disabled={!interactive || mutation.isPending || navigation.isPending} className="contents">
         <div className="space-y-5">
           <section className="rounded-2xl border bg-white p-5">
             <h2 className="text-xl font-black">Nội dung bài đăng</h2>
@@ -280,7 +279,7 @@ export function ResourceEditorForm({ resource }: { resource?: AdminResourceItem 
             ) : null}
           </section>
           <FormStatus status={mutation.isError ? "error" : "idle"} message={mutation.error?.message} />
-          <SubmitButton pending={mutation.isPending} pendingLabel="Đang lưu...">
+          <SubmitButton pending={mutation.isPending || navigation.isPending} pendingLabel="Đang lưu...">
             <Save size={18} className="mr-2 inline" />
             {resource ? "Lưu thay đổi" : "Tạo bài đăng"}
           </SubmitButton>

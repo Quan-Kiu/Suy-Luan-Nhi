@@ -3,7 +3,6 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation } from "@tanstack/react-query";
 import { Calculator, KeyRound, LockKeyhole } from "lucide-react";
-import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
@@ -11,6 +10,7 @@ import { parentApi } from "@/api/parent";
 import { FormStatus, SubmitButton, TextField } from "@/components/form";
 import { Card } from "@/components/ui";
 import { contentText, useContent } from "@/content/client";
+import { usePendingRouter } from "@/hooks/use-pending-router";
 import type { ParentMathChallenge } from "@/modules/family/parent-challenge";
 
 const schema = z.object({ answer: z.string().trim().min(1, "Hãy nhập câu trả lời") });
@@ -19,7 +19,7 @@ type GateMethod = "pin" | "math";
 
 export function ParentGateForm({ hasPin, challenge }: { hasPin: boolean; challenge: ParentMathChallenge }) {
   const content = useContent("parent");
-  const router = useRouter();
+  const navigation = usePendingRouter();
   const [method, setMethod] = useState<GateMethod>(hasPin ? "pin" : "math");
   const form = useForm<FormValues>({ resolver: zodResolver(schema), defaultValues: { answer: "" } });
   const mutation = useMutation({
@@ -29,7 +29,7 @@ export function ParentGateForm({ hasPin, challenge }: { hasPin: boolean; challen
         method,
         challengeToken: method === "math" ? challenge.token : undefined,
       }),
-    onSuccess: () => router.refresh(),
+    onSuccess: () => navigation.refresh(),
   });
 
   function changeMethod(next: GateMethod) {
@@ -100,7 +100,7 @@ export function ParentGateForm({ hasPin, challenge }: { hasPin: boolean; challen
         />
         <FormStatus status={mutation.isError ? "error" : "idle"} message={mutation.error?.message} />
         <SubmitButton
-          pending={mutation.isPending}
+          pending={mutation.isPending || navigation.isPending}
           pendingLabel={contentText(content, "gate.submitting", "Đang kiểm tra...")}
         >
           {contentText(content, "gate.submit", "Mở khu vực phụ huynh")}

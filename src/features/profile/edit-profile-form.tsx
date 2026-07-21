@@ -2,7 +2,6 @@
 
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { z } from "zod";
@@ -12,6 +11,7 @@ import { FormStatus, SelectField, SubmitButton, TextField } from "@/components/f
 import { Card } from "@/components/ui";
 import { contentText, useContent } from "@/content/client";
 import { getAgeGroupOptions } from "@/features/profile/age-group-options";
+import { usePendingRouter } from "@/hooks/use-pending-router";
 import { queryKeys } from "@/lib/query/keys";
 
 const schema = z.object({
@@ -23,7 +23,7 @@ type FormValues = z.infer<typeof schema>;
 
 export function EditProfileForm({ child }: { child: ChildSummary }) {
   const content = useContent("profile");
-  const router = useRouter();
+  const navigation = usePendingRouter();
   const queryClient = useQueryClient();
   const form = useForm<FormValues>({
     resolver: zodResolver(schema),
@@ -34,8 +34,7 @@ export function EditProfileForm({ child }: { child: ChildSummary }) {
     onSuccess: async () => {
       await queryClient.invalidateQueries({ queryKey: queryKeys.children.all });
       toast.success(contentText(content, "edit.success", "Đã cập nhật hồ sơ"));
-      router.push("/profiles");
-      router.refresh();
+      navigation.push("/profiles");
     },
   });
 
@@ -57,7 +56,7 @@ export function EditProfileForm({ child }: { child: ChildSummary }) {
       </Card>
       <FormStatus status={mutation.isError ? "error" : "idle"} message={mutation.error?.message} />
       <SubmitButton
-        pending={mutation.isPending}
+        pending={mutation.isPending || navigation.isPending}
         pendingLabel={contentText(content, "edit.submitting", "Đang lưu...")}
       >
         {contentText(content, "edit.submit", "Lưu thay đổi")}

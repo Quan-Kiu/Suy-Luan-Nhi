@@ -2,7 +2,7 @@
 
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation } from "@tanstack/react-query";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useSearchParams } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import type { z } from "zod";
@@ -11,10 +11,11 @@ import { FormStatus, SubmitButton, TextField } from "@/components/form";
 import { contentText, useContent } from "@/content/client";
 import { getAuthErrorMessage, toAuthFlowError } from "@/features/auth/auth-errors";
 import { resetPasswordSchema } from "@/features/auth/schemas";
+import { usePendingRouter } from "@/hooks/use-pending-router";
 
 export function ResetPasswordForm() {
   const content = useContent("auth");
-  const router = useRouter();
+  const navigation = usePendingRouter();
   const token = useSearchParams().get("token");
   const form = useForm<z.infer<typeof resetPasswordSchema>>({
     resolver: zodResolver(resetPasswordSchema),
@@ -29,7 +30,7 @@ export function ResetPasswordForm() {
     },
     onSuccess: () => {
       toast.success(contentText(content, "reset.success", "Mật khẩu đã được cập nhật"));
-      router.push("/auth/sign-in");
+      navigation.push("/auth/sign-in");
     },
   });
 
@@ -69,7 +70,7 @@ export function ResetPasswordForm() {
       />
       <FormStatus status={errorMessage ? "error" : "idle"} message={errorMessage} />
       <SubmitButton
-        pending={mutation.isPending}
+        pending={mutation.isPending || navigation.isPending}
         pendingLabel={contentText(content, "reset.submitting", "Đang cập nhật...")}
       >
         {contentText(content, "reset.submit", "Cập nhật mật khẩu")}

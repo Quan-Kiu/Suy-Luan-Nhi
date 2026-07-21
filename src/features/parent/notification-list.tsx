@@ -1,9 +1,9 @@
 "use client";
 
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { useRouter } from "next/navigation";
 import { parentApi } from "@/api/parent";
 import { FormStatus } from "@/components/form";
+import { usePendingRouter } from "@/hooks/use-pending-router";
 import { queryKeys } from "@/lib/query/keys";
 import { cn } from "@/lib/utils";
 
@@ -16,7 +16,7 @@ type NotificationItem = {
 };
 
 export function NotificationList({ items }: { items: NotificationItem[] }) {
-  const router = useRouter();
+  const navigation = usePendingRouter();
   const queryClient = useQueryClient();
   const mutation = useMutation({
     mutationFn: (notificationId: string) => parentApi.markNotificationRead(notificationId),
@@ -25,14 +25,14 @@ export function NotificationList({ items }: { items: NotificationItem[] }) {
         queryClient.invalidateQueries({ queryKey: queryKeys.parent.notifications }),
         queryClient.invalidateQueries({ queryKey: queryKeys.parent.dashboard }),
       ]);
-      router.refresh();
+      navigation.refresh();
     },
   });
 
   return (
     <div className="space-y-3">
       {items.map((item) => {
-        const pending = mutation.isPending && mutation.variables === item.id;
+        const pending = navigation.isPending || (mutation.isPending && mutation.variables === item.id);
         return (
           <button
             type="button"
@@ -41,7 +41,7 @@ export function NotificationList({ items }: { items: NotificationItem[] }) {
             disabled={pending || Boolean(item.readAt)}
             onClick={() => mutation.mutate(item.id)}
             className={cn(
-              "w-full rounded-2xl border p-4 text-left transition disabled:cursor-default",
+              "w-full rounded-2xl border p-4 text-left transition disabled:cursor-not-allowed",
               item.readAt ? "bg-white" : "border-[#e6a35e] bg-[#fff5df] hover:border-[#d98732]",
               pending && "opacity-60",
             )}

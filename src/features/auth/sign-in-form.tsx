@@ -3,7 +3,7 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation } from "@tanstack/react-query";
 import Link from "next/link";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useSearchParams } from "next/navigation";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import type { z } from "zod";
@@ -14,10 +14,11 @@ import { contentText, useContent } from "@/content/client";
 import { EmailVerificationDialog } from "@/features/auth/email-verification-dialog";
 import { getAuthErrorMessage, isAuthError, toAuthFlowError } from "@/features/auth/auth-errors";
 import { signInSchema } from "@/features/auth/schemas";
+import { usePendingRouter } from "@/hooks/use-pending-router";
 
 export function SignInForm() {
   const content = useContent("auth");
-  const router = useRouter();
+  const navigation = usePendingRouter();
   const params = useSearchParams();
   const requestedCallback = params.get("callbackUrl");
   const [verificationEmail, setVerificationEmail] = useState<string | null>(null);
@@ -35,8 +36,7 @@ export function SignInForm() {
       return result.data;
     },
     onSuccess: (data) => {
-      router.push(requestedCallback ?? getAuthenticatedHome(data?.user.role));
-      router.refresh();
+      navigation.push(requestedCallback ?? getAuthenticatedHome(data?.user.role));
     },
     onError: (error, values) => {
       if (isAuthError(error, "EMAIL_NOT_VERIFIED")) setVerificationEmail(values.email);
@@ -77,7 +77,7 @@ export function SignInForm() {
         />
         <FormStatus status={errorMessage ? "error" : "idle"} message={errorMessage} />
         <SubmitButton
-          pending={mutation.isPending}
+          pending={mutation.isPending || navigation.isPending}
           pendingLabel={contentText(content, "signIn.submitting", "Đang đăng nhập...")}
         >
           {contentText(content, "signIn.submit", "Đăng nhập")}
@@ -95,7 +95,7 @@ export function SignInForm() {
         open={Boolean(verificationEmail)}
         email={verificationEmail ?? ""}
         callbackURL={requestedCallback ?? "/profiles"}
-        retryPending={mutation.isPending}
+        retryPending={mutation.isPending || navigation.isPending}
         onClose={() => {
           setVerificationEmail(null);
           mutation.reset();

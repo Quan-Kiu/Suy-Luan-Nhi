@@ -2,9 +2,9 @@
 
 import { useMutation } from "@tanstack/react-query";
 import { ShieldCheck, ShieldOff } from "lucide-react";
-import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { membersApi } from "@/api/admin/members";
+import { usePendingRouter } from "@/hooks/use-pending-router";
 
 export type MemberItem = {
   id: string;
@@ -19,12 +19,12 @@ export type MemberItem = {
 type UpdateInput = { payload: Record<string, unknown>; successMessage: string };
 
 export function MemberRow({ item, currentUserId }: { item: MemberItem; currentUserId: string }) {
-  const router = useRouter();
+  const navigation = usePendingRouter();
   const mutation = useMutation({
     mutationFn: ({ payload }: UpdateInput) => membersApi.update(item.id, payload),
     onSuccess: (_, variables) => {
       toast.success(variables.successMessage);
-      router.refresh();
+      navigation.refresh();
     },
   });
   const isCurrentUser = item.id === currentUserId;
@@ -38,7 +38,7 @@ export function MemberRow({ item, currentUserId }: { item: MemberItem; currentUs
       <td className="p-3">
         <select
           aria-label={`Vai trò của ${item.name}`}
-          disabled={isCurrentUser || mutation.isPending}
+          disabled={isCurrentUser || mutation.isPending || navigation.isPending}
           defaultValue={item.role}
           onChange={(event) =>
             mutation.mutate({ payload: { role: event.target.value }, successMessage: "Đã cập nhật vai trò" })
@@ -65,9 +65,9 @@ export function MemberRow({ item, currentUserId }: { item: MemberItem; currentUs
       </td>
       <td className="p-3">
         <button
-          disabled={isCurrentUser || mutation.isPending}
+          disabled={isCurrentUser || mutation.isPending || navigation.isPending}
           type="button"
-          aria-busy={mutation.isPending}
+          aria-busy={mutation.isPending || navigation.isPending}
           onClick={() =>
             mutation.mutate({
               payload: {
@@ -80,7 +80,11 @@ export function MemberRow({ item, currentUserId }: { item: MemberItem; currentUs
           className={`inline-flex items-center gap-2 rounded-xl border px-3 py-2 font-bold disabled:opacity-30 ${item.banned ? "text-green-700" : "text-red-700"}`}
         >
           {item.banned ? <ShieldCheck size={16} /> : <ShieldOff size={16} />}
-          {mutation.isPending ? "Đang cập nhật..." : item.banned ? "Mở lại" : "Tạm ngưng"}
+          {mutation.isPending || navigation.isPending
+            ? "Đang cập nhật..."
+            : item.banned
+              ? "Mở lại"
+              : "Tạm ngưng"}
         </button>
       </td>
     </tr>

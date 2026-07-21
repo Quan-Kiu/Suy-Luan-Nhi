@@ -2,7 +2,6 @@
 
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { z } from "zod";
@@ -16,6 +15,7 @@ import {
   TextField,
 } from "@/components/form";
 import { contentText, useContent } from "@/content/client";
+import { usePendingRouter } from "@/hooks/use-pending-router";
 import { queryKeys } from "@/lib/query/keys";
 
 export type SkillItem = {
@@ -37,7 +37,7 @@ type FormValues = z.infer<typeof schema>;
 
 export function SkillForm({ item }: { item: SkillItem }) {
   const content = useContent("admin");
-  const router = useRouter();
+  const navigation = usePendingRouter();
   const queryClient = useQueryClient();
   const form = useForm<FormValues>({
     resolver: zodResolver(schema),
@@ -53,7 +53,7 @@ export function SkillForm({ item }: { item: SkillItem }) {
     onSuccess: async () => {
       await queryClient.invalidateQueries({ queryKey: queryKeys.admin.taxonomy });
       toast.success(contentText(content, "taxonomy.skillSaved", "Đã lưu kỹ năng"));
-      router.refresh();
+      navigation.refresh();
     },
   });
 
@@ -96,7 +96,7 @@ export function SkillForm({ item }: { item: SkillItem }) {
           registration={form.register("active")}
         />
         <SubmitButton
-          pending={mutation.isPending}
+          pending={mutation.isPending || navigation.isPending}
           pendingLabel={contentText(content, "taxonomy.saving", "Đang lưu...")}
           className="w-auto"
         >
