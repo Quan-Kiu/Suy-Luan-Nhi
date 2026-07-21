@@ -9,6 +9,7 @@ import type { z } from "zod";
 import { authClient } from "@/auth/client";
 import { FormStatus, SubmitButton, TextField } from "@/components/form";
 import { contentText, useContent } from "@/content/client";
+import { getAuthErrorMessage, toAuthFlowError } from "@/features/auth/auth-errors";
 import { resetPasswordSchema } from "@/features/auth/schemas";
 
 export function ResetPasswordForm() {
@@ -21,12 +22,9 @@ export function ResetPasswordForm() {
   });
   const mutation = useMutation({
     mutationFn: async ({ password }: z.infer<typeof resetPasswordSchema>) => {
-      if (!token) throw new Error(contentText(content, "reset.invalidLink", "Liên kết không hợp lệ."));
+      if (!token) throw toAuthFlowError({ code: "INVALID_TOKEN" }, "PASSWORD_RESET_FAILED");
       const result = await authClient.resetPassword({ newPassword: password, token });
-      if (result.error)
-        throw new Error(
-          result.error.message ?? contentText(content, "errors.reset", "Không thể đổi mật khẩu"),
-        );
+      if (result.error) throw toAuthFlowError(result.error, "PASSWORD_RESET_FAILED");
       return result.data;
     },
     onSuccess: () => {
@@ -48,6 +46,9 @@ export function ResetPasswordForm() {
     );
   }
 
+  const errorMessage = mutation.isError
+    ? getAuthErrorMessage(content, mutation.error, "PASSWORD_RESET_FAILED")
+    : undefined;
   return (
     <form className="space-y-4" onSubmit={form.handleSubmit((values) => mutation.mutate(values))} noValidate>
       <TextField
@@ -66,7 +67,7 @@ export function ResetPasswordForm() {
         registration={form.register("confirmPassword")}
         error={form.formState.errors.confirmPassword?.message}
       />
-      <FormStatus status={mutation.isError ? "error" : "idle"} message={mutation.error?.message} />
+      <FormStatus status={errorMessage ? "error" : "idle"} message={errorMessage} />
       <SubmitButton
         pending={mutation.isPending}
         pendingLabel={contentText(content, "reset.submitting", "Đang cập nhật...")}

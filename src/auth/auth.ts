@@ -1,4 +1,5 @@
 import { drizzleAdapter } from "@better-auth/drizzle-adapter";
+import { i18n } from "@better-auth/i18n";
 import { betterAuth } from "better-auth";
 import { nextCookies } from "better-auth/next-js";
 import { eq } from "drizzle-orm";
@@ -7,6 +8,7 @@ import { db } from "@/db/client";
 import * as schema from "@/db/schema";
 import { parentProfiles } from "@/db/schema";
 import { sendTransactionalEmail } from "@/email/mailer";
+import { authTranslations, resolveAuthLocale } from "@/auth/translations";
 
 const rateLimitEnabled =
   process.env["AUTH_RATE_LIMIT_ENABLED"] === undefined
@@ -46,7 +48,7 @@ export const auth = betterAuth({
   },
   emailVerification: {
     sendOnSignUp: env.AUTH_REQUIRE_EMAIL_VERIFICATION,
-    sendOnSignIn: true,
+    sendOnSignIn: false,
     autoSignInAfterVerification: true,
     expiresIn: 60 * 60 * 24,
     sendVerificationEmail: async ({ user, url }) => {
@@ -103,7 +105,15 @@ export const auth = betterAuth({
       },
     },
   },
-  plugins: [nextCookies()],
+  plugins: [
+    i18n({
+      translations: authTranslations,
+      defaultLocale: "vi",
+      detection: ["callback", "header"],
+      getLocale: (context) => resolveAuthLocale(context.headers?.get("x-app-locale")),
+    }),
+    nextCookies(),
+  ],
 });
 
 export type AuthSession = typeof auth.$Infer.Session;

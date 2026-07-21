@@ -7,6 +7,7 @@ import type { z } from "zod";
 import { authClient } from "@/auth/client";
 import { FormStatus, SubmitButton, TextField } from "@/components/form";
 import { contentText, useContent } from "@/content/client";
+import { getAuthErrorMessage, toAuthFlowError } from "@/features/auth/auth-errors";
 import { forgotPasswordSchema } from "@/features/auth/schemas";
 
 export function ForgotPasswordForm() {
@@ -21,7 +22,7 @@ export function ForgotPasswordForm() {
         email,
         redirectTo: `${window.location.origin}/auth/reset-password`,
       });
-      if (result.error) throw new Error(result.error.message ?? "Không thể gửi liên kết đặt lại");
+      if (result.error) throw toAuthFlowError(result.error, "PASSWORD_RESET_REQUEST_FAILED");
       return result.data;
     },
   });
@@ -40,6 +41,9 @@ export function ForgotPasswordForm() {
     );
   }
 
+  const errorMessage = mutation.isError
+    ? getAuthErrorMessage(content, mutation.error, "PASSWORD_RESET_REQUEST_FAILED")
+    : undefined;
   return (
     <form className="space-y-4" onSubmit={form.handleSubmit((values) => mutation.mutate(values))} noValidate>
       <TextField
@@ -50,7 +54,7 @@ export function ForgotPasswordForm() {
         registration={form.register("email")}
         error={form.formState.errors.email?.message}
       />
-      <FormStatus status={mutation.isError ? "error" : "idle"} message={mutation.error?.message} />
+      <FormStatus status={errorMessage ? "error" : "idle"} message={errorMessage} />
       <SubmitButton
         pending={mutation.isPending}
         pendingLabel={contentText(content, "forgot.submitting", "Đang gửi...")}

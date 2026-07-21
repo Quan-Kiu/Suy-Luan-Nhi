@@ -4,17 +4,21 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation } from "@tanstack/react-query";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import type { z } from "zod";
 import { signUp } from "@/auth/client";
 import { FormStatus, SubmitButton, TextField } from "@/components/form";
 import { contentText, useContent } from "@/content/client";
+import { getAuthErrorMessage, toAuthFlowError } from "@/features/auth/auth-errors";
+import { EmailVerificationStep } from "@/features/auth/email-verification-step";
 import { signUpSchema } from "@/features/auth/schemas";
 
 export function SignUpForm() {
   const content = useContent("auth");
   const router = useRouter();
+  const [verificationEmail, setVerificationEmail] = useState<string | null>(null);
   const form = useForm<z.infer<typeof signUpSchema>>({
     resolver: zodResolver(signUpSchema),
     defaultValues: { name: "", email: "", password: "", confirmPassword: "" },
@@ -23,19 +27,39 @@ export function SignUpForm() {
     mutationFn: async ({ confirmPassword: _, ...values }: z.infer<typeof signUpSchema>) => {
       void _;
       const result = await signUp.email({ ...values, callbackURL: "/profiles" });
-      if (result.error)
-        throw new Error(
-          result.error.message ?? contentText(content, "errors.signUp", "Không thể tạo tài khoản"),
-        );
+      if (result.error) throw toAuthFlowError(result.error, "SIGN_UP_FAILED");
       return result.data;
     },
-    onSuccess: () => {
+    onSuccess: (data, values) => {
+      if (!data?.token) {
+        setVerificationEmail(values.email);
+        return;
+      }
       toast.success(contentText(content, "signUp.success", "Tài khoản đã được tạo"));
       router.push("/profiles");
       router.refresh();
     },
   });
 
+  if (verificationEmail) {
+    return (
+      <EmailVerificationStep
+        email={verificationEmail}
+        onUseDifferentEmail={() => {
+          setVerificationEmail(null);
+          mutation.reset();
+          form.setValue("email", "");
+          form.setValue("password", "");
+          form.setValue("confirmPassword", "");
+          requestAnimationFrame(() => form.setFocus("email"));
+        }}
+      />
+    );
+  }
+
+  const errorMessage = mutation.isError
+    ? getAuthErrorMessage(content, mutation.error, "SIGN_UP_FAILED")
+    : undefined;
   return (
     <form className="space-y-4" onSubmit={form.handleSubmit((values) => mutation.mutate(values))} noValidate>
       <TextField
@@ -76,7 +100,7 @@ export function SignUpForm() {
           "Tài khoản này thuộc phụ huynh. Bé không cần email hoặc thông tin định danh.",
         )}
       </p>
-      <FormStatus status={mutation.isError ? "error" : "idle"} message={mutation.error?.message} />
+      <FormStatus status={errorMessage ? "error" : "idle"} message={errorMessage} />
       <SubmitButton
         pending={mutation.isPending}
         pendingLabel={contentText(content, "signUp.submitting", "Đang tạo...")}

@@ -64,7 +64,79 @@ export const authContentEntries = defineContent("auth", {
     value: "Liên kết đặt lại mật khẩu không hợp lệ hoặc đã hết hạn.",
     description: "Thông báo liên kết đặt lại không hợp lệ.",
   },
-  "errors.signIn": { value: "Không thể đăng nhập", description: "Lỗi đăng nhập mặc định." },
-  "errors.signUp": { value: "Không thể tạo tài khoản", description: "Lỗi đăng ký mặc định." },
-  "errors.reset": { value: "Không thể đổi mật khẩu", description: "Lỗi đặt lại mật khẩu mặc định." },
+  "verification.signUpTitle": {
+    value: "Xác minh email để hoàn tất",
+    description: "Tiêu đề xác minh sau đăng ký.",
+  },
+  "verification.signUpDescription": {
+    value: "Tài khoản đã được tạo. Hãy mở email và nhấn nút xác minh trước khi bắt đầu.",
+    description: "Mô tả bước xác minh sau đăng ký.",
+  },
+  "verification.signInTitle": { value: "Xác minh email để tiếp tục", description: "Tiêu đề modal xác minh." },
+  "verification.signInDescription": {
+    value: "Tài khoản này chưa xác minh email. Hãy hoàn tất bước bảo mật trước khi đăng nhập.",
+    description: "Mô tả modal xác minh khi đăng nhập.",
+  },
+  "verification.spamHint": {
+    value: "Chưa thấy email? Hãy kiểm tra mục Thư rác/Spam hoặc bấm gửi lại bên dưới.",
+    description: "Gợi ý tìm email xác minh.",
+  },
+  "verification.stepOpenEmail": {
+    value: "Mở email từ Suy Luận Nhí",
+    description: "Bước mở email xác minh.",
+  },
+  "verification.stepConfirm": {
+    value: "Nhấn “Xác minh email” trong thư",
+    description: "Bước nhấn liên kết xác minh.",
+  },
+  "verification.stepReturn": {
+    value: "Quay lại và tiếp tục hành trình",
+    description: "Bước quay lại ứng dụng.",
+  },
+  "verification.sent": {
+    value: "Email xác minh đã được gửi. Hãy kiểm tra cả thư rác nếu chưa thấy.",
+    description: "Thông báo gửi lại email thành công.",
+  },
+  "verification.resend": { value: "Gửi lại email xác minh", description: "Nút gửi lại email xác minh." },
+  "verification.resending": { value: "Đang gửi lại...", description: "Trạng thái gửi lại email." },
+  "verification.changeEmail": { value: "Dùng email khác", description: "Nút đổi email đăng ký." },
+  "verification.backToSignIn": { value: "Quay lại đăng nhập", description: "Liên kết quay lại đăng nhập." },
+  "verification.retry": { value: "Đã xác minh, thử lại", description: "Nút thử đăng nhập lại." },
+  "verification.later": { value: "Để sau", description: "Nút đóng modal xác minh." },
+  "verification.close": { value: "Đóng", description: "Nhãn đóng modal xác minh." },
+  "errors.invalidCredentials": {
+    value: "Email hoặc mật khẩu chưa đúng.",
+    description: "Lỗi sai thông tin đăng nhập.",
+  },
+  "errors.emailNotVerified": { value: "Email chưa được xác minh.", description: "Lỗi email chưa xác minh." },
+  "errors.accountExists": { value: "Email này đã được sử dụng.", description: "Lỗi tài khoản đã tồn tại." },
+  "errors.invalidEmail": { value: "Email chưa đúng định dạng.", description: "Lỗi email không hợp lệ." },
+  "errors.invalidPassword": { value: "Mật khẩu không hợp lệ.", description: "Lỗi mật khẩu không hợp lệ." },
+  "errors.passwordTooShort": {
+    value: "Mật khẩu chưa đủ độ dài yêu cầu.",
+    description: "Lỗi mật khẩu quá ngắn.",
+  },
+  "errors.passwordTooLong": {
+    value: "Mật khẩu vượt quá độ dài cho phép.",
+    description: "Lỗi mật khẩu quá dài.",
+  },
+  "errors.invalidToken": { value: "Liên kết không hợp lệ.", description: "Lỗi token không hợp lệ." },
+  "errors.tokenExpired": { value: "Liên kết đã hết hạn.", description: "Lỗi token hết hạn." },
+  "errors.emailAlreadyVerified": { value: "Email này đã được xác minh.", description: "Email đã xác minh." },
+  "errors.rateLimited": {
+    value: "Bạn thao tác quá nhanh. Vui lòng thử lại sau ít phút.",
+    description: "Lỗi giới hạn tần suất.",
+  },
+  "errors.signIn": { value: "Không thể đăng nhập lúc này.", description: "Lỗi đăng nhập mặc định." },
+  "errors.signUp": { value: "Không thể tạo tài khoản lúc này.", description: "Lỗi đăng ký mặc định." },
+  "errors.forgot": {
+    value: "Không thể gửi liên kết đặt lại lúc này.",
+    description: "Lỗi gửi email đặt lại.",
+  },
+  "errors.reset": { value: "Không thể đổi mật khẩu lúc này.", description: "Lỗi đặt lại mật khẩu mặc định." },
+  "errors.verificationSend": {
+    value: "Không thể gửi email xác minh lúc này.",
+    description: "Lỗi gửi email xác minh.",
+  },
+  "errors.generic": { value: "Có lỗi xảy ra. Vui lòng thử lại.", description: "Lỗi xác thực chung." },
 });
