@@ -9,7 +9,11 @@ export function useVerificationResend(email: string, callbackURL = "/profiles") 
   const content = useContent("auth");
   const mutation = useMutation({
     mutationFn: async () => {
-      const result = await authClient.sendVerificationEmail({ email, callbackURL });
+      const result = await authClient.sendVerificationEmail({
+        email,
+        callbackURL,
+        fetchOptions: { credentials: "omit" },
+      });
       if (result.error) throw toAuthFlowError(result.error, "VERIFICATION_SEND_FAILED");
       return result.data;
     },

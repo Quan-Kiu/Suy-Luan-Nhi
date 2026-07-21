@@ -60,6 +60,25 @@ describe("authentication verification UX", () => {
     expect(screen.queryByText("Email is not verified")).not.toBeInTheDocument();
   });
 
+  it("resends verification without the stale signed-in session cookie", async () => {
+    mocks.signInEmail.mockResolvedValue({
+      data: null,
+      error: { code: "EMAIL_NOT_VERIFIED", message: "Email is not verified", status: 403 },
+    });
+    renderWithQuery(<SignInForm />);
+
+    await userEvent.type(screen.getByLabelText("Email"), "pending@example.com");
+    await userEvent.type(screen.getByLabelText("Mật khẩu"), "StrongPass123!");
+    await userEvent.click(screen.getByRole("button", { name: "Đăng nhập" }));
+    await userEvent.click(await screen.findByRole("button", { name: "Gửi lại email xác minh" }));
+
+    expect(mocks.sendVerificationEmail).toHaveBeenCalledWith({
+      email: "pending@example.com",
+      callbackURL: "/profiles",
+      fetchOptions: { credentials: "omit" },
+    });
+  });
+
   it("turns successful registration into a required email-verification step", async () => {
     mocks.signUpEmail.mockResolvedValue({
       data: { token: null, user: { email: "new@example.com", emailVerified: false } },
