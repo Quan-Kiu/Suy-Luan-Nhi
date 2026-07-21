@@ -58,3 +58,5 @@ next-env.d.ts
 /.scratch/db-backups/
 /.scratch/dev-cache-stale-*/
 /.scratch/playwright*.config.ts
+# source reference bundle (must never be committed)
+/starter/
