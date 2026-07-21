@@ -6,8 +6,10 @@ export const imageUploadCategories = [
   "general",
   "mission-cover",
   "world-cover",
+  "badge-icon",
   "question-asset",
   "resource-cover",
+  "feedback-attachment",
 ] as const satisfies readonly MediaCategory[];
 
 export type ImageUploadCategory = (typeof imageUploadCategories)[number];

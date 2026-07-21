@@ -31,7 +31,10 @@ export function MissionListActions({
     onSuccess: async () => {
       setArchiveOpen(false);
       toast.success("Đã lưu trữ nhiệm vụ");
-      await queryClient.invalidateQueries({ queryKey: queryKeys.admin.missions });
+      await Promise.all([
+        queryClient.invalidateQueries({ queryKey: queryKeys.admin.missions }),
+        queryClient.invalidateQueries({ queryKey: queryKeys.children.all }),
+      ]);
       navigation.refresh();
     },
   });

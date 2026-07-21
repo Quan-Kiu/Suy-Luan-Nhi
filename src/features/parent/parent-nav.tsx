@@ -37,11 +37,21 @@ function isActive(pathname: string, href: string, exact: boolean) {
   return exact ? pathname === href : pathname === href || pathname.startsWith(`${href}/`);
 }
 
-export function ParentNav({ unread = 0 }: { unread?: number }) {
+export function ParentNav({
+  unread = 0,
+  resourcesEnabled = true,
+}: {
+  unread?: number;
+  resourcesEnabled?: boolean;
+}) {
   const content = useContent("parent");
   const pathname = usePathname();
   const signOutFlow = useSignOutNavigation("/");
-  const links = items.map((item) => ({ ...item, label: contentText(content, item.labelKey, item.fallback) }));
+  const visibleItems = resourcesEnabled ? items : items.filter((item) => item.href !== "/parent/resources");
+  const links = visibleItems.map((item) => ({
+    ...item,
+    label: contentText(content, item.labelKey, item.fallback),
+  }));
 
   return (
     <>

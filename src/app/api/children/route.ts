@@ -1,6 +1,7 @@
+import { revalidatePath } from "next/cache";
 import { apiJson } from "@/lib/api-response";
 import { requireApiRoles } from "@/auth/api";
-import { createChild, listChildren } from "@/modules/family/family";
+import { ChildProfileLimitError, createChild, listChildren } from "@/modules/family/family";
 import { createChildSchema } from "@/modules/family/schemas";
 
 export async function GET(request: Request) {
@@ -18,6 +19,18 @@ export async function POST(request: Request) {
       { message: input.error.issues[0]?.message, issues: input.error.flatten() },
       { status: 400 },
     );
-  const child = await createChild(authResult.session.user.id, authResult.session.user.name, input.data);
-  return apiJson(child, { status: 201 });
+  try {
+    const child = await createChild(authResult.session.user.id, authResult.session.user.name, input.data);
+    revalidatePath("/profiles");
+    revalidatePath("/onboarding");
+    return apiJson(child, { status: 201 });
+  } catch (error) {
+    if (error instanceof ChildProfileLimitError) {
+      return apiJson(
+        { code: "CHILD_PROFILE_LIMIT_REACHED", message: error.message, limit: error.limit },
+        { status: 409 },
+      );
+    }
+    throw error;
+  }
 }

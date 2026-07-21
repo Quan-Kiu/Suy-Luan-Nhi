@@ -1,4 +1,5 @@
 import { apiJson } from "@/lib/api-response";
+import { invalidateAdminMissionViews } from "@/lib/cache/invalidation";
 import { requireApiRoles } from "@/auth/api";
 import { adminMissionDraftSchema } from "@/modules/admin/schemas";
 import {
@@ -43,7 +44,9 @@ export async function POST(request: Request) {
     );
   }
   try {
-    return apiJson(await createAdminMission(input.data, authResult.session.user.id), { status: 201 });
+    const mission = await createAdminMission(input.data, authResult.session.user.id);
+    invalidateAdminMissionViews(mission.id);
+    return apiJson(mission, { status: 201 });
   } catch (error) {
     if (error instanceof Error && error.message.includes("unique")) {
       return apiJson({ message: "Slug nhiệm vụ đã tồn tại" }, { status: 409 });

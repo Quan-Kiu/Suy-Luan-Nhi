@@ -21,7 +21,7 @@ export default async function Page() {
     estimatedMinutes: 5,
     primarySkillId: taxonomy.skills[0].id,
     secondarySkillIds: [],
-    rewardBadgeId: taxonomy.badges[0]?.id ?? null,
+    rewardBadgeId: taxonomy.badges.find((badge) => badge.active)?.id ?? null,
     coverUrl: "/assets/cards/mission-thumb-footprint-detective.png",
     ageGroups: ["6-8"],
     difficulty: 1,

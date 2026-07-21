@@ -69,6 +69,12 @@ export const notificationType = pgEnum("notification_type", [
   "thinking_habit",
   "system",
 ]);
+export const feedbackStatus = pgEnum("system_feedback_status", [
+  "new",
+  "in_progress",
+  "resolved",
+  "dismissed",
+]);
 
 export const parentProfiles = pgTable("parent_profiles", {
   id: uuid("id").defaultRandom().primaryKey(),
@@ -568,6 +574,47 @@ export const notifications = pgTable("notifications", {
   readAt: timestamp("read_at", { withTimezone: true }),
   createdAt: timestamp("created_at", { withTimezone: true }).defaultNow().notNull(),
 });
+
+export const systemFeedback = pgTable(
+  "system_feedback",
+  {
+    id: uuid("id").defaultRandom().primaryKey(),
+    userId: text("user_id").references(() => user.id, { onDelete: "set null" }),
+    content: text("content").notNull(),
+    pagePath: text("page_path").notNull(),
+    pageTitle: text("page_title"),
+    context: jsonb("context").$type<Record<string, unknown>>().default({}).notNull(),
+    status: feedbackStatus("status").default("new").notNull(),
+    adminNote: text("admin_note"),
+    handledBy: text("handled_by").references(() => user.id, { onDelete: "set null" }),
+    handledAt: timestamp("handled_at", { withTimezone: true }),
+    createdAt: timestamp("created_at", { withTimezone: true }).defaultNow().notNull(),
+    updatedAt: timestamp("updated_at", { withTimezone: true }).defaultNow().notNull(),
+  },
+  (table) => [
+    index("system_feedback_status_created_idx").on(table.status, table.createdAt),
+    index("system_feedback_user_created_idx").on(table.userId, table.createdAt),
+    check("system_feedback_content_length", sql`char_length(${table.content}) between 10 and 4000`),
+  ],
+);
+
+export const systemFeedbackAttachments = pgTable(
+  "system_feedback_attachments",
+  {
+    feedbackId: uuid("feedback_id")
+      .notNull()
+      .references(() => systemFeedback.id, { onDelete: "cascade" }),
+    mediaAssetId: uuid("media_asset_id")
+      .notNull()
+      .references(() => mediaAssets.id, { onDelete: "restrict" }),
+    sortOrder: integer("sort_order").notNull(),
+  },
+  (table) => [
+    primaryKey({ columns: [table.feedbackId, table.mediaAssetId] }),
+    unique("system_feedback_attachment_order_unique").on(table.feedbackId, table.sortOrder),
+    index("system_feedback_attachment_media_idx").on(table.mediaAssetId),
+  ],
+);
 
 export const dataRequests = pgTable("data_requests", {
   id: uuid("id").defaultRandom().primaryKey(),

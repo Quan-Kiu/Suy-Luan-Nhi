@@ -1,4 +1,5 @@
 import { describe, expect, it } from "vitest";
+import { createBadgeSchema, updateBadgeSchema } from "@/modules/admin/badge-admin";
 import { adminResourceSchema } from "@/modules/admin/resource-admin";
 import {
   adminMissionDraftSchema,
@@ -99,5 +100,24 @@ describe("adminResourceSchema", () => {
   it("requires an uploaded video URL for video resources", () => {
     expect(adminResourceSchema.safeParse({ ...resourceBase, mediaUrl: null }).success).toBe(false);
     expect(adminResourceSchema.safeParse(resourceBase).success).toBe(true);
+  });
+});
+
+describe("badge schemas", () => {
+  const badge = {
+    slug: "nguoi-ban-khu-pho-xanh",
+    name: "Người bạn Khu phố Xanh",
+    description: "Hoàn thành nhiệm vụ và cùng chăm sóc khu phố.",
+    iconUrl: "/assets/badge.png",
+    skillId: null,
+  };
+
+  it("accepts a complete badge and keeps the technical code safe", () => {
+    expect(createBadgeSchema.safeParse(badge).success).toBe(true);
+    expect(createBadgeSchema.safeParse({ ...badge, slug: "Huy hiệu mới" }).success).toBe(false);
+  });
+
+  it("allows an existing badge to be hidden without deleting it", () => {
+    expect(updateBadgeSchema.safeParse({ ...badge, active: false, slug: undefined }).success).toBe(true);
   });
 });

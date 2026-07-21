@@ -113,6 +113,44 @@ test("content admin creates taxonomy and world content through the CMS", async (
   await expect(
     page.getByRole("article", { name: "Kỹ năng: Tư duy E2E" }).getByPlaceholder("Ví dụ: Quan sát kỹ"),
   ).toHaveValue("Tư duy E2E");
+
+  await page.goto("/admin/badges");
+  await expect(page.getByRole("heading", { name: "Huy hiệu", exact: true })).toBeVisible();
+  const newBadge = page.getByRole("region", { name: "Thêm huy hiệu mới" });
+  await newBadge.getByPlaceholder("Ví dụ: Người bạn Khu phố Xanh").fill("Huy hiệu E2E");
+  await newBadge
+    .getByPlaceholder("Giải thích bé nhận huy hiệu khi hoàn thành điều gì.")
+    .fill("Huy hiệu dùng để kiểm tra luồng quản lý phần thưởng.");
+  await newBadge.locator('input[type="file"]').setInputFiles({
+    name: "badge-e2e.png",
+    mimeType: "image/png",
+    buffer: tinyPng,
+  });
+  await expect(newBadge.getByText(/Tệp đã được gắn tự động vào nội dung/)).toBeVisible();
+  await newBadge.getByRole("button", { name: "Thêm huy hiệu" }).click();
+  await expect(page.getByText("Đã thêm huy hiệu")).toBeVisible();
+  const badgeCard = page.getByRole("article", { name: "Huy hiệu: Huy hiệu E2E" });
+  await expect(badgeCard).toBeVisible();
+
+  await page.goto("/admin/missions/new");
+  await expect(
+    page
+      .getByRole("combobox", { name: /Huy hiệu nhận được|Phần thưởng/ })
+      .getByRole("option", { name: "Huy hiệu E2E" }),
+  ).toHaveCount(1);
+
+  await page.goto("/admin/badges");
+  const editableBadge = page.getByRole("article", { name: "Huy hiệu: Huy hiệu E2E" });
+  await editableBadge.getByLabel("Cho phép chọn huy hiệu này trong nhiệm vụ mới").uncheck();
+  await editableBadge.getByRole("button", { name: "Lưu thay đổi" }).click();
+  await expect(page.getByText("Đã cập nhật huy hiệu")).toBeVisible();
+
+  await page.goto("/admin/missions/new");
+  await expect(
+    page
+      .getByRole("combobox", { name: /Huy hiệu nhận được|Phần thưởng/ })
+      .getByRole("option", { name: /Huy hiệu E2E/ }),
+  ).toHaveCount(0);
 });
 test("media follows upload, reviewer approval and owner deletion permissions", async ({ page }) => {
   await signIn(page, "content@demo.local", "/admin/media");
@@ -176,7 +214,7 @@ test("super admin changes common settings without editing raw JSON", async ({ pa
   const uploadPolicies = page.locator("section").filter({
     has: page.getByRole("heading", { name: "Giới hạn tải ảnh theo từng nội dung" }),
   });
-  await expect(uploadPolicies.getByRole("group")).toHaveCount(5);
+  await expect(uploadPolicies.getByRole("group")).toHaveCount(7);
   const missionCoverPolicy = uploadPolicies.getByRole("group", { name: "Ảnh bìa nhiệm vụ" });
   const maxSizeInput = missionCoverPolicy.getByLabel("Dung lượng tối đa (MB)");
   await expect(maxSizeInput).toHaveValue("5");

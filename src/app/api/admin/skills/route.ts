@@ -1,4 +1,5 @@
 import { apiJson } from "@/lib/api-response";
+import { invalidateTaxonomyCaches } from "@/lib/cache/invalidation";
 import { z } from "zod";
 import { requireApiRoles } from "@/auth/api";
 import { createSkill } from "@/modules/admin/operations";
@@ -13,5 +14,7 @@ export async function POST(request: Request) {
   if ("error" in authResult) return authResult.error;
   const input = schema.safeParse(await request.json().catch(() => null));
   if (!input.success) return apiJson({ message: input.error.issues[0]?.message }, { status: 400 });
-  return apiJson(await createSkill(authResult.session.user.id, input.data), { status: 201 });
+  const skill = await createSkill(authResult.session.user.id, input.data);
+  invalidateTaxonomyCaches();
+  return apiJson(skill, { status: 201 });
 }

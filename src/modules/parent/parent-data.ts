@@ -4,12 +4,14 @@ import { db } from "@/db/client";
 import type { AgeGroup } from "@/domain/age-groups";
 import type { ParentResourceCategory, ParentResourceType } from "@/domain/parent-resources";
 import { cacheTags } from "@/lib/cache/tags";
+import { parseMissionSnapshot } from "@/modules/catalog/snapshot";
 import { buildSkillSummaries } from "@/modules/parent/skill-summary";
 import {
   activitySummaries,
   childBadges,
   conversationSuggestions,
   missionSessions,
+  missionVersions,
   missions,
   notifications,
   parentProfiles,
@@ -17,6 +19,15 @@ import {
   badges,
   skills,
 } from "@/db/schema";
+
+function historicalMissionPresentation(snapshot: unknown, fallback: { title: string; coverUrl: string }) {
+  try {
+    const mission = parseMissionSnapshot(snapshot);
+    return { missionTitle: mission.title, missionCover: mission.coverUrl };
+  } catch {
+    return { missionTitle: fallback.title, missionCover: fallback.coverUrl };
+  }
+}
 
 async function readParentDashboard(childId: string, parentProfileId: string) {
   const since = new Date();
@@ -59,11 +70,13 @@ async function readParentDashboard(childId: string, parentProfileId: string) {
         stars: missionSessions.stars,
         hints: missionSessions.hintUsedCount,
         retries: missionSessions.wrongAttemptCount,
-        missionTitle: missions.title,
-        missionCover: missions.coverUrl,
+        missionSnapshot: missionVersions.snapshot,
+        fallbackMissionTitle: missions.title,
+        fallbackMissionCover: missions.coverUrl,
       })
       .from(missionSessions)
       .innerJoin(missions, eq(missionSessions.missionId, missions.id))
+      .innerJoin(missionVersions, eq(missionSessions.missionVersionId, missionVersions.id))
       .where(eq(missionSessions.childProfileId, childId))
       .orderBy(desc(missionSessions.startedAt))
       .limit(6),
@@ -88,7 +101,15 @@ async function readParentDashboard(childId: string, parentProfileId: string) {
     activity,
     totals,
     skills: buildSkillSummaries(skillTotals, skillDefinitions),
-    recentSessions,
+    recentSessions: recentSessions.map(
+      ({ missionSnapshot, fallbackMissionTitle, fallbackMissionCover, ...item }) => ({
+        ...item,
+        ...historicalMissionPresentation(missionSnapshot, {
+          title: fallbackMissionTitle,
+          coverUrl: fallbackMissionCover,
+        }),
+      }),
+    ),
     earnedBadges,
     unreadNotifications: unread[0]?.count ?? 0,
   };
@@ -99,7 +120,11 @@ export function getParentDashboard(childId: string, parentProfileId: string) {
     () => readParentDashboard(childId, parentProfileId),
     ["parent-dashboard", childId, parentProfileId],
     {
-      tags: [cacheTags.parentDashboard(childId), cacheTags.parentNotifications(parentProfileId)],
+      tags: [
+        cacheTags.parentDashboard(childId),
+        cacheTags.parentNotifications(parentProfileId),
+        cacheTags.adminTaxonomy,
+      ],
       revalidate: 30,
     },
   )();
@@ -115,7 +140,7 @@ export async function getActivityHistory(
   if (filters.from) conditions.push(gte(missionSessions.startedAt, new Date(filters.from)));
   if (filters.to)
     conditions.push(sql`${missionSessions.startedAt} <= ${new Date(`${filters.to}T23:59:59.999Z`)}`);
-  return db
+  const rows = await db
     .select({
       id: missionSessions.id,
       status: missionSessions.status,
@@ -126,14 +151,24 @@ export async function getActivityHistory(
       hints: missionSessions.hintUsedCount,
       retries: missionSessions.wrongAttemptCount,
       stars: missionSessions.stars,
-      missionTitle: missions.title,
-      missionCover: missions.coverUrl,
+      missionSnapshot: missionVersions.snapshot,
+      fallbackMissionTitle: missions.title,
+      fallbackMissionCover: missions.coverUrl,
       missionSlug: missions.slug,
     })
     .from(missionSessions)
     .innerJoin(missions, eq(missionSessions.missionId, missions.id))
+    .innerJoin(missionVersions, eq(missionSessions.missionVersionId, missionVersions.id))
     .where(and(...conditions))
     .orderBy(desc(missionSessions.startedAt));
+
+  return rows.map(({ missionSnapshot, fallbackMissionTitle, fallbackMissionCover, ...item }) => ({
+    ...item,
+    ...historicalMissionPresentation(missionSnapshot, {
+      title: fallbackMissionTitle,
+      coverUrl: fallbackMissionCover,
+    }),
+  }));
 }
 
 async function readSuggestions(ageGroup: "6-8" | "9-10" | "11-12") {

@@ -57,9 +57,6 @@ const envSchema = z.object({
   CLOUDINARY_API_SECRET: optionalString,
   CLOUDINARY_FOLDER: z.string().min(1).default("sln-gpt"),
   CLOUDINARY_UPLOAD_PRESET: optionalString,
-  PARENT_GATE_TTL_MINUTES: z.coerce.number().int().min(5).max(120).default(30),
-  PARENT_GATE_MAX_ATTEMPTS: z.coerce.number().int().min(3).max(20).default(5),
-  PARENT_GATE_LOCK_MINUTES: z.coerce.number().int().min(1).max(60).default(5),
   CRON_SECRET: optionalSecret,
 });
 const parsed = envSchema.safeParse(process.env);

@@ -38,10 +38,7 @@ describe("cloudinaryStorageProvider", () => {
       end() {
         attempt += 1;
         if (attempt === 1) {
-          callback(
-            { http_code: 403, message: "Server returned unexpected status code - 403" },
-            undefined,
-          );
+          callback({ http_code: 403, message: "Server returned unexpected status code - 403" }, undefined);
           return;
         }
         callback(undefined, {

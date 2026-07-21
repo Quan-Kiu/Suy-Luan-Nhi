@@ -1,7 +1,7 @@
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { Rocket } from "lucide-react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
@@ -11,6 +11,7 @@ import { AsyncButton } from "@/components/async-button";
 import { FormStatus, SubmitButton, TextField } from "@/components/form";
 import { contentText, useContent } from "@/content/client";
 import { usePendingRouter } from "@/hooks/use-pending-router";
+import { queryKeys } from "@/lib/query/keys";
 
 const schema = z.object({ scheduledFor: z.string().min(1, "Hãy chọn thời gian hiển thị") });
 type FormValues = z.infer<typeof schema>;
@@ -18,10 +19,11 @@ type FormValues = z.infer<typeof schema>;
 export function ReviewPublishActions({ missionId, versionId }: { missionId: string; versionId: string }) {
   const content = useContent("admin");
   const navigation = usePendingRouter();
+  const queryClient = useQueryClient();
   const form = useForm<FormValues>({ resolver: zodResolver(schema), defaultValues: { scheduledFor: "" } });
   const publishMutation = useMutation({
     mutationFn: () => reviewsApi.publish(missionId, versionId),
-    onSuccess: () => {
+    onSuccess: async () => {
       toast.success(contentText(content, "review.publishSuccessTitle", "Đã cho bé xem"), {
         description: contentText(
           content,
@@ -31,13 +33,17 @@ export function ReviewPublishActions({ missionId, versionId }: { missionId: stri
         id: `mission-publish-${versionId}`,
         duration: 8000,
       });
+      await Promise.all([
+        queryClient.invalidateQueries({ queryKey: queryKeys.admin.missions }),
+        queryClient.invalidateQueries({ queryKey: queryKeys.children.all }),
+      ]);
       navigation.refresh();
     },
   });
   const scheduleMutation = useMutation({
     mutationFn: ({ scheduledFor }: FormValues) =>
       reviewsApi.schedule(missionId, versionId, new Date(scheduledFor).toISOString()),
-    onSuccess: () => {
+    onSuccess: async () => {
       toast.success(contentText(content, "review.scheduleSuccessTitle", "Đã lưu thời gian hiển thị"), {
         description: contentText(
           content,
@@ -47,6 +53,7 @@ export function ReviewPublishActions({ missionId, versionId }: { missionId: stri
         id: `mission-schedule-${versionId}`,
         duration: 8000,
       });
+      await queryClient.invalidateQueries({ queryKey: queryKeys.admin.missions });
       navigation.refresh();
     },
   });

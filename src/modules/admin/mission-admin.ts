@@ -88,7 +88,7 @@ export async function getAdminTaxonomy() {
   const [worldRows, skillRows, badgeRows] = await Promise.all([
     db.select().from(missionWorlds).orderBy(asc(missionWorlds.sortOrder)),
     db.select().from(skills).where(eq(skills.active, true)).orderBy(asc(skills.title)),
-    db.select().from(badges).where(eq(badges.active, true)).orderBy(asc(badges.name)),
+    db.select().from(badges).orderBy(asc(badges.name)),
   ]);
   return { worlds: worldRows, skills: skillRows, badges: badgeRows };
 }
@@ -511,8 +511,10 @@ function collectReferencedUrls(value: unknown, urls = new Set<string>()) {
   return urls;
 }
 
-async function findUnapprovedReferencedMedia(snapshot: unknown) {
-  const urls = [...collectReferencedUrls(snapshot)];
+async function findUnapprovedReferencedMedia(snapshot: unknown, extraUrls: string[] = []) {
+  const referencedUrls = collectReferencedUrls(snapshot);
+  for (const url of extraUrls) collectReferencedUrls(url, referencedUrls);
+  const urls = [...referencedUrls];
   if (!urls.length) return [];
   const registered = await db.query.mediaAssets.findMany({
     where: inArray(mediaAssets.url, urls),
@@ -534,7 +536,13 @@ export async function submitMissionForReview(missionId: string, actorId: string)
   }
   const snapshot = await buildMissionSnapshot(missionId);
   if (!snapshot) return { error: "not_found" } as const;
-  const unapprovedMedia = await findUnapprovedReferencedMedia(snapshot);
+  const rewardBadge = snapshot.rewardBadge
+    ? await db.query.badges.findFirst({ where: eq(badges.slug, snapshot.rewardBadge) })
+    : null;
+  const unapprovedMedia = await findUnapprovedReferencedMedia(
+    snapshot,
+    rewardBadge ? [rewardBadge.iconUrl] : [],
+  );
   if (unapprovedMedia.length) {
     return { error: "media_unapproved", media: unapprovedMedia } as const;
   }

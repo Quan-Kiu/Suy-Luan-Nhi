@@ -1,4 +1,4 @@
-import { revalidateTag } from "next/cache";
+import { revalidatePath, revalidateTag } from "next/cache";
 import { cacheTags } from "@/lib/cache/tags";
 
 const expireImmediately = { expire: 0 } as const;
@@ -25,4 +25,27 @@ export function invalidateChildMissionMap(childId: string) {
 
 export function invalidatePublishedCatalog() {
   revalidateTag(cacheTags.publishedCatalog, expireImmediately);
+}
+
+export function invalidateAdminMissionViews(missionId?: string) {
+  revalidatePath("/admin");
+  revalidatePath("/admin/missions");
+  revalidatePath("/admin/reviews");
+  if (missionId) revalidatePath(`/admin/missions/${missionId}/edit`);
+}
+
+export function invalidateTaxonomyCaches() {
+  revalidateTag(cacheTags.adminTaxonomy, expireImmediately);
+  revalidateTag(cacheTags.publishedCatalog, expireImmediately);
+  revalidatePath("/admin/taxonomy");
+  revalidatePath("/admin/worlds");
+  revalidatePath("/admin/badges");
+  revalidatePath("/admin/missions");
+  revalidatePath("/admin/missions/new");
+  revalidatePath("/admin/reviews");
+  revalidatePath("/parent");
+}
+
+export function invalidateSystemSettingsViews() {
+  revalidatePath("/", "layout");
 }

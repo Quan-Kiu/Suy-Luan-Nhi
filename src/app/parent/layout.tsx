@@ -8,9 +8,14 @@ import { getOrCreateParentProfile } from "@/modules/family/family";
 import { createParentMathChallenge } from "@/modules/family/parent-challenge";
 import { hasParentGate } from "@/modules/family/parent-gate";
 import { getUnreadNotificationCount } from "@/modules/parent/parent-data";
+import { getOperationalSystemSettings } from "@/modules/system-settings/runtime";
 
 export default async function ParentLayout({ children }: { children: React.ReactNode }) {
-  const [session, content] = await Promise.all([requireParent(), getContentNamespace("parent")]);
+  const [session, content, systemSettings] = await Promise.all([
+    requireParent(),
+    getContentNamespace("parent"),
+    getOperationalSystemSettings(),
+  ]);
   const parent = await getOrCreateParentProfile(session.user.id, session.user.name);
   const unlocked = await hasParentGate(parent.id);
 
@@ -29,7 +34,12 @@ export default async function ParentLayout({ children }: { children: React.React
   const unread = await getUnreadNotificationCount(parent.id);
 
   return (
-    <ParentShell childName={active.child.displayName} unread={unread} content={content}>
+    <ParentShell
+      childName={active.child.displayName}
+      unread={unread}
+      content={content}
+      resourcesEnabled={systemSettings.features.parentResourcesEnabled}
+    >
       {children}
     </ParentShell>
   );

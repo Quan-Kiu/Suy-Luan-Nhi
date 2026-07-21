@@ -2,12 +2,14 @@ import { and, desc, eq, isNull, sql } from "drizzle-orm";
 import { db } from "@/db/client";
 import {
   auditLogs,
+  badges,
   mediaAssets,
   missions,
   missionVersions,
   missionWorlds,
   parentResources,
   questions,
+  systemFeedbackAttachments,
 } from "@/db/schema";
 import type { MediaCategory } from "@/domain/media";
 import { deleteStoredMedia, storeMedia } from "@/modules/media/storage";
@@ -76,7 +78,12 @@ export async function listMedia(filters: MediaListFilters = {}) {
   };
 }
 
-export async function uploadMedia(file: File, altText: string, category: MediaCategory, actorId: string) {
+export async function uploadMedia(
+  file: File,
+  altText: string,
+  category: MediaCategory,
+  actorId: string | null,
+) {
   if (!altText.trim()) {
     throw new MediaValidationError("Mô tả hình ảnh là bắt buộc để đảm bảo khả năng tiếp cận");
   }
@@ -109,29 +116,33 @@ export async function uploadMedia(file: File, altText: string, category: MediaCa
   return asset;
 }
 
-export async function deleteMedia(mediaId: string, actorId: string) {
+export async function deleteMedia(mediaId: string, actorId: string | null) {
   const asset = await db.query.mediaAssets.findFirst({ where: eq(mediaAssets.id, mediaId) });
   if (!asset || asset.deletedAt) return false;
   const [references] = await db
     .select({
       missionCovers: sql<number>`(select count(*)::int from ${missions} where ${missions.coverUrl} = ${asset.url})`,
+      badgeIcons: sql<number>`(select count(*)::int from ${badges} where ${badges.iconUrl} = ${asset.url} or ${badges.iconAssetId} = ${asset.id})`,
       worldCovers: sql<number>`(select count(*)::int from ${missionWorlds} where ${missionWorlds.coverUrl} = ${asset.url})`,
       resourceMedia: sql<number>`(select count(*)::int from ${parentResources} where ${parentResources.coverUrl} = ${asset.url} or ${parentResources.mediaUrl} = ${asset.url})`,
       questionPayloads: sql<number>`(select count(*)::int from ${questions} where ${questions.payload}::text like ${`%${asset.url}%`})`,
       versionSnapshots: sql<number>`(select count(*)::int from ${missionVersions} where ${missionVersions.snapshot}::text like ${`%${asset.url}%`} and ${missionVersions.status} in ('in_review','approved','published'))`,
+      feedbackAttachments: sql<number>`(select count(*)::int from ${systemFeedbackAttachments} where ${systemFeedbackAttachments.mediaAssetId} = ${asset.id})`,
     })
     .from(mediaAssets)
     .where(eq(mediaAssets.id, mediaId));
   if (
     (references?.missionCovers ?? 0) +
+      (references?.badgeIcons ?? 0) +
       (references?.worldCovers ?? 0) +
       (references?.resourceMedia ?? 0) +
       (references?.questionPayloads ?? 0) +
-      (references?.versionSnapshots ?? 0) >
+      (references?.versionSnapshots ?? 0) +
+      (references?.feedbackAttachments ?? 0) >
     0
   ) {
     throw new Error(
-      "Media đang được dùng trong nhiệm vụ, thế giới hoặc tài nguyên; hãy thay thế trước khi xóa",
+      "Tệp đang được dùng trong nhiệm vụ, huy hiệu, chủ đề hoặc tài nguyên; hãy thay thế trước khi xóa",
     );
   }
   await deleteStoredMedia(asset.storageProvider, asset.storageKey, asset.storageMetadata);

@@ -6,9 +6,14 @@ import { contentText } from "@/content/resolve";
 import { ProfileManager } from "@/features/profile/profile-manager";
 import { getContentNamespace } from "@/modules/content/content";
 import { listChildren } from "@/modules/family/family";
+import { getOperationalSystemSettings } from "@/modules/system-settings/runtime";
 
 export default async function ProfilesPage() {
-  const [session, content] = await Promise.all([requireParent(), getContentNamespace("profile")]);
+  const [session, content, systemSettings] = await Promise.all([
+    requireParent(),
+    getContentNamespace("profile"),
+    getOperationalSystemSettings(),
+  ]);
   const children = await listChildren(session.user.id, session.user.name);
   return (
     <main className="paper-texture min-h-[calc(100vh-5rem)] px-5 py-7">
@@ -34,7 +39,7 @@ export default async function ProfilesPage() {
       </div>
       <div className="mt-6">
         {children.length ? (
-          <ProfileManager profiles={children} />
+          <ProfileManager profiles={children} maxProfiles={systemSettings.limits.maxChildProfiles} />
         ) : (
           <Card className="p-6 text-center">
             <p className="font-black">

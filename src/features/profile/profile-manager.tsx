@@ -8,18 +8,31 @@ import { childrenApi } from "@/api/children";
 import { ConfirmDialog } from "@/components/confirm-dialog";
 import { FormStatus } from "@/components/form";
 import { contentText, useContent } from "@/content/client";
+import { useSetActiveChild } from "@/features/child/active-child-context";
 import { ProfileCard, type ProfileListItem } from "@/features/profile/profile-card";
 import { usePendingRouter } from "@/hooks/use-pending-router";
 import { queryKeys } from "@/lib/query/keys";
 
-export function ProfileManager({ profiles }: { profiles: ProfileListItem[] }) {
+export function ProfileManager({
+  profiles,
+  maxProfiles,
+}: {
+  profiles: ProfileListItem[];
+  maxProfiles: number;
+}) {
   const content = useContent("profile");
   const navigation = usePendingRouter();
   const queryClient = useQueryClient();
+  const setActiveChild = useSetActiveChild();
   const [deleteTarget, setDeleteTarget] = useState<ProfileListItem | null>(null);
   const selectMutation = useMutation({
     mutationFn: (profile: ProfileListItem) => childrenApi.select(profile.id).then(() => profile),
-    onSuccess: () => {
+    onSuccess: (profile) => {
+      setActiveChild({
+        id: profile.id,
+        displayName: profile.displayName,
+        ageGroup: profile.ageGroup,
+      });
       navigation.push("/missions");
     },
   });
@@ -74,12 +87,21 @@ export function ProfileManager({ profiles }: { profiles: ProfileListItem[] }) {
         onClose={() => setDeleteTarget(null)}
         onConfirm={() => deleteTarget && deleteMutation.mutate(deleteTarget)}
       />
-      <Link
-        href="/onboarding"
-        className="block rounded-2xl border-2 border-dashed border-[#d7c39d] bg-white/70 p-5 text-center font-black text-[#6d5738]"
-      >
-        {contentText(content, "list.createMore", "+ Tạo thêm hồ sơ bé")}
-      </Link>
+      {profiles.length >= maxProfiles ? (
+        <div className="rounded-2xl border border-amber-200 bg-amber-50 p-5 text-center">
+          <p className="font-black text-amber-900">Đã đạt giới hạn {maxProfiles} hồ sơ bé</p>
+          <p className="mt-2 text-sm leading-6 text-amber-800">
+            Có thể xóa một hồ sơ không còn sử dụng trước khi tạo hồ sơ mới.
+          </p>
+        </div>
+      ) : (
+        <Link
+          href="/onboarding"
+          className="block rounded-2xl border-2 border-dashed border-[#d7c39d] bg-white/70 p-5 text-center font-black text-[#6d5738]"
+        >
+          {contentText(content, "list.createMore", "+ Tạo thêm hồ sơ bé")}
+        </Link>
+      )}
     </div>
   );
 }

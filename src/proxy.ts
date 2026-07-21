@@ -4,12 +4,37 @@ import { apiJson } from "@/lib/api-response";
 import { isTrustedRequestOrigin } from "@/lib/origin";
 import { shouldRelockParentGate } from "@/lib/navigation/parent-gate-relock";
 import { PARENT_GATE_COOKIE_NAME } from "@/modules/family/parent-gate-constants";
+import { getOperationalSystemSettings } from "@/modules/system-settings/runtime";
 
 const protectedPrefixes = ["/parent", "/admin", "/profiles", "/missions", "/play", "/complete"];
 const mutationMethods = new Set(["POST", "PUT", "PATCH", "DELETE"]);
+const maintenanceBypassPrefixes = [
+  "/maintenance",
+  "/admin",
+  "/api/admin",
+  "/api/auth",
+  "/api/health",
+  "/api/cron",
+  "/auth",
+  "/service-unavailable",
+  "/uploads",
+];
 
-export function proxy(request: NextRequest) {
+function matchesPrefix(pathname: string, prefix: string) {
+  return pathname === prefix || pathname.startsWith(`${prefix}/`);
+}
+
+function isMaintenanceBypass(pathname: string) {
+  return maintenanceBypassPrefixes.some((prefix) => matchesPrefix(pathname, prefix));
+}
+
+function isSignUpRequest(request: NextRequest) {
+  return request.method === "POST" && request.nextUrl.pathname.startsWith("/api/auth/sign-up");
+}
+
+export async function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
+  const settings = await getOperationalSystemSettings();
   const shouldRelockParent = shouldRelockParentGate({
     pathname,
     hasGateCookie: Boolean(request.cookies.get(PARENT_GATE_COOKIE_NAME)),
@@ -20,6 +45,27 @@ export function proxy(request: NextRequest) {
     if (shouldRelockParent) response.cookies.delete(PARENT_GATE_COOKIE_NAME);
     return response;
   };
+
+  if (isSignUpRequest(request) && !settings.features.registrationEnabled) {
+    return apiJson(
+      { code: "REGISTRATION_DISABLED", message: "Hệ thống đang tạm dừng tiếp nhận tài khoản mới" },
+      { status: 403 },
+    );
+  }
+
+  if (settings.maintenance.enabled && !isMaintenanceBypass(pathname)) {
+    if (pathname.startsWith("/api/")) {
+      return apiJson(
+        { code: "MAINTENANCE_MODE", message: settings.maintenance.message },
+        { status: 503, headers: { "Retry-After": "300" } },
+      );
+    }
+    const target = new URL("/maintenance", request.url);
+    target.searchParams.set("from", `${pathname}${request.nextUrl.search}`);
+    const response = NextResponse.redirect(target);
+    if (shouldRelockParent) response.cookies.delete(PARENT_GATE_COOKIE_NAME);
+    return response;
+  }
 
   if (
     pathname.startsWith("/api/") &&
@@ -41,9 +87,7 @@ export function proxy(request: NextRequest) {
     }
   }
 
-  if (!protectedPrefixes.some((prefix) => pathname === prefix || pathname.startsWith(`${prefix}/`))) {
-    return nextResponse();
-  }
+  if (!protectedPrefixes.some((prefix) => matchesPrefix(pathname, prefix))) return nextResponse();
 
   const hasSessionCookie = request.cookies
     .getAll()
@@ -61,6 +105,7 @@ export const config = {
   matcher: [
     "/",
     "/auth/:path*",
+    "/maintenance",
     "/onboarding/:path*",
     "/worlds/:path*",
     "/api/:path*",

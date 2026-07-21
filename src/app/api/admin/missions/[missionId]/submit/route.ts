@@ -1,4 +1,5 @@
 import { apiJson } from "@/lib/api-response";
+import { invalidateAdminMissionViews } from "@/lib/cache/invalidation";
 import { requireApiRoles } from "@/auth/api";
 import { submitMissionForReview } from "@/modules/admin/mission-admin";
 export async function POST(request: Request, { params }: { params: Promise<{ missionId: string }> }) {
@@ -22,5 +23,6 @@ export async function POST(request: Request, { params }: { params: Promise<{ mis
           result.error === "safety_incomplete" || result.error === "template_variables_invalid" ? 422 : 404,
       },
     );
+  invalidateAdminMissionViews(missionId);
   return apiJson(result);
 }

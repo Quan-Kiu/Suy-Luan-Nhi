@@ -15,6 +15,27 @@ export const commonContentEntries = defineContent("common", {
     value: "Mạng đang không ổn định. Hãy kiểm tra kết nối rồi thử lại.",
     description: "Thông báo lỗi mạng chung.",
   },
+  "feedback.open": { value: "Gửi góp ý về trang này", description: "Nhãn trợ năng mở góp ý nhanh." },
+  "feedback.button": { value: "Góp ý", description: "Nhãn nút góp ý toàn cục." },
+  "feedback.eyebrow": { value: "Góp ý nhanh", description: "Nhãn đầu hộp góp ý." },
+  "feedback.title": {
+    value: "Bạn muốn chúng tôi cải thiện điều gì?",
+    description: "Tiêu đề hộp góp ý toàn cục.",
+  },
+  "feedback.contentLabel": { value: "Nội dung góp ý", description: "Nhãn ô nội dung góp ý." },
+  "feedback.contentPlaceholder": {
+    value: "Mô tả điều bạn gặp hoặc kết quả bạn mong muốn...",
+    description: "Gợi ý nhập nội dung góp ý.",
+  },
+  "feedback.capturePrivacy": {
+    value: "Nội dung đang nhập trong biểu mẫu và các vùng riêng tư sẽ được ẩn khỏi ảnh tự chụp.",
+    description: "Giải thích cách bảo vệ dữ liệu khi tự chụp trang để gửi góp ý.",
+  },
+  "feedback.attachmentsDisabled": {
+    value: "Ảnh đính kèm đang được tắt. Bạn vẫn có thể gửi nội dung góp ý.",
+    description: "Thông báo khi quản trị viên tắt ảnh trong góp ý.",
+  },
+  "feedback.success": { value: "Đã gửi góp ý. Cảm ơn bạn!", description: "Thông báo gửi góp ý thành công." },
 });
 
 export const gameplayContentEntries = defineContent("gameplay", {
@@ -98,7 +119,10 @@ export const adminContentEntries = defineContent("admin", {
   },
   "media.delete": { value: "Xóa tệp", description: "Nhãn xóa tệp." },
   "media.deleteConfirm": { value: "Xóa vĩnh viễn tệp này?", description: "Xác nhận xóa tệp." },
-  "settings.title": { value: "Cài đặt nâng cao", description: "Tiêu đề quản lý cài đặt nâng cao." },
+  "settings.title": {
+    value: "Cấu hình hệ thống",
+    description: "Tiêu đề quản lý cấu hình vận hành hệ thống.",
+  },
   "settings.jsonLabel": { value: "Nội dung cài đặt", description: "Nhãn giá trị cài đặt." },
   "settings.jsonPlaceholder": { value: "Nhập nội dung cài đặt", description: "Gợi ý nhập giá trị cài đặt." },
   "settings.save": { value: "Lưu", description: "Nhãn lưu cài đặt." },

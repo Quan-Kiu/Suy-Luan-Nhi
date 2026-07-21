@@ -1,5 +1,6 @@
 import { and, asc, desc, eq, gte, sql } from "drizzle-orm";
 import { db } from "@/db/client";
+import { clearOperationalSystemSettingsCache } from "@/modules/system-settings/runtime";
 import {
   ageGroups,
   account,
@@ -290,6 +291,7 @@ export async function getSystemSettings() {
 }
 
 export async function setSystemSetting(actorId: string, key: string, value: unknown) {
+  const current = await db.query.systemSettings.findFirst({ where: eq(systemSettings.key, key) });
   const [setting] = await db
     .insert(systemSettings)
     .values({ key, value, updatedBy: actorId })
@@ -303,8 +305,10 @@ export async function setSystemSetting(actorId: string, key: string, value: unkn
     action: "system_setting.updated",
     resourceType: "system_setting",
     resourceId: key,
+    beforeState: current ? { value: current.value } : undefined,
     afterState: { value },
   });
+  clearOperationalSystemSettingsCache();
   return setting;
 }
 

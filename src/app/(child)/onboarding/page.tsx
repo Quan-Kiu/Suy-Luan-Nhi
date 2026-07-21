@@ -1,10 +1,20 @@
+import { redirect } from "next/navigation";
 import { requireParent } from "@/auth/session";
 import { contentText } from "@/content/resolve";
 import { CreateProfileForm } from "@/features/profile/create-profile-form";
 import { getContentNamespace } from "@/modules/content/content";
+import { listChildren } from "@/modules/family/family";
+import { getOperationalSystemSettings } from "@/modules/system-settings/runtime";
 
 export default async function OnboardingPage() {
-  const [, content] = await Promise.all([requireParent(), getContentNamespace("profile")]);
+  const [session, content, systemSettings] = await Promise.all([
+    requireParent(),
+    getContentNamespace("profile"),
+    getOperationalSystemSettings(),
+  ]);
+  const children = await listChildren(session.user.id, session.user.name);
+  if (children.length >= systemSettings.limits.maxChildProfiles) redirect("/profiles");
+
   return (
     <main className="paper-texture px-5 pt-5 pb-8">
       <div className="mb-6 text-center">

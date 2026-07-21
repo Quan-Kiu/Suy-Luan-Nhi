@@ -1,5 +1,5 @@
 import { expect, test } from "@playwright/test";
-import { apiData, getDemoChild, selectChild, signIn } from "./helpers";
+import { apiData, getDemoChild, selectChild, signIn, unlockParentGate } from "./helpers";
 
 test.describe("requested issue regressions", () => {
   test("editing the reported mission saves without a 500", async ({ page }) => {
@@ -57,22 +57,7 @@ test.describe("requested issue regressions", () => {
     await signIn(page, "parent@demo.local", "/profiles");
     const child = await getDemoChild(page);
     await selectChild(page, child.id);
-    await page.goto("/parent");
-    const mathButton = page.getByRole("button", { name: "Trả lời toán" });
-    if (await mathButton.isVisible().catch(() => false)) await mathButton.click();
-    const prompt = await page
-      .locator("p")
-      .filter({ hasText: /\d+\s*[+-]\s*\d+\s*=\s*\?/ })
-      .first()
-      .textContent();
-    const match = prompt?.match(/(\d+)\s*([+-])\s*(\d+)/);
-    expect(match).toBeTruthy();
-    const left = Number(match?.[1]);
-    const right = Number(match?.[3]);
-    const answer = match?.[2] === "+" ? left + right : left - right;
-    await page.getByLabel("Kết quả phép tính").fill(String(answer));
-    await page.getByRole("button", { name: "Mở khu vực phụ huynh" }).click();
-    await expect(page.getByRole("heading", { name: /Tuần của/i })).toBeVisible();
+    await unlockParentGate(page);
     await page.getByRole("link", { name: "Khu vực của bé" }).first().click();
     await page.waitForURL(/\/missions/);
     await page.waitForLoadState("domcontentloaded");

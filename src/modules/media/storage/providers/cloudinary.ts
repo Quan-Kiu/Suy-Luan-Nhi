@@ -17,10 +17,7 @@ function resourceType(input: ValidatedMedia) {
   return input.mediaType === "image" ? ("image" as const) : ("video" as const);
 }
 
-function toStorageError(
-  error: UploadApiErrorResponse,
-  context: { retriedWithoutPreset?: boolean } = {},
-) {
+function toStorageError(error: UploadApiErrorResponse, context: { retriedWithoutPreset?: boolean } = {}) {
   const message = error.message || "Cloudinary upload failed";
   console.error("[media.cloudinary.upload_failed]", {
     httpCode: error.http_code,

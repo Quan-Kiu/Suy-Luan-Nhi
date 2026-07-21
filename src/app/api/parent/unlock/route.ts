@@ -1,13 +1,13 @@
 import { apiJson } from "@/lib/api-response";
 import { eq } from "drizzle-orm";
 import { requireApiRoles } from "@/auth/api";
-import { env } from "@/config/env";
 import { db } from "@/db/client";
 import { parentProfiles } from "@/db/schema";
 import { getOrCreateParentProfile } from "@/modules/family/family";
 import { verifyParentMathChallenge } from "@/modules/family/parent-challenge";
 import { grantParentGate } from "@/modules/family/parent-gate";
 import { verifyPin } from "@/modules/family/pin";
+import { getOperationalSystemSettings } from "@/modules/system-settings/runtime";
 
 export async function POST(request: Request) {
   const authResult = await requireApiRoles(request, ["parent", "super_admin"]);
@@ -23,7 +23,10 @@ export async function POST(request: Request) {
   if (!answer || !method) {
     return apiJson({ message: "Thiếu phương thức hoặc câu trả lời xác nhận" }, { status: 400 });
   }
-  const parent = await getOrCreateParentProfile(authResult.session.user.id, authResult.session.user.name);
+  const [parent, systemSettings] = await Promise.all([
+    getOrCreateParentProfile(authResult.session.user.id, authResult.session.user.name),
+    getOperationalSystemSettings(),
+  ]);
   if (parent.pinLockedUntil && parent.pinLockedUntil > new Date()) {
     return apiJson(
       { message: "Khu vực phụ huynh đang tạm khóa. Ba/mẹ thử lại sau vài phút." },
@@ -37,12 +40,14 @@ export async function POST(request: Request) {
       : verifyParentMathChallenge(challengeToken, answer);
   if (!valid) {
     const attempts = parent.pinFailedAttempts + 1;
-    const locked = attempts >= env.PARENT_GATE_MAX_ATTEMPTS;
+    const locked = attempts >= systemSettings.security.parentGateMaxAttempts;
     await db
       .update(parentProfiles)
       .set({
         pinFailedAttempts: locked ? 0 : attempts,
-        pinLockedUntil: locked ? new Date(Date.now() + env.PARENT_GATE_LOCK_MINUTES * 60_000) : null,
+        pinLockedUntil: locked
+          ? new Date(Date.now() + systemSettings.security.parentGateLockMinutes * 60_000)
+          : null,
         updatedAt: new Date(),
       })
       .where(eq(parentProfiles.id, parent.id));

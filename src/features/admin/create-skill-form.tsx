@@ -42,7 +42,11 @@ export function CreateSkillForm() {
   const mutation = useMutation({
     mutationFn: taxonomyApi.createSkill,
     onSuccess: async () => {
-      await queryClient.invalidateQueries({ queryKey: queryKeys.admin.taxonomy });
+      await Promise.all([
+        queryClient.invalidateQueries({ queryKey: queryKeys.admin.taxonomy }),
+        queryClient.invalidateQueries({ queryKey: queryKeys.admin.missions }),
+        queryClient.invalidateQueries({ queryKey: queryKeys.children.all }),
+      ]);
       form.reset();
       toast.success(contentText(content, "taxonomy.createSuccess", "Đã thêm kỹ năng"));
       navigation.refresh();

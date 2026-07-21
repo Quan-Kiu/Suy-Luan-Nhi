@@ -1,6 +1,11 @@
 import { apiRequest } from "@/lib/api/client";
 
-export type SystemSetting = { key: string; value: unknown; updatedAt: Date | string };
+export type SystemSetting = {
+  key: string;
+  value: unknown;
+  updatedAt: Date | string | null;
+  source?: "default" | "saved";
+};
 
 export const systemSettingsApi = {
   save(key: string, value: unknown) {

@@ -1,4 +1,5 @@
 import { apiJson } from "@/lib/api-response";
+import { invalidateAdminMissionViews, invalidatePublishedCatalog } from "@/lib/cache/invalidation";
 import { requireApiRoles } from "@/auth/api";
 import { archiveMission } from "@/modules/admin/mission-admin";
 export async function POST(request: Request, { params }: { params: Promise<{ missionId: string }> }) {
@@ -6,5 +7,8 @@ export async function POST(request: Request, { params }: { params: Promise<{ mis
   if ("error" in authResult) return authResult.error;
   const { missionId } = await params;
   const mission = await archiveMission(missionId, authResult.session.user.id);
-  return mission ? apiJson(mission) : apiJson({ message: "Không tìm thấy nhiệm vụ" }, { status: 404 });
+  if (!mission) return apiJson({ message: "Không tìm thấy nhiệm vụ" }, { status: 404 });
+  invalidatePublishedCatalog();
+  invalidateAdminMissionViews(missionId);
+  return apiJson(mission);
 }

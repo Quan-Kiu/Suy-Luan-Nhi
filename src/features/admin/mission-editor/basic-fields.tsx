@@ -26,6 +26,7 @@ export function MissionBasicFields({
   const coverUrl = useWatch({ control: form.control, name: "coverUrl" });
   const selectedAgeGroups = useWatch({ control: form.control, name: "ageGroups" });
   const secondarySkillIds = useWatch({ control: form.control, name: "secondarySkillIds" });
+  const rewardBadgeId = useWatch({ control: form.control, name: "rewardBadgeId" });
 
   function toggleArrayValue<T extends string>(
     name: "ageGroups" | "secondarySkillIds",
@@ -143,7 +144,13 @@ export function MissionBasicFields({
           })}
           options={[
             { value: "", label: contentText(content, "missionEditor.noReward", "Không có huy hiệu") },
-            ...taxonomy.badges.map((badge) => ({ value: badge.id, label: badge.name })),
+            ...taxonomy.badges
+              .filter((badge) => badge.active || badge.id === rewardBadgeId)
+              .map((badge) => ({
+                value: badge.id,
+                label: badge.active ? badge.name : `${badge.name} — đã ngừng dùng`,
+                disabled: !badge.active && badge.id !== rewardBadgeId,
+              })),
           ]}
         />
         <TextField

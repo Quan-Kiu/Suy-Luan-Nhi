@@ -1,4 +1,5 @@
 import {
+  Award,
   BarChart3,
   BookOpen,
   Braces,
@@ -10,6 +11,7 @@ import {
   ImageIcon,
   Languages,
   Layers3,
+  MessageSquareText,
   Settings,
   ShieldCheck,
   Tags,
@@ -102,6 +104,13 @@ const navGroups = [
         roles: editors,
       },
       {
+        href: "/admin/badges",
+        labelKey: "nav.badges",
+        fallback: "Huy hiệu",
+        icon: Award,
+        roles: editors,
+      },
+      {
         href: "/admin/taxonomy",
         labelKey: "nav.taxonomy",
         fallback: "Nhóm tuổi & kỹ năng",
@@ -114,6 +123,13 @@ const navGroups = [
     labelKey: "navGroup.operations",
     fallback: "Theo dõi hệ thống",
     items: [
+      {
+        href: "/admin/feedback",
+        labelKey: "nav.feedback",
+        fallback: "Góp ý hệ thống",
+        icon: MessageSquareText,
+        roles: allStaff,
+      },
       {
         href: "/admin/reports",
         labelKey: "nav.reports",

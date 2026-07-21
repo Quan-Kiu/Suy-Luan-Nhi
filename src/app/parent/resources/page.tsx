@@ -4,9 +4,11 @@ import { requireParent } from "@/auth/session";
 import { ResourceLibrary } from "@/features/parent/resource-library";
 import { getActiveChild } from "@/modules/family/active-child";
 import { getResources } from "@/modules/parent/parent-data";
+import { getOperationalSystemSettings } from "@/modules/system-settings/runtime";
 
 export default async function Page() {
-  await requireParent();
+  const [, systemSettings] = await Promise.all([requireParent(), getOperationalSystemSettings()]);
+  if (!systemSettings.features.parentResourcesEnabled) redirect("/parent");
   const active = await getActiveChild();
   if (!active) redirect("/profiles");
   const result = await getResources({ ageGroup: active.child.ageGroup, page: 1, pageSize: 9 });

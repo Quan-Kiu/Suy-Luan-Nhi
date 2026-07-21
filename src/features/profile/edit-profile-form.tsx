@@ -10,6 +10,7 @@ import { childrenApi, type ChildSummary } from "@/api/children";
 import { FormStatus, SelectField, SubmitButton, TextField } from "@/components/form";
 import { Card } from "@/components/ui";
 import { contentText, useContent } from "@/content/client";
+import { useActiveChild, useSetActiveChild } from "@/features/child/active-child-context";
 import { getAgeGroupOptions } from "@/features/profile/age-group-options";
 import { usePendingRouter } from "@/hooks/use-pending-router";
 import { queryKeys } from "@/lib/query/keys";
@@ -25,13 +26,16 @@ export function EditProfileForm({ child }: { child: ChildSummary }) {
   const content = useContent("profile");
   const navigation = usePendingRouter();
   const queryClient = useQueryClient();
+  const activeChild = useActiveChild();
+  const setActiveChild = useSetActiveChild();
   const form = useForm<FormValues>({
     resolver: zodResolver(schema),
     defaultValues: { displayName: child.displayName, ageGroup: child.ageGroup },
   });
   const mutation = useMutation({
     mutationFn: (values: FormValues) => childrenApi.update(child.id, values),
-    onSuccess: async () => {
+    onSuccess: async (updated) => {
+      if (activeChild?.id === updated.id) setActiveChild(updated);
       await queryClient.invalidateQueries({ queryKey: queryKeys.children.all });
       toast.success(contentText(content, "edit.success", "Đã cập nhật hồ sơ"));
       navigation.refresh();

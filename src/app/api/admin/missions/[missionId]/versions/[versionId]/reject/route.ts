@@ -1,4 +1,5 @@
 import { apiJson } from "@/lib/api-response";
+import { invalidateAdminMissionViews } from "@/lib/cache/invalidation";
 import { requireApiRoles } from "@/auth/api";
 import { reviewRejectionSchema } from "@/modules/admin/schemas";
 import { rejectMissionVersion } from "@/modules/admin/mission-admin";
@@ -17,5 +18,7 @@ export async function POST(
     authResult.session.user.id,
     input.data.comment,
   );
-  return version ? apiJson(version) : apiJson({ message: "Phiên bản không còn chờ duyệt" }, { status: 409 });
+  if (!version) return apiJson({ message: "Phiên bản không còn chờ duyệt" }, { status: 409 });
+  invalidateAdminMissionViews(missionId);
+  return apiJson(version);
 }

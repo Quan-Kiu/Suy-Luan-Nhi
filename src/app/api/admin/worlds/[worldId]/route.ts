@@ -1,4 +1,5 @@
 import { apiJson } from "@/lib/api-response";
+import { invalidateTaxonomyCaches } from "@/lib/cache/invalidation";
 import { z } from "zod";
 import { requireApiRoles } from "@/auth/api";
 import { updateWorld } from "@/modules/admin/operations";
@@ -18,5 +19,7 @@ export async function PATCH(request: Request, { params }: { params: Promise<{ wo
   if (!input.success) return apiJson({ message: input.error.issues[0]?.message }, { status: 400 });
   const { worldId } = await params;
   const result = await updateWorld(authResult.session.user.id, worldId, input.data);
-  return result ? apiJson(result) : apiJson({ message: "Không tìm thấy thế giới" }, { status: 404 });
+  if (!result) return apiJson({ message: "Không tìm thấy thế giới" }, { status: 404 });
+  invalidateTaxonomyCaches();
+  return apiJson(result);
 }

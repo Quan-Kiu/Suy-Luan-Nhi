@@ -36,7 +36,11 @@ export function AgeGroupForm({ item }: { item: AgeGroupItem }) {
   const mutation = useMutation({
     mutationFn: (values: FormValues) => taxonomyApi.updateAgeGroup(item.code, values),
     onSuccess: async () => {
-      await queryClient.invalidateQueries({ queryKey: queryKeys.admin.taxonomy });
+      await Promise.all([
+        queryClient.invalidateQueries({ queryKey: queryKeys.admin.taxonomy }),
+        queryClient.invalidateQueries({ queryKey: queryKeys.admin.missions }),
+        queryClient.invalidateQueries({ queryKey: queryKeys.children.all }),
+      ]);
       toast.success(contentText(content, "taxonomy.ageSaved", "Đã lưu nhóm tuổi"));
       navigation.refresh();
     },

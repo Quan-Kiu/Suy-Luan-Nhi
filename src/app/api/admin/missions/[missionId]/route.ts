@@ -1,4 +1,5 @@
 import { apiJson } from "@/lib/api-response";
+import { invalidateAdminMissionViews } from "@/lib/cache/invalidation";
 import { requireApiRoles } from "@/auth/api";
 import { adminMissionDraftSchema } from "@/modules/admin/schemas";
 import {
@@ -38,7 +39,9 @@ export async function PATCH(request: Request, { params }: { params: Promise<{ mi
   }
   try {
     const mission = await updateAdminMission(missionId, input.data, authResult.session.user.id);
-    return mission ? apiJson(mission) : apiJson({ message: "Không tìm thấy nhiệm vụ" }, { status: 404 });
+    if (!mission) return apiJson({ message: "Không tìm thấy nhiệm vụ" }, { status: 404 });
+    invalidateAdminMissionViews(missionId);
+    return apiJson(mission);
   } catch (error) {
     if (error instanceof Error && error.message.includes("unique")) {
       return apiJson({ message: "Slug nhiệm vụ đã tồn tại" }, { status: 409 });

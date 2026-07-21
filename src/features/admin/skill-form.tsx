@@ -51,7 +51,11 @@ export function SkillForm({ item }: { item: SkillItem }) {
   const mutation = useMutation({
     mutationFn: (values: FormValues) => taxonomyApi.updateSkill(item.id, values),
     onSuccess: async () => {
-      await queryClient.invalidateQueries({ queryKey: queryKeys.admin.taxonomy });
+      await Promise.all([
+        queryClient.invalidateQueries({ queryKey: queryKeys.admin.taxonomy }),
+        queryClient.invalidateQueries({ queryKey: queryKeys.admin.missions }),
+        queryClient.invalidateQueries({ queryKey: queryKeys.children.all }),
+      ]);
       toast.success(contentText(content, "taxonomy.skillSaved", "Đã lưu kỹ năng"));
       navigation.refresh();
     },

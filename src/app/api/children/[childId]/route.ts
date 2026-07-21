@@ -1,3 +1,4 @@
+import { revalidatePath } from "next/cache";
 import { apiJson } from "@/lib/api-response";
 import { requireApiRoles } from "@/auth/api";
 import { getOwnedChild, softDeleteChild, updateChild } from "@/modules/family/family";
@@ -22,14 +23,18 @@ export async function PATCH(request: Request, { params }: { params: Promise<{ ch
     );
   const { childId } = await params;
   const child = await updateChild(authResult.session.user.id, childId, input.data);
-  return child ? apiJson(child) : apiJson({ message: "Không tìm thấy hồ sơ bé" }, { status: 404 });
+  if (!child) return apiJson({ message: "Không tìm thấy hồ sơ bé" }, { status: 404 });
+  revalidatePath("/profiles");
+  return apiJson(child);
 }
 
 export async function DELETE(request: Request, { params }: { params: Promise<{ childId: string }> }) {
   const authResult = await requireApiRoles(request, ["parent", "super_admin"]);
   if ("error" in authResult) return authResult.error;
   const { childId } = await params;
-  return (await softDeleteChild(authResult.session.user.id, childId))
-    ? apiJson({ deleted: true, resource: "child_profile" })
-    : apiJson({ message: "Không tìm thấy hồ sơ bé" }, { status: 404 });
+  const deleted = await softDeleteChild(authResult.session.user.id, childId);
+  if (!deleted) return apiJson({ message: "Không tìm thấy hồ sơ bé" }, { status: 404 });
+  revalidatePath("/profiles");
+  revalidatePath("/onboarding");
+  return apiJson({ deleted: true, resource: "child_profile" });
 }

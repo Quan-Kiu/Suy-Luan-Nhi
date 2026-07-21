@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import "./globals.css";
 import { Providers } from "@/components/providers";
+import { GlobalFeedbackWidget } from "@/features/feedback/global-feedback-widget";
 import "@/lib/validation/zod-locale";
 
 export const metadata: Metadata = {
@@ -12,7 +13,10 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
   return (
     <html lang="vi" data-scroll-behavior="smooth">
       <body>
-        <Providers>{children}</Providers>
+        <Providers>
+          {children}
+          <GlobalFeedbackWidget />
+        </Providers>
       </body>
     </html>
   );

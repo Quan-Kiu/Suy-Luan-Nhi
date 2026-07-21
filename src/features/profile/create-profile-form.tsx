@@ -10,6 +10,7 @@ import { FormStatus, SubmitButton, TextField } from "@/components/form";
 import { Card } from "@/components/ui";
 import { contentText, useContent } from "@/content/client";
 import { createChildProfileSchema, type CreateChildProfileInput } from "@/domain/schemas";
+import { useActiveChild, useSetActiveChild } from "@/features/child/active-child-context";
 import { AgeGroupCardsField } from "@/features/profile/age-group-cards-field";
 import { getAgeGroupOptions } from "@/features/profile/age-group-options";
 import { usePendingRouter } from "@/hooks/use-pending-router";
@@ -19,6 +20,8 @@ export function CreateProfileForm() {
   const content = useContent("profile");
   const navigation = usePendingRouter();
   const queryClient = useQueryClient();
+  const activeChild = useActiveChild();
+  const setActiveChild = useSetActiveChild();
   const form = useForm<CreateChildProfileInput>({
     resolver: zodResolver(createChildProfileSchema),
     defaultValues: { displayName: "", ageGroup: "6-8" },
@@ -27,6 +30,7 @@ export function CreateProfileForm() {
   const mutation = useMutation({
     mutationFn: childrenApi.create,
     onSuccess: async (profile) => {
+      if (!activeChild) setActiveChild(profile);
       await queryClient.invalidateQueries({ queryKey: queryKeys.children.all });
       toast.success(
         `${profile.displayName}: ${contentText(content, "create.success", "Hồ sơ đã sẵn sàng!")}`,

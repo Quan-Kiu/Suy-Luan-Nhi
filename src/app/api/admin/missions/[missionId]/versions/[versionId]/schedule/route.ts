@@ -1,4 +1,5 @@
 import { apiJson } from "@/lib/api-response";
+import { invalidateAdminMissionViews } from "@/lib/cache/invalidation";
 import { z } from "zod";
 import { requireApiRoles } from "@/auth/api";
 import { scheduleMissionVersion } from "@/modules/admin/mission-admin";
@@ -18,10 +19,12 @@ export async function POST(
     authResult.session.user.id,
     new Date(input.data.scheduledFor),
   );
-  return result
-    ? apiJson(result)
-    : apiJson(
-        { message: "Chỉ phiên bản approved và thời gian tương lai mới được lên lịch" },
-        { status: 409 },
-      );
+  if (!result) {
+    return apiJson(
+      { message: "Chỉ phiên bản approved và thời gian tương lai mới được lên lịch" },
+      { status: 409 },
+    );
+  }
+  invalidateAdminMissionViews(missionId);
+  return apiJson(result);
 }

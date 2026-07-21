@@ -1,4 +1,4 @@
-import { and, desc, eq, isNull } from "drizzle-orm";
+import { and, desc, eq, isNull, sql } from "drizzle-orm";
 import { cache } from "react";
 import { db } from "@/db/client";
 import {
@@ -13,6 +13,7 @@ import {
   sessionQuestionStates,
 } from "@/db/schema";
 import { hashPin } from "@/modules/family/pin";
+import { getOperationalSystemSettings } from "@/modules/system-settings/runtime";
 import type { z } from "zod";
 import type { createChildSchema, updateChildSchema, updateParentSettingsSchema } from "./schemas";
 
@@ -44,24 +45,46 @@ export async function getOwnedChild(userId: string, childId: string) {
     .then((rows) => rows[0] ?? null);
 }
 
+export class ChildProfileLimitError extends Error {
+  constructor(readonly limit: number) {
+    super(`Mỗi gia đình chỉ được tạo tối đa ${limit} hồ sơ bé`);
+    this.name = "ChildProfileLimitError";
+  }
+}
+
 export async function createChild(
   userId: string,
   parentName: string,
   input: z.infer<typeof createChildSchema>,
 ) {
-  const parent = await getOrCreateParentProfile(userId, parentName);
-  const [child] = await db
-    .insert(childProfiles)
-    .values({ parentProfileId: parent.id, ...input })
-    .returning();
-  await db.insert(auditLogs).values({
-    actorId: userId,
-    action: "child.created",
-    resourceType: "child_profile",
-    resourceId: child.id,
-    afterState: child,
+  const [parent, systemSettings] = await Promise.all([
+    getOrCreateParentProfile(userId, parentName),
+    getOperationalSystemSettings(),
+  ]);
+  return db.transaction(async (tx) => {
+    await tx.execute(
+      sql`select 1 from ${parentProfiles} where ${parentProfiles.id} = ${parent.id} for update`,
+    );
+    const [{ count }] = await tx
+      .select({ count: sql<number>`count(*)::int` })
+      .from(childProfiles)
+      .where(and(eq(childProfiles.parentProfileId, parent.id), isNull(childProfiles.deletedAt)));
+    if ((count ?? 0) >= systemSettings.limits.maxChildProfiles) {
+      throw new ChildProfileLimitError(systemSettings.limits.maxChildProfiles);
+    }
+    const [child] = await tx
+      .insert(childProfiles)
+      .values({ parentProfileId: parent.id, ...input })
+      .returning();
+    await tx.insert(auditLogs).values({
+      actorId: userId,
+      action: "child.created",
+      resourceType: "child_profile",
+      resourceId: child.id,
+      afterState: child,
+    });
+    return child;
   });
-  return child;
 }
 
 export async function updateChild(userId: string, childId: string, input: z.infer<typeof updateChildSchema>) {

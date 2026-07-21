@@ -1,5 +1,6 @@
 import { requireApiRoles } from "@/auth/api";
 import { apiJson } from "@/lib/api-response";
+import { invalidateAdminMissionViews } from "@/lib/cache/invalidation";
 import { restoreMissionVersion } from "@/modules/admin/mission-admin";
 
 export async function POST(
@@ -10,7 +11,10 @@ export async function POST(
   if ("error" in authResult) return authResult.error;
   const { missionId, versionId } = await params;
   const result = await restoreMissionVersion(missionId, versionId, authResult.session.user.id);
-  if (!("error" in result)) return apiJson(result);
+  if (!("error" in result)) {
+    invalidateAdminMissionViews(missionId);
+    return apiJson(result);
+  }
   if (result.error === "not_found") {
     return apiJson({ message: "Không tìm thấy phiên bản cần khôi phục" }, { status: 404 });
   }

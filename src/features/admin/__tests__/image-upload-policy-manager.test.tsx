@@ -26,7 +26,9 @@ describe("ImageUploadPolicyManager", () => {
     const user = userEvent.setup();
     renderManager();
 
-    expect(screen.getAllByRole("group")).toHaveLength(5);
+    expect(screen.getAllByRole("group")).toHaveLength(7);
+    expect(screen.getByRole("group", { name: "Ảnh huy hiệu" })).toBeInTheDocument();
+    expect(screen.getByRole("group", { name: "Ảnh đính kèm góp ý" })).toBeInTheDocument();
     const missionCover = screen.getByRole("group", { name: "Ảnh bìa nhiệm vụ" });
     const maxSize = within(missionCover).getByLabelText("Dung lượng tối đa (MB)");
     await user.clear(maxSize);

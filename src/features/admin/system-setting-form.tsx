@@ -2,8 +2,8 @@
 
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation } from "@tanstack/react-query";
-import { Settings2 } from "lucide-react";
-import { useForm } from "react-hook-form";
+import { AlertTriangle, Settings2 } from "lucide-react";
+import { useForm, useWatch } from "react-hook-form";
 import { toast } from "sonner";
 import { z } from "zod";
 import { systemSettingsApi, type SystemSetting } from "@/api/admin/settings";
@@ -14,6 +14,7 @@ import {
   TextareaField,
   TextField,
 } from "@/components/form";
+import { getManagedSystemSettingDefinition } from "@/domain/system-settings";
 import {
   describeSetting,
   getSystemSettingKind,
@@ -36,7 +37,8 @@ export function SystemSettingForm({
   item: SystemSetting;
   onSaved: (item: SystemSetting) => void;
 }) {
-  const kind = getSystemSettingKind(item.value);
+  const definition = getManagedSystemSettingDefinition(item.key);
+  const kind = definition?.kind ?? getSystemSettingKind(item.value);
   const fieldId = `setting-${item.key.replace(/[^a-zA-Z0-9_-]+/g, "-")}`;
   const form = useForm<FormValues>({
     resolver: zodResolver(schema),
@@ -45,6 +47,7 @@ export function SystemSettingForm({
       enabled: kind === "boolean" ? Boolean(item.value) : false,
     },
   });
+  const enabled = useWatch({ control: form.control, name: "enabled" });
   const mutation = useMutation({
     mutationFn: ({ text, enabled }: FormValues) =>
       systemSettingsApi.save(item.key, parseSystemSetting(kind, text, enabled)),
@@ -87,33 +90,57 @@ export function SystemSettingForm({
           label="Bật thiết lập này"
           description="Bỏ chọn để tắt. Thay đổi chỉ có hiệu lực sau khi nhấn lưu."
         />
-      ) : kind === "structured" ? (
+      ) : definition?.input === "textarea" || kind === "structured" ? (
         <TextareaField
           id={`${fieldId}-structured`}
-          label="Nội dung nâng cao"
-          rows={7}
-          description="Chỉ chỉnh khi đã hiểu cấu trúc. Giữ đúng dấu ngoặc, dấu phẩy và dấu nháy."
+          label={kind === "structured" ? "Nội dung nâng cao" : "Nội dung hiển thị"}
+          rows={kind === "structured" ? 7 : 4}
+          description={kind === "structured" ? "Giữ đúng dấu ngoặc, dấu phẩy và dấu nháy." : undefined}
           registration={form.register("text")}
           error={form.formState.errors.text?.message}
-          className="font-mono text-sm"
+          className={kind === "structured" ? "font-mono text-sm" : undefined}
         />
       ) : (
         <TextField
           id={`${fieldId}-value`}
           type={kind === "number" ? "number" : "text"}
-          label={kind === "number" ? "Giá trị số" : "Giá trị hiển thị"}
-          description={kind === "number" ? "Nhập số không kèm đơn vị hoặc ký hiệu." : undefined}
+          min={definition?.min}
+          max={definition?.max}
+          label={
+            kind === "number"
+              ? `Giá trị${definition?.unit ? ` (${definition.unit})` : ""}`
+              : "Nội dung hiển thị"
+          }
+          description={
+            kind === "number"
+              ? `Nhập số từ ${definition?.min ?? 0} đến ${definition?.max ?? "giới hạn cho phép"}.`
+              : undefined
+          }
           registration={form.register("text")}
           error={form.formState.errors.text?.message}
         />
       )}
+
+      {definition?.danger && enabled ? (
+        <div className="flex gap-3 rounded-2xl border border-red-200 bg-red-50 p-4 text-sm leading-6 text-red-800">
+          <AlertTriangle className="mt-0.5 shrink-0" size={19} />
+          <p>
+            <strong>Thao tác ảnh hưởng toàn hệ thống.</strong> Người dùng đang ở khu vực phụ huynh hoặc chế độ
+            bé sẽ được chuyển sang trang bảo trì ở yêu cầu tiếp theo.
+          </p>
+        </div>
+      ) : null}
 
       <details className="rounded-xl bg-[#f7f3eb] p-3 text-xs text-[#6f6558]">
         <summary className="cursor-pointer font-black text-[#4f463b]">
           Thông tin dành cho đội kỹ thuật
         </summary>
         <p className="mt-2 font-mono break-all">Mã cài đặt: {item.key}</p>
-        <p className="mt-1">Cập nhật gần nhất: {new Date(item.updatedAt).toLocaleString("vi-VN")}</p>
+        <p className="mt-1">
+          {item.updatedAt
+            ? `Cập nhật gần nhất: ${new Date(item.updatedAt).toLocaleString("vi-VN")}`
+            : "Đang dùng giá trị mặc định an toàn của hệ thống."}
+        </p>
       </details>
 
       <FormStatus status={status} message={statusMessage} />

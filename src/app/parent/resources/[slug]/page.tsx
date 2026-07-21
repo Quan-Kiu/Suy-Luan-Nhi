@@ -9,9 +9,11 @@ import {
   type ParentResourceType,
 } from "@/domain/parent-resources";
 import { getResource } from "@/modules/parent/parent-data";
+import { getOperationalSystemSettings } from "@/modules/system-settings/runtime";
 
 export default async function Page({ params }: { params: Promise<{ slug: string }> }) {
-  await requireParent();
+  const [, systemSettings] = await Promise.all([requireParent(), getOperationalSystemSettings()]);
+  if (!systemSettings.features.parentResourcesEnabled) redirect("/parent");
   const { slug } = await params;
   if (slug === "dong-hanh-khi-be-chua-trung") {
     redirect("/parent/resources/dong-hanh-khi-be-chua-tra-loi-dung");

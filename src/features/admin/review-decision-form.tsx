@@ -1,7 +1,7 @@
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { CheckCircle2, XCircle } from "lucide-react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
@@ -10,6 +10,7 @@ import { reviewsApi } from "@/api/admin/reviews";
 import { FormStatus, TextareaField } from "@/components/form";
 import { contentText, useContent } from "@/content/client";
 import { usePendingRouter } from "@/hooks/use-pending-router";
+import { queryKeys } from "@/lib/query/keys";
 
 const schema = z.object({ comment: z.string().trim().max(2000, "Lời nhắn không được quá 2000 ký tự") });
 type FormValues = z.infer<typeof schema>;
@@ -18,16 +19,18 @@ type Action = "approve" | "reject";
 export function ReviewDecisionForm({ missionId, versionId }: { missionId: string; versionId: string }) {
   const content = useContent("admin");
   const navigation = usePendingRouter();
+  const queryClient = useQueryClient();
   const form = useForm<FormValues>({ resolver: zodResolver(schema), defaultValues: { comment: "" } });
   const mutation = useMutation({
     mutationFn: ({ action, comment }: FormValues & { action: Action }) =>
       reviewsApi.decide(missionId, versionId, action, comment).then(() => action),
-    onSuccess: (action) => {
+    onSuccess: async (action) => {
       toast.success(
         action === "approve"
           ? contentText(content, "review.approveSuccess", "Đã xác nhận nội dung đạt yêu cầu")
           : contentText(content, "review.rejectSuccess", "Đã trả lại để chỉnh sửa"),
       );
+      await queryClient.invalidateQueries({ queryKey: queryKeys.admin.missions });
       navigation.refresh();
     },
   });

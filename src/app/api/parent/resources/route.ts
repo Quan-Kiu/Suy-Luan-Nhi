@@ -8,10 +8,15 @@ import {
 } from "@/domain/parent-resources";
 import { getActiveChild } from "@/modules/family/active-child";
 import { getResources } from "@/modules/parent/parent-data";
+import { getOperationalSystemSettings } from "@/modules/system-settings/runtime";
 
 export async function GET(request: Request) {
   const authResult = await requireApiParentGate(request);
   if ("error" in authResult) return authResult.error;
+  const systemSettings = await getOperationalSystemSettings();
+  if (!systemSettings.features.parentResourcesEnabled) {
+    return apiJson({ code: "FEATURE_DISABLED", message: "Thư viện tài nguyên đang tạm ẩn" }, { status: 404 });
+  }
   const active = await getActiveChild();
   if (!active) {
     return apiJson({ code: "ACTIVE_CHILD_REQUIRED", message: "Hãy chọn hồ sơ bé trước" }, { status: 409 });

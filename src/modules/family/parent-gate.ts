@@ -2,6 +2,7 @@ import { createHmac, timingSafeEqual } from "node:crypto";
 import { cookies } from "next/headers";
 import { env } from "@/config/env";
 import { PARENT_GATE_COOKIE_NAME } from "@/modules/family/parent-gate-constants";
+import { getOperationalSystemSettings } from "@/modules/system-settings/runtime";
 
 type GatePayload = { parentProfileId: string; expiresAt: number };
 
@@ -29,7 +30,8 @@ function decode(value: string): GatePayload | null {
 }
 
 export async function grantParentGate(parentProfileId: string) {
-  const expiresAt = Date.now() + env.PARENT_GATE_TTL_MINUTES * 60_000;
+  const systemSettings = await getOperationalSystemSettings();
+  const expiresAt = Date.now() + systemSettings.security.parentGateSessionMinutes * 60_000;
   (await cookies()).set(PARENT_GATE_COOKIE_NAME, encode({ parentProfileId, expiresAt }), {
     httpOnly: true,
     secure: new URL(env.BETTER_AUTH_URL).protocol === "https:",

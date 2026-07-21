@@ -1,4 +1,5 @@
 import { apiJson } from "@/lib/api-response";
+import { invalidateTaxonomyCaches } from "@/lib/cache/invalidation";
 import { z } from "zod";
 import { requireApiRoles } from "@/auth/api";
 import { isAgeGroup } from "@/domain/age-groups";
@@ -19,5 +20,7 @@ export async function PATCH(request: Request, { params }: { params: Promise<{ co
   const { code } = await params;
   if (!isAgeGroup(code)) return apiJson({ message: "Nhóm tuổi không hợp lệ" }, { status: 400 });
   const result = await updateAgeGroup(authResult.session.user.id, code, input.data);
-  return result ? apiJson(result) : apiJson({ message: "Không tìm thấy nhóm tuổi" }, { status: 404 });
+  if (!result) return apiJson({ message: "Không tìm thấy nhóm tuổi" }, { status: 404 });
+  invalidateTaxonomyCaches();
+  return apiJson(result);
 }

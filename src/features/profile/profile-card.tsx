@@ -1,12 +1,13 @@
 import { Pencil, Play, Trash2 } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
+import type { ChildSummary } from "@/api/children";
 import { Button, Card } from "@/components/ui";
 
 export type ProfileListItem = {
   id: string;
   displayName: string;
-  ageGroup: string;
+  ageGroup: ChildSummary["ageGroup"];
   avatarUrl: string;
   currentRank: string;
 };

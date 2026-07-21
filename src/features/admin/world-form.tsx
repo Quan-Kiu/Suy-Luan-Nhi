@@ -71,7 +71,11 @@ export function WorldForm({
       return mode === "create" ? worldsApi.create(input) : worldsApi.update(initial.id!, input);
     },
     onSuccess: async () => {
-      await queryClient.invalidateQueries({ queryKey: queryKeys.admin.worlds });
+      await Promise.all([
+        queryClient.invalidateQueries({ queryKey: queryKeys.admin.worlds }),
+        queryClient.invalidateQueries({ queryKey: queryKeys.admin.missions }),
+        queryClient.invalidateQueries({ queryKey: queryKeys.children.all }),
+      ]);
       toast.success(
         mode === "create"
           ? contentText(content, "world.createSuccess", "Đã thêm chủ đề nhiệm vụ")
