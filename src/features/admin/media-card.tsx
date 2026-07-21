@@ -1,9 +1,10 @@
 "use client";
 
 import { useMutation } from "@tanstack/react-query";
-import { CheckCircle2, LoaderCircle, Trash2, XCircle } from "lucide-react";
+import { Check, CheckCircle2, Copy, LoaderCircle, Trash2, XCircle } from "lucide-react";
 import Image from "next/image";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
+import { toast } from "sonner";
 import { mediaApi, type MediaItem } from "@/api/admin/media";
 import { ConfirmDialog } from "@/components/confirm-dialog";
 import { FormStatus } from "@/components/form";
@@ -33,6 +34,28 @@ export function MediaCard({
 }) {
   const content = useContent("admin");
   const [deleteOpen, setDeleteOpen] = useState(false);
+  const [copied, setCopied] = useState(false);
+  const copyResetTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  useEffect(
+    () => () => {
+      if (copyResetTimer.current) clearTimeout(copyResetTimer.current);
+    },
+    [],
+  );
+
+  async function copyLink() {
+    try {
+      await navigator.clipboard.writeText(item.url);
+      setCopied(true);
+      toast.success(contentText(content, "media.copySuccess", "Đã sao chép liên kết"));
+
+      if (copyResetTimer.current) clearTimeout(copyResetTimer.current);
+      copyResetTimer.current = setTimeout(() => setCopied(false), 2_000);
+    } catch {
+      toast.error(contentText(content, "media.copyError", "Không thể sao chép liên kết"));
+    }
+  }
   const mutation = useMutation({
     mutationFn: async (action: Action) => {
       if (action === "delete") {
@@ -81,7 +104,24 @@ export function MediaCard({
               {safetyStatusLabels[item.safetyStatus] ?? item.safetyStatus}
             </span>
           </div>
-          <div className="flex gap-1">
+          <div className="flex shrink-0 gap-1">
+            <button
+              type="button"
+              aria-label={contentText(
+                content,
+                copied ? "media.copySuccess" : "media.copyLink",
+                copied ? "Đã sao chép liên kết" : "Sao chép liên kết",
+              )}
+              title={contentText(
+                content,
+                copied ? "media.copySuccess" : "media.copyLink",
+                copied ? "Đã sao chép liên kết" : "Sao chép liên kết",
+              )}
+              onClick={copyLink}
+              className="rounded-lg border p-2 text-sky-700 transition hover:bg-sky-50 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-700"
+            >
+              {copied ? <Check size={15} aria-hidden="true" /> : <Copy size={15} aria-hidden="true" />}
+            </button>
             {canReview ? (
               <>
                 <button

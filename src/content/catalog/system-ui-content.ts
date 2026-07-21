@@ -87,6 +87,15 @@ export const adminContentEntries = defineContent("admin", {
   },
   "media.approve": { value: "Đánh dấu phù hợp", description: "Nhãn duyệt tệp." },
   "media.reject": { value: "Đánh dấu cần thay", description: "Nhãn từ chối tệp." },
+  "media.copyLink": { value: "Sao chép liên kết", description: "Nhãn sao chép nhanh liên kết tệp." },
+  "media.copySuccess": {
+    value: "Đã sao chép liên kết",
+    description: "Thông báo sao chép liên kết thành công.",
+  },
+  "media.copyError": {
+    value: "Không thể sao chép liên kết",
+    description: "Thông báo sao chép liên kết thất bại.",
+  },
   "media.delete": { value: "Xóa tệp", description: "Nhãn xóa tệp." },
   "media.deleteConfirm": { value: "Xóa vĩnh viễn tệp này?", description: "Xác nhận xóa tệp." },
   "settings.title": { value: "Cài đặt nâng cao", description: "Tiêu đề quản lý cài đặt nâng cao." },
