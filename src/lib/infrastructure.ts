@@ -23,6 +23,11 @@ export function isDatabaseUnavailable(error: unknown) {
     if (!item || typeof item !== "object") return false;
     const code = "code" in item ? String(item.code) : "";
     const message = "message" in item ? String(item.message) : "";
-    return databaseErrorCodes.has(code) || /connect\s+ECONNREFUSED|database.*unavailable/i.test(message);
+    return (
+      databaseErrorCodes.has(code) ||
+      /connect\s+ECONNREFUSED|database.*unavailable|connection (?:terminated|timed? ?out)|connection timeout/i.test(
+        message,
+      )
+    );
   });
 }
