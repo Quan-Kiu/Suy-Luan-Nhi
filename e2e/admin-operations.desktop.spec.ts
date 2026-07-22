@@ -133,11 +133,8 @@ test("content admin creates taxonomy and world content through the CMS", async (
   await expect(badgeCard).toBeVisible();
 
   await page.goto("/admin/missions/new");
-  await expect(
-    page
-      .getByRole("combobox", { name: /Huy hiệu nhận được|Phần thưởng/ })
-      .getByRole("option", { name: "Huy hiệu E2E" }),
-  ).toHaveCount(1);
+  await expect(page.getByRole("heading", { name: "Huy hiệu khi hoàn thành" })).toBeVisible();
+  await expect(page.getByRole("radio", { name: /Huy hiệu E2E/ })).toHaveCount(1);
 
   await page.goto("/admin/badges");
   const editableBadge = page.getByRole("article", { name: "Huy hiệu: Huy hiệu E2E" });
@@ -146,11 +143,7 @@ test("content admin creates taxonomy and world content through the CMS", async (
   await expect(page.getByText("Đã cập nhật huy hiệu")).toBeVisible();
 
   await page.goto("/admin/missions/new");
-  await expect(
-    page
-      .getByRole("combobox", { name: /Huy hiệu nhận được|Phần thưởng/ })
-      .getByRole("option", { name: /Huy hiệu E2E/ }),
-  ).toHaveCount(0);
+  await expect(page.getByRole("radio", { name: /Huy hiệu E2E/ })).toHaveCount(0);
 });
 test("media follows upload, reviewer approval and owner deletion permissions", async ({ page }) => {
   await signIn(page, "content@demo.local", "/admin/media");

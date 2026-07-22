@@ -6,6 +6,7 @@ import { Card } from "@/components/ui";
 import { contentText, useContent } from "@/content/client";
 import type { ContentVariableDefinition } from "@/domain/content-variables";
 import { ContentTemplateField } from "@/features/admin/content-template-field";
+import { MissionRewardBadgeField } from "@/features/admin/mission-editor/reward-badge-field";
 import { MediaUploadField } from "@/features/admin/media-upload-field";
 import type { MissionEditorTaxonomy } from "@/features/admin/mission-editor/types";
 import { createSlug } from "@/lib/slug";
@@ -26,7 +27,6 @@ export function MissionBasicFields({
   const coverUrl = useWatch({ control: form.control, name: "coverUrl" });
   const selectedAgeGroups = useWatch({ control: form.control, name: "ageGroups" });
   const secondarySkillIds = useWatch({ control: form.control, name: "secondarySkillIds" });
-  const rewardBadgeId = useWatch({ control: form.control, name: "rewardBadgeId" });
 
   function toggleArrayValue<T extends string>(
     name: "ageGroups" | "secondarySkillIds",
@@ -137,22 +137,7 @@ export function MissionBasicFields({
           error={form.formState.errors.primarySkillId?.message}
           options={taxonomy.skills.map((skill) => ({ value: skill.id, label: skill.title }))}
         />
-        <SelectField
-          label={contentText(content, "missionEditor.reward", "Phần thưởng")}
-          registration={form.register("rewardBadgeId", {
-            setValueAs: (value) => (value === "" ? null : value),
-          })}
-          options={[
-            { value: "", label: contentText(content, "missionEditor.noReward", "Không có huy hiệu") },
-            ...taxonomy.badges
-              .filter((badge) => badge.active || badge.id === rewardBadgeId)
-              .map((badge) => ({
-                value: badge.id,
-                label: badge.active ? badge.name : `${badge.name} — đã ngừng dùng`,
-                disabled: !badge.active && badge.id !== rewardBadgeId,
-              })),
-          ]}
-        />
+        <MissionRewardBadgeField badges={taxonomy.badges} />
         <TextField
           type="number"
           min={1}
@@ -237,6 +222,7 @@ export function MissionBasicFields({
             value={coverUrl}
             onChange={(url) => form.setValue("coverUrl", url, { shouldDirty: true, shouldValidate: true })}
             category="mission-cover"
+            previewFit="cover"
             altText={title || "Ảnh bìa nhiệm vụ"}
             error={form.formState.errors.coverUrl?.message}
           />

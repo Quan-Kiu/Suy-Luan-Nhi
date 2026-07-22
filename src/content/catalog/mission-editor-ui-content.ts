@@ -83,6 +83,38 @@ export const missionEditorContentEntries = defineContent("admin", {
   "missionEditor.secondarySkills": { value: "Kỹ năng đi kèm", description: "Nhãn kỹ năng phụ." },
   "missionEditor.reward": { value: "Huy hiệu nhận được", description: "Nhãn phần thưởng." },
   "missionEditor.noReward": { value: "Không có huy hiệu", description: "Tùy chọn không huy hiệu." },
+  "missionEditor.rewardSectionTitle": {
+    value: "Huy hiệu khi hoàn thành",
+    description: "Tiêu đề khu vực chọn huy hiệu của nhiệm vụ.",
+  },
+  "missionEditor.rewardSectionDescription": {
+    value: "Chọn huy hiệu bé sẽ nhận sau khi hoàn thành nhiệm vụ. Mỗi nhiệm vụ có thể trao một huy hiệu.",
+    description: "Giải thích cách huy hiệu được gắn với nhiệm vụ.",
+  },
+  "missionEditor.manageBadges": {
+    value: "Quản lý huy hiệu",
+    description: "Liên kết đến trang quản lý huy hiệu.",
+  },
+  "missionEditor.noRewardTitle": {
+    value: "Không trao huy hiệu",
+    description: "Lựa chọn nhiệm vụ không trao huy hiệu.",
+  },
+  "missionEditor.noRewardDescription": {
+    value: "Bé vẫn hoàn thành nhiệm vụ nhưng không nhận huy hiệu mới.",
+    description: "Giải thích lựa chọn không trao huy hiệu.",
+  },
+  "missionEditor.badgeAvailable": {
+    value: "Sẵn sàng trao cho bé",
+    description: "Trạng thái huy hiệu đang hoạt động.",
+  },
+  "missionEditor.badgeInactive": {
+    value: "Đã ngừng dùng — đang được nhiệm vụ này chọn",
+    description: "Trạng thái huy hiệu không còn hoạt động nhưng vẫn được nhiệm vụ hiện tại sử dụng.",
+  },
+  "missionEditor.noBadgesAvailable": {
+    value: "Chưa có huy hiệu đang hoạt động. Bạn có thể tạo huy hiệu mới từ trang Quản lý huy hiệu.",
+    description: "Trạng thái trống khi chưa có huy hiệu để chọn.",
+  },
   "missionEditor.minutes": { value: "Thời gian dự kiến (phút)", description: "Nhãn thời lượng nhiệm vụ." },
   "missionEditor.cover": { value: "Ảnh hiển thị trên thẻ", description: "Nhãn tải ảnh bìa nhiệm vụ." },
   "missionEditor.ageGroups": { value: "Nhóm tuổi", description: "Nhãn nhóm tuổi nhiệm vụ." },
