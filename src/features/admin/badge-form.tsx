@@ -40,10 +40,12 @@ export function BadgeForm({
   mode,
   initial,
   skills,
+  showUsageSummary = true,
 }: {
   mode: "create" | "edit";
   initial: FormValues & Partial<BadgeItem>;
   skills: SkillOption[];
+  showUsageSummary?: boolean;
 }) {
   const navigation = usePendingRouter();
   const queryClient = useQueryClient();
@@ -82,7 +84,7 @@ export function BadgeForm({
 
   return (
     <form onSubmit={form.handleSubmit((values) => mutation.mutate(values))} className="space-y-4" noValidate>
-      {mode === "edit" ? (
+      {mode === "edit" && showUsageSummary ? (
         <div className="flex flex-wrap gap-2 text-xs font-bold text-[#6f6558]">
           <span className="inline-flex items-center gap-1 rounded-full bg-[#f5f2ec] px-3 py-1.5">
             <Award size={14} /> {initial.missionCount ?? 0} nhiệm vụ đang gắn

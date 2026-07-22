@@ -1,7 +1,15 @@
 "use client";
 
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { CheckCircle2, Clock3, ExternalLink, ImageIcon, MessageSquareText, UserRound } from "lucide-react";
+import {
+  CheckCircle2,
+  ChevronDown,
+  Clock3,
+  ExternalLink,
+  ImageIcon,
+  MessageSquareText,
+  UserRound,
+} from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
 import { adminFeedbackApi, type SystemFeedbackItem, type SystemFeedbackPage } from "@/api/admin/feedback";
@@ -38,116 +46,132 @@ function FeedbackCard({ item }: { item: SystemFeedbackItem }) {
       : "Không có thông tin";
 
   return (
-    <article className="rounded-3xl border border-[#e6dac7] bg-white p-5 shadow-[0_10px_28px_rgba(76,55,31,0.07)]">
-      <div className="flex flex-wrap items-start justify-between gap-3">
-        <div className="min-w-0">
+    <details className="group overflow-hidden rounded-2xl border border-[#e6dac7] bg-white shadow-[0_6px_18px_rgba(76,55,31,0.06)]">
+      <summary className="flex min-h-24 cursor-pointer list-none items-center gap-3 px-4 py-3 marker:hidden">
+        <div className="min-w-0 flex-1">
           <div className="flex flex-wrap items-center gap-2">
-            <span
-              className={cn("rounded-full border px-3 py-1 text-xs font-black", statusStyles[item.status])}
-            >
-              {systemFeedbackStatusLabels[item.status]}
+            <span className={cn("rounded-full border px-2.5 py-1 text-xs font-black", statusStyles[status])}>
+              {systemFeedbackStatusLabels[status]}
             </span>
             <span className="inline-flex items-center gap-1 text-xs font-bold text-[#786d60]">
               <Clock3 size={14} /> {new Date(item.createdAt).toLocaleString("vi-VN")}
             </span>
+            {item.attachments.length ? (
+              <span className="inline-flex items-center gap-1 text-xs font-bold text-[#786d60]">
+                <ImageIcon size={14} /> {item.attachments.length} ảnh
+              </span>
+            ) : null}
           </div>
-          <h2 className="mt-3 flex items-center gap-2 text-lg font-black text-[#342f28]">
-            <MessageSquareText size={19} className="text-[#b9470d]" />
-            {item.pageTitle || "Góp ý từ một trang trong hệ thống"}
-          </h2>
+          <div className="mt-2 flex min-w-0 items-center gap-2">
+            <MessageSquareText size={18} className="shrink-0 text-[#b9470d]" />
+            <h2 className="truncate font-black text-[#342f28]">
+              {item.pageTitle || "Góp ý từ một trang trong hệ thống"}
+            </h2>
+          </div>
+          <p className="mt-1 line-clamp-1 text-sm text-[#62584d]">Tóm tắt: {item.content}</p>
+        </div>
+        <div className="hidden shrink-0 text-right text-xs leading-5 text-[#62584d] sm:block">
+          <p className="font-black">{item.userName}</p>
+          <p className="max-w-44 truncate">{item.userEmail}</p>
+        </div>
+        <ChevronDown size={19} className="shrink-0 transition group-open:rotate-180" />
+      </summary>
+
+      <div className="space-y-4 border-t border-[#eadfc9] p-4">
+        <div className="grid gap-3 lg:grid-cols-[minmax(0,1fr)_auto]">
           <a
             href={item.pagePath}
             target="_blank"
             rel="noreferrer"
-            className="mt-1 inline-flex max-w-full items-center gap-1 text-sm font-bold break-all text-[#9f3d0b] hover:underline"
+            className="inline-flex min-w-0 items-center gap-1 text-sm font-bold break-all text-[#9f3d0b] hover:underline"
           >
             {item.pagePath} <ExternalLink size={14} className="shrink-0" />
           </a>
-        </div>
-        <div className="rounded-2xl bg-[#f7f3eb] px-4 py-3 text-xs leading-5 text-[#62584d]">
-          <p className="flex items-center gap-2 font-black">
-            <UserRound size={15} /> {item.userName}
-          </p>
-          <p className="mt-1">{item.userEmail}</p>
-          <p className="mt-1">Màn hình: {viewport}</p>
-        </div>
-      </div>
-
-      <div className="mt-4 rounded-2xl bg-[#fff8ec] p-4 leading-7 whitespace-pre-wrap text-[#493f35]">
-        {item.content}
-      </div>
-
-      {item.attachments.length ? (
-        <div className="mt-4">
-          <p className="mb-2 flex items-center gap-2 text-sm font-black text-[#4f463b]">
-            <ImageIcon size={17} /> {item.attachments.length} ảnh đính kèm
-          </p>
-          <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
-            {item.attachments.map((attachment, index) => (
-              <a
-                key={attachment.id}
-                href={attachment.url}
-                target="_blank"
-                rel="noreferrer"
-                className="group overflow-hidden rounded-2xl border bg-[#f3eee5]"
-              >
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img
-                  src={attachment.url}
-                  alt={attachment.altText || `Ảnh góp ý ${index + 1}`}
-                  className="aspect-video w-full object-cover transition group-hover:scale-[1.02]"
-                />
-                <div className="flex items-center justify-between gap-2 bg-white p-3 text-xs font-bold">
-                  <span className="truncate">{attachment.fileName}</span>
-                  <ExternalLink size={14} className="shrink-0" />
-                </div>
-              </a>
-            ))}
+          <div className="rounded-xl bg-[#f7f3eb] px-3 py-2 text-xs leading-5 text-[#62584d]">
+            <p className="flex items-center gap-2 font-black">
+              <UserRound size={15} /> {item.userName}
+            </p>
+            <p>{item.userEmail}</p>
+            <p>Màn hình: {viewport}</p>
           </div>
         </div>
-      ) : null}
 
-      <div className="mt-5 grid gap-4 lg:grid-cols-[220px_minmax(0,1fr)_auto] lg:items-end">
-        <label className="grid gap-2 text-sm font-black text-[#342f28]">
-          Trạng thái xử lý
-          <select
-            value={status}
-            onChange={(event) => setStatus(event.target.value as SystemFeedbackStatus)}
-            className="min-h-12 cursor-pointer rounded-xl border border-[#d9c9ae] bg-white px-3 outline-none focus:border-[#e9641a] focus:ring-2 focus:ring-[#e9641a]/20"
+        <div className="rounded-xl bg-[#fff8ec] p-3 leading-6 whitespace-pre-wrap text-[#493f35]">
+          {item.content}
+        </div>
+
+        {item.attachments.length ? (
+          <div>
+            <p className="mb-2 flex items-center gap-2 text-sm font-black text-[#4f463b]">
+              <ImageIcon size={17} /> {item.attachments.length} ảnh đính kèm
+            </p>
+            <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
+              {item.attachments.map((attachment, index) => (
+                <a
+                  key={attachment.id}
+                  href={attachment.url}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="group/image overflow-hidden rounded-xl border bg-[#f3eee5]"
+                >
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img
+                    src={attachment.url}
+                    alt={attachment.altText || `Ảnh góp ý ${index + 1}`}
+                    className="h-40 w-full object-contain p-2 transition group-hover/image:scale-[1.01]"
+                  />
+                  <div className="flex items-center justify-between gap-2 bg-white px-3 py-2 text-xs font-bold">
+                    <span className="truncate">{attachment.fileName}</span>
+                    <ExternalLink size={14} className="shrink-0" />
+                  </div>
+                </a>
+              ))}
+            </div>
+          </div>
+        ) : null}
+
+        <div className="grid gap-3 lg:grid-cols-[220px_minmax(0,1fr)_auto] lg:items-end">
+          <label className="grid gap-1.5 text-sm font-black text-[#342f28]">
+            Trạng thái xử lý
+            <select
+              value={status}
+              onChange={(event) => setStatus(event.target.value as SystemFeedbackStatus)}
+              className="min-h-11 rounded-xl border border-[#d9c9ae] bg-white px-3 outline-none focus:border-[#e9641a] focus:ring-2 focus:ring-[#e9641a]/20"
+            >
+              {systemFeedbackStatuses.map((value) => (
+                <option key={value} value={value}>
+                  {systemFeedbackStatusLabels[value]}
+                </option>
+              ))}
+            </select>
+          </label>
+          <label className="grid gap-1.5 text-sm font-black text-[#342f28]">
+            Ghi chú nội bộ
+            <textarea
+              value={adminNote}
+              onChange={(event) => setAdminNote(event.target.value)}
+              rows={2}
+              maxLength={2000}
+              placeholder="Ghi lại nguyên nhân, hướng xử lý hoặc kết quả kiểm tra..."
+              className="min-h-11 rounded-xl border border-[#d9c9ae] bg-white px-3 py-2.5 font-normal outline-none focus:border-[#e9641a] focus:ring-2 focus:ring-[#e9641a]/20"
+            />
+          </label>
+          <button
+            type="button"
+            disabled={mutation.isPending}
+            onClick={() => mutation.mutate()}
+            className="inline-flex min-h-11 items-center justify-center gap-2 rounded-xl bg-[#b9470d] px-5 font-black text-white shadow-[0_5px_0_#7f2e05] disabled:cursor-wait disabled:opacity-60"
           >
-            {systemFeedbackStatuses.map((value) => (
-              <option key={value} value={value}>
-                {systemFeedbackStatusLabels[value]}
-              </option>
-            ))}
-          </select>
-        </label>
-        <label className="grid gap-2 text-sm font-black text-[#342f28]">
-          Ghi chú nội bộ
-          <textarea
-            value={adminNote}
-            onChange={(event) => setAdminNote(event.target.value)}
-            rows={3}
-            maxLength={2000}
-            placeholder="Ghi lại nguyên nhân, hướng xử lý hoặc kết quả kiểm tra..."
-            className="min-h-12 rounded-xl border border-[#d9c9ae] bg-white px-3 py-3 font-normal outline-none focus:border-[#e9641a] focus:ring-2 focus:ring-[#e9641a]/20"
-          />
-        </label>
-        <button
-          type="button"
-          disabled={mutation.isPending}
-          onClick={() => mutation.mutate()}
-          className="inline-flex min-h-12 cursor-pointer items-center justify-center gap-2 rounded-2xl bg-[#b9470d] px-5 font-black text-white shadow-[0_6px_0_#7f2e05] disabled:cursor-wait disabled:opacity-60"
-        >
-          <CheckCircle2 size={18} /> {mutation.isPending ? "Đang lưu..." : "Lưu xử lý"}
-        </button>
+            <CheckCircle2 size={18} /> {mutation.isPending ? "Đang lưu..." : "Lưu xử lý"}
+          </button>
+        </div>
+        <FormStatus
+          status={mutation.isError ? "error" : "idle"}
+          message={mutation.error?.message}
+          className="mt-2"
+        />
       </div>
-      <FormStatus
-        status={mutation.isError ? "error" : "idle"}
-        message={mutation.error?.message}
-        className="mt-3"
-      />
-    </article>
+    </details>
   );
 }
 

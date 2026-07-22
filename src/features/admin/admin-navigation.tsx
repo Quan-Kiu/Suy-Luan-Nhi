@@ -92,7 +92,7 @@ const navGroups = [
       {
         href: "/admin/content-variables",
         labelKey: "nav.contentVariables",
-        fallback: "Biến trong nội dung",
+        fallback: "Thông tin tự điền",
         icon: Braces,
         roles: superAdmins,
       },
@@ -180,17 +180,17 @@ type Props = {
 export function AdminNavigation({ pathname, role, content, onNavigate, ariaLabel }: Props) {
   const primaryRole = getPrimaryRole(role);
   return (
-    <nav aria-label={ariaLabel} className="space-y-6 text-sm">
+    <nav aria-label={ariaLabel} className="space-y-4 pb-4 text-sm">
       {navGroups.map((group) => {
         const visibleItems = group.items.filter((item) => item.roles.includes(primaryRole));
         if (!visibleItems.length) return null;
 
         return (
           <section key={group.labelKey}>
-            <p className="mb-2 px-3 text-[11px] font-black tracking-[0.14em] text-[#756b60] uppercase">
+            <p className="mb-1.5 px-3 text-[10px] font-black tracking-[0.14em] text-[#756b60] uppercase">
               {contentText(content, group.labelKey, group.fallback)}
             </p>
-            <div className="space-y-1">
+            <div className="space-y-0.5">
               {visibleItems.map((item) => {
                 const active =
                   "exact" in item && item.exact
@@ -204,7 +204,7 @@ export function AdminNavigation({ pathname, role, content, onNavigate, ariaLabel
                     onClick={onNavigate}
                     aria-current={active ? "page" : undefined}
                     className={cn(
-                      "flex min-h-11 items-center gap-3 rounded-xl px-3 font-bold transition hover:bg-[#f5f2ec]",
+                      "flex min-h-10 items-center gap-2.5 rounded-lg px-3 font-bold transition hover:bg-[#f5f2ec]",
                       active && "bg-[#fff0df] text-[#bd4910] shadow-sm",
                     )}
                   >
@@ -218,17 +218,17 @@ export function AdminNavigation({ pathname, role, content, onNavigate, ariaLabel
         );
       })}
 
-      <div className="rounded-2xl bg-[#edf4df] p-4 text-xs text-[#587048]">
-        <div className="flex items-center gap-2 font-black">
+      <details className="rounded-xl bg-[#edf4df] text-xs text-[#587048]">
+        <summary className="flex min-h-10 cursor-pointer list-none items-center gap-2 px-3 py-2 font-black marker:hidden">
           <ShieldCheck size={16} />
           {contentText(content, "shell.workflowTitle", "Quy trình nội dung an toàn")}
-        </div>
-        <ol className="mt-2 space-y-1.5 leading-5">
+        </summary>
+        <ol className="space-y-1 border-t border-[#dbe8c9] px-3 py-2 leading-5">
           <li>1. Soạn và lưu nội dung.</li>
           <li>2. Kiểm tra an toàn cho trẻ.</li>
           <li>3. Một người khác kiểm tra trước khi cho bé xem.</li>
         </ol>
-      </div>
+      </details>
     </nav>
   );
 }

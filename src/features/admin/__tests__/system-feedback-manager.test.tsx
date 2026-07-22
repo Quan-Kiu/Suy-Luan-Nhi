@@ -51,6 +51,9 @@ describe("SystemFeedbackManager", () => {
     );
 
     expect(screen.getByRole("heading", { name: "Nhiệm vụ demo" })).toBeVisible();
+    const details = screen.getByText("Tóm tắt: Nút tiếp tục bị che trên điện thoại.").closest("details");
+    expect(details).not.toBeNull();
+    details!.open = true;
     expect(screen.getByText("Nút tiếp tục bị che trên điện thoại.")).toBeVisible();
     expect(screen.getByText("Màn hình: 390 × 844px")).toBeVisible();
     expect(screen.getByRole("img", { name: "Ảnh trang hiện tại" })).toBeVisible();

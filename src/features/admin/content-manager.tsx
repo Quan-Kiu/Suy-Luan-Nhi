@@ -52,9 +52,9 @@ function syncUrl(filters: AppliedFilters) {
 }
 function ContentStudioSkeleton() {
   return (
-    <div className="space-y-4" aria-hidden="true">
+    <div className="grid gap-3 2xl:grid-cols-2" aria-hidden="true">
       {[0, 1, 2].map((item) => (
-        <div key={item} className="animate-pulse rounded-3xl border border-[#eadfc9] bg-white p-5">
+        <div key={item} className="animate-pulse rounded-2xl border border-[#eadfc9] bg-white p-4">
           <div className="flex flex-wrap gap-2">
             <div className="h-6 w-28 rounded-full bg-[#efe7da]" />
             <div className="h-6 w-36 rounded-full bg-[#efe7da]" />
@@ -143,8 +143,8 @@ export function ContentManager({ initialData, initialFilters: providedFilters = 
     );
   }
   return (
-    <div className="space-y-6">
-      <section className="rounded-3xl border border-[#e5d8c2] bg-[#fffaf0] p-5 sm:p-6">
+    <div className="space-y-5">
+      <section className="rounded-2xl border border-[#e5d8c2] bg-[#fffaf0] p-4 sm:p-5">
         <div className="flex items-start gap-3">
           <span className="grid size-11 shrink-0 place-items-center rounded-2xl bg-[#fff0df] text-[#b9470d]">
             <Sparkles size={21} />
@@ -350,7 +350,9 @@ export function ContentManager({ initialData, initialFilters: providedFilters = 
         ) : null}
 
         {!query.isLoading && !query.isError ? (
-          <div className={cn("space-y-4 transition-opacity", query.isFetching && "opacity-65")}>
+          <div
+            className={cn("grid gap-3 transition-opacity 2xl:grid-cols-2", query.isFetching && "opacity-65")}
+          >
             {data.items.map((row) => {
               const area = getContentAreaMeta(row.namespace);
               const purpose = getContentPurpose(row.key, row.value);
@@ -358,24 +360,24 @@ export function ContentManager({ initialData, initialFilters: providedFilters = 
               return (
                 <article
                   key={`${row.namespace}:${row.key}:${row.locale}`}
-                  className="rounded-3xl border border-[#e5d8c2] bg-white p-5 shadow-[0_8px_24px_rgba(76,55,31,0.05)] sm:p-6"
+                  className="rounded-2xl border border-[#e5d8c2] bg-white p-4 shadow-[0_6px_18px_rgba(76,55,31,0.05)]"
                 >
-                  <div className="flex flex-wrap items-start justify-between gap-4">
+                  <div className="flex flex-wrap items-start justify-between gap-3">
                     <div className="min-w-0">
                       <p className="text-sm font-black text-[#9f3d0b]">
                         {area.shortLabel} <span aria-hidden="true">›</span> {categoryLabel}
                       </p>
-                      <p className="mt-2 max-w-3xl text-sm leading-6 text-[#6f6558]">
+                      <p className="mt-1.5 line-clamp-2 max-w-3xl text-sm leading-5 text-[#6f6558]">
                         {getContentLocationSummary(row.namespace, row.category, row.key, row.value)}
                       </p>
                     </div>
                     <div className="flex flex-wrap gap-2 text-xs font-black">
-                      <span className="rounded-full bg-[#eef4e4] px-3 py-1.5 text-[#557047]">
+                      <span className="rounded-full bg-[#eef4e4] px-2.5 py-1 text-[#557047]">
                         {purpose.label}
                       </span>
                       <span
                         className={cn(
-                          "rounded-full px-3 py-1.5",
+                          "rounded-full px-2.5 py-1",
                           row.source === "database"
                             ? "bg-[#fff0df] text-[#9f3d0b]"
                             : "bg-[#f5f2ec] text-[#6f6558]",
@@ -386,16 +388,16 @@ export function ContentManager({ initialData, initialFilters: providedFilters = 
                     </div>
                   </div>
 
-                  <div className="mt-4 rounded-2xl border border-[#eadfc9] bg-[#fffaf0] p-4">
+                  <div className="mt-3 rounded-xl border border-[#eadfc9] bg-[#fffaf0] p-3">
                     <p className="flex items-center gap-2 text-xs font-black tracking-wide text-[#756b60] uppercase">
                       <Eye size={15} /> Người dùng đang nhìn thấy
                     </p>
-                    <p className="mt-2 text-base leading-7 font-bold whitespace-pre-wrap text-[#342f28]">
+                    <p className="mt-1.5 line-clamp-3 text-sm leading-6 font-bold whitespace-pre-wrap text-[#342f28]">
                       {contentPreviewText(row.value)}
                     </p>
                   </div>
 
-                  <details className="mt-4 rounded-xl bg-[#f7f3eb] p-3 text-xs text-[#6f6558]">
+                  <details className="mt-3 rounded-xl bg-[#f7f3eb] p-2.5 text-xs text-[#6f6558]">
                     <summary className="cursor-pointer font-black text-[#4f463b]">
                       Thông tin dành cho đội kỹ thuật
                     </summary>

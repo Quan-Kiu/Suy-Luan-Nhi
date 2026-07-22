@@ -54,9 +54,11 @@ function toInput(values: FormValues, mode: "create" | "edit"): WorldInput {
 export function WorldForm({
   mode,
   initial,
+  showPreview = true,
 }: {
   mode: "create" | "edit";
   initial: FormValues & { id?: string };
+  showPreview?: boolean;
 }) {
   const content = useContent("admin");
   const navigation = usePendingRouter();
@@ -90,7 +92,7 @@ export function WorldForm({
 
   return (
     <form onSubmit={form.handleSubmit((values) => mutation.mutate(values))} className="space-y-3" noValidate>
-      {mode === "edit" && coverUrl ? (
+      {mode === "edit" && showPreview && coverUrl ? (
         <Image
           src={coverUrl}
           width={320}
@@ -177,6 +179,7 @@ export function WorldForm({
             value={coverUrl}
             onChange={(url) => form.setValue("coverUrl", url, { shouldDirty: true, shouldValidate: true })}
             category="world-cover"
+            previewFit="cover"
             altText={title || "Ảnh bìa chủ đề"}
             error={form.formState.errors.coverUrl?.message}
           />

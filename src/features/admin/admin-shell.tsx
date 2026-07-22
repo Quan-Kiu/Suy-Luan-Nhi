@@ -35,10 +35,10 @@ export function AdminShell({
   }, []);
 
   return (
-    <div className="min-h-screen bg-[#f5f3ee] text-[#342f28]">
+    <div data-admin-shell className="h-[100dvh] overflow-hidden bg-[#f5f3ee] text-[#342f28]">
       <header
         data-testid="admin-header"
-        className="sticky top-0 z-40 flex h-16 items-center justify-between border-b bg-white px-4 sm:px-5"
+        className="relative z-40 flex h-16 items-center justify-between border-b bg-white px-4 sm:px-5"
       >
         <div className="flex min-w-0 items-center gap-2">
           <button
@@ -122,13 +122,16 @@ export function AdminShell({
         ) : null}
       </AnimatePresence>
 
-      <div className="grid min-h-[calc(100vh-4rem)] lg:grid-cols-[280px_minmax(0,1fr)]">
-        <aside className="hidden border-r bg-white p-4 lg:block">
-          <div className="sticky top-20">
-            <AdminNavigation pathname={pathname} role={role} content={content} />
-          </div>
+      <div className="grid h-[calc(100dvh-4rem)] min-h-0 lg:grid-cols-[248px_minmax(0,1fr)]">
+        <aside className="hidden min-h-0 scrollbar-thin overflow-y-auto overscroll-contain border-r bg-white px-3 py-4 lg:block">
+          <AdminNavigation pathname={pathname} role={role} content={content} />
         </aside>
-        <main className="min-w-0 p-4 sm:p-6 lg:p-8">{children}</main>
+        <main
+          id="admin-main-content"
+          className="min-h-0 min-w-0 scrollbar-thin overflow-y-auto overscroll-contain p-4 sm:p-5 lg:p-6"
+        >
+          <div className="mx-auto w-full max-w-[1680px]">{children}</div>
+        </main>
       </div>
     </div>
   );

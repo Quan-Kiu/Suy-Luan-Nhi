@@ -148,6 +148,7 @@ export function ResourceEditorForm({ resource }: { resource?: AdminResourceItem 
                   form.setValue("coverUrl", url, { shouldDirty: true, shouldValidate: true })
                 }
                 category="resource-cover"
+                previewFit="cover"
                 altText={title || "Ảnh bìa tài nguyên"}
                 error={form.formState.errors.coverUrl?.message}
               />

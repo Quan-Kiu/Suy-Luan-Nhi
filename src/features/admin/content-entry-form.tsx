@@ -160,8 +160,8 @@ export function ContentEntryForm({
 
   return (
     <>
-      <details className="group mt-4 overflow-hidden rounded-2xl border border-[#e5d8c2] bg-[#fffdf8]">
-        <summary className="flex min-h-12 cursor-pointer list-none items-center justify-between gap-3 px-4 py-3 font-black text-[#3f392f] marker:hidden">
+      <details className="group mt-3 overflow-hidden rounded-xl border border-[#e5d8c2] bg-[#fffdf8]">
+        <summary className="flex min-h-11 cursor-pointer list-none items-center justify-between gap-3 px-3.5 py-2.5 text-sm font-black text-[#3f392f] marker:hidden">
           <span className="inline-flex items-center gap-2">
             <Pencil size={17} /> Chỉnh sửa câu chữ
           </span>
@@ -169,7 +169,7 @@ export function ContentEntryForm({
         </summary>
         <form
           onSubmit={form.handleSubmit((values) => mutation.mutate(values))}
-          className="space-y-4 border-t border-[#eadfc9] p-4"
+          className="space-y-3 border-t border-[#eadfc9] p-3.5"
           aria-busy={!interactive || mutation.isPending || resetMutation.isPending}
           noValidate
         >

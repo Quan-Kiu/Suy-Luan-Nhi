@@ -27,6 +27,7 @@ type Props = {
   description?: string;
   error?: string;
   compact?: boolean;
+  previewFit?: "cover" | "contain";
 };
 
 const defaultAccept = "image/png,image/jpeg,image/webp,image/gif,image/avif";
@@ -37,19 +38,43 @@ function previewKind(url: string): MediaKind {
   return "image";
 }
 
-function Preview({ url, label }: { url: string; label: string }) {
+function Preview({
+  url,
+  label,
+  fit,
+  compact,
+}: {
+  url: string;
+  label: string;
+  fit: "cover" | "contain";
+  compact: boolean;
+}) {
   const kind = previewKind(url);
+  const heightClass = compact ? "h-24" : "h-32";
   if (kind === "video") {
     return (
-      <video src={url} controls preload="metadata" className="h-32 w-full rounded-xl bg-black object-cover" />
+      <video
+        src={url}
+        controls
+        preload="metadata"
+        className={cn(heightClass, "w-full rounded-xl bg-black object-contain")}
+      />
     );
   }
   if (kind === "audio") {
     return <audio src={url} controls preload="metadata" className="w-full" />;
   }
   return (
-    <div className="relative h-32 overflow-hidden rounded-xl bg-[#f5f0e6]">
-      <Image src={url} fill sizes="320px" alt={label} className="object-cover" />
+    <div
+      className={cn("relative overflow-hidden rounded-xl border border-[#eadfc9] bg-[#f5f0e6]", heightClass)}
+    >
+      <Image
+        src={url}
+        fill
+        sizes="(min-width: 1280px) 520px, 100vw"
+        alt={label}
+        className={fit === "cover" ? "object-cover" : "object-contain p-2"}
+      />
     </div>
   );
 }
@@ -64,6 +89,7 @@ export function MediaUploadField({
   description = "Chọn tệp từ máy. Hệ thống sẽ tự tải lên và gắn vào nội dung.",
   error,
   compact = false,
+  previewFit = "contain",
 }: Props) {
   const inputId = useId();
   const inputRef = useRef<HTMLInputElement>(null);
@@ -102,11 +128,11 @@ export function MediaUploadField({
         </label>
         <p className="mt-1 text-xs leading-5 text-[#6f6558]">{description}</p>
       </div>
-      {value ? <Preview url={value} label={altText || label} /> : null}
+      {value ? <Preview url={value} label={altText || label} fit={previewFit} compact={compact} /> : null}
       <label
         htmlFor={inputId}
         className={cn(
-          "flex min-h-12 cursor-pointer items-center justify-center gap-2 rounded-xl border-2 border-dashed border-[#d5c09b] bg-white px-4 text-sm font-black transition hover:border-[#e9641a] hover:bg-[#fff7eb]",
+          "flex min-h-11 cursor-pointer items-center justify-center gap-2 rounded-xl border-2 border-dashed border-[#d5c09b] bg-white px-4 text-sm font-black transition hover:border-[#e9641a] hover:bg-[#fff7eb]",
           mutation.isPending && "pointer-events-none opacity-60",
         )}
       >
@@ -125,18 +151,20 @@ export function MediaUploadField({
           if (file) mutation.mutate(file);
         }}
       />
-      {policySummary ? (
-        <p className="text-xs font-bold text-[#6f6558]">Yêu cầu đối với ảnh: {policySummary}.</p>
-      ) : null}
-      {value ? (
-        <p className="flex items-center gap-2 text-xs font-bold break-all text-green-700">
-          <CheckCircle2 size={15} className="shrink-0" /> Tệp đã được gắn tự động vào nội dung.
-        </p>
-      ) : (
-        <p className="flex items-center gap-2 text-xs text-[#806d54]">
-          <KindIcon size={15} /> Chưa có tệp nào được chọn.
-        </p>
-      )}
+      <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-xs">
+        {policySummary ? (
+          <p className="font-bold text-[#6f6558]">Yêu cầu đối với ảnh: {policySummary}.</p>
+        ) : null}
+        {value ? (
+          <p className="flex items-center gap-1.5 font-bold text-green-700">
+            <CheckCircle2 size={15} className="shrink-0" /> Tệp đã được gắn tự động vào nội dung.
+          </p>
+        ) : (
+          <p className="flex items-center gap-1.5 text-[#806d54]">
+            <KindIcon size={15} /> Chưa chọn tệp
+          </p>
+        )}
+      </div>
       {mutation.isError ? (
         <p role="alert" className="text-sm font-bold text-red-700">
           {mutation.error.message}

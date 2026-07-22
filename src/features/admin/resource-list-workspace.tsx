@@ -238,27 +238,27 @@ export function ResourceListWorkspace({
               </select>
             </label>
           </div>
-          <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+          <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4">
             {data.items.map((item) => (
               <article key={item.id} className="overflow-hidden rounded-2xl border bg-white shadow-sm">
-                <div className="relative h-40 bg-[#f5f0e6]">
+                <div className="relative h-28 bg-[#f5f0e6] sm:h-32">
                   {item.coverUrl ? (
                     <Image
                       src={item.coverUrl}
                       fill
-                      sizes="(min-width:1280px) 33vw, 50vw"
+                      sizes="(min-width:1536px) 25vw, (min-width:1280px) 33vw, 50vw"
                       alt=""
                       className="object-cover"
                     />
                   ) : null}
                 </div>
-                <div className="p-4">
+                <div className="p-3.5">
                   <div className="flex flex-wrap items-start justify-between gap-2">
                     <div className="min-w-0">
                       <p className="text-xs font-black text-[#9f3d0b]">
                         {parentResourceTypeLabels[item.resourceType]}
                       </p>
-                      <h2 className="mt-1 text-lg font-black">{item.title}</h2>
+                      <h2 className="mt-1 line-clamp-2 text-base leading-5 font-black">{item.title}</h2>
                     </div>
                     <span
                       className={cn(
@@ -269,8 +269,8 @@ export function ResourceListWorkspace({
                       {statusLabels[item.status]}
                     </span>
                   </div>
-                  <p className="mt-2 line-clamp-2 text-sm leading-6 text-[#6f6558]">{item.excerpt}</p>
-                  <div className="mt-3 flex flex-wrap gap-2 text-xs font-bold text-[#6f6558]">
+                  <p className="mt-2 line-clamp-2 text-sm leading-5 text-[#6f6558]">{item.excerpt}</p>
+                  <div className="mt-2.5 flex flex-wrap gap-1.5 text-xs font-bold text-[#6f6558]">
                     <span className="rounded-full bg-[#f5f2ec] px-2 py-1">
                       {parentResourceCategoryLabels[item.category]}
                     </span>
@@ -279,10 +279,10 @@ export function ResourceListWorkspace({
                     </span>
                   </div>
                   {canEdit ? (
-                    <div className="mt-4 grid grid-cols-2 gap-2">
+                    <div className="mt-3 grid grid-cols-2 gap-2">
                       <Link
                         href={`/admin/resources/${item.id}/edit`}
-                        className="inline-flex min-h-11 items-center justify-center gap-2 rounded-xl border font-black"
+                        className="inline-flex min-h-10 items-center justify-center gap-1.5 rounded-xl border text-sm font-black"
                       >
                         <Edit3 size={17} /> Chỉnh sửa
                       </Link>
@@ -290,7 +290,7 @@ export function ResourceListWorkspace({
                         type="button"
                         disabled={item.status === "archived"}
                         onClick={() => setArchiveTarget(item)}
-                        className="inline-flex min-h-11 items-center justify-center gap-2 rounded-xl border border-amber-200 bg-amber-50 font-black text-amber-800 disabled:opacity-40"
+                        className="inline-flex min-h-10 items-center justify-center gap-1.5 rounded-xl border border-amber-200 bg-amber-50 text-sm font-black text-amber-800 disabled:opacity-40"
                       >
                         <Archive size={17} /> Lưu trữ
                       </button>

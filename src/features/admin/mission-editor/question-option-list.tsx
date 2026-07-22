@@ -32,6 +32,7 @@ function nextId(items: EditorOption[]) {
   while (items.some((item) => item.id === `item-${index}`)) index += 1;
   return `item-${index}`;
 }
+
 export function QuestionOptionList({
   title,
   items,
@@ -65,52 +66,38 @@ export function QuestionOptionList({
   return (
     <fieldset className="rounded-2xl border bg-[#fffdf8] p-4">
       <legend className="px-1 text-sm font-black">{title}</legend>
-      <div className="mt-2 space-y-3">
+      <div className="mt-2 grid gap-3 2xl:grid-cols-2">
         {items.map((item, index) => (
           <div key={item.id} className="rounded-xl border bg-white p-3">
-            <div className="flex items-start gap-3">
-              {onCorrectChange ? (
-                <label className="mt-3 flex shrink-0 items-center gap-2 text-xs font-bold">
-                  <input
-                    type="radio"
-                    name={`${title}-correct`}
-                    checked={correctId === item.id}
-                    onChange={() => onCorrectChange(item.id)}
-                  />
-                  Đúng
-                </label>
-              ) : null}
-              {onMissingChange ? (
-                <label className="mt-3 flex shrink-0 items-center gap-2 text-xs font-bold">
-                  <input
-                    type="radio"
-                    name={`${title}-missing`}
-                    checked={missingId === item.id}
-                    onChange={() => onMissingChange(item.id)}
-                  />
-                  Ô trống
-                </label>
-              ) : null}
-              <div className="min-w-0 flex-1 space-y-2">
-                <ContentTemplateField
-                  label={`${title} ${index + 1}`}
-                  value={item.label}
-                  onValueChange={(value) => update(index, { label: value, altText: value })}
-                  variables={templateVariables}
-                  placeholder="Nội dung hiển thị"
-                  showHint={false}
-                />
-                <MediaUploadField
-                  label={`Hình minh họa ${index + 1}`}
-                  value={item.asset}
-                  onChange={(url) => update(index, { asset: url, altText: item.label })}
-                  category="question-asset"
-                  altText={item.label || `${title} ${index + 1}`}
-                  description="Không bắt buộc. Chọn ảnh từ máy, hệ thống sẽ tự tải lên và gắn vào nội dung."
-                  compact
-                />
+            <div className="mb-2 flex flex-wrap items-center justify-between gap-2">
+              <div className="flex flex-wrap items-center gap-3 text-xs font-bold">
+                <span className="rounded-full bg-[#f5f2ec] px-2.5 py-1 text-[#6f6558]">
+                  {title} {index + 1}
+                </span>
+                {onCorrectChange ? (
+                  <label className="flex min-h-9 items-center gap-2">
+                    <input
+                      type="radio"
+                      name={`${title}-correct`}
+                      checked={correctId === item.id}
+                      onChange={() => onCorrectChange(item.id)}
+                    />
+                    Đáp án đúng
+                  </label>
+                ) : null}
+                {onMissingChange ? (
+                  <label className="flex min-h-9 items-center gap-2">
+                    <input
+                      type="radio"
+                      name={`${title}-missing`}
+                      checked={missingId === item.id}
+                      onChange={() => onMissingChange(item.id)}
+                    />
+                    Ô trống
+                  </label>
+                ) : null}
               </div>
-              <div className="flex shrink-0 flex-col gap-1">
+              <div className="flex shrink-0 items-center gap-1">
                 {reorderable ? (
                   <>
                     <button
@@ -118,7 +105,7 @@ export function QuestionOptionList({
                       aria-label={`Đưa ${title} ${index + 1} lên`}
                       disabled={index === 0}
                       onClick={() => move(index, -1)}
-                      className="rounded-lg border p-2 disabled:opacity-30"
+                      className="grid size-9 place-items-center rounded-lg border disabled:opacity-30"
                     >
                       <ArrowUp size={15} />
                     </button>
@@ -127,7 +114,7 @@ export function QuestionOptionList({
                       aria-label={`Đưa ${title} ${index + 1} xuống`}
                       disabled={index === items.length - 1}
                       onClick={() => move(index, 1)}
-                      className="rounded-lg border p-2 disabled:opacity-30"
+                      className="grid size-9 place-items-center rounded-lg border disabled:opacity-30"
                     >
                       <ArrowDown size={15} />
                     </button>
@@ -138,11 +125,30 @@ export function QuestionOptionList({
                   aria-label={`Xóa ${title} ${index + 1}`}
                   disabled={items.length <= minItems}
                   onClick={() => remove(index)}
-                  className="rounded-lg border border-red-200 bg-red-50 p-2 text-red-700 disabled:opacity-30"
+                  className="grid size-9 place-items-center rounded-lg border border-red-200 bg-red-50 text-red-700 disabled:opacity-30"
                 >
                   <Trash2 size={15} />
                 </button>
               </div>
+            </div>
+            <div className="space-y-2">
+              <ContentTemplateField
+                label="Nội dung"
+                value={item.label}
+                onValueChange={(value) => update(index, { label: value, altText: value })}
+                variables={templateVariables}
+                placeholder="Nội dung hiển thị"
+                showHint={false}
+              />
+              <MediaUploadField
+                label="Hình minh họa"
+                value={item.asset}
+                onChange={(url) => update(index, { asset: url, altText: item.label })}
+                category="question-asset"
+                altText={item.label || `${title} ${index + 1}`}
+                description="Không bắt buộc. Chọn ảnh từ máy khi đáp án cần hình minh họa."
+                compact
+              />
             </div>
           </div>
         ))}
@@ -150,7 +156,7 @@ export function QuestionOptionList({
       <button
         type="button"
         onClick={() => onChange([...items, { id: nextId(items), label: `${addLabel} ${items.length + 1}` }])}
-        className="mt-3 inline-flex items-center gap-2 rounded-xl border bg-white px-3 py-2 text-sm font-black"
+        className="mt-3 inline-flex min-h-10 items-center gap-2 rounded-xl border bg-white px-3 text-sm font-black"
       >
         <Plus size={16} /> {addLabel}
       </button>
