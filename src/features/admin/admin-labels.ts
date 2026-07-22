@@ -4,7 +4,7 @@ export const missionStatusLabels: Record<string, string> = {
   rejected: "Cần chỉnh sửa",
   approved: "Đạt yêu cầu",
   published: "Đang hiển thị",
-  archived: "Đã cất",
+  archived: "Đã lưu trữ",
 };
 
 export const questionTypeLabels: Record<string, string> = {
@@ -38,7 +38,8 @@ export const auditActionLabels: Record<string, string> = {
   "mission.approved": "Xác nhận nhiệm vụ đạt yêu cầu",
   "mission.rejected": "Yêu cầu chỉnh sửa nhiệm vụ",
   "mission.published": "Cho bé xem nhiệm vụ",
-  "mission.archived": "Cất nhiệm vụ",
+  "mission.archived": "Lưu trữ nhiệm vụ",
+  "mission.restored": "Khôi phục nhiệm vụ",
   "world.created": "Thêm chủ đề nhiệm vụ",
   "world.updated": "Cập nhật chủ đề nhiệm vụ",
   "badge.created": "Thêm huy hiệu",

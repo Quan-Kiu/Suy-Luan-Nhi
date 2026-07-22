@@ -1,7 +1,16 @@
 "use client";
 
 import { keepPreviousData, useQuery } from "@tanstack/react-query";
-import { ChevronLeft, ChevronRight, Filter, LoaderCircle, Search, X } from "lucide-react";
+import {
+  Archive,
+  ChevronLeft,
+  ChevronRight,
+  Filter,
+  ListChecks,
+  LoaderCircle,
+  Search,
+  X,
+} from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { useMemo, useState } from "react";
@@ -55,6 +64,13 @@ function formatDate(value: string) {
   return new Date(value).toLocaleDateString("vi-VN");
 }
 
+function formatMissionTimeline(item: AdminMissionListItem) {
+  if (item.status === "archived") {
+    return `Lưu trữ ${formatDate(item.archivedAt ?? item.updatedAt)}`;
+  }
+  return `Cập nhật ${formatDate(item.updatedAt)}`;
+}
+
 function MissionEditTarget({
   canEdit,
   href,
@@ -90,6 +106,7 @@ export function MissionListWorkspace({ initialData, initialFilters, worlds, canE
   });
   const data = query.data ?? initialData;
   const hasFilters = Boolean(filters.search || filters.status || filters.worldId);
+  const archiveView = filters.status === "archived";
   const t = (key: string, fallback: string) => contentText(content, key, fallback);
 
   function applyFilters() {
@@ -110,6 +127,29 @@ export function MissionListWorkspace({ initialData, initialFilters, worlds, canE
     setFilters(next);
     syncUrl(next);
   }
+
+  function showActiveMissions() {
+    const next: AppliedFilters = {
+      ...filters,
+      status: undefined,
+      page: 1,
+    };
+    setDraft((current) => ({ ...current, status: "" }));
+    setFilters(next);
+    syncUrl(next);
+  }
+
+  function showArchivedMissions() {
+    const next: AppliedFilters = {
+      ...filters,
+      status: "archived",
+      page: 1,
+    };
+    setDraft((current) => ({ ...current, status: "archived" }));
+    setFilters(next);
+    syncUrl(next);
+  }
+
   function changePage(page: number) {
     const next = { ...filters, page };
     setFilters(next);
@@ -118,6 +158,34 @@ export function MissionListWorkspace({ initialData, initialFilters, worlds, canE
 
   return (
     <div className="space-y-5">
+      <nav
+        aria-label="Xem nhanh danh sách nhiệm vụ"
+        className="flex w-fit flex-wrap gap-1 rounded-xl border bg-white p-1"
+      >
+        <button
+          type="button"
+          aria-pressed={!archiveView}
+          onClick={showActiveMissions}
+          className={cn(
+            "type-action inline-flex min-h-10 items-center gap-2 rounded-lg px-3 py-2 font-black transition",
+            !archiveView ? "bg-[#3f392f] text-white" : "text-[#62594e] hover:bg-[#f7f3eb]",
+          )}
+        >
+          <ListChecks size={17} /> Đang quản lý
+        </button>
+        <button
+          type="button"
+          aria-pressed={archiveView}
+          onClick={showArchivedMissions}
+          className={cn(
+            "type-action inline-flex min-h-10 items-center gap-2 rounded-lg px-3 py-2 font-black transition",
+            archiveView ? "bg-[#3f392f] text-white" : "text-[#62594e] hover:bg-[#f7f3eb]",
+          )}
+        >
+          <Archive size={17} /> Kho lưu trữ
+        </button>
+      </nav>
+
       <form
         className="grid gap-3 rounded-2xl border bg-white p-4 sm:grid-cols-2 xl:grid-cols-[minmax(260px,1fr)_220px_210px_auto_auto]"
         onSubmit={(event) => {
@@ -157,7 +225,7 @@ export function MissionListWorkspace({ initialData, initialFilters, worlds, canE
             onChange={(event) => setDraft((current) => ({ ...current, status: event.target.value }))}
             className="min-h-11 w-full rounded-xl border px-3"
           >
-            <option value="">{t("missions.allStatuses", "Mọi trạng thái")}</option>
+            <option value="">{t("missions.allStatuses", "Mọi trạng thái đang quản lý")}</option>
             {Object.entries(missionStatusLabels).map(([value, label]) => (
               <option key={value} value={value}>
                 {label}
@@ -195,7 +263,16 @@ export function MissionListWorkspace({ initialData, initialFilters, worlds, canE
         <div className={cn("space-y-4 transition-opacity", query.isFetching && "opacity-65")}>
           <div className="flex flex-wrap items-center justify-between gap-3">
             <p className="type-supporting font-bold text-[#6f6558]">
-              {contentTemplate(content, "missions.resultCount", "{count} nhiệm vụ", { count: data.total })}
+              {archiveView
+                ? contentTemplate(
+                    content,
+                    "missions.archiveResultCount",
+                    "{count} nhiệm vụ trong Kho lưu trữ",
+                    { count: data.total },
+                  )
+                : contentTemplate(content, "missions.resultCount", "{count} nhiệm vụ", {
+                    count: data.total,
+                  })}
             </p>
             <label className="type-label flex items-center gap-2 font-bold text-[#6f6558]">
               Hiển thị
@@ -218,52 +295,61 @@ export function MissionListWorkspace({ initialData, initialFilters, worlds, canE
           </div>
 
           <div className="grid gap-4 md:hidden">
-            {data.items.map((item, index) => (
-              <article key={item.id} className="overflow-hidden rounded-2xl border bg-white shadow-sm">
-                <MissionEditTarget
-                  canEdit={canEdit}
-                  href={`/admin/missions/${item.id}/edit`}
-                  className="block"
+            {data.items.map((item, index) => {
+              const archived = item.status === "archived";
+              return (
+                <article
+                  key={item.id}
+                  className={cn(
+                    "overflow-hidden rounded-2xl border bg-white shadow-sm",
+                    archived && "border-stone-300 bg-stone-50",
+                  )}
                 >
-                  <div className="relative h-36 w-full overflow-hidden">
-                    <Image
-                      src={item.coverUrl}
-                      fill
-                      sizes="(max-width: 767px) calc(100vw - 2rem), 1px"
-                      priority={index === 0}
-                      alt=""
-                      className="object-cover"
-                    />
-                  </div>
-                  <div className="p-4">
-                    <div className="flex flex-wrap items-start justify-between gap-2">
-                      <div className="min-w-0">
-                        <h2 className="type-card-title">{item.title}</h2>
-                        <p className="type-supporting text-[#6f6558]">{item.worldTitle}</p>
-                      </div>
-                      <MissionStatusBadge status={item.status} />
+                  <MissionEditTarget
+                    canEdit={canEdit && !archived}
+                    href={`/admin/missions/${item.id}/edit`}
+                    className="block"
+                  >
+                    <div className="relative h-36 w-full overflow-hidden">
+                      <Image
+                        src={item.coverUrl}
+                        fill
+                        sizes="(max-width: 767px) calc(100vw - 2rem), 1px"
+                        priority={index === 0}
+                        alt=""
+                        className={cn("object-cover", archived && "opacity-75 grayscale-[35%]")}
+                      />
                     </div>
-                    <p className="type-supporting mt-3 text-[#6f6558]">
-                      {contentTemplate(
-                        content,
-                        "missions.summary",
-                        "{questions} câu hỏi · khoảng {minutes} phút",
-                        {
-                          questions: item.questionCount,
-                          minutes: item.estimatedMinutes,
-                        },
-                      )}
-                    </p>
-                    <p className="type-caption mt-1 text-[#756b60]">Cập nhật {formatDate(item.updatedAt)}</p>
-                  </div>
-                </MissionEditTarget>
-                {canEdit ? (
-                  <div className="border-t px-4 py-3">
-                    <MissionListActions missionId={item.id} showLabels />
-                  </div>
-                ) : null}
-              </article>
-            ))}
+                    <div className="p-4">
+                      <div className="flex flex-wrap items-start justify-between gap-2">
+                        <div className="min-w-0">
+                          <h2 className="type-card-title">{item.title}</h2>
+                          <p className="type-supporting text-[#6f6558]">{item.worldTitle}</p>
+                        </div>
+                        <MissionStatusBadge status={item.status} />
+                      </div>
+                      <p className="type-supporting mt-3 text-[#6f6558]">
+                        {contentTemplate(
+                          content,
+                          "missions.summary",
+                          "{questions} câu hỏi · khoảng {minutes} phút",
+                          {
+                            questions: item.questionCount,
+                            minutes: item.estimatedMinutes,
+                          },
+                        )}
+                      </p>
+                      <p className="type-caption mt-1 text-[#756b60]">{formatMissionTimeline(item)}</p>
+                    </div>
+                  </MissionEditTarget>
+                  {canEdit ? (
+                    <div className="border-t px-4 py-3">
+                      <MissionListActions missionId={item.id} status={item.status} showLabels />
+                    </div>
+                  ) : null}
+                </article>
+              );
+            })}
           </div>
 
           <div className="hidden overflow-x-auto rounded-2xl border bg-white md:block">
@@ -274,7 +360,7 @@ export function MissionListWorkspace({ initialData, initialFilters, worlds, canE
                   <th className="p-3">{t("missions.columnWorld", "Thế giới")}</th>
                   <th className="p-3">{t("missions.columnStatus", "Trạng thái")}</th>
                   <th className="p-3">{t("missions.columnContent", "Độ dài")}</th>
-                  <th className="p-3">{t("missions.columnUpdated", "Cập nhật")}</th>
+                  <th className="p-3">{t("missions.columnTimeline", "Thời gian")}</th>
                   {canEdit ? <th className="p-3">{t("missions.columnActions", "Thao tác")}</th> : null}
                 </tr>
               </thead>
@@ -287,12 +373,27 @@ export function MissionListWorkspace({ initialData, initialFilters, worlds, canE
           </div>
           {!data.items.length ? (
             <div className="rounded-2xl border bg-white p-10 text-center">
-              <p className="font-black">{t("missions.empty", "Không tìm thấy nhiệm vụ phù hợp.")}</p>
-              <p className="type-supporting mt-2 text-[#6f6558]">
-                {canEdit
-                  ? "Thử xóa bộ lọc hoặc tạo một nhiệm vụ mới."
-                  : "Thử xóa bộ lọc để xem toàn bộ nhiệm vụ."}
+              <p className="font-black">
+                {archiveView
+                  ? t("missions.archiveEmpty", "Kho lưu trữ đang trống.")
+                  : t("missions.empty", "Không tìm thấy nhiệm vụ phù hợp.")}
               </p>
+              <p className="type-supporting mt-2 text-[#6f6558]">
+                {archiveView
+                  ? "Những nhiệm vụ được lưu trữ sẽ xuất hiện ở đây và có thể khôi phục khi cần."
+                  : canEdit
+                    ? "Thử xóa bộ lọc hoặc tạo một nhiệm vụ mới."
+                    : "Thử xóa bộ lọc để xem toàn bộ nhiệm vụ."}
+              </p>
+              {archiveView ? (
+                <button
+                  type="button"
+                  onClick={showActiveMissions}
+                  className="mt-4 inline-flex min-h-10 items-center gap-2 rounded-xl border px-4 font-black"
+                >
+                  <ListChecks size={17} /> Xem nhiệm vụ đang quản lý
+                </button>
+              ) : null}
             </div>
           ) : null}
 
@@ -342,16 +443,25 @@ function MissionTableRow({
   canEdit: boolean;
   content: ContentDictionary;
 }) {
+  const archived = item.status === "archived";
   return (
-    <tr className="border-t align-middle hover:bg-[#fffdf8]">
+    <tr
+      className={cn("border-t align-middle hover:bg-[#fffdf8]", archived && "bg-stone-50 hover:bg-stone-100")}
+    >
       <td className="p-3">
         <MissionEditTarget
-          canEdit={canEdit}
+          canEdit={canEdit && !archived}
           href={`/admin/missions/${item.id}/edit`}
           className="flex min-w-64 items-center gap-3"
         >
           <span className="relative block h-13 w-17 shrink-0 overflow-hidden rounded-xl">
-            <Image src={item.coverUrl} fill sizes="68px" alt="" className="object-cover" />
+            <Image
+              src={item.coverUrl}
+              fill
+              sizes="68px"
+              alt=""
+              className={cn("object-cover", archived && "opacity-75 grayscale-[35%]")}
+            />
           </span>
           <span>
             <strong className="block">{item.title}</strong>
@@ -369,10 +479,10 @@ function MissionTableRow({
           minutes: item.estimatedMinutes,
         })}
       </td>
-      <td className="p-3 text-[#806d54]">{formatDate(item.updatedAt)}</td>
+      <td className="p-3 whitespace-nowrap text-[#806d54]">{formatMissionTimeline(item)}</td>
       {canEdit ? (
         <td className="p-3">
-          <MissionListActions missionId={item.id} showLabels />
+          <MissionListActions missionId={item.id} status={item.status} showLabels />
         </td>
       ) : null}
     </tr>

@@ -37,6 +37,8 @@ export async function listAdminMissions(filters: AdminMissionFilters = {}) {
     ["draft", "in_review", "rejected", "approved", "published", "archived"].includes(filters.status ?? "")
   ) {
     conditions.push(eq(missions.status, filters.status as typeof missions.$inferSelect.status));
+  } else {
+    conditions.push(ne(missions.status, "archived"));
   }
   if (filters.worldId) conditions.push(eq(missions.worldId, filters.worldId));
   if (filters.search?.trim()) {
@@ -62,6 +64,7 @@ export async function listAdminMissions(filters: AdminMissionFilters = {}) {
         currentDraftVersion: missions.currentDraftVersion,
         publishedAt: missions.publishedAt,
         scheduledFor: missions.scheduledFor,
+        archivedAt: missions.archivedAt,
         updatedAt: missions.updatedAt,
         worldId: missionWorlds.id,
         worldTitle: missionWorlds.title,
@@ -580,17 +583,72 @@ export async function submitMissionForReview(missionId: string, actorId: string)
 }
 
 export async function archiveMission(missionId: string, actorId: string) {
-  const [updated] = await db
-    .update(missions)
-    .set({ status: "archived", archivedAt: new Date(), updatedBy: actorId, updatedAt: new Date() })
-    .where(eq(missions.id, missionId))
-    .returning();
-  if (!updated) return null;
-  await db.insert(reviewHistories).values({ missionId, action: "archived", actorId });
-  await db
-    .insert(auditLogs)
-    .values({ actorId, action: "mission.archived", resourceType: "mission", resourceId: missionId });
-  return updated;
+  const current = await db.query.missions.findFirst({ where: eq(missions.id, missionId) });
+  if (!current) return null;
+  if (current.status === "archived") return current;
+
+  return db.transaction(async (tx) => {
+    const archivedAt = new Date();
+    const [updated] = await tx
+      .update(missions)
+      .set({ status: "archived", archivedAt, updatedBy: actorId, updatedAt: archivedAt })
+      .where(eq(missions.id, missionId))
+      .returning();
+    await tx.insert(reviewHistories).values({
+      missionId,
+      action: "archived",
+      actorId,
+      beforeState: { status: current.status },
+      afterState: { status: "archived" },
+    });
+    await tx.insert(auditLogs).values({
+      actorId,
+      action: "mission.archived",
+      resourceType: "mission",
+      resourceId: missionId,
+      beforeState: { status: current.status },
+      afterState: { status: "archived" },
+    });
+    return updated;
+  });
+}
+
+export async function restoreArchivedMission(missionId: string, actorId: string) {
+  const current = await db.query.missions.findFirst({ where: eq(missions.id, missionId) });
+  if (!current) return null;
+  if (current.status !== "archived") return current;
+
+  return db.transaction(async (tx) => {
+    const restoredAt = new Date();
+    const [updated] = await tx
+      .update(missions)
+      .set({
+        status: "draft",
+        archivedAt: null,
+        scheduledFor: null,
+        updatedBy: actorId,
+        updatedAt: restoredAt,
+      })
+      .where(eq(missions.id, missionId))
+      .returning();
+    await tx.insert(reviewHistories).values({
+      missionId,
+      action: "updated",
+      actorId,
+      comment: "Khôi phục từ kho lưu trữ",
+      beforeState: { status: "archived" },
+      afterState: { status: "draft" },
+    });
+    await tx.insert(auditLogs).values({
+      actorId,
+      action: "mission.restored",
+      resourceType: "mission",
+      resourceId: missionId,
+      beforeState: { status: "archived" },
+      afterState: { status: "draft" },
+    });
+    return updated;
+  });
 }
 
 export async function getPendingReviews() {

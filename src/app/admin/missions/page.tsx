@@ -38,6 +38,7 @@ export default async function Page({ searchParams }: { searchParams: Promise<Sea
       ...item,
       publishedAt: item.publishedAt?.toISOString() ?? null,
       scheduledFor: item.scheduledFor?.toISOString() ?? null,
+      archivedAt: item.archivedAt?.toISOString() ?? null,
       updatedAt: item.updatedAt.toISOString(),
     })),
   };

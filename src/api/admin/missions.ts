@@ -21,6 +21,7 @@ export type AdminMissionListItem = {
   currentDraftVersion: number;
   publishedAt: string | null;
   scheduledFor: string | null;
+  archivedAt: string | null;
   updatedAt: string;
   worldId: string;
   worldTitle: string;
@@ -88,5 +89,8 @@ export const adminMissionsApi = {
   },
   archive(missionId: string) {
     return apiRequest({ url: `/api/admin/missions/${missionId}/archive`, method: "POST" });
+  },
+  restore(missionId: string) {
+    return apiRequest({ url: `/api/admin/missions/${missionId}/restore`, method: "POST" });
   },
 };
