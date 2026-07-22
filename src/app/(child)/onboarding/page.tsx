@@ -14,21 +14,32 @@ export default async function OnboardingPage() {
   ]);
   const children = await listChildren(session.user.id, session.user.name);
   if (children.length >= systemSettings.limits.maxChildProfiles) redirect("/profiles");
+  const isFirstProfile = children.length === 0;
 
   return (
     <main className="paper-texture px-5 pt-5 pb-8">
       <div className="mb-6 text-center">
         <p className="text-sm font-black text-[#d56617]">
-          {contentText(content, "create.pageBadge", "Hồ sơ riêng tư tối giản")}
+          {contentText(
+            content,
+            isFirstProfile ? "create.firstProfileBadge" : "create.pageBadge",
+            isFirstProfile ? "Bước 2/2 · Hồ sơ của bé" : "Hồ sơ riêng tư tối giản",
+          )}
         </p>
         <h1 className="mt-3 text-3xl font-black">
-          {contentText(content, "create.pageTitle", "Tạo hồ sơ cho bé")}
+          {contentText(
+            content,
+            isFirstProfile ? "create.firstProfileTitle" : "create.pageTitle",
+            "Tạo hồ sơ cho bé",
+          )}
         </h1>
         <p className="mt-2 text-[#806d54]">
           {contentText(
             content,
-            "create.pageDescription",
-            "Chỉ mất một chút để bé có hành trình phù hợp nhất.",
+            isFirstProfile ? "create.firstProfileDescription" : "create.pageDescription",
+            isFirstProfile
+              ? "Tài khoản ba mẹ đã sẵn sàng. Chỉ cần tên ở nhà và nhóm tuổi để bắt đầu."
+              : "Chỉ mất một chút để bé có hành trình phù hợp nhất.",
           )}
         </p>
       </div>

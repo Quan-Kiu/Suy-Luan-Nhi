@@ -66,6 +66,18 @@ export const profileContentEntries = defineContent("profile", {
     value: "Chỉ lưu thông tin cần thiết",
     description: "Nhãn đầu trang tạo hồ sơ của bé.",
   },
+  "create.firstProfileBadge": {
+    value: "Bước 2/2 · Hồ sơ của bé",
+    description: "Nhãn quy trình khi tạo hồ sơ bé đầu tiên.",
+  },
+  "create.firstProfileTitle": {
+    value: "Tạo hồ sơ cho bé",
+    description: "Tiêu đề khi tạo hồ sơ bé đầu tiên sau đăng ký.",
+  },
+  "create.firstProfileDescription": {
+    value: "Tài khoản ba mẹ đã sẵn sàng. Chỉ cần tên ở nhà và nhóm tuổi để bắt đầu.",
+    description: "Mô tả bước tạo hồ sơ bé đầu tiên.",
+  },
   "create.pageTitle": { value: "Tạo hồ sơ cho bé", description: "Tiêu đề trang tạo hồ sơ của bé." },
   "create.pageDescription": {
     value: "Chỉ mất một phút để tạo hành trình phù hợp cho bé.",
@@ -76,6 +88,22 @@ export const profileContentEntries = defineContent("profile", {
   "list.pageDescription": {
     value: "Mỗi bé có hồ sơ và tiến độ riêng trong tài khoản của ba/mẹ.",
     description: "Mô tả trang chọn hồ sơ của bé.",
+  },
+  "list.emptyPageBadge": {
+    value: "Bước 2/2 · Hồ sơ của bé",
+    description: "Nhãn quy trình trên trang hồ sơ khi gia đình chưa có hồ sơ bé.",
+  },
+  "list.emptyPageTitle": {
+    value: "Tạo hồ sơ cho bé",
+    description: "Tiêu đề trang hồ sơ khi chưa có hồ sơ bé.",
+  },
+  "list.emptyPageDescription": {
+    value: "Tài khoản ba mẹ đã sẵn sàng. Thêm hồ sơ đầu tiên để bé bắt đầu khám phá.",
+    description: "Mô tả trang hồ sơ khi chưa có hồ sơ bé.",
+  },
+  "list.firstProfileTitle": {
+    value: "Thêm hồ sơ đầu tiên",
+    description: "Tiêu đề thẻ tạo hồ sơ bé đầu tiên.",
   },
   "list.emptyTitle": {
     value: "Gia đình chưa có hồ sơ bé",

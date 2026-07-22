@@ -22,6 +22,14 @@ export const landingContentEntries = defineContent("landing", {
     description: "Mô tả chính của landing page.",
   },
   "hero.primaryCta": { value: "Tạo hồ sơ cho bé", description: "Nhãn lối tắt tạo tài khoản." },
+  "hero.startCta": {
+    value: "Bắt đầu cho bé",
+    description: "Nhãn bắt đầu quy trình tạo tài khoản ba mẹ và hồ sơ cho bé.",
+  },
+  "hero.startHint": {
+    value: "Ba mẹ tạo tài khoản trước, sau đó thêm hồ sơ cho bé.",
+    description: "Giải thích bước tiếp theo khi khách bắt đầu sử dụng.",
+  },
   "hero.parentCta": {
     value: "Vào khu vực phụ huynh",
     description: "lối tắt cho Parent Account đã đăng nhập.",

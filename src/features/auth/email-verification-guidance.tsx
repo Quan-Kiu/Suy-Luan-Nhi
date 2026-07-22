@@ -24,16 +24,16 @@ export function EmailVerificationGuidance({
       <h2 id={titleId} className="mt-4 text-2xl font-black text-[#3f3528]">
         {contentText(
           content,
-          isSignUp ? "verification.signUpTitle" : "verification.signInTitle",
-          isSignUp ? "Xác minh email để hoàn tất" : "Xác minh email để tiếp tục",
+          isSignUp ? "verification.signUpFlowTitle" : "verification.signInTitle",
+          isSignUp ? "Kiểm tra email để sang bước 2" : "Xác minh email để tiếp tục",
         )}
       </h2>
       <p id={descriptionId} className="mt-2 text-sm leading-6 text-[#746654]">
         {contentText(
           content,
-          isSignUp ? "verification.signUpDescription" : "verification.signInDescription",
+          isSignUp ? "verification.signUpFlowDescription" : "verification.signInDescription",
           isSignUp
-            ? "Tài khoản đã được tạo. Hãy mở email và nhấn nút xác minh trước khi bắt đầu."
+            ? "Tài khoản ba mẹ đã được tạo. Hãy xác minh email, sau đó quay lại để tạo hồ sơ cho bé."
             : "Tài khoản này chưa xác minh email. Hãy hoàn tất bước bảo mật trước khi đăng nhập.",
         )}
       </p>
@@ -44,7 +44,11 @@ export function EmailVerificationGuidance({
         {[
           contentText(content, "verification.stepOpenEmail", "Mở email từ Suy Luận Nhí"),
           contentText(content, "verification.stepConfirm", "Nhấn “Xác minh email” trong thư"),
-          contentText(content, "verification.stepReturn", "Quay lại và tiếp tục hành trình"),
+          contentText(
+            content,
+            isSignUp ? "verification.signUpFlowReturn" : "verification.stepReturn",
+            isSignUp ? "Quay lại Suy Luận Nhí và tạo hồ sơ cho bé" : "Quay lại và tiếp tục hành trình",
+          ),
         ].map((step) => (
           <div key={step} className="flex items-center gap-3">
             <CheckCircle2 size={19} className="shrink-0 text-[#5d8748]" />

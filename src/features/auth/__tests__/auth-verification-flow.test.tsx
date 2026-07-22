@@ -102,9 +102,9 @@ describe("authentication verification UX", () => {
     await userEvent.type(screen.getByLabelText("Email"), "new@example.com");
     await userEvent.type(screen.getByLabelText("Mật khẩu"), "StrongPass123!");
     await userEvent.type(screen.getByLabelText("Nhập lại mật khẩu"), "StrongPass123!");
-    await userEvent.click(screen.getByRole("button", { name: "Tạo tài khoản phụ huynh" }));
+    await userEvent.click(screen.getByRole("button", { name: "Tạo tài khoản ba mẹ" }));
 
-    expect(await screen.findByText("Xác minh email để hoàn tất")).toBeInTheDocument();
+    expect(await screen.findByText("Kiểm tra email để sang bước 2")).toBeInTheDocument();
     expect(screen.getByText("new@example.com")).toBeInTheDocument();
     expect(mocks.signUpEmail).toHaveBeenCalledWith({
       name: "Nguyễn Minh",

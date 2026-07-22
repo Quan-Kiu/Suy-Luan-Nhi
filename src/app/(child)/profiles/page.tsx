@@ -15,6 +15,7 @@ export default async function ProfilesPage() {
     getOperationalSystemSettings(),
   ]);
   const children = await listChildren(session.user.id, session.user.name);
+  const hasProfiles = children.length > 0;
   return (
     <main className="paper-texture min-h-[calc(100vh-5rem)] px-5 py-7">
       <div className="text-center">
@@ -26,14 +27,25 @@ export default async function ProfilesPage() {
           alt={contentText(content, "list.imageAlt", "Bống bên nhà cây")}
           className="mx-auto h-36 w-56 rounded-[26px] object-cover"
         />
-        <h1 className="mt-4 text-3xl font-black">
-          {contentText(content, "list.pageTitle", "Chọn hồ sơ của bé")}
+        {!hasProfiles ? (
+          <p className="mt-4 text-sm font-black text-[#d56617]">
+            {contentText(content, "list.emptyPageBadge", "Bước 2/2 · Hồ sơ của bé")}
+          </p>
+        ) : null}
+        <h1 className={hasProfiles ? "mt-4 text-3xl font-black" : "mt-2 text-3xl font-black"}>
+          {contentText(
+            content,
+            hasProfiles ? "list.pageTitle" : "list.emptyPageTitle",
+            hasProfiles ? "Chọn hồ sơ của bé" : "Tạo hồ sơ cho bé",
+          )}
         </h1>
         <p className="mt-2 text-[#806d54]">
           {contentText(
             content,
-            "list.pageDescription",
-            "Mỗi bé có hành trình và tiến độ riêng, được bảo vệ trong tài khoản phụ huynh.",
+            hasProfiles ? "list.pageDescription" : "list.emptyPageDescription",
+            hasProfiles
+              ? "Mỗi bé có hành trình và tiến độ riêng, được bảo vệ trong tài khoản phụ huynh."
+              : "Tài khoản ba mẹ đã sẵn sàng. Thêm hồ sơ đầu tiên để bé bắt đầu khám phá.",
           )}
         </p>
       </div>
@@ -43,7 +55,7 @@ export default async function ProfilesPage() {
         ) : (
           <Card className="p-6 text-center">
             <p className="font-black">
-              {contentText(content, "list.emptyTitle", "Gia đình chưa có hồ sơ bé")}
+              {contentText(content, "list.firstProfileTitle", "Thêm hồ sơ đầu tiên")}
             </p>
             <p className="mt-2 text-sm text-[#806d54]">
               {contentText(

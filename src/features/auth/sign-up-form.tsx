@@ -99,8 +99,8 @@ export function SignUpForm() {
       <p className="rounded-2xl bg-[#edf4df] p-3 text-xs leading-5 text-[#567044]">
         {contentText(
           content,
-          "signUp.privacyNote",
-          "Tài khoản này thuộc phụ huynh. Bé không cần email hoặc thông tin định danh.",
+          "signUp.flowPrivacyNote",
+          "Chỉ ba mẹ cần tài khoản. Bé không cần email, tên thật hoặc ngày sinh đầy đủ.",
         )}
       </p>
       <FormStatus status={errorMessage ? "error" : "idle"} message={errorMessage} />
@@ -108,7 +108,7 @@ export function SignUpForm() {
         pending={mutation.isPending || navigation.isPending}
         pendingLabel={contentText(content, "signUp.submitting", "Đang tạo...")}
       >
-        {contentText(content, "signUp.submit", "Tạo tài khoản phụ huynh")}
+        {contentText(content, "signUp.flowSubmit", "Tạo tài khoản ba mẹ")}
       </SubmitButton>
       <p className="text-center text-sm">
         {contentText(content, "signUp.hasAccount", "Đã có tài khoản?")}{" "}

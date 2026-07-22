@@ -43,6 +43,7 @@ export function AuthAwareEntryLink({
 
   const staff = state === "staff";
   const parent = state === "parent";
+  const guest = state === "guest";
   const href = staff
     ? "/admin"
     : parent
@@ -63,8 +64,8 @@ export function AuthAwareEntryLink({
           )
         : contentText(
             content,
-            staff ? "hero.adminCta" : parent ? "hero.parentCta" : "hero.primaryCta",
-            staff ? "Mở trang quản trị" : parent ? "Vào khu vực phụ huynh" : "Tạo hồ sơ cho bé",
+            staff ? "hero.adminCta" : parent ? "hero.parentCta" : "hero.startCta",
+            staff ? "Mở trang quản trị" : parent ? "Vào khu vực phụ huynh" : "Bắt đầu cho bé",
           );
 
   return (
@@ -74,12 +75,21 @@ export function AuthAwareEntryLink({
       className={cn(
         compact
           ? "rounded-full border border-[#e4d5ba] bg-white px-4 py-2 font-black"
-          : "wood-button inline-flex min-h-14 items-center justify-center gap-2 rounded-2xl px-6 font-black text-white",
+          : "wood-button inline-flex min-h-14 items-center justify-center gap-3 rounded-2xl px-6 py-3 font-black text-white",
         className,
       )}
     >
-      {label}
-      {!compact ? <ArrowRight size={20} /> : null}
+      {guest && !compact ? (
+        <span className="flex flex-col items-start text-left leading-tight">
+          <span>{label}</span>
+          <span className="mt-1 text-xs font-bold text-white/85">
+            {contentText(content, "hero.startHint", "Ba mẹ tạo tài khoản trước, sau đó thêm hồ sơ cho bé.")}
+          </span>
+        </span>
+      ) : (
+        label
+      )}
+      {!compact ? <ArrowRight size={20} className="shrink-0" /> : null}
     </Link>
   );
 }

@@ -20,6 +20,16 @@ export const authContentEntries = defineContent("auth", {
   "signIn.submitting": { value: "Đang đăng nhập...", description: "Nhãn khi đang đăng nhập." },
   "signIn.forgot": { value: "Quên mật khẩu?", description: "Liên kết quên mật khẩu." },
   "signIn.createAccount": { value: "Tạo tài khoản", description: "Liên kết tạo tài khoản." },
+  "signUp.pageTitle": {
+    value: "Bước 1: Tạo tài khoản ba mẹ",
+    description: "Tiêu đề trang đăng ký trong quy trình thiết lập gia đình.",
+  },
+  "signUp.pageSubtitle": {
+    value: "Sau khi xác minh email, ba mẹ sẽ tạo hồ sơ cho bé ở bước 2.",
+    description: "Mô tả rõ bước tiếp theo sau khi tạo tài khoản.",
+  },
+  "signUp.stepAccount": { value: "Tài khoản ba mẹ", description: "Tên bước tạo tài khoản ba mẹ." },
+  "signUp.stepProfile": { value: "Hồ sơ của bé", description: "Tên bước tạo hồ sơ cho bé." },
   "signUp.parentNameLabel": { value: "Tên ba/mẹ", description: "Nhãn tên phụ huynh." },
   "signUp.parentNamePlaceholder": {
     value: "Ví dụ: Nguyễn Minh Anh",
@@ -39,7 +49,15 @@ export const authContentEntries = defineContent("auth", {
     value: "Chỉ ba/mẹ cần tài khoản. Hồ sơ của bé không cần email, tên thật hoặc ngày sinh đầy đủ.",
     description: "Ghi chú riêng tư khi đăng ký.",
   },
+  "signUp.flowPrivacyNote": {
+    value: "Chỉ ba mẹ cần tài khoản. Bé không cần email, tên thật hoặc ngày sinh đầy đủ.",
+    description: "Ghi chú riêng tư trong quy trình tạo tài khoản và hồ sơ bé.",
+  },
   "signUp.submit": { value: "Tạo tài khoản phụ huynh", description: "Nhãn nút đăng ký." },
+  "signUp.flowSubmit": {
+    value: "Tạo tài khoản ba mẹ",
+    description: "Nhãn nút đăng ký trong quy trình thiết lập gia đình.",
+  },
   "signUp.submitting": { value: "Đang tạo...", description: "Nhãn khi đang tạo tài khoản." },
   "signUp.success": {
     value: "Đã tạo tài khoản. Hãy kiểm tra email để xác minh.",
@@ -76,6 +94,18 @@ export const authContentEntries = defineContent("auth", {
   "verification.signUpTitle": {
     value: "Kiểm tra email để hoàn tất đăng ký",
     description: "Tiêu đề xác minh sau đăng ký.",
+  },
+  "verification.signUpFlowTitle": {
+    value: "Kiểm tra email để sang bước 2",
+    description: "Tiêu đề xác minh email trong quy trình tạo tài khoản và hồ sơ bé.",
+  },
+  "verification.signUpFlowDescription": {
+    value: "Tài khoản ba mẹ đã được tạo. Hãy xác minh email, sau đó quay lại để tạo hồ sơ cho bé.",
+    description: "Mô tả bước xác minh và bước tạo hồ sơ tiếp theo.",
+  },
+  "verification.signUpFlowReturn": {
+    value: "Quay lại Suy Luận Nhí và tạo hồ sơ cho bé",
+    description: "Bước cuối trong hướng dẫn xác minh email sau đăng ký.",
   },
   "verification.signUpDescription": {
     value: "Mở email từ Suy Luận Nhí và bấm “Xác minh email” để bắt đầu.",
