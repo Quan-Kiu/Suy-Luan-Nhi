@@ -1,10 +1,10 @@
 "use client";
 
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import Link from "next/link";
 import { useState } from "react";
 import { toast } from "sonner";
-import { childrenApi } from "@/api/children";
+import { childrenApi, type ChildProfile } from "@/api/children";
 import { ConfirmDialog } from "@/components/confirm-dialog";
 import { FormStatus } from "@/components/form";
 import { contentText, useContent } from "@/content/client";
@@ -14,12 +14,22 @@ import { ProfileTrash, type DeletedProfileListItem } from "@/features/profile/pr
 import { usePendingRouter } from "@/hooks/use-pending-router";
 import { queryKeys } from "@/lib/query/keys";
 
+function toProfileListItem(profile: ChildProfile): ProfileListItem {
+  return {
+    id: profile.id,
+    displayName: profile.displayName,
+    ageGroup: profile.ageGroup,
+    avatarUrl: profile.avatarUrl,
+    currentRank: profile.currentRank,
+  };
+}
+
 export function ProfileManager({
   profiles,
   deletedProfiles,
   maxProfiles,
 }: {
-  profiles: ProfileListItem[];
+  profiles: ChildProfile[];
   deletedProfiles: DeletedProfileListItem[];
   maxProfiles: number;
 }) {
@@ -28,7 +38,12 @@ export function ProfileManager({
   const queryClient = useQueryClient();
   const activeChild = useActiveChild();
   const setActiveChild = useSetActiveChild();
-  const [activeProfiles, setActiveProfiles] = useState(profiles);
+  const profilesQuery = useQuery({
+    queryKey: queryKeys.children.list,
+    queryFn: childrenApi.list,
+    initialData: profiles,
+  });
+  const activeProfiles = profilesQuery.data.map(toProfileListItem);
   const [trashProfiles, setTrashProfiles] = useState(deletedProfiles);
   const [trashOpen, setTrashOpen] = useState(deletedProfiles.length > 0);
   const [deleteTarget, setDeleteTarget] = useState<ProfileListItem | null>(null);
@@ -50,14 +65,8 @@ export function ProfileManager({
     mutationFn: (profile: DeletedProfileListItem) => childrenApi.restore(profile.id),
     onSuccess: (restored, profile) => {
       setTrashProfiles((current) => current.filter((item) => item.id !== profile.id));
-      setActiveProfiles((current) => [
-        {
-          id: restored.id,
-          displayName: restored.displayName,
-          ageGroup: restored.ageGroup,
-          avatarUrl: restored.avatarUrl,
-          currentRank: restored.currentRank,
-        },
+      queryClient.setQueryData<ChildProfile[]>(queryKeys.children.list, (current = []) => [
+        restored,
         ...current.filter((item) => item.id !== restored.id),
       ]);
       toast.success(contentText(content, "trash.restoreSuccess", "Đã khôi phục hồ sơ"));
@@ -75,7 +84,9 @@ export function ProfileManager({
         ...profile,
         deletionRequestedAt: deleted.deletionRequestedAt,
       };
-      setActiveProfiles((current) => current.filter((item) => item.id !== profile.id));
+      queryClient.setQueryData<ChildProfile[]>(queryKeys.children.list, (current = []) =>
+        current.filter((item) => item.id !== profile.id),
+      );
       setTrashProfiles((current) => [trashProfile, ...current.filter((item) => item.id !== profile.id)]);
       setTrashOpen(true);
       setDeleteTarget(null);
@@ -119,7 +130,11 @@ export function ProfileManager({
     deleteForever: contentText(content, "trash.deleteForever", "Xóa vĩnh viễn"),
   };
   const error =
-    selectMutation.error ?? deleteMutation.error ?? restoreMutation.error ?? permanentDeleteMutation.error;
+    profilesQuery.error ??
+    selectMutation.error ??
+    deleteMutation.error ??
+    restoreMutation.error ??
+    permanentDeleteMutation.error;
   const trashPendingId = restoreMutation.isPending
     ? restoreMutation.variables.id
     : permanentDeleteMutation.isPending

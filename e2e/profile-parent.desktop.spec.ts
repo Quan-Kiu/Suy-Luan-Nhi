@@ -10,7 +10,9 @@ test("parent moves a child profile to trash, restores it and deletes it permanen
 
   await unlockParentGate(page);
 
-  await page.goto("/onboarding");
+  await page.goto("/profiles");
+  await page.getByRole("link", { name: /Tạo thêm hồ sơ bé/i }).click();
+  await expect(page).toHaveURL(/\/onboarding$/);
   await page.getByLabel("Tên thân mật của bé").fill("Mít E2E");
   await page.getByText("6–8 tuổi", { exact: true }).click();
   await page.getByRole("button", { name: /Tạo hồ sơ và bắt đầu/i }).click();

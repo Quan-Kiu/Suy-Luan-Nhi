@@ -1,7 +1,5 @@
 import type { NextConfig } from "next";
 
-const DYNAMIC_ROUTE_CACHE_SECONDS = 5 * 60;
-
 const remotePatterns: NonNullable<NonNullable<NextConfig["images"]>["remotePatterns"]> = [];
 if (process.env.S3_PUBLIC_BASE_URL) {
   const url = new URL(process.env.S3_PUBLIC_BASE_URL);
@@ -38,7 +36,6 @@ const nextConfig: NextConfig = {
   images: { remotePatterns },
   experimental: {
     serverActions: { bodySizeLimit: "2mb" },
-    staleTimes: { dynamic: DYNAMIC_ROUTE_CACHE_SECONDS },
   },
   async headers() {
     return [{ source: "/(.*)", headers: securityHeaders }];

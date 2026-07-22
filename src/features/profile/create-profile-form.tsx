@@ -6,7 +6,7 @@ import Image from "next/image";
 import { Controller, useForm, useWatch } from "react-hook-form";
 import { useEffect } from "react";
 import { toast } from "sonner";
-import { childrenApi } from "@/api/children";
+import { childrenApi, type ChildProfile } from "@/api/children";
 import { FormStatus, SubmitButton, TextField } from "@/components/form";
 import { Card } from "@/components/ui";
 import { contentText, useContent } from "@/content/client";
@@ -45,9 +45,17 @@ export function CreateProfileForm() {
   }, [avatarsQuery.data, form, selectedAvatarId]);
   const mutation = useMutation({
     mutationFn: childrenApi.create,
-    onSuccess: async (profile) => {
+    onSuccess: (profile) => {
       if (!activeChild) setActiveChild(profile);
-      await queryClient.invalidateQueries({ queryKey: queryKeys.children.all });
+      queryClient.setQueryData<ChildProfile[]>(queryKeys.children.list, (current = []) => [
+        profile,
+        ...current.filter((item) => item.id !== profile.id),
+      ]);
+      void queryClient.invalidateQueries({
+        queryKey: queryKeys.children.list,
+        exact: true,
+        refetchType: "none",
+      });
       toast.success(
         `${profile.displayName}: ${contentText(content, "create.success", "Hồ sơ đã sẵn sàng!")}`,
       );

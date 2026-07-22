@@ -25,6 +25,9 @@ export type UpdateChildInput = Pick<ChildProfile, "displayName" | "ageGroup"> & 
 };
 
 export const childrenApi = {
+  list() {
+    return apiRequest<ChildProfile[]>({ url: "/api/children", method: "GET" });
+  },
   create(input: CreateChildProfileInput) {
     return apiRequest<ChildProfile>({ url: "/api/children", method: "POST", data: input });
   },

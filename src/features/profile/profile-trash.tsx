@@ -80,22 +80,22 @@ export function ProfileTrash({
               return (
                 <li
                   key={profile.id}
-                  className="grid gap-3 rounded-2xl border border-[#eadfc9] bg-white p-3 sm:grid-cols-[56px_minmax(0,1fr)_auto] sm:items-center sm:p-4"
+                  className="grid grid-cols-[48px_minmax(0,1fr)] items-center gap-x-3 gap-y-3 rounded-2xl border border-[#eadfc9] bg-white p-3 md:grid-cols-[56px_minmax(0,1fr)_auto] md:p-4"
                 >
                   <Image
                     src={profile.avatarUrl}
                     width={56}
                     height={56}
                     alt=""
-                    className="size-14 rounded-full bg-[#f1eadc] object-contain"
+                    className="size-12 rounded-full bg-[#f1eadc] object-contain md:size-14"
                   />
-                  <div className="min-w-0">
-                    <p className="type-card-title truncate text-[#342f28]">{profile.displayName}</p>
+                  <div className="min-w-0 self-center">
+                    <p className="type-card-title break-words text-[#342f28]">{profile.displayName}</p>
                     <p className="type-caption mt-1 text-[#806d54]">
                       {labels.deletedAt} {deletedDateFormatter.format(new Date(profile.deletionRequestedAt))}
                     </p>
                   </div>
-                  <div className="grid grid-cols-2 gap-2 sm:flex">
+                  <div className="col-span-2 grid grid-cols-1 gap-2 min-[390px]:grid-cols-2 md:col-span-1 md:flex">
                     <button
                       type="button"
                       disabled={pending}

@@ -5,6 +5,7 @@ export const queryKeys = {
   },
   children: {
     all: ["children"] as const,
+    list: ["children", "list"] as const,
     avatars: ["children", "avatars"] as const,
     detail: (childId: string) => ["children", childId] as const,
     missionMap: (childId: string) => ["children", childId, "mission-map"] as const,

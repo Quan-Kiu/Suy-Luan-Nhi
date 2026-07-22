@@ -41,7 +41,7 @@ test("landing explains the product in three clear steps", async ({ page }) => {
 test("admin CMS exposes an accessible mobile navigation drawer", async ({ page }) => {
   await page.goto("/auth/sign-in");
   await page.getByLabel("Email").fill("content@demo.local");
-  await page.getByLabel("Mật khẩu").fill(password);
+  await page.locator('input[name="password"]').fill(password);
   await page.getByRole("button", { name: "Đăng nhập", exact: true }).click();
   await page.waitForURL(/\/admin$/);
 
@@ -62,13 +62,13 @@ test("parent can log in, select a child and open the mission map on mobile", asy
   await page.goto("/auth/sign-in?callbackUrl=/profiles");
   await expect(page.getByLabel("Email")).toHaveAttribute("placeholder", /example\.com/);
   await page.getByLabel("Email").fill("parent@demo.local");
-  await page.getByLabel("Mật khẩu").fill(password);
+  await page.locator('input[name="password"]').fill(password);
   await page.getByRole("button", { name: "Đăng nhập", exact: true }).click();
   await page.waitForURL((url) => url.pathname === "/profiles");
 
   await page.getByRole("button", { name: "Vào bản đồ", exact: true }).first().click();
   await page.waitForURL(/\/missions$/);
-  await expect(page.getByRole("heading", { name: /Bản đồ nhiệm vụ|Bống/i })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Bống", exact: true })).toBeVisible();
 
   const childMenuTrigger = page.locator('button[aria-controls="child-mobile-navigation"]');
   await expect(childMenuTrigger).toBeVisible();
@@ -77,9 +77,11 @@ test("parent can log in, select a child and open the mission map on mobile", asy
   await page.keyboard.press("Escape");
   await expect(page.getByRole("navigation", { name: "Điều hướng chế độ bé" })).toBeHidden();
 
-  const cardHeights = await page
-    .locator("[data-mission-card]")
-    .evaluateAll((cards) => cards.slice(0, 2).map((card) => Math.round(card.getBoundingClientRect().height)));
+  const missionCards = page.locator("[data-mission-card]");
+  await expect.poll(() => missionCards.count()).toBeGreaterThanOrEqual(2);
+  const cardHeights = await missionCards.evaluateAll((cards) =>
+    cards.slice(0, 2).map((card) => Math.round(card.getBoundingClientRect().height)),
+  );
   expect(new Set(cardHeights).size).toBe(1);
 
   const hasHorizontalOverflow = await page.evaluate(
@@ -94,10 +96,66 @@ test("parent can log in, select a child and open the mission map on mobile", asy
   await expect(page.getByTestId("child-header")).toHaveAttribute("data-persistence-token", "kept");
 });
 
+test("deleted profile card keeps its content and actions readable on mobile", async ({ page }) => {
+  await signIn(page, "parent@demo.local");
+  await page.goto("/profiles");
+
+  await page.getByLabel("Xóa Bống").click();
+  await page
+    .getByRole("alertdialog", { name: "Đưa hồ sơ Bống vào thùng rác?" })
+    .getByRole("button", { name: "Đưa vào thùng rác" })
+    .click();
+
+  const restoreButton = page.getByRole("button", { name: "Khôi phục hồ sơ Bống" });
+  const deleteButton = page.getByRole("button", { name: "Xóa vĩnh viễn hồ sơ Bống" });
+  const card = restoreButton.locator("xpath=ancestor::li");
+  const name = card.getByText("Bống", { exact: true });
+
+  await expect(card).toBeVisible();
+  await expect(name).toBeVisible();
+  await expect(restoreButton).toBeVisible();
+  await expect(deleteButton).toBeVisible();
+
+  await expect
+    .poll(async () => {
+      const boxes = await Promise.all([
+        card.boundingBox(),
+        name.boundingBox(),
+        restoreButton.boundingBox(),
+        deleteButton.boundingBox(),
+      ]);
+      return boxes.every(Boolean);
+    })
+    .toBe(true);
+
+  const [cardBox, nameBox, restoreBox, deleteBox] = await Promise.all([
+    card.boundingBox(),
+    name.boundingBox(),
+    restoreButton.boundingBox(),
+    deleteButton.boundingBox(),
+  ]);
+  expect(cardBox).not.toBeNull();
+  expect(nameBox).not.toBeNull();
+  expect(restoreBox).not.toBeNull();
+  expect(deleteBox).not.toBeNull();
+  expect(nameBox!.width).toBeGreaterThan(180);
+  expect(restoreBox!.y).toBeGreaterThan(nameBox!.y + nameBox!.height);
+  expect(deleteBox!.x).toBeGreaterThan(restoreBox!.x);
+  expect(deleteBox!.x + deleteBox!.width).toBeLessThanOrEqual(cardBox!.x + cardBox!.width + 1);
+
+  const hasHorizontalOverflow = await page.evaluate(
+    () => document.documentElement.scrollWidth > window.innerWidth + 1,
+  );
+  expect(hasHorizontalOverflow).toBe(false);
+
+  await restoreButton.click();
+  await expect(page.getByRole("heading", { name: "Bống" })).toBeVisible();
+});
+
 test("parent gate exposes a clear mobile placeholder", async ({ page }) => {
   await page.goto("/auth/sign-in?callbackUrl=/profiles");
   await page.getByLabel("Email").fill("parent@demo.local");
-  await page.getByLabel("Mật khẩu").fill(password);
+  await page.locator('input[name="password"]').fill(password);
   await page.getByRole("button", { name: "Đăng nhập", exact: true }).click();
   await page.waitForURL((url) => url.pathname === "/profiles");
   await page.getByRole("button", { name: "Vào bản đồ", exact: true }).first().click();
@@ -134,7 +192,7 @@ test("parent gate exposes a clear mobile placeholder", async ({ page }) => {
 test("landing primary CTA routes an authenticated parent into the Parent Workspace", async ({ page }) => {
   await page.goto("/auth/sign-in?callbackUrl=/profiles");
   await page.getByLabel("Email").fill("parent@demo.local");
-  await page.getByLabel("Mật khẩu").fill(password);
+  await page.locator('input[name="password"]').fill(password);
   await page.getByRole("button", { name: "Đăng nhập", exact: true }).click();
   await page.waitForURL((url) => url.pathname === "/profiles");
 
@@ -168,11 +226,11 @@ test("activity cards and date filters stay usable on mobile", async ({ page }) =
   await from.fill("01072026");
   await expect(from).toHaveValue("01/07/2026");
   await to.fill("31022026");
-  await page.getByRole("button", { name: "Lọc hoạt động" }).click();
+  await page.getByRole("button", { name: "Xem kết quả" }).click();
   await expect(page.getByText(/Ngày chưa hợp lệ\. Hãy nhập đúng định dạng/)).toBeVisible();
 
   await to.fill("31072026");
-  await page.getByRole("button", { name: "Lọc hoạt động" }).click();
+  await page.getByRole("button", { name: "Xem kết quả" }).click();
   await page.waitForURL(/from=2026-07-01.*to=2026-07-31/);
 
   const card = page.locator("[data-activity-card]").first();

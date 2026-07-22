@@ -51,11 +51,17 @@ export function EditProfileForm({ child }: { child: ChildProfile }) {
   }, [avatarsQuery.data, form, selectedAvatarId]);
   const mutation = useMutation({
     mutationFn: (values: FormValues) => childrenApi.update(child.id, values),
-    onSuccess: async (updated) => {
+    onSuccess: (updated) => {
       if (activeChild?.id === updated.id) setActiveChild(updated);
-      await queryClient.invalidateQueries({ queryKey: queryKeys.children.all });
+      queryClient.setQueryData<ChildProfile[]>(queryKeys.children.list, (current = []) =>
+        current.map((item) => (item.id === updated.id ? updated : item)),
+      );
+      void queryClient.invalidateQueries({
+        queryKey: queryKeys.children.list,
+        exact: true,
+        refetchType: "none",
+      });
       toast.success(contentText(content, "edit.success", "Đã cập nhật hồ sơ"));
-      navigation.refresh();
       navigation.push("/profiles");
     },
   });

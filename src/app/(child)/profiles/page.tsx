@@ -1,4 +1,5 @@
 import Image from "next/image";
+import type { ChildProfile } from "@/api/children";
 import Link from "next/link";
 import { requireParent } from "@/auth/session";
 import { Card } from "@/components/ui";
@@ -15,7 +16,18 @@ export default async function ProfilesPage() {
     getOperationalSystemSettings(),
   ]);
   const allChildren = await listChildren(session.user.id, session.user.name, true);
-  const children = allChildren.filter((child) => !child.deletedAt);
+  const children: ChildProfile[] = allChildren
+    .filter((child) => !child.deletedAt)
+    .map((child) => ({
+      id: child.id,
+      displayName: child.displayName,
+      ageGroup: child.ageGroup,
+      avatarAssetId: child.avatarAssetId,
+      avatarUrl: child.avatarUrl,
+      currentRank: child.currentRank,
+      status: child.status === "pending_deletion" ? "pending_deletion" : "active",
+      deletionRequestedAt: child.deletionRequestedAt?.toISOString() ?? null,
+    }));
   const deletedChildren = allChildren.flatMap((child) => {
     const deletedAt = child.deletionRequestedAt ?? child.deletedAt;
     return deletedAt
