@@ -7,7 +7,7 @@ import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import type { z } from "zod";
 import { authClient } from "@/auth/client";
-import { FormStatus, SubmitButton, TextField } from "@/components/form";
+import { FormStatus, PasswordField, SubmitButton } from "@/components/form";
 import { contentText, useContent } from "@/content/client";
 import { getAuthErrorMessage, toAuthFlowError } from "@/features/auth/auth-errors";
 import { resetPasswordSchema } from "@/features/auth/schemas";
@@ -52,16 +52,14 @@ export function ResetPasswordForm() {
     : undefined;
   return (
     <form className="space-y-4" onSubmit={form.handleSubmit((values) => mutation.mutate(values))} noValidate>
-      <TextField
-        type="password"
+      <PasswordField
         autoComplete="new-password"
         label={contentText(content, "reset.passwordLabel", "Mật khẩu mới")}
         placeholder={contentText(content, "reset.passwordPlaceholder", "Mật khẩu mới ít nhất 10 ký tự")}
         registration={form.register("password")}
         error={form.formState.errors.password?.message}
       />
-      <TextField
-        type="password"
+      <PasswordField
         autoComplete="new-password"
         label={contentText(content, "signUp.confirmPasswordLabel", "Nhập lại mật khẩu")}
         placeholder={contentText(content, "reset.confirmPlaceholder", "Nhập lại mật khẩu mới")}

@@ -9,7 +9,7 @@ import { toast } from "sonner";
 import type { z } from "zod";
 import { signUp } from "@/auth/client";
 import { buildEmailVerificationCallback } from "@/auth/email-verification";
-import { FormStatus, SubmitButton, TextField } from "@/components/form";
+import { FormStatus, PasswordField, SubmitButton, TextField } from "@/components/form";
 import { contentText, useContent } from "@/content/client";
 import { getAuthErrorMessage, toAuthFlowError } from "@/features/auth/auth-errors";
 import { EmailVerificationStep } from "@/features/auth/email-verification-step";
@@ -80,16 +80,14 @@ export function SignUpForm() {
         registration={form.register("email")}
         error={form.formState.errors.email?.message}
       />
-      <TextField
-        type="password"
+      <PasswordField
         autoComplete="new-password"
         label={contentText(content, "signIn.passwordLabel", "Mật khẩu")}
         placeholder={contentText(content, "signUp.passwordPlaceholder", "Tạo mật khẩu ít nhất 10 ký tự")}
         registration={form.register("password")}
         error={form.formState.errors.password?.message}
       />
-      <TextField
-        type="password"
+      <PasswordField
         autoComplete="new-password"
         label={contentText(content, "signUp.confirmPasswordLabel", "Nhập lại mật khẩu")}
         placeholder={contentText(content, "signUp.confirmPasswordPlaceholder", "Nhập lại mật khẩu")}

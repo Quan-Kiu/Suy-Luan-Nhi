@@ -5,7 +5,7 @@ export const demoPassword = "LocalDemo-2026!";
 export async function signIn(page: Page, email: string, callbackUrl = "/profiles") {
   await page.goto(`/auth/sign-in?callbackUrl=${encodeURIComponent(callbackUrl)}`);
   await page.getByLabel("Email").fill(email);
-  await page.getByLabel("Mật khẩu").fill(demoPassword);
+  await page.locator('input[name="password"]').fill(demoPassword);
   await page.getByRole("button", { name: "Đăng nhập", exact: true }).click();
   await page.waitForURL((url) => !url.pathname.startsWith("/auth/sign-in"));
 }

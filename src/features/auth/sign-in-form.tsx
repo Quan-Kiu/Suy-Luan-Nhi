@@ -9,7 +9,7 @@ import { useForm } from "react-hook-form";
 import type { z } from "zod";
 import { signIn } from "@/auth/client";
 import { getAuthenticatedHome } from "@/auth/navigation";
-import { CheckboxField, FormStatus, SubmitButton, TextField } from "@/components/form";
+import { CheckboxField, FormStatus, PasswordField, SubmitButton, TextField } from "@/components/form";
 import { contentText, useContent } from "@/content/client";
 import { EmailVerificationDialog } from "@/features/auth/email-verification-dialog";
 import { getAuthErrorMessage, isAuthError, toAuthFlowError } from "@/features/auth/auth-errors";
@@ -63,8 +63,7 @@ export function SignInForm() {
           registration={form.register("email")}
           error={form.formState.errors.email?.message}
         />
-        <TextField
-          type="password"
+        <PasswordField
           autoComplete="current-password"
           label={contentText(content, "signIn.passwordLabel", "Mật khẩu")}
           placeholder={contentText(content, "signIn.passwordPlaceholder", "Nhập mật khẩu")}

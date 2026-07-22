@@ -9,7 +9,7 @@ import { childrenApi } from "@/api/children";
 import { parentApi } from "@/api/parent";
 import { AsyncButton } from "@/components/async-button";
 import { ConfirmDialog } from "@/components/confirm-dialog";
-import { ControlledCheckboxField, FormStatus, SubmitButton, TextField } from "@/components/form";
+import { ControlledCheckboxField, FormStatus, PasswordField, SubmitButton } from "@/components/form";
 import { Card } from "@/components/ui";
 import { contentText, useContent } from "@/content/client";
 import { type ParentSettingsFormValues, parentSettingsSchema } from "@/features/parent/settings-schema";
@@ -138,8 +138,8 @@ export function SettingsForm({ initial, childId }: { initial: Settings; childId:
         </SettingsSection>
 
         <SettingsSection title={contentText(content, "settings.pinTitle", "PIN phụ huynh")}>
-          <TextField
-            type="password"
+          <PasswordField
+            autoComplete="new-password"
             inputMode="numeric"
             maxLength={8}
             label={contentText(content, "settings.pinTitle", "PIN phụ huynh")}
