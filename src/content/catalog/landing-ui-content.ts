@@ -93,4 +93,13 @@ export const landingContentEntries = defineContent("landing", {
     value: "Bé được thử lại thoải mái. Hệ thống ghi nhận nỗ lực, không phạt khi bé trả lời chưa đúng.",
     description: "Lời nhắc về cách hệ thống khuyến khích bé.",
   },
+  "companion.title": { value: "Đồng hành cùng bé", description: "Tiêu đề khối đồng hành cuối trang." },
+  "companion.description": {
+    value: "Theo dõi tiến bộ riêng tư để hiểu bé hơn và động viên đúng lúc.",
+    description: "Mô tả lợi ích dành cho phụ huynh ở cuối landing page.",
+  },
+  "companion.note": {
+    value: "Suy Luận Nhí được xây dựng với tình yêu thương và sự thấu hiểu trẻ em.",
+    description: "Thông điệp thương hiệu ở cuối landing page.",
+  },
 });

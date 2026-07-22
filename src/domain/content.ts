@@ -9,6 +9,7 @@ export const assets = {
   complete: "/assets/scenes/scene-mission-complete-celebration.png",
   parent: "/assets/scenes/scene-parent-guidance.png",
   hedgehog: "/assets/mascots/mascot-hedgehog-speaking.png",
+  hedgehogMap: "/assets/mascots/mascot-hedgehog-map.png",
   hedgehogThumb: "/assets/mascots/mascot-hedgehog-thumbs-up.png",
   dogAvatar: "/assets/mascots/mascot-dog-bong-avatar.png",
   badge: "/assets/props/badge-sharp-detective.png",

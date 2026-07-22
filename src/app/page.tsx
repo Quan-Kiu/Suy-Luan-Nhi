@@ -4,6 +4,7 @@ import { Check, HeartHandshake, PlayCircle, Puzzle, ShieldCheck, UserRoundPlus }
 import { contentText } from "@/content/resolve";
 import { assets } from "@/domain/content";
 import { AuthAwareEntryLink } from "@/features/landing/auth-aware-entry-link";
+import { LandingCompanionBanner } from "@/features/landing/landing-companion-banner";
 import { LandingHeader } from "@/features/landing/landing-header";
 import { getContentNamespace } from "@/modules/content/content";
 
@@ -71,15 +72,15 @@ export default async function HomePage() {
         animate={{ opacity: 1, y: 0 }}
       >
         <div className="relative z-10">
-          <p className="inline-flex items-center gap-2 rounded-full bg-[#edf4df] px-4 py-2 text-sm font-black text-[#557143]">
+          <p className="type-label inline-flex items-center gap-2 rounded-full bg-[#edf4df] px-4 py-2 font-black text-[#557143]">
             <ShieldCheck size={18} /> {t("hero.badge", "Không quảng cáo · Không mua hàng")}
           </p>
-          <h1 className="mt-6 max-w-2xl text-5xl leading-[1.02] font-black tracking-tight text-[#40321f] sm:text-6xl lg:text-7xl">
+          <h1 className="type-display mt-6 max-w-2xl">
             <span className="text-[#de5b14]">{t("hero.titleAccent", "Nhiệm vụ vui")}</span>
             <br />
             {t("hero.titleRest", "cho bé luyện cách nghĩ")}
           </h1>
-          <p className="mt-5 max-w-xl text-lg leading-8 text-[#75624b]">
+          <p className="type-lead mt-5 max-w-xl text-[#75624b]">
             {t(
               "hero.description",
               "Mỗi ngày một chuyến phiêu lưu ngắn giúp bé quan sát, so sánh, thử lại và tự tin tìm ra cách giải.",
@@ -94,7 +95,7 @@ export default async function HomePage() {
               <PlayCircle size={20} /> {t("hero.secondaryCta", "Xem 3 bước bắt đầu")}
             </a>
           </div>
-          <div className="mt-5 flex flex-wrap gap-x-5 gap-y-2 text-sm font-bold text-[#6c7d58]">
+          <div className="type-label mt-5 flex flex-wrap gap-x-5 gap-y-2 font-bold text-[#6c7d58]">
             {trustItems.map((item) => (
               <span key={item} className="flex items-center gap-1">
                 <Check size={16} />
@@ -119,13 +120,13 @@ export default async function HomePage() {
       <section id="how" aria-labelledby="how-title" className="scroll-mt-6 bg-[#edf4df] px-5 py-16 lg:py-20">
         <div className="mx-auto max-w-7xl">
           <div className="mx-auto max-w-3xl text-center">
-            <p className="text-sm font-black tracking-[0.16em] text-[#6d844f] uppercase">
+            <p className="type-overline font-black tracking-[0.16em] text-[#6d844f] uppercase">
               {t("how.eyebrow", "Bắt đầu rất đơn giản")}
             </p>
-            <h2 id="how-title" className="mt-3 text-3xl font-black text-[#40321f] sm:text-4xl">
+            <h2 id="how-title" className="type-marketing-title mt-3">
               {t("how.title", "Ba bước để bé bắt đầu một nhiệm vụ")}
             </h2>
-            <p className="mx-auto mt-4 max-w-2xl text-base leading-7 text-[#617149] sm:text-lg">
+            <p className="type-lead mx-auto mt-4 max-w-2xl text-[#617149]">
               {t(
                 "how.description",
                 "Ba mẹ tạo hồ sơ một lần. Sau đó bé chọn nhiệm vụ phù hợp, làm theo hướng dẫn và có thể nhận gợi ý bất cứ lúc nào.",
@@ -149,11 +150,11 @@ export default async function HomePage() {
                     <span className="grid size-14 place-items-center rounded-2xl bg-[#fff0df] text-[#d65a16]">
                       <Icon size={28} aria-hidden="true" />
                     </span>
-                    <span className="grid size-9 place-items-center rounded-full bg-[#5f7846] text-sm font-black text-white">
+                    <span className="type-label grid size-9 place-items-center rounded-full bg-[#5f7846] font-black text-white">
                       {step.number}
                     </span>
                   </div>
-                  <h3 className="mt-5 text-xl font-black text-[#40321f]">{step.title}</h3>
+                  <h3 className="type-card-title mt-5">{step.title}</h3>
                   <p className="mt-3 leading-7 text-[#75684f]">{step.description}</p>
                 </motion.li>
               );
@@ -173,7 +174,7 @@ export default async function HomePage() {
       </section>
 
       <section id="safe" className="mx-auto max-w-7xl scroll-mt-6 px-5 py-20 lg:px-10">
-        <h2 className="text-center text-3xl font-black">
+        <h2 className="type-marketing-title text-center">
           {t("safe.title", "An tâm cho bé, vui học mỗi ngày")}
         </h2>
         <div className="mt-8 grid gap-5 md:grid-cols-3">
@@ -193,12 +194,14 @@ export default async function HomePage() {
                 alt=""
                 className="mx-auto h-24 w-24 object-contain"
               />
-              <h3 className="mt-3 text-xl font-black">{card.title}</h3>
+              <h3 className="type-card-title mt-3">{card.title}</h3>
               <p className="mt-2 text-[#77654d]">{card.description}</p>
             </motion.article>
           ))}
         </div>
       </section>
+
+      <LandingCompanionBanner content={content} />
     </main>
   );
 }
