@@ -64,7 +64,7 @@ export function LandingHeader({ content }: { content: ContentDictionary }) {
             className="h-14 w-auto object-contain"
           />
         </Link>
-        <nav aria-label="Điều hướng chính" className="hidden items-center gap-7 text-sm font-black md:flex">
+        <nav aria-label="Điều hướng chính" className="type-action hidden items-center gap-7 md:flex">
           <NavigationLinks content={content} />
         </nav>
         <button

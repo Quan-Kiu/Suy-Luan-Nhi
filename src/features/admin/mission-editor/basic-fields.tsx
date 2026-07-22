@@ -39,10 +39,10 @@ export function MissionBasicFields({
 
   return (
     <Card className="rounded-2xl p-5 shadow-sm">
-      <h2 className="text-xl font-black">
+      <h2 className="type-section-title">
         {contentText(content, "missionEditor.basicTitle", "1. Nội dung hiển thị")}
       </h2>
-      <p className="mt-1 text-sm text-[#6f6558]">
+      <p className="type-supporting mt-1 text-[#6f6558]">
         Nhập những gì trẻ và phụ huynh sẽ nhìn thấy. Có thể dùng tag để gọi tên bé hoặc chèn dữ liệu hồ sơ.
       </p>
       <div className="mt-4 grid gap-4 md:grid-cols-2">
@@ -154,9 +154,7 @@ export function MissionBasicFields({
       </div>
 
       <fieldset className="mt-4">
-        <legend className="text-sm font-black">
-          {contentText(content, "missionEditor.ageGroups", "Nhóm tuổi")}
-        </legend>
+        <legend className="type-label">{contentText(content, "missionEditor.ageGroups", "Nhóm tuổi")}</legend>
         <div className="mt-2 flex flex-wrap gap-3">
           {ageGroups.map((ageGroup) => (
             <label
@@ -173,21 +171,21 @@ export function MissionBasicFields({
           ))}
         </div>
         {form.formState.errors.ageGroups?.message ? (
-          <p role="alert" className="mt-2 text-sm font-bold text-red-700">
+          <p role="alert" className="type-supporting mt-2 font-bold text-red-700">
             {form.formState.errors.ageGroups.message}
           </p>
         ) : null}
       </fieldset>
 
       <fieldset className="mt-4">
-        <legend className="text-sm font-black">
+        <legend className="type-label">
           {contentText(content, "missionEditor.secondarySkills", "Kỹ năng phụ")}
         </legend>
         <div className="mt-2 flex flex-wrap gap-2">
           {taxonomy.skills.map((skill) => (
             <label
               key={skill.id}
-              className="flex items-center gap-2 rounded-xl border bg-white px-3 py-2 text-sm font-bold"
+              className="type-label flex items-center gap-2 rounded-xl border bg-white px-3 py-2 font-bold"
             >
               <input
                 type="checkbox"
@@ -202,7 +200,7 @@ export function MissionBasicFields({
 
       <details className="mt-5 rounded-2xl border bg-[#fbf8f2] p-4">
         <summary className="cursor-pointer font-black">Thiết lập nâng cao</summary>
-        <p className="mt-1 text-sm text-[#6f6558]">
+        <p className="type-supporting mt-1 text-[#6f6558]">
           Các mục này thường được hệ thống tự tạo. Chỉ thay đổi khi bạn hiểu rõ ảnh hưởng.
         </p>
         <div className="mt-4 grid gap-4 md:grid-cols-2">

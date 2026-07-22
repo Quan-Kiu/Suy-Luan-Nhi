@@ -23,9 +23,7 @@ export function ParentGateView({
           alt={contentText(content, "gate.imageAlt", "Lá chắn Parent Gate")}
           className="mx-auto size-28 object-contain"
         />
-        <h1 className="mt-3 text-3xl font-black">
-          {contentText(content, "gate.title", "Khu vực phụ huynh")}
-        </h1>
+        <h1 className="type-page-title mt-3">{contentText(content, "gate.title", "Khu vực phụ huynh")}</h1>
         <p className="mt-2 text-[#786348]">
           {contentText(
             content,

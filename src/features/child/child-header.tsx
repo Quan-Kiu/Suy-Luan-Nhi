@@ -72,7 +72,7 @@ export function ChildHeader() {
             alt="Linh vật thám tử của Suy Luận Nhí"
             className="h-11 w-auto shrink-0 object-contain"
           />
-          <span className="truncate font-black text-[#3f321f]">Suy Luận Nhí</span>
+          <span className="type-card-title truncate text-[#3f321f]">Suy Luận Nhí</span>
         </Link>
       </div>
       <button
@@ -120,7 +120,7 @@ export function ChildHeader() {
                       prefetch={true}
                       onClick={() => setOpen(false)}
                       className={cn(
-                        "flex min-h-12 items-center gap-3 rounded-2xl px-4 font-black",
+                        "type-action flex min-h-12 items-center gap-3 rounded-2xl px-4",
                         active ? "bg-[#fff0df] text-[#bd4910]" : "hover:bg-white",
                       )}
                     >
@@ -134,7 +134,7 @@ export function ChildHeader() {
                   disabled={signOutFlow.pending}
                   aria-busy={signOutFlow.pending}
                   onClick={() => void signOutFlow.signOutAndNavigate()}
-                  className="flex min-h-12 items-center gap-3 rounded-2xl px-4 text-left font-black text-red-700 hover:bg-red-50"
+                  className="type-action flex min-h-12 items-center gap-3 rounded-2xl px-4 text-left text-red-700 hover:bg-red-50"
                 >
                   {signOutFlow.pending ? (
                     <LoaderCircle size={19} className="animate-spin" />

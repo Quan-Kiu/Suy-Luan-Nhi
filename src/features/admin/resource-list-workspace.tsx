@@ -218,8 +218,8 @@ export function ResourceListWorkspace({
         ) : null}
         <div className={cn("space-y-4 transition-opacity", query.isFetching && "opacity-65")}>
           <div className="flex flex-wrap items-center justify-between gap-3">
-            <p className="text-sm font-bold text-[#6f6558]">{data.total} tài nguyên</p>
-            <label className="flex items-center gap-2 text-sm font-bold text-[#6f6558]">
+            <p className="type-supporting font-bold text-[#6f6558]">{data.total} tài nguyên</p>
+            <label className="type-label flex items-center gap-2 font-bold text-[#6f6558]">
               Hiển thị
               <select
                 value={filters.pageSize}
@@ -255,22 +255,22 @@ export function ResourceListWorkspace({
                 <div className="p-3.5">
                   <div className="flex flex-wrap items-start justify-between gap-2">
                     <div className="min-w-0">
-                      <p className="text-xs font-black text-[#9f3d0b]">
+                      <p className="type-overline text-[#9f3d0b]">
                         {parentResourceTypeLabels[item.resourceType]}
                       </p>
-                      <h2 className="mt-1 line-clamp-2 text-base leading-5 font-black">{item.title}</h2>
+                      <h2 className="type-card-title mt-1 line-clamp-2">{item.title}</h2>
                     </div>
                     <span
                       className={cn(
-                        "rounded-full px-2.5 py-1 text-[11px] font-black",
+                        "type-caption rounded-full px-2.5 py-1 font-black",
                         statusClass(item.status),
                       )}
                     >
                       {statusLabels[item.status]}
                     </span>
                   </div>
-                  <p className="mt-2 line-clamp-2 text-sm leading-5 text-[#6f6558]">{item.excerpt}</p>
-                  <div className="mt-2.5 flex flex-wrap gap-1.5 text-xs font-bold text-[#6f6558]">
+                  <p className="type-supporting mt-2 line-clamp-2 text-[#6f6558]">{item.excerpt}</p>
+                  <div className="type-caption mt-2.5 flex flex-wrap gap-1.5 text-[#6f6558]">
                     <span className="rounded-full bg-[#f5f2ec] px-2 py-1">
                       {parentResourceCategoryLabels[item.category]}
                     </span>
@@ -282,7 +282,7 @@ export function ResourceListWorkspace({
                     <div className="mt-3 grid grid-cols-2 gap-2">
                       <Link
                         href={`/admin/resources/${item.id}/edit`}
-                        className="inline-flex min-h-10 items-center justify-center gap-1.5 rounded-xl border text-sm font-black"
+                        className="type-action inline-flex min-h-10 items-center justify-center gap-1.5 rounded-xl border font-black"
                       >
                         <Edit3 size={17} /> Chỉnh sửa
                       </Link>
@@ -290,7 +290,7 @@ export function ResourceListWorkspace({
                         type="button"
                         disabled={item.status === "archived"}
                         onClick={() => setArchiveTarget(item)}
-                        className="inline-flex min-h-10 items-center justify-center gap-1.5 rounded-xl border border-amber-200 bg-amber-50 text-sm font-black text-amber-800 disabled:opacity-40"
+                        className="type-action inline-flex min-h-10 items-center justify-center gap-1.5 rounded-xl border border-amber-200 bg-amber-50 text-amber-800 disabled:opacity-40"
                       >
                         <Archive size={17} /> Lưu trữ
                       </button>
@@ -308,7 +308,7 @@ export function ResourceListWorkspace({
           {query.isError ? (
             <div
               role="alert"
-              className="rounded-2xl border border-red-200 bg-red-50 p-4 text-sm font-bold text-red-800"
+              className="type-label rounded-2xl border border-red-200 bg-red-50 p-4 font-bold text-red-800"
             >
               {query.error.message}
             </div>
@@ -323,7 +323,7 @@ export function ResourceListWorkspace({
               >
                 <ChevronLeft size={18} /> Trang trước
               </button>
-              <span className="text-sm font-black text-[#6f6558]">
+              <span className="type-label font-black text-[#6f6558]">
                 Trang {data.page}/{data.totalPages}
               </span>
               <button

@@ -244,11 +244,11 @@ export function QuestionConfigurationEditor({
           }}
         />
         <fieldset className="rounded-2xl border bg-[#fffdf8] p-4">
-          <legend className="px-1 text-sm font-black">Chọn mảnh đúng cho từng chỗ</legend>
-          <p className="mt-1 text-sm text-[#6f6558]">Chọn mảnh cần đặt vào từng chỗ.</p>
+          <legend className="type-label px-1">Chọn mảnh đúng cho từng chỗ</legend>
+          <p className="type-supporting mt-1 text-[#6f6558]">Chọn mảnh cần đặt vào từng chỗ.</p>
           <div className="mt-3 grid gap-3 md:grid-cols-2">
             {slots.map((slot) => (
-              <label key={slot.id} className="space-y-2 text-sm font-bold">
+              <label key={slot.id} className="type-label space-y-2 font-bold">
                 <span>{slot.label}</span>
                 <select
                   value={question.correctAnswer[slot.id] ?? ""}

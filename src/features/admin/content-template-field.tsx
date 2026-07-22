@@ -104,7 +104,7 @@ export function ContentTemplateField({
       requestAnimationFrame(() => refreshTrigger(nextValue));
     },
     className: cn(
-      "w-full rounded-xl border bg-white px-3 py-2.5 text-sm outline-none transition focus:border-[#df6d24] focus:ring-4 focus:ring-[#f3b77f]/25",
+      "w-full rounded-xl border bg-white px-3 py-2.5 type-body outline-none transition focus:border-[#df6d24] focus:ring-4 focus:ring-[#f3b77f]/25",
       error && "border-red-400",
     ),
   };
@@ -112,7 +112,7 @@ export function ContentTemplateField({
   return (
     <div className={cn("relative space-y-1.5", containerClassName)}>
       <div className="flex items-center justify-between gap-3">
-        <label htmlFor={fieldId} className="text-sm font-black text-[#3f382f]">
+        <label htmlFor={fieldId} className="type-label font-black text-[#3f382f]">
           {label}
         </label>
         <button
@@ -122,7 +122,7 @@ export function ContentTemplateField({
             setTrigger(null);
             setOpen((current) => !current);
           }}
-          className="inline-flex items-center gap-1.5 rounded-lg border bg-[#fffaf0] px-2.5 py-1.5 text-xs font-black text-[#9b5615]"
+          className="type-caption inline-flex items-center gap-1.5 rounded-lg border bg-[#fffaf0] px-2.5 py-1.5 font-black text-[#9b5615]"
         >
           <Braces size={14} /> Chèn biến
         </button>
@@ -145,25 +145,25 @@ export function ContentTemplateField({
         />
       )}
       {showHint ? (
-        <p className="text-xs leading-5 text-[#756b60]">
+        <p className="type-caption text-[#756b60]">
           {description ? `${description} ` : ""}Gõ <strong>{"{{"}</strong> để xem gợi ý tag.
         </p>
       ) : description ? (
-        <p className="text-xs leading-5 text-[#756b60]">{description}</p>
+        <p className="type-caption text-[#756b60]">{description}</p>
       ) : null}
       {error ? (
-        <p role="alert" className="text-sm font-bold text-red-700">
+        <p role="alert" className="type-supporting font-bold text-red-700">
           {error}
         </p>
       ) : null}
       {unavailable.length ? (
-        <p role="alert" className="rounded-lg bg-amber-50 px-2.5 py-2 text-xs font-bold text-amber-900">
+        <p role="alert" className="type-caption rounded-lg bg-amber-50 px-2.5 py-2 font-bold text-amber-900">
           Tag chưa được bật hoặc không tồn tại: {unavailable.map((key) => `{{${key}}}`).join(", ")}
         </p>
       ) : null}
       {open ? (
         <div className="absolute right-0 z-30 mt-1 w-full max-w-md overflow-hidden rounded-2xl border bg-white shadow-xl">
-          <div className="border-b bg-[#fffaf0] px-3 py-2 text-xs font-black text-[#756b60]">
+          <div className="type-caption border-b bg-[#fffaf0] px-3 py-2 font-black text-[#756b60]">
             Chọn tag để chèn
           </div>
           <div className="max-h-64 overflow-y-auto p-1.5">
@@ -176,19 +176,19 @@ export function ContentTemplateField({
                   onClick={() => insertVariable(item.key)}
                   className="flex w-full items-start gap-3 rounded-xl px-3 py-2 text-left hover:bg-[#fff5e7]"
                 >
-                  <code className="shrink-0 rounded-md bg-[#f2eee7] px-2 py-1 text-xs font-black text-[#9b5615]">
+                  <code className="type-caption shrink-0 rounded-md bg-[#f2eee7] px-2 py-1 font-black text-[#9b5615]">
                     {contentVariableTag(item.key)}
                   </code>
                   <span className="min-w-0">
-                    <strong className="block text-sm">{item.label}</strong>
-                    <span className="block text-xs leading-5 text-[#756b60]">
+                    <strong className="type-label block">{item.label}</strong>
+                    <span className="type-caption block text-[#756b60]">
                       {item.description} Ví dụ: {item.example}
                     </span>
                   </span>
                 </button>
               ))
             ) : (
-              <p className="px-3 py-4 text-sm text-[#756b60]">Không có tag phù hợp.</p>
+              <p className="type-supporting px-3 py-4 text-[#756b60]">Không có tag phù hợp.</p>
             )}
           </div>
         </div>

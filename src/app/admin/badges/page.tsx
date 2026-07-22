@@ -21,7 +21,7 @@ export default async function Page() {
         description="Tạo và cập nhật huy hiệu, xem nhiệm vụ nào đang sử dụng và giữ nguyên lịch sử phần thưởng của bé."
         icon={Award}
       />
-      <div className="rounded-2xl border border-blue-200 bg-blue-50 p-4 text-sm leading-6 text-blue-900">
+      <div className="type-supporting rounded-2xl border border-blue-200 bg-blue-50 p-4 text-blue-900">
         Huy hiệu được trao khi bé hoàn thành nhiệm vụ có gắn phần thưởng đó. Hãy duyệt ảnh huy hiệu trong thư
         viện trước khi gửi nhiệm vụ đi kiểm tra.
       </div>

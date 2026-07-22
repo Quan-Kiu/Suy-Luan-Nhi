@@ -85,7 +85,7 @@ export function BadgeForm({
   return (
     <form onSubmit={form.handleSubmit((values) => mutation.mutate(values))} className="space-y-4" noValidate>
       {mode === "edit" && showUsageSummary ? (
-        <div className="flex flex-wrap gap-2 text-xs font-bold text-[#6f6558]">
+        <div className="type-caption flex flex-wrap gap-2 font-bold text-[#6f6558]">
           <span className="inline-flex items-center gap-1 rounded-full bg-[#f5f2ec] px-3 py-1.5">
             <Award size={14} /> {initial.missionCount ?? 0} nhiệm vụ đang gắn
           </span>
@@ -148,7 +148,7 @@ export function BadgeForm({
           description="Tắt mục này không làm mất huy hiệu mà bé đã nhận và không thay đổi nhiệm vụ đã xuất bản."
         />
       ) : null}
-      <details className="rounded-xl bg-[#f7f3eb] p-3 text-sm">
+      <details className="type-supporting rounded-xl bg-[#f7f3eb] p-3">
         <summary className="cursor-pointer font-black">Thông tin dành cho đội kỹ thuật</summary>
         <div className="mt-3 max-w-xl">
           {mode === "create" ? (
@@ -161,7 +161,7 @@ export function BadgeForm({
               error={form.formState.errors.slug?.message}
             />
           ) : (
-            <p className="font-mono text-xs text-[#6f6558]">Mã nội bộ: {initial.slug}</p>
+            <p className="type-caption font-mono text-[#6f6558]">Mã nội bộ: {initial.slug}</p>
           )}
         </div>
       </details>

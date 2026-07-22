@@ -82,7 +82,7 @@ export function AuthAwareEntryLink({
       {guest && !compact ? (
         <span className="flex flex-col items-start text-left leading-tight">
           <span>{label}</span>
-          <span className="mt-1 text-xs font-bold text-white/85">
+          <span className="type-caption mt-1 font-bold text-white/85">
             {contentText(content, "hero.startHint", "Ba mẹ tạo tài khoản trước, sau đó thêm hồ sơ cho bé.")}
           </span>
         </span>

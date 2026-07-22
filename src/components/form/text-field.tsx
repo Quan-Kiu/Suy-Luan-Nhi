@@ -4,7 +4,7 @@ import { FieldShell } from "@/components/form/field-shell";
 import { cn } from "@/lib/utils";
 
 export const formControlClass =
-  "min-h-12 w-full rounded-2xl border-2 border-[#eadfc9] bg-[#fffdf8] px-4 outline-none transition focus:border-[#e9641a] disabled:cursor-not-allowed disabled:bg-[#f5f2ec]";
+  "type-body min-h-12 w-full rounded-2xl border-2 border-[#eadfc9] bg-[#fffdf8] px-4 outline-none transition focus:border-[#e9641a] disabled:cursor-not-allowed disabled:bg-[#f5f2ec]";
 
 type Props = Omit<InputHTMLAttributes<HTMLInputElement>, "name"> & {
   label: string;

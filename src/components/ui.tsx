@@ -17,7 +17,7 @@ export function Button({ className, ...props }: ButtonHTMLAttributes<HTMLButtonE
   return (
     <button
       className={cn(
-        "min-h-12 cursor-pointer rounded-2xl bg-[#b9470d] px-5 py-3 font-extrabold text-white shadow-[0_8px_0_#7f2e05] transition hover:-translate-y-0.5 hover:brightness-105 active:translate-y-1 active:shadow-none disabled:cursor-not-allowed disabled:opacity-50 aria-busy:cursor-progress",
+        "type-action min-h-12 cursor-pointer rounded-2xl bg-[#b9470d] px-5 py-3 text-white shadow-[0_8px_0_#7f2e05] transition hover:-translate-y-0.5 hover:brightness-105 active:translate-y-1 active:shadow-none disabled:cursor-not-allowed disabled:opacity-50 aria-busy:cursor-progress",
         className,
       )}
       {...props}
@@ -29,7 +29,7 @@ export function Pill({ className, ...props }: HTMLAttributes<HTMLSpanElement>) {
   return (
     <span
       className={cn(
-        "inline-flex items-center gap-2 rounded-full border border-[#eadfc9] bg-[#fff9ed] px-3 py-1.5 text-sm font-bold text-[#5b472e]",
+        "type-label inline-flex items-center gap-2 rounded-full border border-[#eadfc9] bg-[#fff9ed] px-3 py-1.5 text-[#5b472e]",
         className,
       )}
       {...props}

@@ -37,7 +37,7 @@ export async function selectChild(page: Page, childId: string) {
 
 export async function unlockParentGate(page: Page, answer?: string) {
   await page.goto("/parent");
-  const dashboard = page.getByRole("heading", { name: /Tuần của/i });
+  const dashboard = page.getByRole("heading", { name: /Tuần(?: này)? của/i });
   const input = page.getByLabel(/Kết quả phép tính|PIN phụ huynh/);
   const gateVisible = await input
     .waitFor({ state: "visible", timeout: 5_000 })

@@ -152,7 +152,7 @@ export function SortingQuestion({ question, value, onChange, disabled, renderMed
       onDragCancel={() => setActiveId(null)}
       onDragEnd={handleDragEnd}
     >
-      <p className="mb-3 text-sm leading-6 text-[#6f604b]">
+      <p className="type-supporting mb-3 text-[#6f604b]">
         Kéo từng bước bằng biểu tượng chấm, hoặc dùng nút lên/xuống để sắp xếp.
       </p>
       <SortableContext items={order} strategy={verticalListSortingStrategy}>

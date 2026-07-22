@@ -100,7 +100,7 @@ export function QuestionPlayer({ question, value, onChange, disabled = false }: 
         aria-label="Câu trả lời"
         value={typeof value === "string" ? value : ""}
         onChange={(event) => onChange(event.target.value)}
-        className="min-h-16 w-full rounded-2xl border-2 border-[#eadfc9] bg-white px-5 text-center text-xl font-black focus:border-[#e9641a]"
+        className="type-child-section-title min-h-16 w-full rounded-2xl border-2 border-[#eadfc9] bg-white px-5 text-center focus:border-[#e9641a]"
       />
     );
   }

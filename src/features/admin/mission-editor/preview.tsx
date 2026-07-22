@@ -55,7 +55,7 @@ export function MissionEditorPreview({
         </Card>
         <Card className="p-4">
           <p className="font-black">Tag trong bản xem trước</p>
-          <p className="mt-2 text-sm leading-6 text-[#746b60]">
+          <p className="type-supporting mt-2 text-[#746b60]">
             Bản xem trước dùng dữ liệu mẫu do Super Admin cấu hình. Khi bé sử dụng, hệ thống mới thay bằng dữ
             liệu trong hồ sơ đang chọn.
           </p>
@@ -65,7 +65,7 @@ export function MissionEditorPreview({
               .map((item) => (
                 <span
                   key={item.key}
-                  className="rounded-full bg-[#fff0df] px-3 py-1 text-xs font-black text-[#9b5615]"
+                  className="type-caption rounded-full bg-[#fff0df] px-3 py-1 font-black text-[#9b5615]"
                 >
                   {`{{${item.key}}}`} → {item.example}
                 </span>

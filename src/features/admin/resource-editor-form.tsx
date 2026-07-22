@@ -125,7 +125,7 @@ export function ResourceEditorForm({ resource }: { resource?: AdminResourceItem 
       <fieldset disabled={!interactive || mutation.isPending || navigation.isPending} className="contents">
         <div className="space-y-5">
           <section className="rounded-2xl border bg-white p-5">
-            <h2 className="text-xl font-black">Nội dung bài đăng</h2>
+            <h2 className="type-section-title">Nội dung bài đăng</h2>
             <div className="mt-4 grid gap-4 md:grid-cols-2">
               <TextField
                 label="Tiêu đề"
@@ -186,7 +186,7 @@ export function ResourceEditorForm({ resource }: { resource?: AdminResourceItem 
                 error={form.formState.errors.content?.message}
               />
               <details className="rounded-2xl bg-[#f5f2ec] p-4">
-                <summary className="cursor-pointer text-sm font-black text-[#4f463b]">
+                <summary className="type-action cursor-pointer font-black text-[#4f463b]">
                   Thiết lập nâng cao
                 </summary>
                 <div className="mt-3 max-w-xl">
@@ -204,7 +204,7 @@ export function ResourceEditorForm({ resource }: { resource?: AdminResourceItem 
         </div>
         <aside className="space-y-5">
           <section className="rounded-2xl border bg-white p-5">
-            <h2 className="text-lg font-black">Bài này dành cho ai?</h2>
+            <h2 className="type-card-title">Bài này dành cho ai?</h2>
             <div className="mt-4 space-y-4">
               <label className="block font-bold">
                 Loại tài nguyên
@@ -255,8 +255,8 @@ export function ResourceEditorForm({ resource }: { resource?: AdminResourceItem 
             </div>
           </section>
           <section className="rounded-2xl border bg-white p-5">
-            <h2 className="text-lg font-black">Nhóm tuổi</h2>
-            <p className="mt-1 text-sm text-[#6f6558]">
+            <h2 className="type-card-title">Nhóm tuổi</h2>
+            <p className="type-supporting mt-1 text-[#6f6558]">
               Chỉ cho các gia đình có bé trong nhóm tuổi phù hợp xem bài này.
             </p>
             <div className="mt-4 space-y-2">
@@ -276,7 +276,7 @@ export function ResourceEditorForm({ resource }: { resource?: AdminResourceItem 
               ))}
             </div>
             {form.formState.errors.ageGroups?.message ? (
-              <p role="alert" className="mt-2 text-sm font-bold text-red-700">
+              <p role="alert" className="type-supporting mt-2 font-bold text-red-700">
                 {form.formState.errors.ageGroups.message}
               </p>
             ) : null}

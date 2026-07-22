@@ -145,8 +145,8 @@ export function ResourceLibrary({ initialData }: { initialData: ParentResourcePa
                     <Pill>{parentResourceTypeLabels[item.resourceType]}</Pill>
                     <Pill>{parentResourceCategoryLabels[item.category]}</Pill>
                   </div>
-                  <h2 className="mt-3 text-xl font-black">{item.title}</h2>
-                  <p className="mt-2 text-sm leading-6 text-[#6f604b]">{item.excerpt}</p>
+                  <h2 className="type-section-title mt-3">{item.title}</h2>
+                  <p className="type-supporting mt-2 text-[#6f604b]">{item.excerpt}</p>
                 </div>
               </Card>
             </Link>
@@ -160,7 +160,7 @@ export function ResourceLibrary({ initialData }: { initialData: ParentResourcePa
         {query.isError ? (
           <div
             role="alert"
-            className="mt-4 rounded-2xl border border-red-200 bg-red-50 p-4 text-sm font-bold text-red-800"
+            className="type-label mt-4 rounded-2xl border border-red-200 bg-red-50 p-4 font-bold text-red-800"
           >
             {query.error.message}
           </div>
@@ -175,7 +175,7 @@ export function ResourceLibrary({ initialData }: { initialData: ParentResourcePa
             >
               <ChevronLeft size={18} /> Trang trước
             </button>
-            <span className="text-sm font-black text-[#6f6558]">
+            <span className="type-label font-black text-[#6f6558]">
               Trang {data.page}/{data.totalPages}
             </span>
             <button

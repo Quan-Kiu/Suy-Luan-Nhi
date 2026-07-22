@@ -28,7 +28,7 @@ function statusPresentation(status: ActivityItem["status"], content: ContentDict
 
 export function ActivityHistoryCard({ item, content }: { item: ActivityItem; content: ContentDictionary }) {
   const status = statusPresentation(item.status, content);
-  const metricClassName = "min-w-0 justify-center px-2 text-center text-xs leading-4 sm:px-3 sm:text-sm";
+  const metricClassName = "min-w-0 justify-center px-2 text-center type-caption leading-4 sm:px-3";
 
   return (
     <Card data-activity-card className="p-4 sm:p-5">
@@ -41,8 +41,8 @@ export function ActivityHistoryCard({ item, content }: { item: ActivityItem; con
           className="row-span-2 size-[72px] rounded-2xl object-cover sm:row-span-1 sm:size-20"
         />
         <div className="min-w-0 self-center">
-          <h2 className="text-lg leading-tight font-black break-words">{item.missionTitle}</h2>
-          <p data-activity-time className="mt-1 text-sm font-medium text-[#786348] tabular-nums">
+          <h2 className="type-card-title break-words">{item.missionTitle}</h2>
+          <p data-activity-time className="type-supporting mt-1 font-medium text-[#786348] tabular-nums">
             {formatVietnamDateTime(item.startedAt)}
           </p>
         </div>

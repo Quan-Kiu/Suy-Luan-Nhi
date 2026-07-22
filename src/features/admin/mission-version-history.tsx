@@ -49,10 +49,10 @@ export function MissionVersionHistory({
           <History size={21} />
         </span>
         <div>
-          <h2 className="text-xl font-black">
+          <h2 className="type-section-title">
             {contentText(content, "missionVersions.title", "Các lần đã gửi")}
           </h2>
-          <p className="mt-1 text-sm leading-6 text-[#6f6558]">
+          <p className="type-supporting mt-1 text-[#6f6558]">
             {contentText(
               content,
               "missionVersions.description",
@@ -78,13 +78,13 @@ export function MissionVersionHistory({
                   </strong>
                   <MissionStatusBadge status={version.status} />
                 </div>
-                <p className="mt-1 text-xs text-[#806d54]">
+                <p className="type-caption mt-1 text-[#806d54]">
                   {contentTemplate(content, "missionVersions.createdAt", "Đã gửi {time}", {
                     time: new Date(version.createdAt).toLocaleString("vi-VN"),
                   })}
                 </p>
                 {version.reviewComment ? (
-                  <p className="mt-2 line-clamp-2 text-sm text-[#5f5548]">
+                  <p className="type-supporting mt-2 line-clamp-2 text-[#5f5548]">
                     <strong>{contentText(content, "missionVersions.reviewComment", "Nhận xét:")}</strong>{" "}
                     {version.reviewComment}
                   </p>
@@ -107,7 +107,7 @@ export function MissionVersionHistory({
           ))}
         </div>
       ) : (
-        <p className="mt-4 rounded-2xl bg-[#f5f2ec] p-4 text-sm text-[#6f6558]">
+        <p className="type-supporting mt-4 rounded-2xl bg-[#f5f2ec] p-4 text-[#6f6558]">
           {contentText(
             content,
             "missionVersions.empty",

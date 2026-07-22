@@ -104,8 +104,10 @@ export function SessionPlayer({ initialView }: { initialView: SessionView }) {
     <main className="paper-texture min-h-[calc(100vh-4rem)] px-5 pt-5 pb-8">
       <SessionProgress current={view.progress.current} total={view.progress.total} />
       <div className="text-center">
-        <p className="text-xs font-black tracking-[.16em] text-[#d78517] uppercase">{view.mission.title}</p>
-        <h1 className="mt-2 text-3xl leading-tight font-black">{view.question.prompt}</h1>
+        <p className="type-overline font-black tracking-[.16em] text-[#d78517] uppercase">
+          {view.mission.title}
+        </p>
+        <h1 className="type-child-page-title mt-2">{view.question.prompt}</h1>
         <p className="mt-2 text-[#806d54]">{view.question.instruction}</p>
       </div>
 
@@ -177,7 +179,7 @@ export function SessionPlayer({ initialView }: { initialView: SessionView }) {
         onClick={() => exitMutation.mutate()}
         disabled={exitMutation.isPending || navigation.isPending}
         aria-busy={exitMutation.isPending || navigation.isPending}
-        className="mt-6 flex w-full items-center justify-center gap-2 text-sm font-bold text-[#806d54] disabled:opacity-50"
+        className="type-action mt-6 flex w-full items-center justify-center gap-2 text-[#806d54] disabled:opacity-50"
       >
         {exitMutation.isPending || navigation.isPending ? (
           <LoaderCircle size={16} className="animate-spin" />

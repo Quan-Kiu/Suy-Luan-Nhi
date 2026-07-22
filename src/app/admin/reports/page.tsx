@@ -19,25 +19,25 @@ export default async function Page() {
       />
       <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
         <Card className="p-4">
-          <p className="text-3xl font-black">{data.attempts.total}</p>
-          <p className="text-sm font-bold">Số câu bé đã trả lời</p>
+          <p className="type-metric-value">{data.attempts.total}</p>
+          <p className="type-supporting font-bold">Số câu bé đã trả lời</p>
         </Card>
         <Card className="p-4">
-          <p className="text-3xl font-black">{accuracy}%</p>
-          <p className="text-sm font-bold">Tỷ lệ trả lời đúng</p>
+          <p className="type-metric-value">{accuracy}%</p>
+          <p className="type-supporting font-bold">Tỷ lệ trả lời đúng</p>
         </Card>
         <Card className="p-4">
-          <p className="text-3xl font-black">{Math.round(data.attempts.averageMs / 1000)} giây</p>
-          <p className="text-sm font-bold">Thời gian trung bình cho mỗi câu</p>
+          <p className="type-metric-value">{Math.round(data.attempts.averageMs / 1000)} giây</p>
+          <p className="type-supporting font-bold">Thời gian trung bình cho mỗi câu</p>
         </Card>
         <Card className="p-4">
-          <p className="text-3xl font-black">{data.averageReviewHours.toFixed(1)} giờ</p>
-          <p className="text-sm font-bold">Thời gian trung bình để kiểm tra nội dung</p>
+          <p className="type-metric-value">{data.averageReviewHours.toFixed(1)} giờ</p>
+          <p className="type-supporting font-bold">Thời gian trung bình để kiểm tra nội dung</p>
         </Card>
       </div>
       <div className="grid gap-5 lg:grid-cols-2">
         <Card className="p-5">
-          <h2 className="text-xl font-black">Các lượt chơi đang ở bước nào</h2>
+          <h2 className="type-section-title">Các lượt chơi đang ở bước nào</h2>
           <div className="mt-4 space-y-3">
             {Object.entries(data.sessionsByStatus).map(([status, count]) => (
               <div key={status} className="flex items-center justify-between rounded-xl bg-[#f7f3eb] p-3">
@@ -48,7 +48,7 @@ export default async function Page() {
           </div>
         </Card>
         <Card className="p-5">
-          <h2 className="text-xl font-black">Nhiệm vụ được chơi nhiều</h2>
+          <h2 className="type-section-title">Nhiệm vụ được chơi nhiều</h2>
           <div className="mt-4 space-y-3">
             {data.topMissions.map((item, index) => (
               <div key={item.title} className="flex items-center gap-3">
@@ -62,8 +62,8 @@ export default async function Page() {
           </div>
         </Card>
         <Card className="p-5 lg:col-span-2">
-          <h2 className="text-xl font-black">Các tính năng được sử dụng</h2>
-          <p className="mt-1 text-sm text-[#6f6558]">
+          <h2 className="type-section-title">Các tính năng được sử dụng</h2>
+          <p className="type-supporting mt-1 text-[#6f6558]">
             Chỉ tổng hợp số lần các tính năng được dùng; không lưu câu trả lời hoặc thông tin riêng của bé
             trong báo cáo này.
           </p>

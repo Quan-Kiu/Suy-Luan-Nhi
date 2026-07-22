@@ -24,8 +24,8 @@ export function FieldShell({
   const messageId = error ? `${id}-error` : description ? `${id}-description` : undefined;
 
   return (
-    <div className={cn("grid content-start gap-2 font-bold", className)}>
-      <label htmlFor={id}>
+    <div className={cn("grid content-start gap-2", className)}>
+      <label htmlFor={id} className="type-label">
         {label}
         {required ? <span aria-hidden="true"> *</span> : null}
       </label>
@@ -34,10 +34,7 @@ export function FieldShell({
         <span
           id={messageId}
           role={error ? "alert" : undefined}
-          className={cn(
-            "block text-sm leading-5 font-normal",
-            error ? "font-bold text-red-700" : "text-[#806d54]",
-          )}
+          className={cn("type-supporting block", error ? "font-bold text-red-700" : "text-[#806d54]")}
         >
           {message}
         </span>

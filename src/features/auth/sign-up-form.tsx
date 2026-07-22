@@ -94,7 +94,7 @@ export function SignUpForm() {
         registration={form.register("confirmPassword")}
         error={form.formState.errors.confirmPassword?.message}
       />
-      <p className="rounded-2xl bg-[#edf4df] p-3 text-xs leading-5 text-[#567044]">
+      <p className="type-caption rounded-2xl bg-[#edf4df] p-3 text-[#567044]">
         {contentText(
           content,
           "signUp.flowPrivacyNote",
@@ -108,7 +108,7 @@ export function SignUpForm() {
       >
         {contentText(content, "signUp.flowSubmit", "Tạo tài khoản ba mẹ")}
       </SubmitButton>
-      <p className="text-center text-sm">
+      <p className="type-supporting text-center">
         {contentText(content, "signUp.hasAccount", "Đã có tài khoản?")}{" "}
         <Link href="/auth/sign-in" className="font-bold text-[#c55312] underline">
           {contentText(content, "signIn.submit", "Đăng nhập")}

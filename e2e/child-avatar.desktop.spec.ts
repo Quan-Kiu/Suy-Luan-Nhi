@@ -34,8 +34,8 @@ test("parent chooses and changes a system-managed child avatar", async ({ page }
 
   await page.getByLabel("Xóa Avatar E2E").click();
   await page
-    .getByRole("alertdialog", { name: "Xóa hồ sơ Avatar E2E?" })
-    .getByRole("button", { name: "Chuyển sang chờ xóa" })
+    .getByRole("alertdialog", { name: "Đưa hồ sơ Avatar E2E vào thùng rác?" })
+    .getByRole("button", { name: "Đưa vào thùng rác" })
     .click();
   await expect(page.getByRole("heading", { name: "Avatar E2E" })).toHaveCount(0);
 });

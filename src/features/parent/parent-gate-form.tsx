@@ -73,7 +73,7 @@ export function ParentGateForm({ hasPin, challenge }: { hasPin: boolean; challen
           </button>
         </div>
       ) : null}
-      <p className="mt-5 text-center text-2xl font-black" aria-live="polite">
+      <p className="type-child-section-title mt-5 text-center" aria-live="polite">
         {prompt}
       </p>
       <form
@@ -96,7 +96,7 @@ export function ParentGateForm({ hasPin, challenge }: { hasPin: boolean; challen
             },
           })}
           error={form.formState.errors.answer?.message}
-          className="min-h-14 text-center text-xl"
+          className="type-child-section-title min-h-14 text-center"
         />
         <FormStatus status={mutation.isError ? "error" : "idle"} message={mutation.error?.message} />
         <SubmitButton

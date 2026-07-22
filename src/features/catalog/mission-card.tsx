@@ -62,11 +62,11 @@ export function MissionCard({
           ) : null}
         </div>
         <div className="flex flex-1 flex-col p-2 text-center">
-          <h3 className="min-h-10 leading-tight font-black">{mission.title}</h3>
-          <p className="mt-1 text-xs text-[#6f604b]">
+          <h3 className="type-card-title min-h-10">{mission.title}</h3>
+          <p className="type-caption mt-1 text-[#6f604b]">
             {mission.estimatedMinutes} phút · Mức {mission.difficulty}
           </p>
-          <span className="mt-auto inline-flex min-h-8 items-center justify-center self-center rounded-full bg-white/85 px-3 py-1 text-[10px] font-black">
+          <span className="type-action mt-auto inline-flex min-h-8 items-center justify-center self-center rounded-full bg-white/85 px-3 py-1">
             {actionLabel}
           </span>
         </div>

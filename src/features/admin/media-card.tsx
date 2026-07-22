@@ -108,16 +108,16 @@ export function MediaCard({
         )}
       </div>
       <div className="p-4">
-        <p className="truncate font-black" title={item.fileName}>
+        <p className="type-card-title truncate" title={item.fileName}>
           {item.fileName}
         </p>
-        <p className="mt-1 line-clamp-2 text-xs text-[#806d54]">{item.altText}</p>
+        <p className="type-caption mt-1 line-clamp-2 text-[#806d54]">{item.altText}</p>
         <div className="mt-3 flex items-center justify-between gap-2">
           <div className="flex flex-wrap gap-1">
-            <span className="rounded-full bg-[#f5f2ec] px-2 py-1 text-[10px] font-black">
+            <span className="type-caption rounded-full bg-[#f5f2ec] px-2 py-1 font-black">
               {mediaCategoryLabels[item.category as MediaCategory] ?? item.category}
             </span>
-            <span className="rounded-full bg-[#f5f2ec] px-2 py-1 text-[10px] font-black">
+            <span className="type-caption rounded-full bg-[#f5f2ec] px-2 py-1 font-black">
               {safetyStatusLabels[item.safetyStatus] ?? item.safetyStatus}
             </span>
           </div>
@@ -191,7 +191,7 @@ export function MediaCard({
           message={mutation.variables !== "delete" ? mutation.error?.message : undefined}
           className="mt-3"
         />
-        <details className="mt-3 rounded-lg bg-[#f5f2ec] p-2 text-[10px]">
+        <details className="type-caption mt-3 rounded-lg bg-[#f5f2ec] p-2">
           <summary className="cursor-pointer font-black">Thông tin tệp</summary>
           <p className="mt-2 font-bold">Nơi lưu: {item.storageProvider}</p>
           <code className="mt-1 block break-all">{item.url}</code>

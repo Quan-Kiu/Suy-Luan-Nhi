@@ -21,11 +21,11 @@ export function AuthShell({
             alt="Suy Luận Nhí"
             className="h-14 w-auto object-contain"
           />
-          <span className="text-lg font-black">Suy Luận Nhí</span>
+          <span className="type-card-title">Suy Luận Nhí</span>
         </Link>
         <div className="mt-5 text-center">
-          <h1 className="text-3xl font-black">{title}</h1>
-          <p className="mt-2 text-sm leading-6 text-[#806d54]">{subtitle}</p>
+          <h1 className="type-page-title">{title}</h1>
+          <p className="type-supporting mt-2 text-[#806d54]">{subtitle}</p>
         </div>
         <div className="mt-6">{children}</div>
       </section>

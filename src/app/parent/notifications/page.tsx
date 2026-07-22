@@ -9,7 +9,7 @@ export default async function Page() {
   const items = await getParentNotifications(active.parent.id);
   return (
     <>
-      <h1 className="text-3xl font-black">Thông báo</h1>
+      <h1 className="type-page-title">Thông báo</h1>
       <p className="mt-2 mb-5 text-[#786348]">
         Những thông tin mới về hoạt động của bé và các thay đổi quan trọng trong ứng dụng.
       </p>

@@ -20,7 +20,7 @@ export default async function Page() {
         description="Quản lý chế độ bảo trì, các chức năng đang hoạt động và những giới hạn vận hành an toàn. Mỗi thay đổi đều được lưu trong lịch sử."
         icon={Settings}
       />
-      <div className="rounded-2xl border border-amber-200 bg-amber-50 p-4 text-sm leading-6 text-amber-900">
+      <div className="type-supporting rounded-2xl border border-amber-200 bg-amber-50 p-4 text-amber-900">
         <strong className="block">
           Chỉ thay đổi khi bạn hiểu rõ cài đặt này ảnh hưởng đến phần nào của hệ thống.
         </strong>

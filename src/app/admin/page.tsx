@@ -90,7 +90,7 @@ export default async function Page() {
       />
 
       <section aria-labelledby="admin-priority-title">
-        <h2 id="admin-priority-title" className="text-xl font-black">
+        <h2 id="admin-priority-title" className="type-section-title">
           {t("dashboard.priorityTitle", "Việc ưu tiên")}
         </h2>
         <div className="mt-3 grid gap-4 lg:grid-cols-3">
@@ -101,8 +101,8 @@ export default async function Page() {
                   <Icon size={21} />
                 </span>
                 <span className="min-w-0 flex-1">
-                  <strong className="block text-lg">{title}</strong>
-                  <span className="mt-1 block text-sm leading-6 text-[#6f6558]">{description}</span>
+                  <strong className="type-card-title block">{title}</strong>
+                  <span className="type-supporting mt-1 block text-[#6f6558]">{description}</span>
                 </span>
                 <ArrowRight size={18} className="mt-1 shrink-0 transition group-hover:translate-x-1" />
               </Card>
@@ -111,15 +111,15 @@ export default async function Page() {
         </div>
       </section>
       <section aria-labelledby="admin-summary-title">
-        <h2 id="admin-summary-title" className="text-xl font-black">
+        <h2 id="admin-summary-title" className="type-section-title">
           {t("dashboard.summaryTitle", "Tình hình chung")}
         </h2>
         <div className="mt-3 grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
           {metrics.map(({ label, value, icon: Icon }) => (
             <Card key={label} className="p-4">
               <Icon size={20} className="text-[#e9641a]" />
-              <p className="mt-3 text-3xl font-black">{value}</p>
-              <p className="mt-1 text-sm font-bold text-[#6f6558]">{label}</p>
+              <p className="type-metric-value mt-3">{value}</p>
+              <p className="type-supporting mt-1 font-bold text-[#6f6558]">{label}</p>
             </Card>
           ))}
         </div>
@@ -129,14 +129,14 @@ export default async function Page() {
         <Card className="p-5">
           <div className="flex flex-wrap items-center justify-between gap-3">
             <div>
-              <h2 className="text-xl font-black">{t("dashboard.contentStatus", "Tiến độ nội dung")}</h2>
-              <p className="mt-1 text-sm text-[#6f6558]">
+              <h2 className="type-section-title">{t("dashboard.contentStatus", "Tiến độ nội dung")}</h2>
+              <p className="type-supporting mt-1 text-[#6f6558]">
                 Xem mỗi nhiệm vụ đang được soạn, chờ kiểm tra hay đã hiển thị cho bé.
               </p>
             </div>
             <Link
               href="/admin/missions"
-              className="inline-flex items-center gap-1 text-sm font-black text-[#bd4910]"
+              className="type-action inline-flex items-center gap-1 font-black text-[#bd4910]"
             >
               {t("dashboard.openCms", "Xem tất cả nhiệm vụ")}
               <ArrowRight size={16} />
@@ -149,13 +149,13 @@ export default async function Page() {
                 href={`/admin/missions?status=${status}`}
                 className="rounded-2xl border bg-[#fbf8f2] p-4 transition hover:border-[#e5b98f]"
               >
-                <p className="text-2xl font-black">{count}</p>
-                <p className="mt-1 text-sm font-bold">{friendlyLabel(missionStatusLabels, status)}</p>
+                <p className="type-metric-value">{count}</p>
+                <p className="type-supporting mt-1 font-bold">{friendlyLabel(missionStatusLabels, status)}</p>
               </Link>
             ))}
           </div>
           {!Object.keys(data.missionCounts).length ? (
-            <p className="mt-4 text-sm text-[#6f6558]">
+            <p className="type-supporting mt-4 text-[#6f6558]">
               {t("dashboard.emptyMissions", "Chưa có nhiệm vụ nào.")}
             </p>
           ) : null}
@@ -164,8 +164,8 @@ export default async function Page() {
         <Card className="p-5">
           <div className="flex items-center justify-between gap-3">
             <div>
-              <h2 className="text-xl font-black">{t("dashboard.recentAudit", "Thay đổi gần đây")}</h2>
-              <p className="mt-1 text-sm text-[#6f6558]">
+              <h2 className="type-section-title">{t("dashboard.recentAudit", "Thay đổi gần đây")}</h2>
+              <p className="type-supporting mt-1 text-[#6f6558]">
                 Những thay đổi mới nhất do người quản trị hoặc hệ thống thực hiện.
               </p>
             </div>
@@ -175,21 +175,21 @@ export default async function Page() {
             {data.recentAudit.slice(0, 5).map((item) => (
               <div key={item.id} className="rounded-xl border p-3">
                 <div className="flex flex-wrap items-center justify-between gap-2">
-                  <strong className="text-sm">{friendlyLabel(auditActionLabels, item.action)}</strong>
+                  <strong className="type-label">{friendlyLabel(auditActionLabels, item.action)}</strong>
                   <Pill>{friendlyLabel(resourceTypeLabels, item.resourceType)}</Pill>
                 </div>
-                <p className="mt-1 text-xs text-[#806d54]">{item.createdAt.toLocaleString("vi-VN")}</p>
+                <p className="type-caption mt-1 text-[#806d54]">{item.createdAt.toLocaleString("vi-VN")}</p>
               </div>
             ))}
             {!data.recentAudit.length ? (
-              <p className="rounded-xl bg-[#f7f3eb] p-4 text-sm text-[#6f6558]">
+              <p className="type-supporting rounded-xl bg-[#f7f3eb] p-4 text-[#6f6558]">
                 Chưa có thay đổi nào được ghi nhận.
               </p>
             ) : null}
           </div>
           <Link
             href="/admin/audit"
-            className="mt-4 inline-flex items-center gap-1 text-sm font-black text-[#bd4910]"
+            className="type-action mt-4 inline-flex items-center gap-1 font-black text-[#bd4910]"
           >
             {t("dashboard.viewAudit", "Xem nhật ký thay đổi")}
             <ArrowRight size={16} />

@@ -164,7 +164,7 @@ export function SettingsForm({ initial, childId }: { initial: Settings; childId:
         </SubmitButton>
 
         <Card className="p-5">
-          <h2 className="text-xl font-black">
+          <h2 className="type-section-title">
             {contentText(content, "settings.dataTitle", "Dữ liệu gia đình")}
           </h2>
           <div className="mt-4 grid gap-3 sm:grid-cols-3">

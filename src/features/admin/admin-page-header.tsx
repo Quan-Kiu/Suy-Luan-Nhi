@@ -22,10 +22,10 @@ export function AdminPageHeader({
           </span>
         ) : null}
         <div className="min-w-0">
-          {eyebrow ? <p className="text-sm font-bold text-[#756b60]">{eyebrow}</p> : null}
-          <h1 className="text-2xl font-black tracking-tight sm:text-3xl">{title}</h1>
+          {eyebrow ? <p className="type-label text-[#756b60]">{eyebrow}</p> : null}
+          <h1 className="type-page-title">{title}</h1>
           {description ? (
-            <p className="mt-1 max-w-3xl text-sm leading-5 text-[#6f6558]">{description}</p>
+            <p className="type-supporting mt-1 max-w-3xl text-[#6f6558]">{description}</p>
           ) : null}
         </div>
       </div>

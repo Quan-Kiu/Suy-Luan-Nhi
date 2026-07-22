@@ -27,6 +27,17 @@ describe("MediaUploadField", () => {
     vi.restoreAllMocks();
     vi.spyOn(mediaApi, "getUploadPolicies").mockResolvedValue(defaultImageUploadPolicies);
   });
+  it("opens a hidden file input from an accessible button", async () => {
+    const user = userEvent.setup();
+    const { container } = renderField();
+    const input = container.querySelector('input[type="file"]') as HTMLInputElement;
+    const click = vi.spyOn(input, "click");
+
+    expect(input).toHaveAttribute("hidden");
+    await user.click(screen.getByRole("button", { name: /Ảnh bìa nhiệm vụ.*Chọn tệp để tải lên/ }));
+    expect(click).toHaveBeenCalledOnce();
+  });
+
   it("allows selecting the same file again after an upload error", async () => {
     const upload = vi.spyOn(mediaApi, "upload").mockRejectedValue(new Error("Kho lưu trữ chưa sẵn sàng"));
     const user = userEvent.setup();

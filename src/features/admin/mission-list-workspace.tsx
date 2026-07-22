@@ -119,13 +119,13 @@ export function MissionListWorkspace({ initialData, initialFilters, worlds, canE
   return (
     <div className="space-y-5">
       <form
-        className="grid gap-3 rounded-2xl border bg-white p-4 lg:grid-cols-[minmax(260px,1fr)_220px_210px_auto_auto]"
+        className="grid gap-3 rounded-2xl border bg-white p-4 sm:grid-cols-2 xl:grid-cols-[minmax(260px,1fr)_220px_210px_auto_auto]"
         onSubmit={(event) => {
           event.preventDefault();
           applyFilters();
         }}
       >
-        <label className="relative">
+        <label className="relative sm:col-span-2 xl:col-span-1">
           <span className="sr-only">Tìm nhiệm vụ</span>
           <Search className="absolute top-3 left-3 text-[#887b6c]" size={18} />
           <input
@@ -182,7 +182,7 @@ export function MissionListWorkspace({ initialData, initialFilters, worlds, canE
             <X size={17} /> Xóa lọc
           </button>
         ) : (
-          <span className="hidden lg:block" />
+          <span className="hidden xl:block" />
         )}
       </form>
 
@@ -194,10 +194,10 @@ export function MissionListWorkspace({ initialData, initialFilters, worlds, canE
         ) : null}
         <div className={cn("space-y-4 transition-opacity", query.isFetching && "opacity-65")}>
           <div className="flex flex-wrap items-center justify-between gap-3">
-            <p className="text-sm font-bold text-[#6f6558]">
+            <p className="type-supporting font-bold text-[#6f6558]">
               {contentTemplate(content, "missions.resultCount", "{count} nhiệm vụ", { count: data.total })}
             </p>
-            <label className="flex items-center gap-2 text-sm font-bold text-[#6f6558]">
+            <label className="type-label flex items-center gap-2 font-bold text-[#6f6558]">
               Hiển thị
               <select
                 value={filters.pageSize}
@@ -238,12 +238,12 @@ export function MissionListWorkspace({ initialData, initialFilters, worlds, canE
                   <div className="p-4">
                     <div className="flex flex-wrap items-start justify-between gap-2">
                       <div className="min-w-0">
-                        <h2 className="text-lg font-black">{item.title}</h2>
-                        <p className="text-sm text-[#6f6558]">{item.worldTitle}</p>
+                        <h2 className="type-card-title">{item.title}</h2>
+                        <p className="type-supporting text-[#6f6558]">{item.worldTitle}</p>
                       </div>
                       <MissionStatusBadge status={item.status} />
                     </div>
-                    <p className="mt-3 text-sm text-[#6f6558]">
+                    <p className="type-supporting mt-3 text-[#6f6558]">
                       {contentTemplate(
                         content,
                         "missions.summary",
@@ -254,7 +254,7 @@ export function MissionListWorkspace({ initialData, initialFilters, worlds, canE
                         },
                       )}
                     </p>
-                    <p className="mt-1 text-xs text-[#756b60]">Cập nhật {formatDate(item.updatedAt)}</p>
+                    <p className="type-caption mt-1 text-[#756b60]">Cập nhật {formatDate(item.updatedAt)}</p>
                   </div>
                 </MissionEditTarget>
                 {canEdit ? (
@@ -267,7 +267,7 @@ export function MissionListWorkspace({ initialData, initialFilters, worlds, canE
           </div>
 
           <div className="hidden overflow-x-auto rounded-2xl border bg-white md:block">
-            <table className="min-w-full text-sm">
+            <table className="type-supporting min-w-full">
               <thead className="bg-[#f7f3eb] text-left">
                 <tr>
                   <th className="p-3">{t("missions.columnMission", "Nhiệm vụ")}</th>
@@ -288,7 +288,7 @@ export function MissionListWorkspace({ initialData, initialFilters, worlds, canE
           {!data.items.length ? (
             <div className="rounded-2xl border bg-white p-10 text-center">
               <p className="font-black">{t("missions.empty", "Không tìm thấy nhiệm vụ phù hợp.")}</p>
-              <p className="mt-2 text-sm text-[#6f6558]">
+              <p className="type-supporting mt-2 text-[#6f6558]">
                 {canEdit
                   ? "Thử xóa bộ lọc hoặc tạo một nhiệm vụ mới."
                   : "Thử xóa bộ lọc để xem toàn bộ nhiệm vụ."}
@@ -299,7 +299,7 @@ export function MissionListWorkspace({ initialData, initialFilters, worlds, canE
           {query.isError ? (
             <div
               role="alert"
-              className="rounded-2xl border border-red-200 bg-red-50 p-4 text-sm font-bold text-red-800"
+              className="type-label rounded-2xl border border-red-200 bg-red-50 p-4 font-bold text-red-800"
             >
               {query.error.message}
             </div>
@@ -315,7 +315,7 @@ export function MissionListWorkspace({ initialData, initialFilters, worlds, canE
               >
                 <ChevronLeft size={18} /> Trang trước
               </button>
-              <span className="text-sm font-black text-[#6f6558]">
+              <span className="type-label font-black text-[#6f6558]">
                 Trang {data.page}/{data.totalPages}
               </span>
               <button
@@ -355,7 +355,7 @@ function MissionTableRow({
           </span>
           <span>
             <strong className="block">{item.title}</strong>
-            <small className="text-[#806d54]">Mã nội bộ: {item.slug}</small>
+            <span className="type-caption block text-[#806d54]">Mã nội bộ: {item.slug}</span>
           </span>
         </MissionEditTarget>
       </td>

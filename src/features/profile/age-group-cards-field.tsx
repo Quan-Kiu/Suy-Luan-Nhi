@@ -23,7 +23,7 @@ export function AgeGroupCardsField({
   return (
     <fieldset>
       <legend className="font-black">{label}</legend>
-      {description ? <p className="mb-4 text-sm text-[#806d54]">{description}</p> : null}
+      {description ? <p className="type-supporting mb-4 text-[#806d54]">{description}</p> : null}
       <div className="grid gap-3 sm:grid-cols-3">
         {options.map((option) => (
           <label
@@ -42,12 +42,12 @@ export function AgeGroupCardsField({
               className="mx-auto h-20 w-20 object-contain"
             />
             <strong className="block">{option.title}</strong>
-            <span className="text-xs text-[#7d684f]">{option.note}</span>
+            <span className="type-caption text-[#7d684f]">{option.note}</span>
           </label>
         ))}
       </div>
       {error ? (
-        <p role="alert" className="mt-2 text-sm font-bold text-red-700">
+        <p role="alert" className="type-supporting mt-2 font-bold text-red-700">
           {error}
         </p>
       ) : null}

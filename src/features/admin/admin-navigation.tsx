@@ -180,14 +180,14 @@ type Props = {
 export function AdminNavigation({ pathname, role, content, onNavigate, ariaLabel }: Props) {
   const primaryRole = getPrimaryRole(role);
   return (
-    <nav aria-label={ariaLabel} className="space-y-4 pb-4 text-sm">
+    <nav aria-label={ariaLabel} className="space-y-4 pb-4">
       {navGroups.map((group) => {
         const visibleItems = group.items.filter((item) => item.roles.includes(primaryRole));
         if (!visibleItems.length) return null;
 
         return (
           <section key={group.labelKey}>
-            <p className="mb-1.5 px-3 text-[10px] font-black tracking-[0.14em] text-[#756b60] uppercase">
+            <p className="type-overline mb-1.5 px-3 text-[#756b60]">
               {contentText(content, group.labelKey, group.fallback)}
             </p>
             <div className="space-y-0.5">
@@ -204,7 +204,7 @@ export function AdminNavigation({ pathname, role, content, onNavigate, ariaLabel
                     onClick={onNavigate}
                     aria-current={active ? "page" : undefined}
                     className={cn(
-                      "flex min-h-10 items-center gap-2.5 rounded-lg px-3 font-bold transition hover:bg-[#f5f2ec]",
+                      "type-action flex min-h-10 items-center gap-2.5 rounded-lg px-3 transition hover:bg-[#f5f2ec]",
                       active && "bg-[#fff0df] text-[#bd4910] shadow-sm",
                     )}
                   >
@@ -218,7 +218,7 @@ export function AdminNavigation({ pathname, role, content, onNavigate, ariaLabel
         );
       })}
 
-      <details className="rounded-xl bg-[#edf4df] text-xs text-[#587048]">
+      <details className="type-caption rounded-xl bg-[#edf4df] text-[#587048]">
         <summary className="flex min-h-10 cursor-pointer list-none items-center gap-2 px-3 py-2 font-black marker:hidden">
           <ShieldCheck size={16} />
           {contentText(content, "shell.workflowTitle", "Quy trình nội dung an toàn")}

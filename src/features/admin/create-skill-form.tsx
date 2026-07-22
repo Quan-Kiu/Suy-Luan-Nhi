@@ -62,10 +62,10 @@ export function CreateSkillForm() {
           <Plus size={19} />
         </span>
         <div>
-          <h3 id="new-skill-title" className="text-lg font-black text-[#342f28]">
+          <h3 id="new-skill-title" className="type-card-title">
             {contentText(content, "taxonomy.createTitle", "Thêm kỹ năng hoặc thói quen")}
           </h3>
-          <p className="mt-1 text-sm leading-6 text-[#6f6558]">
+          <p className="type-supporting mt-1 text-[#6f6558]">
             Đặt tên theo cách phụ huynh và người soạn dễ hiểu. Mã kỹ thuật sẽ được tạo tự động.
           </p>
         </div>
@@ -109,7 +109,9 @@ export function CreateSkillForm() {
           error={form.formState.errors.description?.message}
         />
         <details className="rounded-2xl bg-[#f5f2ec] p-4">
-          <summary className="cursor-pointer text-sm font-black text-[#4f463b]">Thiết lập nâng cao</summary>
+          <summary className="type-action cursor-pointer font-black text-[#4f463b]">
+            Thiết lập nâng cao
+          </summary>
           <div className="mt-3 max-w-xl">
             <TextField
               id="new-skill-slug"

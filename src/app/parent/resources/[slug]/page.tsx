@@ -26,8 +26,8 @@ export default async function Page({ params }: { params: Promise<{ slug: string 
         <Pill>{parentResourceTypeLabels[item.resourceType as ParentResourceType]}</Pill>
         <Pill>{parentResourceCategoryLabels[item.category as ParentResourceCategory]}</Pill>
       </div>
-      <h1 className="mt-4 text-4xl font-black">{item.title}</h1>
-      <p className="mt-3 text-lg text-[#786348]">{item.excerpt}</p>
+      <h1 className="type-page-title mt-4">{item.title}</h1>
+      <p className="type-lead mt-3 text-[#786348]">{item.excerpt}</p>
       {item.coverUrl ? (
         <div className="relative mt-6 h-72 w-full overflow-hidden rounded-[28px]">
           <Image
@@ -52,7 +52,7 @@ export default async function Page({ params }: { params: Promise<{ slug: string 
         </video>
       ) : null}
       <Card className="mt-6 p-6">
-        <div className="text-lg leading-8 whitespace-pre-line">{item.content}</div>
+        <div className="type-reading whitespace-pre-line">{item.content}</div>
       </Card>
     </article>
   );

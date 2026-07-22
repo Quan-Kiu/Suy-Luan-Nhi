@@ -25,7 +25,7 @@ export default async function Page({
       />
       <form className="grid gap-3 rounded-2xl border bg-white p-4 md:grid-cols-[1fr_1fr_auto_auto]">
         <label>
-          <span className="mb-1 block text-xs font-black text-[#6f6558]">Loại nội dung</span>
+          <span className="type-caption mb-1 block font-black text-[#6f6558]">Loại nội dung</span>
           <select
             name="resourceType"
             defaultValue={filters.resourceType ?? ""}
@@ -40,7 +40,7 @@ export default async function Page({
           </select>
         </label>
         <label>
-          <span className="mb-1 block text-xs font-black text-[#6f6558]">Hành động</span>
+          <span className="type-caption mb-1 block font-black text-[#6f6558]">Hành động</span>
           <input
             name="action"
             defaultValue={filters.action}
@@ -61,23 +61,23 @@ export default async function Page({
         ) : null}
       </form>
 
-      <p className="text-sm font-bold text-[#6f6558]">{items.length} thay đổi gần nhất</p>
+      <p className="type-supporting font-bold text-[#6f6558]">{items.length} thay đổi gần nhất</p>
       <div className="space-y-3">
         {items.map((item) => (
           <article key={item.id} className="rounded-2xl border bg-white p-4">
             <div className="flex flex-wrap items-start justify-between gap-3">
               <div>
                 <p className="font-black">{friendlyLabel(auditActionLabels, item.action)}</p>
-                <p className="mt-1 text-sm text-[#6f6558]">
+                <p className="type-supporting mt-1 text-[#6f6558]">
                   {friendlyLabel(resourceTypeLabels, item.resourceType)} ·{" "}
                   {item.createdAt.toLocaleString("vi-VN")}
                 </p>
               </div>
-              <span className="rounded-full bg-[#f5f2ec] px-3 py-1 text-xs font-black">
+              <span className="type-caption rounded-full bg-[#f5f2ec] px-3 py-1 font-black">
                 {item.actorId ? "Tài khoản quản trị" : "Hệ thống tự động"}
               </span>
             </div>
-            <details className="mt-3 rounded-xl bg-[#f7f3eb] p-3 text-xs">
+            <details className="type-caption mt-3 rounded-xl bg-[#f7f3eb] p-3">
               <summary className="cursor-pointer font-black">Thông tin kỹ thuật</summary>
               <dl className="mt-3 grid gap-2 sm:grid-cols-2">
                 <div>

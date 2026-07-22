@@ -14,7 +14,7 @@ export function MissionStatusBadge({ status, className }: { status: string; clas
   return (
     <span
       className={cn(
-        "inline-flex rounded-full px-3 py-1 text-xs font-black",
+        "type-caption inline-flex rounded-full px-3 py-1 font-black",
         statusClasses[status] ?? "bg-[#f4ecdc] text-[#5f5548]",
         className,
       )}

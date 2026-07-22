@@ -60,8 +60,8 @@ export function CreateSystemSettingForm({ onCreated }: { onCreated: (item: Syste
           <Plus size={19} />
         </span>
         <div>
-          <h2 className="font-black text-[#342f28]">Thêm cài đặt nâng cao</h2>
-          <p className="mt-1 text-sm leading-6 text-[#6f6558]">
+          <h2 className="type-card-title">Thêm cài đặt nâng cao</h2>
+          <p className="type-supporting mt-1 text-[#6f6558]">
             Chọn dạng giá trị trước. Mã kỹ thuật được đặt trong phần nâng cao để tránh nhập nhầm.
           </p>
         </div>
@@ -93,7 +93,7 @@ export function CreateSystemSettingForm({ onCreated }: { onCreated: (item: Syste
           description="Chỉ dùng khi cài đặt này cần nhiều giá trị liên quan."
           registration={form.register("text")}
           error={form.formState.errors.text?.message}
-          className="font-mono text-sm"
+          className="font-mono"
         />
       ) : (
         <TextField
@@ -107,7 +107,7 @@ export function CreateSystemSettingForm({ onCreated }: { onCreated: (item: Syste
       )}
 
       <details className="rounded-2xl bg-[#f5f2ec] p-4">
-        <summary className="cursor-pointer text-sm font-black text-[#4f463b]">Thiết lập nâng cao</summary>
+        <summary className="type-action cursor-pointer font-black text-[#4f463b]">Thiết lập nâng cao</summary>
         <div className="mt-3">
           <TextField
             id="new-setting-key"

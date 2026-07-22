@@ -112,7 +112,7 @@ function DroppableSlot({
         onClick={onAssign}
         className="min-w-0 text-left disabled:cursor-not-allowed"
       >
-        <strong className="block text-base">{slot.label}</strong>
+        <strong className="type-card-title block">{slot.label}</strong>
         <small className="mt-1 block leading-5 text-[#6f604b]">
           {item ? item.label : selectedItemId ? "Chạm để đặt vật đang chọn" : "Kéo một vật vào vùng này"}
         </small>
@@ -123,7 +123,7 @@ function DroppableSlot({
           disabled={disabled}
           aria-label={`Đưa ${item.label} trở lại danh sách`}
           onClick={onClear}
-          className="inline-flex min-h-10 items-center gap-1 rounded-xl border bg-white px-3 text-xs font-black"
+          className="type-caption inline-flex min-h-10 items-center gap-1 rounded-xl border bg-white px-3 font-black"
         >
           <RotateCcw size={15} /> Đổi
         </button>

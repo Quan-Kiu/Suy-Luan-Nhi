@@ -13,7 +13,7 @@ export function CheckboxField({ label, registration, error, description, classNa
   const id = props.id ?? registration.name;
   return (
     <div>
-      <label htmlFor={id} className="flex items-start gap-3 text-sm font-bold">
+      <label htmlFor={id} className="type-label flex items-start gap-3">
         <input
           {...props}
           {...registration}
@@ -25,12 +25,12 @@ export function CheckboxField({ label, registration, error, description, classNa
         <span>
           {label}
           {description ? (
-            <small className="mt-1 block font-normal text-[#806d54]">{description}</small>
+            <small className="type-supporting mt-1 block text-[#806d54]">{description}</small>
           ) : null}
         </span>
       </label>
       {error ? (
-        <p role="alert" className="mt-1 text-sm font-bold text-red-700">
+        <p role="alert" className="type-supporting mt-1 font-bold text-red-700">
           {error}
         </p>
       ) : null}

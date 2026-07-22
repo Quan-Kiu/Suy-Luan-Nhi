@@ -47,7 +47,7 @@ export function MissionDetailView({
           </div>
         </div>
         <div className="relative -mt-px bg-white p-5 text-center">
-          <h1 className="text-4xl leading-none font-black">{title}</h1>
+          <h1 className="type-child-page-title">{title}</h1>
           <p className="mt-3 font-bold text-[#8a6b39]">{subtitle}</p>
           <p className="mt-4 leading-7 text-[#715f47]">{storyIntro}</p>
         </div>
@@ -55,17 +55,17 @@ export function MissionDetailView({
       <div className="mt-4 grid grid-cols-3 gap-3">
         <Card className="p-3 text-center">
           <Clock3 className="mx-auto text-[#d97816]" />
-          <p className="mt-2 text-xs">Thời gian</p>
+          <p className="type-caption mt-2">Thời gian</p>
           <p className="font-black">{data.mission.estimatedMinutes} phút</p>
         </Card>
         <Card className="p-3 text-center">
           <Lightbulb className="mx-auto text-[#638c4e]" />
-          <p className="mt-2 text-xs">Kỹ năng</p>
-          <p className="text-sm font-black">{data.primarySkill.title}</p>
+          <p className="type-caption mt-2">Kỹ năng</p>
+          <p className="type-label font-black">{data.primarySkill.title}</p>
         </Card>
         <Card className="p-3 text-center">
           <span className="text-2xl">🧩</span>
-          <p className="mt-2 text-xs">Câu hỏi</p>
+          <p className="type-caption mt-2">Câu hỏi</p>
           <p className="font-black">{snapshot.questions?.length ?? 0}</p>
         </Card>
       </div>
@@ -79,11 +79,11 @@ export function MissionDetailView({
             className="size-20 object-contain"
           />
           <div>
-            <p className="flex items-center gap-2 text-xs font-black tracking-wider text-[#9a5f0e] uppercase">
+            <p className="type-overline flex items-center gap-2 font-black tracking-wider text-[#9a5f0e] uppercase">
               <Gift size={16} /> Phần thưởng
             </p>
-            <p className="mt-1 text-xl font-black">{data.badge.name}</p>
-            <p className="text-sm text-[#806d54]">{data.badge.description}</p>
+            <p className="type-child-section-title mt-1">{data.badge.name}</p>
+            <p className="type-supporting text-[#806d54]">{data.badge.description}</p>
           </div>
         </Card>
       ) : null}

@@ -127,18 +127,18 @@ export function ProductionMissionEditor({
           <div className="rounded-2xl border bg-white p-4 sm:p-5">
             <Link
               href="/admin/missions"
-              className="inline-flex items-center gap-2 text-sm font-black text-[#6f6558]"
+              className="type-action inline-flex items-center gap-2 font-black text-[#6f6558]"
             >
               <ArrowLeft size={17} /> Quay lại danh sách nhiệm vụ
             </Link>
             <div className="mt-3 flex flex-wrap items-end justify-between gap-3">
               <div>
-                <p className="text-xs font-bold text-[#756b60]">
+                <p className="type-caption font-bold text-[#756b60]">
                   {missionId
                     ? contentText(content, "missionEditor.modeEdit", "Đang chỉnh sửa nhiệm vụ")
                     : contentText(content, "missionEditor.modeCreate", "Tạo nhiệm vụ mới")}
                 </p>
-                <h1 className="text-3xl font-black">
+                <h1 className="type-page-title">
                   {title || contentText(content, "missionEditor.newTitle", "Nhiệm vụ chưa đặt tên")}
                 </h1>
               </div>
@@ -148,7 +148,7 @@ export function ProductionMissionEditor({
                   type="submit"
                   disabled={pending}
                   aria-busy={saveMutation.isPending || navigation.isPending}
-                  className="min-h-10 rounded-xl px-4 py-2 text-sm shadow-[0_4px_0_#bd4910]"
+                  className="min-h-10 rounded-xl px-4 py-2 shadow-[0_4px_0_#bd4910]"
                 >
                   <Save size={16} className="mr-2 inline" />
                   {saveMutation.isPending || navigation.isPending
@@ -178,8 +178,8 @@ export function ProductionMissionEditor({
 
           <div className="flex flex-wrap items-center justify-between gap-3 rounded-2xl border bg-white p-4 shadow-sm">
             <div>
-              <p className="text-sm font-black">Điền lần lượt các phần từ trên xuống.</p>
-              <p className="text-xs text-[#6f6558]">
+              <p className="type-label font-black">Điền lần lượt các phần từ trên xuống.</p>
+              <p className="type-caption text-[#6f6558]">
                 {allSafe
                   ? "Đã đủ điều kiện để gửi kiểm tra."
                   : "Hãy xác nhận đủ 6 mục an toàn trước khi gửi."}

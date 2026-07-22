@@ -65,12 +65,12 @@ export function QuestionOptionList({
 
   return (
     <fieldset className="rounded-2xl border bg-[#fffdf8] p-4">
-      <legend className="px-1 text-sm font-black">{title}</legend>
+      <legend className="type-label px-1">{title}</legend>
       <div className="mt-2 grid gap-3 2xl:grid-cols-2">
         {items.map((item, index) => (
           <div key={item.id} className="rounded-xl border bg-white p-3">
             <div className="mb-2 flex flex-wrap items-center justify-between gap-2">
-              <div className="flex flex-wrap items-center gap-3 text-xs font-bold">
+              <div className="type-caption flex flex-wrap items-center gap-3 font-bold">
                 <span className="rounded-full bg-[#f5f2ec] px-2.5 py-1 text-[#6f6558]">
                   {title} {index + 1}
                 </span>
@@ -156,7 +156,7 @@ export function QuestionOptionList({
       <button
         type="button"
         onClick={() => onChange([...items, { id: nextId(items), label: `${addLabel} ${items.length + 1}` }])}
-        className="mt-3 inline-flex min-h-10 items-center gap-2 rounded-xl border bg-white px-3 text-sm font-black"
+        className="type-action mt-3 inline-flex min-h-10 items-center gap-2 rounded-xl border bg-white px-3"
       >
         <Plus size={16} /> {addLabel}
       </button>

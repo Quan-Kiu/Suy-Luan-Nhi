@@ -150,13 +150,14 @@ export function ContentManager({ initialData, initialFilters: providedFilters = 
             <Sparkles size={21} />
           </span>
           <div>
-            <h2 className="text-xl font-black text-[#342f28]">Chọn nơi cần sửa câu chữ</h2>
-            <p className="mt-1 max-w-3xl text-sm leading-6 text-[#6f6558]">
+            <h2 className="type-section-title">Chọn nơi cần sửa câu chữ</h2>
+            <p className="type-supporting mt-1 max-w-3xl text-[#6f6558]">
               Bắt đầu từ khu vực người dùng đang nhìn thấy. Mã kỹ thuật chỉ nằm trong phần thông tin nâng cao.
             </p>
           </div>
         </div>
-        <div className="-mx-1 mt-5 flex snap-x snap-mandatory gap-3 overflow-x-auto px-1 pb-2 sm:mx-0 sm:grid sm:grid-cols-2 sm:overflow-visible sm:px-0 sm:pb-0 xl:grid-cols-4">
+        <p className="type-caption mt-4 text-[#6f6558] sm:hidden">Vuốt ngang để xem thêm khu vực.</p>
+        <div className="-mx-1 mt-2 flex snap-x snap-mandatory gap-3 overflow-x-auto px-1 pb-2 sm:mx-0 sm:mt-5 sm:grid sm:grid-cols-2 sm:overflow-visible sm:px-0 sm:pb-0 xl:grid-cols-4">
           {visibleAreas.map((area) => {
             const active = filters.namespace === area.value;
             return (
@@ -166,14 +167,14 @@ export function ContentManager({ initialData, initialFilters: providedFilters = 
                 aria-pressed={active}
                 onClick={() => chooseArea(active ? "" : area.value)}
                 className={cn(
-                  "min-h-20 min-w-[16rem] snap-start rounded-2xl border p-4 text-left transition sm:min-w-0",
+                  "min-h-18 min-w-[13rem] snap-start rounded-2xl border p-3 text-left transition sm:min-h-20 sm:min-w-0 sm:p-4",
                   active
                     ? "border-[#d85b18] bg-[#fff0df] shadow-sm"
                     : "border-[#e5d8c2] bg-white hover:border-[#d7b995] hover:bg-[#fffdf8]",
                 )}
               >
                 <span className="block font-black text-[#3f392f]">{area.shortLabel}</span>
-                <span className="mt-1 block text-xs leading-5 text-[#6f6558]">{area.description}</span>
+                <span className="type-caption mt-1 block text-[#6f6558]">{area.description}</span>
               </button>
             );
           })}
@@ -181,7 +182,7 @@ export function ContentManager({ initialData, initialFilters: providedFilters = 
       </section>
 
       {!canEdit ? (
-        <section className="rounded-2xl border border-blue-200 bg-blue-50 p-4 text-sm leading-6 text-blue-900">
+        <section className="type-supporting rounded-2xl border border-blue-200 bg-blue-50 p-4 text-blue-900">
           <p className="font-black">Bạn chỉ có thể xem, chưa thể sửa</p>
           <p className="mt-1">
             Bạn có thể tìm và đối chiếu câu chữ. Chỉ người phụ trách biên tập hoặc quản trị viên mới có thể
@@ -199,7 +200,7 @@ export function ContentManager({ initialData, initialFilters: providedFilters = 
       >
         <div className="grid gap-4 lg:grid-cols-[minmax(0,1fr)_280px_auto] lg:items-end">
           <label className="block">
-            <span className="mb-2 block text-sm font-black text-[#3f392f]">Tìm câu chữ</span>
+            <span className="type-label mb-2 block font-black text-[#3f392f]">Tìm câu chữ</span>
             <span className="relative block">
               <Search className="absolute top-3.5 left-3 text-[#887b6c]" size={18} />
               <input
@@ -216,7 +217,7 @@ export function ContentManager({ initialData, initialFilters: providedFilters = 
             </span>
           </label>
           <label className="block">
-            <span className="mb-2 block text-sm font-black text-[#3f392f]">Khu vực hiển thị</span>
+            <span className="type-label mb-2 block font-black text-[#3f392f]">Khu vực hiển thị</span>
             <select
               name="namespace"
               value={draft.namespace}
@@ -251,7 +252,7 @@ export function ContentManager({ initialData, initialFilters: providedFilters = 
           </summary>
           <div className="mt-4 grid gap-4 sm:grid-cols-2">
             <label>
-              <span className="mb-2 block text-sm font-black text-[#3f392f]">Phần trên màn hình</span>
+              <span className="type-label mb-2 block font-black text-[#3f392f]">Phần trên màn hình</span>
               <select
                 name="category"
                 value={draft.category}
@@ -267,7 +268,7 @@ export function ContentManager({ initialData, initialFilters: providedFilters = 
               </select>
             </label>
             <label>
-              <span className="mb-2 block text-sm font-black text-[#3f392f]">Loại câu chữ</span>
+              <span className="type-label mb-2 block font-black text-[#3f392f]">Loại câu chữ</span>
               <select
                 name="valueType"
                 value={draft.valueType}
@@ -298,14 +299,14 @@ export function ContentManager({ initialData, initialFilters: providedFilters = 
       <section className="relative space-y-4" aria-busy={query.isFetching}>
         <div className="flex flex-wrap items-center justify-between gap-3">
           <div>
-            <p className="text-lg font-black text-[#342f28]">{data.total} nội dung phù hợp</p>
-            <p className="mt-1 text-sm text-[#6f6558]">
+            <p className="type-card-title text-[#342f28]">{data.total} nội dung phù hợp</p>
+            <p className="type-supporting mt-1 text-[#6f6558]">
               {filters.namespace
                 ? `Đang xem ${getContentAreaMeta(filters.namespace).label.toLocaleLowerCase("vi")}.`
                 : "Đang xem câu chữ ở tất cả khu vực."}
             </p>
           </div>
-          <label className="flex items-center gap-2 text-sm font-bold text-[#6f6558]">
+          <label className="type-label flex items-center gap-2 font-bold text-[#6f6558]">
             Mỗi trang
             <select
               value={filters.pageSize}
@@ -335,8 +336,8 @@ export function ContentManager({ initialData, initialFilters: providedFilters = 
 
         {query.isError ? (
           <div role="alert" className="rounded-3xl border border-red-200 bg-red-50 p-6 text-red-900">
-            <p className="text-lg font-black">Chưa tải được danh sách câu chữ</p>
-            <p className="mt-2 text-sm leading-6">
+            <p className="type-card-title">Chưa tải được danh sách câu chữ</p>
+            <p className="type-supporting mt-2">
               Kiểm tra kết nối rồi thử tải lại. Các thay đổi trước đó không bị mất.
             </p>
             <button
@@ -364,14 +365,14 @@ export function ContentManager({ initialData, initialFilters: providedFilters = 
                 >
                   <div className="flex flex-wrap items-start justify-between gap-3">
                     <div className="min-w-0">
-                      <p className="text-sm font-black text-[#9f3d0b]">
+                      <p className="type-label font-black text-[#9f3d0b]">
                         {area.shortLabel} <span aria-hidden="true">›</span> {categoryLabel}
                       </p>
-                      <p className="mt-1.5 line-clamp-2 max-w-3xl text-sm leading-5 text-[#6f6558]">
+                      <p className="type-supporting mt-1.5 line-clamp-2 max-w-3xl text-[#6f6558]">
                         {getContentLocationSummary(row.namespace, row.category, row.key, row.value)}
                       </p>
                     </div>
-                    <div className="flex flex-wrap gap-2 text-xs font-black">
+                    <div className="type-caption flex flex-wrap gap-2 font-black">
                       <span className="rounded-full bg-[#eef4e4] px-2.5 py-1 text-[#557047]">
                         {purpose.label}
                       </span>
@@ -389,15 +390,15 @@ export function ContentManager({ initialData, initialFilters: providedFilters = 
                   </div>
 
                   <div className="mt-3 rounded-xl border border-[#eadfc9] bg-[#fffaf0] p-3">
-                    <p className="flex items-center gap-2 text-xs font-black tracking-wide text-[#756b60] uppercase">
+                    <p className="type-overline flex items-center gap-2 font-black tracking-wide text-[#756b60] uppercase">
                       <Eye size={15} /> Người dùng đang nhìn thấy
                     </p>
-                    <p className="mt-1.5 line-clamp-3 text-sm leading-6 font-bold whitespace-pre-wrap text-[#342f28]">
+                    <p className="type-supporting mt-1.5 line-clamp-3 font-bold whitespace-pre-wrap text-[#342f28]">
                       {contentPreviewText(row.value)}
                     </p>
                   </div>
 
-                  <details className="mt-3 rounded-xl bg-[#f7f3eb] p-2.5 text-xs text-[#6f6558]">
+                  <details className="type-caption mt-3 rounded-xl bg-[#f7f3eb] p-2.5 text-[#6f6558]">
                     <summary className="cursor-pointer font-black text-[#4f463b]">
                       Thông tin dành cho đội kỹ thuật
                     </summary>
@@ -420,8 +421,8 @@ export function ContentManager({ initialData, initialFilters: providedFilters = 
 
             {!data.items.length ? (
               <div className="rounded-3xl border border-dashed border-[#d9c9ae] bg-white p-8 text-center">
-                <p className="text-lg font-black text-[#342f28]">Chưa tìm thấy câu chữ phù hợp</p>
-                <p className="mx-auto mt-2 max-w-xl text-sm leading-6 text-[#6f6558]">
+                <p className="type-card-title text-[#342f28]">Chưa tìm thấy câu chữ phù hợp</p>
+                <p className="type-supporting mx-auto mt-2 max-w-xl text-[#6f6558]">
                   Thử dùng từ người dùng thật sự nhìn thấy, chọn khu vực khác hoặc xóa bộ lọc hiện tại.
                 </p>
                 {hasFilters ? (
@@ -455,7 +456,7 @@ export function ContentManager({ initialData, initialFilters: providedFilters = 
             >
               <ChevronLeft size={18} /> Trang trước
             </button>
-            <span className="text-sm font-black text-[#6f6558]">
+            <span className="type-label font-black text-[#6f6558]">
               Trang {data.page} trên {data.totalPages}
             </span>
             <button

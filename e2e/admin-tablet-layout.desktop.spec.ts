@@ -47,7 +47,7 @@ async function expectAdminShellMatchesViewport(page: import("@playwright/test").
   const menuButton = page.getByRole("button", { name: "Mở menu quản trị" });
   const desktopNavigation = page.locator("aside").first();
 
-  if (width < 1024) {
+  if (width < 1280) {
     await expect(menuButton).toBeVisible();
     await expect(desktopNavigation).toBeHidden();
   } else {
@@ -81,7 +81,7 @@ test("world cards keep readable controls on tablet", async ({ page }) => {
   await page.setViewportSize({ width: 820, height: 1180 });
   await signIn(page, "admin@demo.local", "/admin/worlds");
 
-  const cards = page.locator('article[aria-label^="Chủ đề nhiệm vụ:"]');
+  const cards = page.locator('[role="article"][aria-label^="Chủ đề nhiệm vụ:"]');
   await expect(cards.first()).toBeVisible();
   await page.waitForTimeout(1000);
   await expect(cards.first()).toBeVisible();

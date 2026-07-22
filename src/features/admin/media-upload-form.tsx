@@ -69,10 +69,10 @@ export function MediaUploadForm({ onUploaded }: { onUploaded: (item: MediaItem) 
       onSubmit={form.handleSubmit((values) => mutation.mutate(values))}
       noValidate
     >
-      <h2 className="text-xl font-black">
+      <h2 className="type-section-title">
         {contentText(content, "media.uploadTitle", "Thêm hình ảnh, âm thanh hoặc video")}
       </h2>
-      <p className="mt-1 text-sm text-[#806d54]">
+      <p className="type-supporting mt-1 text-[#806d54]">
         {contentText(
           content,
           "media.uploadDescription",
@@ -83,7 +83,7 @@ export function MediaUploadForm({ onUploaded }: { onUploaded: (item: MediaItem) 
         <label className="grid content-start gap-2 font-bold md:col-span-2 2xl:col-span-1">
           <span>Tệp hình ảnh, âm thanh hoặc video</span>
           <span className="relative flex min-h-12 items-stretch overflow-hidden rounded-2xl border-2 border-[#eadfc9] bg-[#fffdf8] transition outline-none focus-within:border-[#e9641a]">
-            <span className="inline-flex shrink-0 items-center border-r border-[#eadfc9] bg-[#fff7e9] px-4 text-sm font-black text-[#5e4b34]">
+            <span className="type-label inline-flex shrink-0 items-center border-r border-[#eadfc9] bg-[#fff7e9] px-4 font-black text-[#5e4b34]">
               Chọn tệp
             </span>
             <span className="min-w-0 flex-1 truncate px-3 py-3 font-normal text-[#6f6558]">
@@ -110,8 +110,8 @@ export function MediaUploadForm({ onUploaded }: { onUploaded: (item: MediaItem) 
             aria-hidden={fileError || policySummary ? undefined : true}
             className={
               fileError
-                ? "min-h-5 text-sm leading-5 font-bold text-red-700"
-                : "min-h-5 text-xs leading-5 font-bold text-[#6f6558]"
+                ? "type-supporting min-h-5 font-bold text-red-700"
+                : "type-caption min-h-5 leading-5 font-bold text-[#6f6558]"
             }
           >
             {fileError ?? (policySummary ? `Yêu cầu đối với ảnh: ${policySummary}.` : "\u00a0")}

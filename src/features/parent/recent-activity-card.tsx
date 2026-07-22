@@ -34,10 +34,10 @@ export function RecentActivityCard({
   return (
     <Card className="p-5">
       <div className="flex items-center justify-between">
-        <h2 className="text-xl font-black">
+        <h2 className="type-section-title">
           {contentText(content, "dashboard.recentTitle", "Hoạt động gần đây")}
         </h2>
-        <Link href="/parent/activity" className="text-sm font-bold underline">
+        <Link href="/parent/activity" className="type-action font-bold underline">
           {contentText(content, "dashboard.viewAll", "Xem tất cả")}
         </Link>
       </div>
@@ -54,12 +54,12 @@ export function RecentActivityCard({
               />
               <div className="flex-1">
                 <p className="font-black">{item.missionTitle}</p>
-                <p className="text-xs text-[#786348]">{statusText(item, content)}</p>
+                <p className="type-caption text-[#786348]">{statusText(item, content)}</p>
               </div>
             </div>
           ))
         ) : (
-          <p className="rounded-2xl bg-[#f7f1e5] p-5 text-center text-sm">
+          <p className="type-supporting rounded-2xl bg-[#f7f1e5] p-5 text-center">
             {contentText(
               content,
               "dashboard.emptyActivity",

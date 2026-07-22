@@ -107,7 +107,7 @@ export function SkillForm({ item }: { item: SkillItem }) {
           {contentText(content, "taxonomy.save", "Lưu thay đổi")}
         </SubmitButton>
       </div>
-      <details className="rounded-xl bg-[#f7f3eb] p-3 text-xs text-[#6f6558]">
+      <details className="type-caption rounded-xl bg-[#f7f3eb] p-3 text-[#6f6558]">
         <summary className="cursor-pointer font-black text-[#4f463b]">
           Thông tin dành cho đội kỹ thuật
         </summary>

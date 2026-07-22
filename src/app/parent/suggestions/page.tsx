@@ -10,7 +10,7 @@ export default async function Page() {
   const items = await getSuggestions(active.child.ageGroup);
   return (
     <>
-      <h1 className="text-3xl font-black">Gợi ý trò chuyện</h1>
+      <h1 className="type-page-title">Gợi ý trò chuyện</h1>
       <p className="mt-2 text-[#786348]">
         Những câu hỏi ngắn giúp bé kể lại cách nghĩ mà không biến cuộc trò chuyện thành bài kiểm tra.
       </p>
@@ -23,9 +23,9 @@ export default async function Page() {
               </span>
               {item.ageGroup ? <Pill>{item.ageGroup} tuổi</Pill> : <Pill>Mọi độ tuổi</Pill>}
             </div>
-            <h2 className="mt-4 text-xl font-black">{item.title}</h2>
-            <p className="mt-3 rounded-2xl bg-[#fff5d8] p-4 text-lg font-black">“{item.questionText}”</p>
-            <p className="mt-3 text-sm text-[#6f604b]">{item.purpose}</p>
+            <h2 className="type-section-title mt-4">{item.title}</h2>
+            <p className="type-lead mt-3 rounded-2xl bg-[#fff5d8] p-4 font-black">“{item.questionText}”</p>
+            <p className="type-supporting mt-3 text-[#6f604b]">{item.purpose}</p>
           </Card>
         ))}
       </div>

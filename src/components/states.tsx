@@ -19,8 +19,8 @@ function StateCard({
   return (
     <Card className={cn("grid place-items-center p-8 text-center", className)}>
       {icon}
-      <h2 className="mt-3 text-xl font-black">{title}</h2>
-      {description ? <p className="mt-2 max-w-md text-sm text-[#806d54]">{description}</p> : null}
+      <h2 className="type-section-title mt-3">{title}</h2>
+      {description ? <p className="type-supporting mt-2 max-w-md text-[#806d54]">{description}</p> : null}
       {action ? <div className="mt-4">{action}</div> : null}
     </Card>
   );

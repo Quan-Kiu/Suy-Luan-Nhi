@@ -59,10 +59,10 @@ export function MissionQuestionEditor({
     <Card className={`rounded-2xl p-4 shadow-sm ${active ? "ring-2 ring-[#e9641a]" : ""}`}>
       <div className="flex flex-wrap items-center gap-2">
         <button type="button" onClick={onActivate} className="mr-auto text-left">
-          <p className="text-xs font-bold text-[#806d54]">
+          <p className="type-caption font-bold text-[#806d54]">
             {contentText(content, "missionEditor.question", "Câu")} {index + 1}
           </p>
-          <h3 className="font-black">
+          <h3 className="type-card-title">
             {contentText(content, questionTypeLabelKeys[question.type], typeFallbacks[question.type])}
           </h3>
         </button>
@@ -207,7 +207,7 @@ export function MissionQuestionEditor({
         <button
           type="button"
           onClick={onActivate}
-          className="mt-3 w-full rounded-xl bg-[#f7f3eb] p-3 text-left text-sm text-[#6f6558]"
+          className="type-action mt-3 w-full rounded-xl bg-[#f7f3eb] p-3 text-left text-[#6f6558]"
         >
           <strong className="block text-[#342f28]">{question.prompt}</strong>
           Chọn để mở và chỉnh sửa câu hỏi này.

@@ -28,7 +28,7 @@ export default function ErrorPage({
     >
       <section className="w-full max-w-md rounded-[28px] border bg-white p-7 text-center shadow-xl">
         <p className="text-5xl">🧭</p>
-        <h1 className="mt-4 text-3xl font-black">Bống bị lạc một chút</h1>
+        <h1 className="type-page-title mt-4">Bống bị lạc một chút</h1>
         <p className="mt-3 text-[#806d54]">Dữ liệu của gia đình vẫn an toàn. Hãy thử tải lại phần này.</p>
         <div className="mt-5 grid gap-3 sm:grid-cols-2">
           <Button type="button" onClick={reset} className="w-full">
@@ -41,7 +41,7 @@ export default function ErrorPage({
             <ArrowLeft className="mr-2" size={18} /> {home.label}
           </Link>
         </div>
-        {error.digest ? <p className="mt-3 text-xs text-[#9a8972]">Mã sự cố: {error.digest}</p> : null}
+        {error.digest ? <p className="type-caption mt-3 text-[#9a8972]">Mã sự cố: {error.digest}</p> : null}
       </section>
     </main>
   );

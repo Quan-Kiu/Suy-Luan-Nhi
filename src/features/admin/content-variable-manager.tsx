@@ -67,8 +67,8 @@ export function ContentVariableManager({ initial }: { initial: ContentVariableDe
               <Braces size={21} />
             </span>
             <div>
-              <h2 className="text-lg font-black">Cách dùng tag trong nội dung</h2>
-              <p className="mt-1 text-sm leading-6 text-[#6f6558]">
+              <h2 className="type-card-title">Cách dùng tag trong nội dung</h2>
+              <p className="type-supporting mt-1 text-[#6f6558]">
                 Người soạn gõ hai dấu ngoặc nhọn{" "}
                 <code className="rounded bg-white px-1.5 py-0.5 font-bold">{"{{"}</code> để mở gợi ý, hoặc bấm
                 “Chèn biến”. Dữ liệu thật chỉ được thay thế khi hiển thị cho bé.
@@ -84,11 +84,11 @@ export function ContentVariableManager({ initial }: { initial: ContentVariableDe
               description="Dùng các tag đang cấu hình để xem kết quả mẫu."
             />
             <div className="grid content-start gap-2">
-              <span className="font-bold">Kết quả xem trước</span>
+              <span className="type-label">Kết quả xem trước</span>
               <div className="min-h-[96px] rounded-2xl border-2 border-[#eadfc9] bg-white px-4 py-3">
                 <p className="leading-7 font-bold">{renderContentTemplatePreview(previewText, variables)}</p>
               </div>
-              <span className="min-h-5 text-sm leading-5 font-normal text-[#806d54]">
+              <span className="type-supporting min-h-5 text-[#806d54]">
                 Tag được thay bằng dữ liệu xem trước của từng cấu hình.
               </span>
             </div>
@@ -106,24 +106,22 @@ export function ContentVariableManager({ initial }: { initial: ContentVariableDe
               >
                 <summary className="flex min-h-16 cursor-pointer list-none items-center justify-between gap-3 px-4 py-3 marker:hidden">
                   <div className="min-w-0">
-                    <p className="text-[11px] font-black tracking-wider text-[#8a6b39] uppercase">
-                      Tag {index + 1}
-                    </p>
+                    <p className="type-overline text-[#8a6b39]">Tag {index + 1}</p>
                     <div className="mt-1 flex flex-wrap items-center gap-2">
-                      <h3 className="font-mono text-base font-black">{`{{${variables[index]?.key || "tag_moi"}}}`}</h3>
-                      <span className="truncate text-sm font-bold text-[#6f6558]">
+                      <h3 className="type-card-title font-mono">{`{{${variables[index]?.key || "tag_moi"}}}`}</h3>
+                      <span className="type-label truncate font-bold text-[#6f6558]">
                         {variables[index]?.label || "Chưa đặt tên dễ hiểu"}
                       </span>
                     </div>
                   </div>
                   <div className="flex shrink-0 items-center gap-2">
-                    <span className="hidden rounded-full bg-[#f5f2ec] px-2.5 py-1 text-xs font-bold text-[#6f6558] sm:inline">
+                    <span className="type-caption hidden rounded-full bg-[#f5f2ec] px-2.5 py-1 font-bold text-[#6f6558] sm:inline">
                       {contentVariableSourceOptions.find(
                         (option) => option.value === variables[index]?.source,
                       )?.label ?? "Nguồn dữ liệu"}
                     </span>
                     <span
-                      className={`rounded-full px-2.5 py-1 text-xs font-black ${
+                      className={`type-caption rounded-full px-2.5 py-1 font-black ${
                         variables[index]?.enabled
                           ? "bg-green-100 text-green-800"
                           : "bg-stone-200 text-stone-700"
@@ -144,7 +142,7 @@ export function ContentVariableManager({ initial }: { initial: ContentVariableDe
                       <button
                         type="button"
                         onClick={() => fields.remove(index)}
-                        className="inline-flex min-h-10 items-center gap-1.5 rounded-xl border border-red-200 bg-red-50 px-3 text-sm font-black text-red-700"
+                        className="type-action inline-flex min-h-10 items-center gap-1.5 rounded-xl border border-red-200 bg-red-50 px-3 text-red-700"
                       >
                         <Trash2 size={16} /> Bỏ tag mới
                       </button>
@@ -201,7 +199,7 @@ export function ContentVariableManager({ initial }: { initial: ContentVariableDe
                     />
                   </div>
                   {!variables[index]?.enabled ? (
-                    <p className="mt-3 rounded-xl bg-[#f5f2ec] px-3 py-2 text-sm text-[#6f6558]">
+                    <p className="type-supporting mt-3 rounded-xl bg-[#f5f2ec] px-3 py-2 text-[#6f6558]">
                       Tag đang tắt nên sẽ không xuất hiện trong gợi ý khi viết nội dung. Nội dung cũ vẫn được
                       thay thế bằng dữ liệu hoặc giá trị dự phòng.
                     </p>

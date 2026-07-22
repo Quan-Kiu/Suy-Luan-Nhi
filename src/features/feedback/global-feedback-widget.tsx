@@ -260,13 +260,13 @@ export function GlobalFeedbackWidget() {
                 className="z-20 flex shrink-0 items-start justify-between gap-4 border-b border-[#eadfc9] bg-[#fffdf8]/95 px-5 pt-[max(1.25rem,env(safe-area-inset-top))] pb-4 backdrop-blur sm:px-6 sm:pt-6 sm:pb-5"
               >
                 <div>
-                  <p className="text-sm font-bold text-[#9a6845]">
+                  <p className="type-supporting font-bold text-[#9a6845]">
                     {contentText(common, "feedback.eyebrow", "Góp ý nhanh")}
                   </p>
-                  <h2 id={dialogTitleId} className="text-2xl font-black text-[#342f28]">
+                  <h2 id={dialogTitleId} className="type-section-title">
                     {contentText(common, "feedback.title", "Bạn muốn chúng tôi cải thiện điều gì?")}
                   </h2>
-                  <p className="mt-1 text-sm leading-6 text-[#6f604b]">
+                  <p className="type-supporting mt-1 text-[#6f604b]">
                     {configQuery.data.maxAttachments > 0
                       ? "Ảnh trang hiện tại sẽ được chuẩn bị sẵn. Bạn chỉ cần nhập nội dung và gửi."
                       : "Bạn chỉ cần nhập nội dung và gửi góp ý."}
@@ -307,10 +307,10 @@ export function GlobalFeedbackWidget() {
                   <section className="rounded-2xl border border-[#eadfc9] bg-[#fff8ec] p-4">
                     <div className="flex flex-wrap items-start justify-between gap-3">
                       <div>
-                        <h3 className="flex items-center gap-2 font-black text-[#342f28]">
+                        <h3 className="type-card-title flex items-center gap-2">
                           <Camera size={18} /> Ảnh đính kèm
                         </h3>
-                        <p className="mt-1 text-xs font-bold text-[#806d54]">
+                        <p className="type-caption mt-1 font-bold text-[#806d54]">
                           {configQuery.data.maxAttachments > 0
                             ? `${policySummary} mỗi ảnh · tối đa ${configQuery.data.maxAttachments} ảnh.`
                             : "Ảnh đính kèm đang tắt."}
@@ -322,7 +322,7 @@ export function GlobalFeedbackWidget() {
                             type="button"
                             disabled={capturing || mutation.isPending}
                             onClick={() => void takeScreenshot()}
-                            className="inline-flex min-h-10 cursor-pointer items-center gap-2 rounded-xl border bg-white px-3 text-sm font-black hover:bg-[#fff2df] disabled:cursor-wait disabled:opacity-60"
+                            className="type-action inline-flex min-h-10 cursor-pointer items-center gap-2 rounded-xl border bg-white px-3 hover:bg-[#fff2df] disabled:cursor-wait disabled:opacity-60"
                           >
                             {capturing ? (
                               <LoaderCircle size={16} className="animate-spin" />
@@ -331,7 +331,7 @@ export function GlobalFeedbackWidget() {
                             )}
                             Chụp lại trang
                           </button>
-                          <label className="inline-flex min-h-10 cursor-pointer items-center gap-2 rounded-xl border bg-white px-3 text-sm font-black hover:bg-[#fff2df]">
+                          <label className="type-label inline-flex min-h-10 cursor-pointer items-center gap-2 rounded-xl border bg-white px-3 font-black hover:bg-[#fff2df]">
                             <ImagePlus size={16} /> Thay bằng ảnh từ máy
                             <input
                               ref={fileInputRef}
@@ -350,7 +350,7 @@ export function GlobalFeedbackWidget() {
                     </div>
 
                     {configQuery.data.maxAttachments === 0 ? (
-                      <p className="mt-4 rounded-xl border border-dashed bg-white p-4 text-center text-sm text-[#806d54]">
+                      <p className="type-supporting mt-4 rounded-xl border border-dashed bg-white p-4 text-center text-[#806d54]">
                         {contentText(
                           common,
                           "feedback.attachmentsDisabled",
@@ -358,7 +358,7 @@ export function GlobalFeedbackWidget() {
                         )}
                       </p>
                     ) : capturing ? (
-                      <div className="mt-4 flex min-h-36 items-center justify-center gap-2 rounded-xl border border-dashed bg-white text-sm font-bold text-[#6f604b]">
+                      <div className="type-label mt-4 flex min-h-36 items-center justify-center gap-2 rounded-xl border border-dashed bg-white font-bold text-[#6f604b]">
                         <LoaderCircle size={20} className="animate-spin" /> Đang chuẩn bị ảnh trang hiện
                         tại...
                       </div>
@@ -370,7 +370,7 @@ export function GlobalFeedbackWidget() {
                               <PreviewImage file={file} alt={`Ảnh góp ý ${index + 1}`} />
                             </div>
                             <div className="flex items-center justify-between gap-2 p-3">
-                              <span className="flex min-w-0 items-center gap-2 truncate text-xs font-bold text-[#6f604b]">
+                              <span className="type-caption flex min-w-0 items-center gap-2 truncate font-bold text-[#6f604b]">
                                 {imageSource === "auto" ? (
                                   <CheckCircle2 size={15} className="text-green-700" />
                                 ) : null}
@@ -393,17 +393,17 @@ export function GlobalFeedbackWidget() {
                         ))}
                       </div>
                     ) : (
-                      <p className="mt-4 rounded-xl border border-dashed bg-white p-4 text-center text-sm text-[#806d54]">
+                      <p className="type-supporting mt-4 rounded-xl border border-dashed bg-white p-4 text-center text-[#806d54]">
                         Không có ảnh đính kèm. Góp ý vẫn có thể được gửi.
                       </p>
                     )}
                     {captureError ? (
-                      <p role="alert" className="mt-3 text-sm font-bold text-amber-800">
+                      <p role="alert" className="type-supporting mt-3 font-bold text-amber-800">
                         {captureError}
                       </p>
                     ) : null}
                     {configQuery.data.maxAttachments > 0 ? (
-                      <p className="mt-3 text-xs leading-5 text-[#806d54]">
+                      <p className="type-caption mt-3 text-[#806d54]">
                         {contentText(
                           common,
                           "feedback.capturePrivacy",

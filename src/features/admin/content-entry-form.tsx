@@ -161,7 +161,7 @@ export function ContentEntryForm({
   return (
     <>
       <details className="group mt-3 overflow-hidden rounded-xl border border-[#e5d8c2] bg-[#fffdf8]">
-        <summary className="flex min-h-11 cursor-pointer list-none items-center justify-between gap-3 px-3.5 py-2.5 text-sm font-black text-[#3f392f] marker:hidden">
+        <summary className="type-action flex min-h-11 cursor-pointer list-none items-center justify-between gap-3 px-3.5 py-2.5 font-black text-[#3f392f] marker:hidden">
           <span className="inline-flex items-center gap-2">
             <Pencil size={17} /> Chỉnh sửa câu chữ
           </span>
@@ -174,7 +174,10 @@ export function ContentEntryForm({
           noValidate
         >
           {fieldError ? (
-            <div role="alert" className="rounded-xl border border-red-200 bg-red-50 p-3 text-sm text-red-800">
+            <div
+              role="alert"
+              className="type-supporting rounded-xl border border-red-200 bg-red-50 p-3 text-red-800"
+            >
               <p className="font-black">Cần kiểm tra lại câu chữ</p>
               <a href={`#${fieldId}`} className="mt-1 inline-block font-bold underline">
                 {fieldError}
@@ -202,12 +205,12 @@ export function ContentEntryForm({
               disabled={!interactive}
               registration={form.register("text")}
               error={fieldError}
-              className={purpose.editor === "structured" ? "font-mono text-sm" : undefined}
+              className={purpose.editor === "structured" ? "font-mono" : undefined}
             />
           )}
 
           {typeof item.value === "string" ? (
-            <div className="flex flex-wrap items-center justify-between gap-2 text-xs font-bold text-[#6f6558]">
+            <div className="type-caption flex flex-wrap items-center justify-between gap-2 font-bold text-[#6f6558]">
               <span>{form.formState.isDirty ? "Có thay đổi chưa lưu" : "Chưa có thay đổi mới"}</span>
               <span className={lengthGuidance && text.length > lengthGuidance ? "text-amber-800" : undefined}>
                 {text.length} ký tự{lengthGuidance ? ` · khuyên dùng tối đa ${lengthGuidance}` : ""}
@@ -217,8 +220,10 @@ export function ContentEntryForm({
 
           {item.source === "database" && item.hasDefault ? (
             <div className="rounded-xl bg-[#f5f2ec] p-3">
-              <p className="text-xs font-black tracking-wide text-[#756b60] uppercase">Câu chữ ban đầu</p>
-              <p className="mt-1 text-sm leading-6 whitespace-pre-wrap text-[#4f463b]">
+              <p className="type-overline font-black tracking-wide text-[#756b60] uppercase">
+                Câu chữ ban đầu
+              </p>
+              <p className="type-supporting mt-1 whitespace-pre-wrap text-[#4f463b]">
                 {contentPreviewText(item.defaultValue)}
               </p>
             </div>

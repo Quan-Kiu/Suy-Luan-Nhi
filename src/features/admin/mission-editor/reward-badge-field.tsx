@@ -29,11 +29,11 @@ export function MissionRewardBadgeField({ badges }: { badges: BadgeOption[] }) {
     >
       <div className="flex flex-wrap items-start justify-between gap-3">
         <div className="min-w-0">
-          <h3 id="mission-reward-badge-title" className="flex items-center gap-2 text-base font-black">
+          <h3 id="mission-reward-badge-title" className="type-card-title flex items-center gap-2">
             <Award aria-hidden="true" size={20} className="text-[#a65420]" />
             {contentText(content, "missionEditor.rewardSectionTitle", "Huy hiệu khi hoàn thành")}
           </h3>
-          <p id="mission-reward-badge-description" className="mt-1 max-w-2xl text-sm text-[#6f6558]">
+          <p id="mission-reward-badge-description" className="type-supporting mt-1 max-w-2xl text-[#6f6558]">
             {contentText(
               content,
               "missionEditor.rewardSectionDescription",
@@ -43,7 +43,7 @@ export function MissionRewardBadgeField({ badges }: { badges: BadgeOption[] }) {
         </div>
         <Link
           href="/admin/badges"
-          className="inline-flex min-h-10 items-center gap-2 rounded-xl border bg-white px-3 py-2 text-sm font-black text-[#51483d] hover:bg-[#f4eee4] focus-visible:outline-2 focus-visible:outline-offset-2"
+          className="type-action inline-flex min-h-10 items-center gap-2 rounded-xl border bg-white px-3 py-2 font-black text-[#51483d] hover:bg-[#f4eee4] focus-visible:outline-2 focus-visible:outline-offset-2"
         >
           <Settings2 aria-hidden="true" size={16} />
           {contentText(content, "missionEditor.manageBadges", "Quản lý huy hiệu")}
@@ -79,7 +79,7 @@ export function MissionRewardBadgeField({ badges }: { badges: BadgeOption[] }) {
               <span className="block font-black">
                 {contentText(content, "missionEditor.noRewardTitle", "Không trao huy hiệu")}
               </span>
-              <span className="mt-1 block text-xs text-[#6f6558]">
+              <span className="type-caption mt-1 block text-[#6f6558]">
                 {contentText(
                   content,
                   "missionEditor.noRewardDescription",
@@ -116,7 +116,7 @@ export function MissionRewardBadgeField({ badges }: { badges: BadgeOption[] }) {
                 </span>
                 <span className="min-w-0">
                   <span className="block font-black">{badge.name}</span>
-                  <span className="mt-1 block text-xs text-[#6f6558]">
+                  <span className="type-caption mt-1 block text-[#6f6558]">
                     {badge.active
                       ? contentText(content, "missionEditor.badgeAvailable", "Sẵn sàng trao cho bé")
                       : contentText(
@@ -136,7 +136,7 @@ export function MissionRewardBadgeField({ badges }: { badges: BadgeOption[] }) {
       </fieldset>
 
       {selectableBadges.length === 0 ? (
-        <p className="mt-3 rounded-xl border border-dashed bg-white px-3 py-2 text-sm text-[#6f6558]">
+        <p className="type-supporting mt-3 rounded-xl border border-dashed bg-white px-3 py-2 text-[#6f6558]">
           {contentText(
             content,
             "missionEditor.noBadgesAvailable",
@@ -145,7 +145,7 @@ export function MissionRewardBadgeField({ badges }: { badges: BadgeOption[] }) {
         </p>
       ) : null}
       {error ? (
-        <p role="alert" className="mt-2 text-sm font-bold text-red-700">
+        <p role="alert" className="type-supporting mt-2 font-bold text-red-700">
           {error}
         </p>
       ) : null}

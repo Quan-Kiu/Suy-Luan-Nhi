@@ -5,7 +5,7 @@ export default function NotFound() {
     <main className="paper-texture grid min-h-screen place-items-center px-5">
       <section className="max-w-md text-center">
         <p className="text-6xl">🔎</p>
-        <h1 className="mt-4 text-4xl font-black">Không tìm thấy trang này</h1>
+        <h1 className="type-page-title mt-4">Không tìm thấy trang này</h1>
         <p className="mt-3 text-[#806d54]">
           Trang hoặc nhiệm vụ có thể đã được lưu trữ, di chuyển hoặc chưa được mở khóa.
         </p>

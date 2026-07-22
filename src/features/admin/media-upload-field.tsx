@@ -93,6 +93,7 @@ export function MediaUploadField({
 }: Props) {
   const inputId = useId();
   const inputRef = useRef<HTMLInputElement>(null);
+  const triggerRef = useRef<HTMLButtonElement>(null);
   const policiesQuery = useQuery({
     queryKey: queryKeys.admin.mediaUploadPolicies,
     queryFn: mediaApi.getUploadPolicies,
@@ -113,6 +114,7 @@ export function MediaUploadField({
       if (inputRef.current) inputRef.current.value = "";
       toast.success("Đã thêm tệp vào nội dung");
     },
+    onSettled: () => triggerRef.current?.focus({ preventScroll: true }),
   });
   const KindIcon = allowedKinds.includes("video")
     ? Video
@@ -123,35 +125,41 @@ export function MediaUploadField({
   return (
     <div className={cn("space-y-2", compact && "rounded-xl border bg-[#fbf8f2] p-3")}>
       <div>
-        <label htmlFor={inputId} className="block text-sm font-black text-[#342f28]">
+        <p id={`${inputId}-label`} className="type-label block font-black text-[#342f28]">
           {label}
-        </label>
-        <p className="mt-1 text-xs leading-5 text-[#6f6558]">{description}</p>
+        </p>
+        <p id={`${inputId}-description`} className="type-caption mt-1 text-[#6f6558]">
+          {description}
+        </p>
       </div>
       {value ? <Preview url={value} label={altText || label} fit={previewFit} compact={compact} /> : null}
-      <label
-        htmlFor={inputId}
-        className={cn(
-          "flex min-h-11 cursor-pointer items-center justify-center gap-2 rounded-xl border-2 border-dashed border-[#d5c09b] bg-white px-4 text-sm font-black transition hover:border-[#e9641a] hover:bg-[#fff7eb]",
-          mutation.isPending && "pointer-events-none opacity-60",
-        )}
+      <button
+        ref={triggerRef}
+        type="button"
+        disabled={mutation.isPending}
+        aria-labelledby={`${inputId}-label ${inputId}-action`}
+        aria-describedby={`${inputId}-description`}
+        onClick={() => inputRef.current?.click()}
+        className="type-action flex min-h-11 w-full cursor-pointer items-center justify-center gap-2 rounded-xl border-2 border-dashed border-[#d5c09b] bg-white px-4 transition hover:border-[#e9641a] hover:bg-[#fff7eb] disabled:cursor-wait disabled:opacity-60"
       >
         {mutation.isPending ? <LoaderCircle size={18} className="animate-spin" /> : <UploadCloud size={18} />}
-        {mutation.isPending ? "Đang tải lên..." : value ? "Thay tệp khác" : "Chọn tệp để tải lên"}
-      </label>
+        <span id={`${inputId}-action`}>
+          {mutation.isPending ? "Đang tải lên..." : value ? "Thay tệp khác" : "Chọn tệp để tải lên"}
+        </span>
+      </button>
       <input
         ref={inputRef}
-        id={inputId}
         type="file"
         accept={accept}
-        className="sr-only"
+        hidden
+        tabIndex={-1}
         onChange={(event) => {
           const file = event.currentTarget.files?.[0];
           event.currentTarget.value = "";
           if (file) mutation.mutate(file);
         }}
       />
-      <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-xs">
+      <div className="type-caption flex flex-wrap items-center gap-x-4 gap-y-1">
         {policySummary ? (
           <p className="font-bold text-[#6f6558]">Yêu cầu đối với ảnh: {policySummary}.</p>
         ) : null}
@@ -166,12 +174,12 @@ export function MediaUploadField({
         )}
       </div>
       {mutation.isError ? (
-        <p role="alert" className="text-sm font-bold text-red-700">
+        <p role="alert" className="type-supporting font-bold text-red-700">
           {mutation.error.message}
         </p>
       ) : null}
       {error ? (
-        <p role="alert" className="text-sm font-bold text-red-700">
+        <p role="alert" className="type-supporting font-bold text-red-700">
           {error}
         </p>
       ) : null}

@@ -27,12 +27,10 @@ export default async function Page({ params }: { params: Promise<{ sessionId: st
           className="h-[390px] w-full object-cover"
         />
         <div className="absolute inset-x-3 top-3 rounded-[24px] border-4 border-[#8d6031] bg-[#f2d28c]/95 p-4 text-center">
-          <p className="text-xs font-black tracking-[.2em] text-[#50733c] uppercase">
+          <p className="type-overline font-black tracking-[.2em] text-[#50733c] uppercase">
             {contentText(content, "completion.label", "Nhiệm vụ hoàn thành")}
           </p>
-          <h1 className="text-4xl font-black text-[#db5712]">
-            {contentText(content, "completion.title", "Tuyệt vời!")}
-          </h1>
+          <h1 className="type-child-page-title">{contentText(content, "completion.title", "Tuyệt vời!")}</h1>
           <p className="font-black">{summary.mission.title}</p>
         </div>
       </div>
@@ -48,11 +46,11 @@ export default async function Page({ params }: { params: Promise<{ sessionId: st
             className="size-24 object-contain"
           />
           <div>
-            <p className="text-xs font-black tracking-wider text-[#b77b20] uppercase">
+            <p className="type-overline font-black tracking-wider text-[#b77b20] uppercase">
               {contentText(content, "completion.newBadge", "Huy hiệu mới")}
             </p>
-            <h2 className="text-2xl font-black">{summary.badge.name}</h2>
-            <p className="text-sm text-[#76634b]">{summary.badge.description}</p>
+            <h2 className="type-child-section-title">{summary.badge.name}</h2>
+            <p className="type-supporting text-[#76634b]">{summary.badge.description}</p>
           </div>
         </Card>
       ) : null}
@@ -65,14 +63,14 @@ export default async function Page({ params }: { params: Promise<{ sessionId: st
           />
         ))}
       </div>
-      <h2 className="mt-5 text-center text-xl font-black">
+      <h2 className="type-child-section-title mt-5 text-center">
         {contentText(content, "completion.habitsTitle", "Con đã luyện những thói quen nào?")}
       </h2>
       <div className="mt-3 grid grid-cols-2 gap-2">
         {summary.thinkingHabits.map((habit) => (
           <div key={habit.slug} className="rounded-2xl border border-[#eadfc9] bg-white p-3 text-center">
             <CheckCircle2 className="mx-auto text-[#658e4e]" />
-            <p className="mt-2 text-sm font-black">{habit.title}</p>
+            <p className="type-label mt-2 font-black">{habit.title}</p>
           </div>
         ))}
       </div>

@@ -207,8 +207,12 @@ test("super admin changes common settings without editing raw JSON", async ({ pa
   const uploadPolicies = page.locator("section").filter({
     has: page.getByRole("heading", { name: "Giới hạn tải ảnh theo từng nội dung" }),
   });
-  await expect(uploadPolicies.getByRole("group")).toHaveCount(7);
-  const missionCoverPolicy = uploadPolicies.getByRole("group", { name: "Ảnh bìa nhiệm vụ" });
+  await expect(uploadPolicies.locator("details")).toHaveCount(8);
+  const missionCoverPanel = uploadPolicies
+    .locator("details")
+    .filter({ has: page.getByText("Ảnh bìa nhiệm vụ", { exact: true }) });
+  await missionCoverPanel.locator("summary").click();
+  const missionCoverPolicy = missionCoverPanel.getByRole("group", { name: "Ảnh bìa nhiệm vụ" });
   const maxSizeInput = missionCoverPolicy.getByLabel("Dung lượng tối đa (MB)");
   await expect(maxSizeInput).toHaveValue("5");
   await maxSizeInput.click();

@@ -80,10 +80,10 @@ export function EmailVerificationResultDialog({
             <CircleAlert size={40} strokeWidth={2.4} aria-hidden="true" />
           )}
         </span>
-        <h1 id={titleId} className="mt-5 text-2xl font-black text-[#34291f] sm:text-3xl">
+        <h1 id={titleId} className="type-page-title mt-5">
           {title}
         </h1>
-        <p id={descriptionId} className="mt-3 text-sm leading-6 text-[#74634f] sm:text-base">
+        <p id={descriptionId} className="type-supporting mt-3 text-[#74634f]">
           {description}
         </p>
         <div className="mt-7 space-y-3">

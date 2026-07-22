@@ -65,7 +65,7 @@ export function CreateProfileForm() {
           autoComplete="off"
           registration={form.register("displayName")}
           error={form.formState.errors.displayName?.message}
-          className="min-h-14 text-lg"
+          className="min-h-14"
         />
       </Card>
 
@@ -125,7 +125,7 @@ export function CreateProfileForm() {
           <p className="font-black text-[#47643a]">
             {contentText(content, "create.privacyTitle", "Chỉ thu thập điều thật sự cần")}
           </p>
-          <p className="text-sm text-[#5b714c]">
+          <p className="type-supporting text-[#5b714c]">
             {contentText(content, "create.privacyDescription", "Không thu thập thông tin định danh của bé.")}
           </p>
         </div>

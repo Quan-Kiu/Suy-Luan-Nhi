@@ -51,7 +51,7 @@ export function AdminShell({
               menuOpen ? "Đóng menu quản trị" : "Mở menu quản trị",
             )}
             onClick={() => setMenuOpen((open) => !open)}
-            className="grid size-10 shrink-0 place-items-center rounded-full border lg:hidden"
+            className="grid size-10 shrink-0 place-items-center rounded-full border xl:hidden"
           >
             {menuOpen ? <X size={20} /> : <Menu size={20} />}
           </button>
@@ -64,17 +64,17 @@ export function AdminShell({
               className="h-10 w-auto object-contain"
             />
             <div className="min-w-0">
-              <p className="truncate font-black">
+              <p className="type-card-title truncate">
                 {contentText(content, "shell.cmsName", "Trung tâm quản trị")}
               </p>
-              <p className="hidden truncate text-xs text-[#7d7468] sm:block">
+              <p className="type-caption hidden truncate text-[#7d7468] sm:block">
                 {contentText(content, "shell.cmsDescription", "Quản lý nhiệm vụ và nội dung")}
               </p>
             </div>
           </Link>
         </div>
         <div className="flex items-center gap-3">
-          <span className="hidden text-right text-xs sm:block">
+          <span className="type-caption hidden text-right sm:block">
             <strong className="block">{userName}</strong>
             <span className="text-[#806d54]">{roleLabel}</span>
           </span>
@@ -94,7 +94,7 @@ export function AdminShell({
       <AnimatePresence>
         {menuOpen ? (
           <motion.div
-            className="fixed inset-0 z-30 bg-black/30 lg:hidden"
+            className="fixed inset-0 z-30 bg-black/30 xl:hidden"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
@@ -122,8 +122,8 @@ export function AdminShell({
         ) : null}
       </AnimatePresence>
 
-      <div className="grid h-[calc(100dvh-4rem)] min-h-0 lg:grid-cols-[248px_minmax(0,1fr)]">
-        <aside className="hidden min-h-0 scrollbar-thin overflow-y-auto overscroll-contain border-r bg-white px-3 py-4 lg:block">
+      <div className="grid h-[calc(100dvh-4rem)] min-h-0 xl:grid-cols-[248px_minmax(0,1fr)]">
+        <aside className="hidden min-h-0 scrollbar-thin overflow-y-auto overscroll-contain border-r bg-white px-3 py-4 xl:block">
           <AdminNavigation pathname={pathname} role={role} content={content} />
         </aside>
         <main

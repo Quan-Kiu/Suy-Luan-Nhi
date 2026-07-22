@@ -40,19 +40,19 @@ export default async function Page() {
               />
             </div>
             <div className="p-4">
-              <span className="rounded-full bg-[#fff5d8] px-3 py-1 text-xs font-black">
+              <span className="type-caption rounded-full bg-[#fff5d8] px-3 py-1 font-black">
                 {contentTemplate(content, "reviews.version", "Lần gửi {number}", {
                   number: item.version.versionNumber,
                 })}
               </span>
-              <h2 className="mt-3 text-xl font-black">{item.title}</h2>
-              <p className="text-sm text-[#806d54]">{item.worldTitle}</p>
-              <p className="mt-3 text-xs text-[#806d54]">
+              <h2 className="type-section-title mt-3">{item.title}</h2>
+              <p className="type-supporting text-[#806d54]">{item.worldTitle}</p>
+              <p className="type-caption mt-3 text-[#806d54]">
                 {contentTemplate(content, "reviews.submittedAt", "Gửi lúc {time}", {
                   time: item.version.createdAt.toLocaleString("vi-VN"),
                 })}
               </p>
-              <span className="mt-4 inline-flex items-center gap-1 text-sm font-black text-[#bd4910]">
+              <span className="type-label mt-4 inline-flex items-center gap-1 font-black text-[#bd4910]">
                 Mở để kiểm tra <ArrowRight size={16} />
               </span>
             </div>

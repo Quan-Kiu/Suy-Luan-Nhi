@@ -92,6 +92,20 @@
       "when": 1784693189213,
       "tag": "0012_content_variable_plain_language",
       "breakpoints": true
+    },
+    {
+      "idx": 13,
+      "version": "7",
+      "when": 1784697911102,
+      "tag": "0013_parent_dashboard_heading",
+      "breakpoints": true
+    },
+    {
+      "idx": 14,
+      "version": "7",
+      "when": 1784698691440,
+      "tag": "0014_profile_trash_restore",
+      "breakpoints": true
     }
   ]
 }

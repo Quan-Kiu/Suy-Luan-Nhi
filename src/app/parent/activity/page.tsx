@@ -28,7 +28,7 @@ export default async function Page({
 
   return (
     <>
-      <h1 className="text-3xl font-black">{contentText(content, "activity.title", "Lịch sử hoạt động")}</h1>
+      <h1 className="type-page-title">{contentText(content, "activity.title", "Lịch sử hoạt động")}</h1>
       <p className="mt-2 text-[#786348]">
         {contentText(
           content,

@@ -29,7 +29,9 @@ function DateField({
 }) {
   return (
     <label className="block min-w-0">
-      <span className="mb-1 block text-xs font-black tracking-wide text-[#6f6558] uppercase">{label}</span>
+      <span className="type-overline mb-1 block font-black tracking-wide text-[#6f6558] uppercase">
+        {label}
+      </span>
       <input
         type="text"
         inputMode="numeric"
@@ -83,7 +85,7 @@ export function ActivityFilters({ initialStatus, initialFrom, initialTo, labels 
     >
       <fieldset disabled={pending} className="grid gap-3 sm:grid-cols-2 xl:grid-cols-[1.15fr_1fr_1fr_auto]">
         <label className="block min-w-0">
-          <span className="mb-1 block text-xs font-black tracking-wide text-[#6f6558] uppercase">
+          <span className="type-overline mb-1 block font-black tracking-wide text-[#6f6558] uppercase">
             Trạng thái
           </span>
           <select
@@ -107,7 +109,7 @@ export function ActivityFilters({ initialStatus, initialFrom, initialTo, labels 
         </div>
       </fieldset>
       {error ? (
-        <p role="alert" className="mt-3 text-sm font-bold text-red-700">
+        <p role="alert" className="type-supporting mt-3 font-bold text-red-700">
           {error}
         </p>
       ) : null}

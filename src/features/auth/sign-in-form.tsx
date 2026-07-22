@@ -81,7 +81,7 @@ export function SignInForm() {
         >
           {contentText(content, "signIn.submit", "Đăng nhập")}
         </SubmitButton>
-        <div className="flex justify-between text-sm">
+        <div className="type-supporting flex justify-between">
           <Link href="/auth/forgot-password" className="font-bold text-[#c55312] underline">
             {contentText(content, "signIn.forgot", "Quên mật khẩu?")}
           </Link>

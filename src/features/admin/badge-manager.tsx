@@ -22,10 +22,12 @@ export function BadgeManager({
                 <Plus size={19} />
               </span>
               <div>
-                <h2 id="new-badge-title" className="font-black">
+                <h2 id="new-badge-title" className="type-card-title">
                   Thêm huy hiệu mới
                 </h2>
-                <p className="mt-0.5 text-sm text-[#6f6558]">Mở biểu mẫu khi cần tạo phần thưởng mới.</p>
+                <p className="type-supporting mt-0.5 text-[#6f6558]">
+                  Mở biểu mẫu khi cần tạo phần thưởng mới.
+                </p>
               </div>
             </div>
             <ChevronDown size={19} className="transition group-open:rotate-180" />
@@ -42,8 +44,8 @@ export function BadgeManager({
 
       <section>
         <div className="mb-3">
-          <h2 className="text-xl font-black">Các huy hiệu hiện có</h2>
-          <p className="mt-1 text-sm text-[#6f6558]">
+          <h2 className="type-section-title">Các huy hiệu hiện có</h2>
+          <p className="type-supporting mt-1 text-[#6f6558]">
             Có {items.length} huy hiệu. Mở từng dòng để chỉnh sửa khi cần.
           </p>
         </div>
@@ -63,19 +65,19 @@ export function BadgeManager({
                 </div>
                 <div className="min-w-0 flex-1">
                   <div className="flex flex-wrap items-center gap-2">
-                    <h3 className="truncate font-black">{item.name}</h3>
+                    <h3 className="type-card-title truncate">{item.name}</h3>
                     <span
-                      className={`rounded-full px-2.5 py-1 text-xs font-black ${
+                      className={`type-caption rounded-full px-2.5 py-1 font-black ${
                         item.active ? "bg-green-100 text-green-800" : "bg-stone-200 text-stone-700"
                       }`}
                     >
                       {item.active ? "Đang dùng" : "Đã ẩn"}
                     </span>
                   </div>
-                  <p className="mt-1 truncate text-sm text-[#6f6558]">
+                  <p className="type-supporting mt-1 truncate text-[#6f6558]">
                     {item.skillTitle || "Không gắn kỹ năng cụ thể"}
                   </p>
-                  <div className="mt-1.5 flex flex-wrap gap-3 text-xs font-bold text-[#6f6558]">
+                  <div className="type-caption mt-1.5 flex flex-wrap gap-3 font-bold text-[#6f6558]">
                     <span className="inline-flex items-center gap-1">
                       <Award size={13} /> {item.missionCount} nhiệm vụ
                     </span>

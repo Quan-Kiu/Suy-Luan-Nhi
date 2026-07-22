@@ -33,9 +33,11 @@ type FormValues = z.infer<typeof schema>;
 export function SystemSettingForm({
   item,
   onSaved,
+  showHeader = true,
 }: {
   item: SystemSetting;
   onSaved: (item: SystemSetting) => void;
+  showHeader?: boolean;
 }) {
   const definition = getManagedSystemSettingDefinition(item.key);
   const kind = definition?.kind ?? getSystemSettingKind(item.value);
@@ -69,18 +71,20 @@ export function SystemSettingForm({
 
   return (
     <form onSubmit={form.handleSubmit((values) => mutation.mutate(values))} className="space-y-4" noValidate>
-      <div className="flex items-start gap-3">
-        <span className="grid size-10 shrink-0 place-items-center rounded-xl bg-[#fff0df] text-[#b9470d]">
-          <Settings2 size={19} />
-        </span>
-        <div className="min-w-0">
-          <h2 className="font-black text-[#342f28]">{humanizeSettingKey(item.key)}</h2>
-          <p className="mt-1 text-sm leading-6 text-[#6f6558]">{describeSetting(item.key)}</p>
-          <span className="mt-2 inline-flex rounded-full bg-[#f5f2ec] px-3 py-1 text-xs font-black text-[#6f6558]">
-            {systemSettingKindLabels[kind]}
+      {showHeader ? (
+        <div className="flex items-start gap-3">
+          <span className="grid size-10 shrink-0 place-items-center rounded-xl bg-[#fff0df] text-[#b9470d]">
+            <Settings2 size={19} />
           </span>
+          <div className="min-w-0">
+            <h2 className="type-card-title">{humanizeSettingKey(item.key)}</h2>
+            <p className="type-supporting mt-1 text-[#6f6558]">{describeSetting(item.key)}</p>
+            <span className="type-caption mt-2 inline-flex rounded-full bg-[#f5f2ec] px-3 py-1 font-black text-[#6f6558]">
+              {systemSettingKindLabels[kind]}
+            </span>
+          </div>
         </div>
-      </div>
+      ) : null}
 
       {kind === "boolean" ? (
         <ControlledCheckboxField
@@ -98,7 +102,7 @@ export function SystemSettingForm({
           description={kind === "structured" ? "Giữ đúng dấu ngoặc, dấu phẩy và dấu nháy." : undefined}
           registration={form.register("text")}
           error={form.formState.errors.text?.message}
-          className={kind === "structured" ? "font-mono text-sm" : undefined}
+          className={kind === "structured" ? "font-mono" : undefined}
         />
       ) : (
         <TextField
@@ -122,7 +126,7 @@ export function SystemSettingForm({
       )}
 
       {definition?.danger && enabled ? (
-        <div className="flex gap-3 rounded-2xl border border-red-200 bg-red-50 p-4 text-sm leading-6 text-red-800">
+        <div className="type-supporting flex gap-3 rounded-2xl border border-red-200 bg-red-50 p-4 text-red-800">
           <AlertTriangle className="mt-0.5 shrink-0" size={19} />
           <p>
             <strong>Thao tác ảnh hưởng toàn hệ thống.</strong> Người dùng đang ở khu vực phụ huynh hoặc chế độ
@@ -131,7 +135,7 @@ export function SystemSettingForm({
         </div>
       ) : null}
 
-      <details className="rounded-xl bg-[#f7f3eb] p-3 text-xs text-[#6f6558]">
+      <details className="type-caption rounded-xl bg-[#f7f3eb] p-3 text-[#6f6558]">
         <summary className="cursor-pointer font-black text-[#4f463b]">
           Thông tin dành cho đội kỹ thuật
         </summary>

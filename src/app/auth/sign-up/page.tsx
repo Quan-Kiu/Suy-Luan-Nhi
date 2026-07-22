@@ -23,7 +23,7 @@ export default async function Page() {
           <span className="mx-auto grid size-16 place-items-center rounded-3xl bg-amber-100 text-amber-800">
             <UserRoundX size={30} aria-hidden="true" />
           </span>
-          <p className="rounded-2xl bg-[#fff8e8] p-4 text-sm leading-6 text-[#6f5731]">
+          <p className="type-supporting rounded-2xl bg-[#fff8e8] p-4 text-[#6f5731]">
             Vui lòng quay lại sau hoặc đăng nhập bằng tài khoản hiện có.
           </p>
           <Link
@@ -50,14 +50,14 @@ export default async function Page() {
         aria-label="Tiến trình thiết lập"
         className="mb-5 grid grid-cols-[1fr_auto_1fr] items-center gap-3"
       >
-        <div className="rounded-2xl bg-[#fff0df] px-3 py-2 text-center text-xs font-black text-[#b9470d]">
+        <div className="type-caption rounded-2xl bg-[#fff0df] px-3 py-2 text-center font-black text-[#b9470d]">
           <span className="mr-1 inline-grid size-5 place-items-center rounded-full bg-[#b9470d] text-white">
             1
           </span>
           {contentText(content, "signUp.stepAccount", "Tài khoản ba mẹ")}
         </div>
         <span aria-hidden="true" className="h-px w-5 bg-[#dcc8a7]" />
-        <div className="rounded-2xl border border-[#e8dcc8] bg-[#faf7f1] px-3 py-2 text-center text-xs font-bold text-[#88755d]">
+        <div className="type-caption rounded-2xl border border-[#e8dcc8] bg-[#faf7f1] px-3 py-2 text-center font-bold text-[#88755d]">
           <span className="mr-1 inline-grid size-5 place-items-center rounded-full bg-[#e4d8c5] text-[#75624b]">
             2
           </span>

@@ -50,27 +50,29 @@ function FeedbackCard({ item }: { item: SystemFeedbackItem }) {
       <summary className="flex min-h-24 cursor-pointer list-none items-center gap-3 px-4 py-3 marker:hidden">
         <div className="min-w-0 flex-1">
           <div className="flex flex-wrap items-center gap-2">
-            <span className={cn("rounded-full border px-2.5 py-1 text-xs font-black", statusStyles[status])}>
+            <span
+              className={cn("type-caption rounded-full border px-2.5 py-1 font-black", statusStyles[status])}
+            >
               {systemFeedbackStatusLabels[status]}
             </span>
-            <span className="inline-flex items-center gap-1 text-xs font-bold text-[#786d60]">
+            <span className="type-caption inline-flex items-center gap-1 font-bold text-[#786d60]">
               <Clock3 size={14} /> {new Date(item.createdAt).toLocaleString("vi-VN")}
             </span>
             {item.attachments.length ? (
-              <span className="inline-flex items-center gap-1 text-xs font-bold text-[#786d60]">
+              <span className="type-caption inline-flex items-center gap-1 font-bold text-[#786d60]">
                 <ImageIcon size={14} /> {item.attachments.length} ảnh
               </span>
             ) : null}
           </div>
           <div className="mt-2 flex min-w-0 items-center gap-2">
             <MessageSquareText size={18} className="shrink-0 text-[#b9470d]" />
-            <h2 className="truncate font-black text-[#342f28]">
+            <h2 className="type-card-title truncate">
               {item.pageTitle || "Góp ý từ một trang trong hệ thống"}
             </h2>
           </div>
-          <p className="mt-1 line-clamp-1 text-sm text-[#62584d]">Tóm tắt: {item.content}</p>
+          <p className="type-supporting mt-1 line-clamp-1 text-[#62584d]">Tóm tắt: {item.content}</p>
         </div>
-        <div className="hidden shrink-0 text-right text-xs leading-5 text-[#62584d] sm:block">
+        <div className="type-caption hidden shrink-0 text-right text-[#62584d] sm:block">
           <p className="font-black">{item.userName}</p>
           <p className="max-w-44 truncate">{item.userEmail}</p>
         </div>
@@ -83,11 +85,11 @@ function FeedbackCard({ item }: { item: SystemFeedbackItem }) {
             href={item.pagePath}
             target="_blank"
             rel="noreferrer"
-            className="inline-flex min-w-0 items-center gap-1 text-sm font-bold break-all text-[#9f3d0b] hover:underline"
+            className="type-action inline-flex min-w-0 items-center gap-1 font-bold break-all text-[#9f3d0b] hover:underline"
           >
             {item.pagePath} <ExternalLink size={14} className="shrink-0" />
           </a>
-          <div className="rounded-xl bg-[#f7f3eb] px-3 py-2 text-xs leading-5 text-[#62584d]">
+          <div className="type-caption rounded-xl bg-[#f7f3eb] px-3 py-2 text-[#62584d]">
             <p className="flex items-center gap-2 font-black">
               <UserRound size={15} /> {item.userName}
             </p>
@@ -102,7 +104,7 @@ function FeedbackCard({ item }: { item: SystemFeedbackItem }) {
 
         {item.attachments.length ? (
           <div>
-            <p className="mb-2 flex items-center gap-2 text-sm font-black text-[#4f463b]">
+            <p className="type-label mb-2 flex items-center gap-2 font-black text-[#4f463b]">
               <ImageIcon size={17} /> {item.attachments.length} ảnh đính kèm
             </p>
             <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
@@ -120,7 +122,7 @@ function FeedbackCard({ item }: { item: SystemFeedbackItem }) {
                     alt={attachment.altText || `Ảnh góp ý ${index + 1}`}
                     className="h-40 w-full object-contain p-2 transition group-hover/image:scale-[1.01]"
                   />
-                  <div className="flex items-center justify-between gap-2 bg-white px-3 py-2 text-xs font-bold">
+                  <div className="type-caption flex items-center justify-between gap-2 bg-white px-3 py-2 font-bold">
                     <span className="truncate">{attachment.fileName}</span>
                     <ExternalLink size={14} className="shrink-0" />
                   </div>
@@ -131,7 +133,7 @@ function FeedbackCard({ item }: { item: SystemFeedbackItem }) {
         ) : null}
 
         <div className="grid gap-3 lg:grid-cols-[220px_minmax(0,1fr)_auto] lg:items-end">
-          <label className="grid gap-1.5 text-sm font-black text-[#342f28]">
+          <label className="type-label grid gap-1.5 font-black text-[#342f28]">
             Trạng thái xử lý
             <select
               value={status}
@@ -145,7 +147,7 @@ function FeedbackCard({ item }: { item: SystemFeedbackItem }) {
               ))}
             </select>
           </label>
-          <label className="grid gap-1.5 text-sm font-black text-[#342f28]">
+          <label className="type-label grid gap-1.5 font-black text-[#342f28]">
             Ghi chú nội bộ
             <textarea
               value={adminNote}
@@ -190,7 +192,7 @@ export function SystemFeedbackManager({ initialData }: { initialData: SystemFeed
           type="button"
           onClick={() => setStatus(undefined)}
           className={cn(
-            "min-h-10 cursor-pointer rounded-xl px-4 text-sm font-black",
+            "type-action min-h-10 cursor-pointer rounded-xl px-4",
             status === undefined ? "bg-[#fff0df] text-[#9f3d0b]" : "hover:bg-[#f7f3eb]",
           )}
         >
@@ -202,14 +204,14 @@ export function SystemFeedbackManager({ initialData }: { initialData: SystemFeed
             type="button"
             onClick={() => setStatus(value)}
             className={cn(
-              "min-h-10 cursor-pointer rounded-xl px-4 text-sm font-black",
+              "type-action min-h-10 cursor-pointer rounded-xl px-4",
               status === value ? "bg-[#fff0df] text-[#9f3d0b]" : "hover:bg-[#f7f3eb]",
             )}
           >
             {systemFeedbackStatusLabels[value]}
           </button>
         ))}
-        <span className="ml-auto text-sm font-bold text-[#786d60]">{query.data?.total ?? 0} góp ý</span>
+        <span className="type-label ml-auto font-bold text-[#786d60]">{query.data?.total ?? 0} góp ý</span>
       </div>
 
       {query.isLoading ? (
@@ -226,8 +228,8 @@ export function SystemFeedbackManager({ initialData }: { initialData: SystemFeed
         </div>
       ) : (
         <div className="rounded-3xl border border-dashed bg-white p-10 text-center">
-          <p className="text-lg font-black">Chưa có góp ý phù hợp</p>
-          <p className="mt-2 text-sm text-[#786d60]">Hãy chọn trạng thái khác hoặc quay lại sau.</p>
+          <p className="type-card-title">Chưa có góp ý phù hợp</p>
+          <p className="type-supporting mt-2 text-[#786d60]">Hãy chọn trạng thái khác hoặc quay lại sau.</p>
         </div>
       )}
     </div>

@@ -162,7 +162,7 @@ export function WorldForm({
         />
       </div>
       <details className="rounded-xl bg-[#f7f3eb] p-3">
-        <summary className="cursor-pointer text-sm font-black">Thiết lập nâng cao</summary>
+        <summary className="type-action cursor-pointer font-black">Thiết lập nâng cao</summary>
         <div className="mt-3 grid gap-3 lg:grid-cols-2">
           {mode === "create" ? (
             <TextField

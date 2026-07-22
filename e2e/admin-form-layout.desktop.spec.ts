@@ -1,6 +1,11 @@
 import { expect, test, type Locator } from "@playwright/test";
 import { clearAuth, signIn } from "./helpers";
 
+const tinyPng = Buffer.from(
+  "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAusB9Y9Z4S8AAAAASUVORK5CYII=",
+  "base64",
+);
+
 async function top(locator: Locator) {
   const box = await locator.boundingBox();
   expect(box).not.toBeNull();
@@ -63,4 +68,44 @@ test("media upload controls stay aligned before and after validation", async ({ 
     path: ".verification/browser/admin-form-layout-media.png",
     fullPage: true,
   });
+});
+
+test("mission image upload keeps the admin shell inside the viewport", async ({ page }) => {
+  await clearAuth(page);
+  await page.setViewportSize({ width: 1844, height: 832 });
+  await signIn(page, "content@demo.local", "/admin/missions/new");
+
+  const uploadButton = page.getByRole("button", { name: /Hình minh họa.*Chọn tệp để tải lên/ }).first();
+  await uploadButton.scrollIntoViewIfNeeded();
+  expect(await page.evaluate(() => window.scrollY)).toBe(0);
+
+  const uploadResponse = page.waitForResponse(
+    (response) => response.request().method() === "POST" && response.url().endsWith("/api/admin/media"),
+  );
+  const fileChooser = page.waitForEvent("filechooser");
+  await uploadButton.click();
+  await (
+    await fileChooser
+  ).setFiles({
+    name: "question-image.png",
+    mimeType: "image/png",
+    buffer: tinyPng,
+  });
+  expect((await uploadResponse).status()).toBe(201);
+  await expect(page.getByText("Đã thêm tệp vào nội dung")).toBeVisible();
+
+  const layout = await page.evaluate(() => {
+    const shell = document.querySelector("[data-admin-shell]")?.getBoundingClientRect();
+    return {
+      scrollY: window.scrollY,
+      viewportHeight: window.innerHeight,
+      shellTop: shell?.top,
+      shellBottom: shell?.bottom,
+    };
+  });
+  expect(layout.scrollY).toBe(0);
+  expect(layout.shellTop).toBe(0);
+  expect(layout.shellBottom).toBe(layout.viewportHeight);
+
+  await page.screenshot({ path: ".verification/browser/admin-mission-upload-layout.png" });
 });

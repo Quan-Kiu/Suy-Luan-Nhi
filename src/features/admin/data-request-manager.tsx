@@ -47,7 +47,7 @@ export function DataRequestManager({ items }: { items: RequestItem[] }) {
   return (
     <div className="space-y-3">
       <div className="overflow-x-auto rounded-2xl border bg-white">
-        <table className="min-w-full text-sm">
+        <table className="type-supporting min-w-full">
           <thead className="bg-[#f7f3eb] text-left">
             <tr>
               <th className="p-3">Yêu cầu</th>

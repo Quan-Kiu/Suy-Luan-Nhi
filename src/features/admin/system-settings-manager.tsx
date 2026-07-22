@@ -1,7 +1,7 @@
 "use client";
 
 import { useQueryClient } from "@tanstack/react-query";
-import { Gauge, ShieldCheck, ToggleLeft, Wrench } from "lucide-react";
+import { ChevronDown, Gauge, ShieldCheck, ToggleLeft, Wrench } from "lucide-react";
 import { useState } from "react";
 import type { SystemSetting } from "@/api/admin/settings";
 import {
@@ -20,6 +20,13 @@ const groupIcons = {
   security: ShieldCheck,
 } satisfies Record<SystemSettingGroup, typeof Wrench>;
 
+function settingValueSummary(item: SystemSetting) {
+  const definition = getManagedSystemSettingDefinition(item.key);
+  if (definition?.kind === "boolean") return item.value ? "Đang bật" : "Đang tắt";
+  if (definition?.kind === "number")
+    return `${String(item.value)}${definition.unit ? ` ${definition.unit}` : ""}`;
+  return "Đã thiết lập nội dung";
+}
 export function SystemSettingsManager({ items }: { items: SystemSetting[] }) {
   const queryClient = useQueryClient();
   const [rows, setRows] = useState(items);
@@ -32,7 +39,7 @@ export function SystemSettingsManager({ items }: { items: SystemSetting[] }) {
   }
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-7">
       {groupOrder.map((group) => {
         const groupItems = rows.filter(
           (item) => getManagedSystemSettingDefinition(item.key)?.group === group,
@@ -41,31 +48,48 @@ export function SystemSettingsManager({ items }: { items: SystemSetting[] }) {
         const copy = systemSettingGroupLabels[group];
         const Icon = groupIcons[group];
         return (
-          <section key={group} aria-labelledby={`system-settings-${group}`} className="space-y-4">
+          <section key={group} aria-labelledby={`system-settings-${group}`} className="space-y-3">
             <div className="flex items-start gap-3">
               <span className="grid size-11 shrink-0 place-items-center rounded-2xl bg-[#342f28] text-white">
                 <Icon size={21} />
               </span>
               <div>
-                <h2 id={`system-settings-${group}`} className="text-xl font-black text-[#342f28]">
+                <h2 id={`system-settings-${group}`} className="type-section-title">
                   {copy.title}
                 </h2>
-                <p className="mt-1 max-w-3xl text-sm leading-6 text-[#6f6558]">{copy.description}</p>
+                <p className="type-supporting mt-1 max-w-3xl text-[#6f6558]">{copy.description}</p>
               </div>
             </div>
-            <div className="grid gap-4 xl:grid-cols-2">
-              {groupItems.map((row) => (
-                <article
-                  key={row.key}
-                  className={
-                    group === "maintenance"
-                      ? "rounded-3xl border border-amber-200 bg-white p-5 shadow-[0_8px_24px_rgba(76,55,31,0.06)]"
-                      : "rounded-3xl border border-[#e5d8c2] bg-white p-5 shadow-[0_8px_24px_rgba(76,55,31,0.05)]"
-                  }
-                >
-                  <SystemSettingForm item={row} onSaved={upsert} />
-                </article>
-              ))}
+            <div className="grid gap-3 xl:grid-cols-2">
+              {groupItems.map((row) => {
+                const definition = getManagedSystemSettingDefinition(row.key);
+                return (
+                  <details
+                    key={row.key}
+                    className={`group overflow-hidden rounded-2xl border bg-white shadow-sm ${
+                      group === "maintenance" ? "border-amber-200" : "border-[#e5d8c2]"
+                    }`}
+                  >
+                    <summary className="flex min-h-20 cursor-pointer list-none items-center gap-3 px-4 py-3 marker:hidden">
+                      <div className="min-w-0 flex-1">
+                        <div className="flex flex-wrap items-center gap-2">
+                          <h3 className="type-card-title">{definition?.label ?? row.key}</h3>
+                          <span className="type-caption rounded-full bg-[#f5f2ec] px-2.5 py-1 font-black text-[#6f6558]">
+                            {settingValueSummary(row)}
+                          </span>
+                        </div>
+                        <p className="type-supporting mt-1 line-clamp-2 text-[#6f6558]">
+                          {definition?.description ?? "Mở để xem và thay đổi cấu hình."}
+                        </p>
+                      </div>
+                      <ChevronDown size={19} className="shrink-0 transition group-open:rotate-180" />
+                    </summary>
+                    <div className="border-t border-[#eadfc9] p-4">
+                      <SystemSettingForm item={row} onSaved={upsert} showHeader={false} />
+                    </div>
+                  </details>
+                );
+              })}
             </div>
           </section>
         );

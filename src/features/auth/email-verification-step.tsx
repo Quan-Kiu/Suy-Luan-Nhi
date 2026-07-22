@@ -32,7 +32,7 @@ export function EmailVerificationStep({
             : contentText(content, "verification.resend", "Gửi lại email xác minh")}
         </button>
         <FormStatus status={resend.status} message={resend.message} />
-        <div className="grid gap-2 text-center text-sm sm:grid-cols-2">
+        <div className="type-supporting grid gap-2 text-center sm:grid-cols-2">
           <button type="button" onClick={onUseDifferentEmail} className="font-bold text-[#c55312] underline">
             {contentText(content, "verification.changeEmail", "Dùng email khác")}
           </button>

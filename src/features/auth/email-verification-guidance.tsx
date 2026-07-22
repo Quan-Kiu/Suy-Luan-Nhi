@@ -21,14 +21,14 @@ export function EmailVerificationGuidance({
       <span className="mx-auto grid size-16 place-items-center rounded-[22px] bg-[#fff0df] text-[#c94b18] shadow-[0_8px_24px_rgba(185,71,13,.15)]">
         <MailCheck size={32} />
       </span>
-      <h2 id={titleId} className="mt-4 text-2xl font-black text-[#3f3528]">
+      <h2 id={titleId} className="type-section-title mt-4">
         {contentText(
           content,
           isSignUp ? "verification.signUpFlowTitle" : "verification.signInTitle",
           isSignUp ? "Kiểm tra email để sang bước 2" : "Xác minh email để tiếp tục",
         )}
       </h2>
-      <p id={descriptionId} className="mt-2 text-sm leading-6 text-[#746654]">
+      <p id={descriptionId} className="type-supporting mt-2 text-[#746654]">
         {contentText(
           content,
           isSignUp ? "verification.signUpFlowDescription" : "verification.signInDescription",
@@ -40,7 +40,7 @@ export function EmailVerificationGuidance({
       <div className="mx-auto mt-4 max-w-sm rounded-2xl border border-[#ead7b9] bg-white px-4 py-3 font-black break-all text-[#4b3f31]">
         {email}
       </div>
-      <div className="mx-auto mt-5 max-w-sm space-y-3 text-left text-sm text-[#5f5446]">
+      <div className="type-supporting mx-auto mt-5 max-w-sm space-y-3 text-left text-[#5f5446]">
         {[
           contentText(content, "verification.stepOpenEmail", "Mở email từ Suy Luận Nhí"),
           contentText(content, "verification.stepConfirm", "Nhấn “Xác minh email” trong thư"),
@@ -56,7 +56,7 @@ export function EmailVerificationGuidance({
           </div>
         ))}
       </div>
-      <p className="mt-4 text-xs leading-5 text-[#8a7862]">
+      <p className="type-caption mt-4 text-[#8a7862]">
         {contentText(
           content,
           "verification.spamHint",

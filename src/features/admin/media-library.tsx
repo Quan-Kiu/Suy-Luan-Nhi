@@ -121,7 +121,7 @@ export function MediaLibrary({ initialData, canReview, canUpload, canDelete }: P
       {canUpload ? (
         <MediaUploadForm onUploaded={addMedia} />
       ) : (
-        <div className="rounded-2xl border bg-white p-5 text-sm text-[#806d54]">
+        <div className="type-supporting rounded-2xl border bg-white p-5 text-[#806d54]">
           {contentText(
             content,
             "media.reviewOnly",
@@ -236,8 +236,8 @@ export function MediaLibrary({ initialData, canReview, canUpload, canDelete }: P
         ) : null}
         <div className={cn("space-y-4 transition-opacity", query.isFetching && "opacity-65")}>
           <div className="flex flex-wrap items-center justify-between gap-3">
-            <p className="text-sm font-bold text-[#6f6558]">{data.total} tư liệu</p>
-            <label className="flex items-center gap-2 text-sm font-bold text-[#6f6558]">
+            <p className="type-supporting font-bold text-[#6f6558]">{data.total} tư liệu</p>
+            <label className="type-label flex items-center gap-2 font-bold text-[#6f6558]">
               Hiển thị
               <select
                 value={filters.pageSize}
@@ -278,7 +278,7 @@ export function MediaLibrary({ initialData, canReview, canUpload, canDelete }: P
           {query.isError ? (
             <div
               role="alert"
-              className="rounded-2xl border border-red-200 bg-red-50 p-4 text-sm font-bold text-red-800"
+              className="type-label rounded-2xl border border-red-200 bg-red-50 p-4 font-bold text-red-800"
             >
               {query.error.message}
             </div>
@@ -297,7 +297,7 @@ export function MediaLibrary({ initialData, canReview, canUpload, canDelete }: P
               >
                 <ChevronLeft size={18} /> Trang trước
               </button>
-              <span className="text-sm font-black text-[#6f6558]">
+              <span className="type-label font-black text-[#6f6558]">
                 Trang {data.page}/{data.totalPages}
               </span>
               <button

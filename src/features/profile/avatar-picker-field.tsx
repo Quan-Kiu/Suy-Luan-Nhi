@@ -32,8 +32,8 @@ export function AvatarPickerField({
 }: Props) {
   return (
     <fieldset aria-describedby="child-avatar-description child-avatar-message">
-      <legend className="text-lg font-black text-[#342f28]">{label}</legend>
-      <p id="child-avatar-description" className="mt-1 text-sm leading-6 text-[#806d54]">
+      <legend className="type-section-title text-[#342f28]">{label}</legend>
+      <p id="child-avatar-description" className="type-supporting mt-1 text-[#806d54]">
         {description}
       </p>
 
@@ -45,7 +45,7 @@ export function AvatarPickerField({
         </div>
       ) : loadError ? (
         <div
-          className="mt-4 rounded-2xl border border-red-200 bg-red-50 p-4 text-sm font-bold text-red-800"
+          className="type-label mt-4 rounded-2xl border border-red-200 bg-red-50 p-4 font-bold text-red-800"
           role="alert"
         >
           {loadError}
@@ -90,7 +90,7 @@ export function AvatarPickerField({
           })}
         </div>
       ) : (
-        <div className="mt-4 rounded-2xl border border-amber-200 bg-amber-50 p-4 text-sm font-bold text-amber-900">
+        <div className="type-label mt-4 rounded-2xl border border-amber-200 bg-amber-50 p-4 font-bold text-amber-900">
           {emptyMessage}
         </div>
       )}
@@ -98,7 +98,10 @@ export function AvatarPickerField({
       <p
         id="child-avatar-message"
         role={fieldError ? "alert" : undefined}
-        className={cn("mt-2 min-h-5 text-sm font-bold", fieldError ? "text-red-700" : "text-transparent")}
+        className={cn(
+          "type-supporting mt-2 min-h-5 font-bold",
+          fieldError ? "text-red-700" : "text-transparent",
+        )}
       >
         {fieldError ?? "Không có lỗi"}
       </p>

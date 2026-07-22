@@ -26,11 +26,11 @@ export function MissionMapView({ data, content }: { data: MissionMapData; conten
         >
           <div className="mb-3 flex items-end justify-between gap-3">
             <div>
-              <p className="text-xs font-black tracking-widest text-[#d17c14] uppercase">
+              <p className="type-overline font-black tracking-widest text-[#d17c14] uppercase">
                 {contentTemplate(content, "mission.world", "Thế giới {order}", { order: world.order })}
               </p>
-              <h2 className="text-2xl font-black">{world.title}</h2>
-              <p className="text-sm text-[#806d54]">{world.subtitle}</p>
+              <h2 className="type-child-section-title">{world.title}</h2>
+              <p className="type-supporting text-[#806d54]">{world.subtitle}</p>
             </div>
             {world.completed ? (
               <Pill className="shrink-0 bg-green-50 text-green-700">

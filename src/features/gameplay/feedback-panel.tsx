@@ -26,7 +26,7 @@ export function FeedbackPanel({
       role="status"
       aria-live="polite"
     >
-      <p className={`text-xl font-black ${correct ? "text-green-700" : "text-[#b75e13]"}`}>
+      <p className={`type-child-section-title ${correct ? "text-green-700" : "text-[#b75e13]"}`}>
         {correct
           ? contentText(content, "feedback.correctTitle", "Tuyệt vời!")
           : contentText(content, "feedback.retryTitle", "Chưa chính xác")}

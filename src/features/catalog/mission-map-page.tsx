@@ -32,9 +32,11 @@ export function MissionMapPage() {
   return (
     <main className="paper-texture min-h-[calc(100vh-5rem)] px-5 pt-5 pb-8">
       <Card className="mb-6 p-4">
-        <p className="text-sm text-[#806d54]">{contentText(content, "journey.label", "Hành trình của")}</p>
-        <h1 className="text-3xl font-black">{child.displayName}</h1>
-        <p className="mt-1 text-sm">
+        <p className="type-supporting text-[#806d54]">
+          {contentText(content, "journey.label", "Hành trình của")}
+        </p>
+        <h1 className="type-child-page-title">{child.displayName}</h1>
+        <p className="type-supporting mt-1">
           {contentText(
             content,
             "journey.description",

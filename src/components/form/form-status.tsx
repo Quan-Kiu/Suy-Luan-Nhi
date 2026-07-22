@@ -21,7 +21,7 @@ export function FormStatus({
       role={status === "error" ? "alert" : "status"}
       aria-live="polite"
       className={cn(
-        "flex items-center gap-2 rounded-xl p-3 text-sm font-bold",
+        "type-supporting flex items-center gap-2 rounded-xl p-3 font-bold",
         status === "error" && "bg-red-50 text-red-700",
         status === "success" && "bg-green-50 text-green-700",
         status === "loading" && "bg-[#f5f2ec] text-[#6f6250]",

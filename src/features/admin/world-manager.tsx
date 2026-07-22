@@ -29,13 +29,13 @@ export function WorldManager({ initial }: { initial: WorldItem[] }) {
               </div>
               <div className="min-w-0 flex-1">
                 <div className="flex flex-wrap items-center gap-2">
-                  <h2 className="truncate font-black">{item.title}</h2>
-                  <span className="rounded-full bg-[#edf4df] px-2.5 py-1 text-xs font-black text-[#587048]">
+                  <h2 className="type-card-title truncate">{item.title}</h2>
+                  <span className="type-caption rounded-full bg-[#edf4df] px-2.5 py-1 font-black text-[#587048]">
                     {statusLabels[item.status]}
                   </span>
                 </div>
-                <p className="mt-1 truncate text-sm font-bold text-[#6f6558]">{item.subtitle}</p>
-                <p className="mt-1 text-xs text-[#806d54]">Vị trí {item.sortOrder} trên bản đồ</p>
+                <p className="type-supporting mt-1 truncate font-bold text-[#6f6558]">{item.subtitle}</p>
+                <p className="type-caption mt-1 text-[#806d54]">Vị trí {item.sortOrder} trên bản đồ</p>
               </div>
               <ChevronDown size={19} className="shrink-0 transition group-open:rotate-180" />
             </summary>
@@ -54,10 +54,12 @@ export function WorldManager({ initial }: { initial: WorldItem[] }) {
                 <Plus size={19} />
               </span>
               <div>
-                <h2 className="font-black">
+                <h2 className="type-card-title">
                   {contentText(content, "world.createTitle", "Thêm chủ đề nhiệm vụ")}
                 </h2>
-                <p className="mt-0.5 text-sm text-[#6f6558]">Mở biểu mẫu khi cần tạo thêm một chủ đề.</p>
+                <p className="type-supporting mt-0.5 text-[#6f6558]">
+                  Mở biểu mẫu khi cần tạo thêm một chủ đề.
+                </p>
               </div>
             </div>
             <ChevronDown size={19} className="transition group-open:rotate-180" />

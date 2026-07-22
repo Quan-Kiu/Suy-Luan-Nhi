@@ -36,10 +36,10 @@ export function MissionSafetySection() {
     <Card className="rounded-2xl p-5 shadow-sm">
       <div className="flex flex-wrap items-start justify-between gap-3">
         <div>
-          <h2 className="text-xl font-black">
+          <h2 className="type-section-title">
             {contentText(content, "missionEditor.safetyTitle", "3. Kiểm tra an toàn trước khi gửi duyệt")}
           </h2>
-          <p className="mt-1 text-sm text-[#6f6558]">
+          <p className="type-supporting mt-1 text-[#6f6558]">
             Xác nhận từng mục sau khi bạn đã xem lại nội dung và phần xem trước.
           </p>
         </div>
@@ -54,7 +54,7 @@ export function MissionSafetySection() {
               label={contentText(content, safetyLabelKeys[key], safetyFallbacks[key])}
               registration={form.register(`safety.${key}` as const)}
             />
-            <p className="mt-2 pl-6 text-xs leading-5 text-[#6f6558]">{safetyDescriptions[key]}</p>
+            <p className="type-caption mt-2 pl-6 text-[#6f6558]">{safetyDescriptions[key]}</p>
           </div>
         ))}
       </div>

@@ -12,7 +12,7 @@ import { getActiveChild } from "@/modules/family/active-child";
 import { getParentDashboard, getSuggestions } from "@/modules/parent/parent-data";
 
 export default async function Page() {
-  const [session, content, active] = await Promise.all([
+  const [, content, active] = await Promise.all([
     requireParent(),
     getContentNamespace("parent"),
     getActiveChild(),
@@ -25,15 +25,15 @@ export default async function Page() {
 
   return (
     <>
-      <div className="flex flex-wrap items-end justify-between gap-3">
-        <div>
-          <p className="text-sm text-[#786348]">
-            {contentTemplate(content, "dashboard.greeting", "Xin chào, {parentName}", {
-              parentName: session.user.name,
+      <div className="flex flex-wrap items-start justify-between gap-4">
+        <div className="min-w-0">
+          <p className="type-supporting font-medium text-[#786348]">
+            {contentTemplate(content, "dashboard.greeting", "Xin chào, ba mẹ!", {
+              parentName: "ba mẹ",
             })}
           </p>
-          <h1 className="text-3xl font-black">
-            {contentTemplate(content, "dashboard.weekTitle", "Tuần của {childName}", {
+          <h1 className="type-page-title mt-1.5 max-w-xl break-words">
+            {contentTemplate(content, "dashboard.weekTitle", "Tuần này của {childName}", {
               childName: active.child.displayName,
             })}
           </h1>
@@ -58,7 +58,7 @@ export default async function Page() {
         <RecentActivityCard items={data.recentSessions} content={content} />
         <ConversationSuggestionCard suggestion={suggestions[0]} content={content} />
       </div>
-      <h2 className="mt-6 text-xl font-black">
+      <h2 className="type-section-title mt-6">
         {contentText(content, "dashboard.skillsTitle", "Thói quen tư duy nổi bật")}
       </h2>
       <div className="mt-3 flex flex-wrap gap-2">
