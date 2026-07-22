@@ -164,7 +164,7 @@ export function ResourceEditorForm({ resource }: { resource?: AdminResourceItem 
                     altText={title || "Video hướng dẫn phụ huynh"}
                     accept="video/mp4,video/webm,video/quicktime"
                     allowedKinds={["video"]}
-                    description="Chọn video từ máy. Hệ thống sẽ tự tải lên và gắn vào bài viết."
+                    description="Chọn video đã có trong thư viện hoặc tải video mới từ máy."
                     error={form.formState.errors.mediaUrl?.message}
                   />
                 </div>

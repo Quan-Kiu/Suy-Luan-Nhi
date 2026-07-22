@@ -153,7 +153,7 @@ test("media follows upload, reviewer approval and owner deletion permissions", a
     buffer: tinyPng,
   });
   await page.getByPlaceholder("Ví dụ: Bống cầm kính lúp bên cây").fill("Điểm ảnh dùng cho kiểm thử media");
-  await page.getByRole("button", { name: "Chọn và tải lên" }).click();
+  await page.getByRole("button", { name: "Tải lên" }).click();
   await expect(page.getByText("Đã thêm vào thư viện")).toBeVisible();
   const uploadedCard = page.locator("article").filter({ hasText: "e2e-pixel.png" });
   await expect(uploadedCard).toContainText("Chờ kiểm tra");

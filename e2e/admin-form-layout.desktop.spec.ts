@@ -17,6 +17,17 @@ async function expectAligned(...locators: Locator[]) {
   expect(Math.max(...positions) - Math.min(...positions)).toBeLessThanOrEqual(1);
 }
 
+async function expectSameHeight(...locators: Locator[]) {
+  const heights = await Promise.all(
+    locators.map(async (locator) => {
+      const box = await locator.boundingBox();
+      expect(box).not.toBeNull();
+      return box!.height;
+    }),
+  );
+  expect(Math.max(...heights) - Math.min(...heights)).toBeLessThanOrEqual(1);
+}
+
 test.describe.configure({ mode: "serial" });
 
 test("content variable fields keep a stable two-column baseline", async ({ page }) => {
@@ -50,11 +61,22 @@ test("media upload controls stay aligned before and after validation", async ({ 
   const file = fileInput.locator("..");
   const category = page.locator('select[name="category"]');
   const description = page.locator('input[name="altText"]');
-  const upload = page.getByRole("button", { name: "Chọn và tải lên" });
+  const upload = page.getByRole("button", { name: "Tải lên" });
 
   await expect(page.getByText("Chưa chọn tệp", { exact: true })).toBeVisible();
   await expectAligned(file, category, description, upload);
+  await expectSameHeight(file, category, description, upload);
+  expect(await upload.evaluate((button) => getComputedStyle(button).boxShadow)).not.toContain("127, 46, 5");
+  expect(await upload.evaluate((button) => button.scrollHeight - button.clientHeight)).toBeLessThanOrEqual(1);
+  expect(
+    await page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth),
+  ).toBeLessThanOrEqual(1);
   const positionsBefore = await Promise.all([file, category, description, upload].map(top));
+
+  await page.screenshot({
+    path: ".verification/browser/admin-form-layout-media-before-validation.png",
+    fullPage: true,
+  });
 
   await upload.click();
   await expect(page.getByText("Hãy chọn một tệp hình ảnh, âm thanh hoặc video")).toBeVisible();
@@ -63,9 +85,35 @@ test("media upload controls stay aligned before and after validation", async ({ 
     ...positionsAfter.map((position, index) => Math.abs(position - positionsBefore[index])),
   );
   expect(maximumShift).toBeLessThanOrEqual(1);
+  await expectSameHeight(file, category, description, upload);
 
   await page.screenshot({
     path: ".verification/browser/admin-form-layout-media.png",
+    fullPage: true,
+  });
+});
+
+test("media upload controls stay balanced on a wide admin viewport", async ({ page }) => {
+  await clearAuth(page);
+  await page.setViewportSize({ width: 1920, height: 1080 });
+  await signIn(page, "content@demo.local", "/admin/media");
+  await expect(page.getByRole("heading", { name: "Hình ảnh, âm thanh và video" })).toBeVisible();
+
+  const file = page.locator('input[type="file"]').first().locator("..");
+  const category = page.locator('select[name="category"]');
+  const description = page.locator('input[name="altText"]');
+  const upload = page.getByRole("button", { name: "Tải lên" });
+
+  await expectAligned(file, category, description, upload);
+  await expectSameHeight(file, category, description, upload);
+  expect(await upload.evaluate((button) => getComputedStyle(button).boxShadow)).not.toContain("127, 46, 5");
+  expect(await upload.evaluate((button) => button.scrollHeight - button.clientHeight)).toBeLessThanOrEqual(1);
+  expect(
+    await page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth),
+  ).toBeLessThanOrEqual(1);
+
+  await page.screenshot({
+    path: ".verification/browser/admin-form-layout-media-wide.png",
     fullPage: true,
   });
 });
@@ -75,7 +123,7 @@ test("mission image upload keeps the admin shell inside the viewport", async ({ 
   await page.setViewportSize({ width: 1844, height: 832 });
   await signIn(page, "content@demo.local", "/admin/missions/new");
 
-  const uploadButton = page.getByRole("button", { name: /Hình minh họa.*Chọn tệp để tải lên/ }).first();
+  const uploadButton = page.getByRole("button", { name: /Hình minh họa.*Tải tệp mới/ }).first();
   await uploadButton.scrollIntoViewIfNeeded();
   expect(await page.evaluate(() => window.scrollY)).toBe(0);
 

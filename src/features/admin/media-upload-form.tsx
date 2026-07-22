@@ -45,6 +45,12 @@ export function MediaUploadForm({ onUploaded }: { onUploaded: (item: MediaItem) 
     staleTime: 5 * 60 * 1000,
   });
   const policySummary = getImageUploadPolicySummary(category, policiesQuery.data);
+  const fileDescriptionIds = [
+    policySummary ? "media-upload-policy" : null,
+    fileError ? "media-file-error" : null,
+  ]
+    .filter(Boolean)
+    .join(" ");
   function resetFileInput() {
     form.resetField("file");
     if (fileInputRef.current) fileInputRef.current.value = "";
@@ -76,17 +82,22 @@ export function MediaUploadForm({ onUploaded }: { onUploaded: (item: MediaItem) 
         {contentText(
           content,
           "media.uploadDescription",
-          "Hãy viết mô tả ngắn để người dùng trình đọc màn hình hiểu nội dung.",
+          "Tải tệp lên thư viện và viết mô tả ngắn để người dùng trình đọc màn hình hiểu nội dung.",
         )}
       </p>
-      <div className="mt-5 grid gap-x-3 gap-y-4 md:grid-cols-2 2xl:grid-cols-[minmax(320px,1.25fr)_minmax(180px,0.45fr)_minmax(300px,1fr)_auto] 2xl:items-start">
+      {policySummary ? (
+        <p id="media-upload-policy" className="type-caption mt-2 font-bold text-[#6f6558]">
+          Yêu cầu đối với ảnh: {policySummary}.
+        </p>
+      ) : null}
+      <div className="mt-5 grid gap-x-3 gap-y-4 md:grid-cols-2 2xl:grid-cols-[minmax(0,1.25fr)_minmax(180px,0.45fr)_minmax(0,1fr)_minmax(8rem,max-content)] 2xl:items-start">
         <label className="grid content-start gap-2 font-bold md:col-span-2 2xl:col-span-1">
-          <span>Tệp hình ảnh, âm thanh hoặc video</span>
-          <span className="relative flex min-h-12 items-stretch overflow-hidden rounded-2xl border-2 border-[#eadfc9] bg-[#fffdf8] transition outline-none focus-within:border-[#e9641a]">
+          <span className="type-label">Tệp hình ảnh, âm thanh hoặc video</span>
+          <span className="relative flex h-12 items-stretch overflow-hidden rounded-2xl border-2 border-[#eadfc9] bg-[#fffdf8] transition outline-none focus-within:border-[#e9641a]">
             <span className="type-label inline-flex shrink-0 items-center border-r border-[#eadfc9] bg-[#fff7e9] px-4 font-black text-[#5e4b34]">
               Chọn tệp
             </span>
-            <span className="min-w-0 flex-1 truncate px-3 py-3 font-normal text-[#6f6558]">
+            <span className="flex min-w-0 flex-1 items-center truncate px-3 font-normal text-[#6f6558]">
               {selectedFileName}
             </span>
             <input
@@ -97,25 +108,18 @@ export function MediaUploadForm({ onUploaded }: { onUploaded: (item: MediaItem) 
               onBlur={fileRegistration.onBlur}
               onChange={fileRegistration.onChange}
               aria-invalid={Boolean(fileError)}
-              aria-describedby="media-file-message"
+              aria-describedby={fileDescriptionIds || undefined}
               ref={(element) => {
                 fileRegistration.ref(element);
                 fileInputRef.current = element;
               }}
             />
           </span>
-          <span
-            id="media-file-message"
-            role={fileError ? "alert" : undefined}
-            aria-hidden={fileError || policySummary ? undefined : true}
-            className={
-              fileError
-                ? "type-supporting min-h-5 font-bold text-red-700"
-                : "type-caption min-h-5 leading-5 font-bold text-[#6f6558]"
-            }
-          >
-            {fileError ?? (policySummary ? `Yêu cầu đối với ảnh: ${policySummary}.` : "\u00a0")}
-          </span>
+          {fileError ? (
+            <span id="media-file-error" role="alert" className="type-supporting font-bold text-red-700">
+              {fileError}
+            </span>
+          ) : null}
         </label>
         <SelectField
           label="Loại nội dung"
@@ -131,13 +135,16 @@ export function MediaUploadForm({ onUploaded }: { onUploaded: (item: MediaItem) 
           registration={form.register("altText")}
           error={form.formState.errors.altText?.message}
         />
-        <div className="md:col-span-2 2xl:col-span-1 2xl:pt-8">
+        <div className="grid content-start gap-2 md:col-span-2 2xl:col-span-1">
+          <span aria-hidden="true" className="type-label invisible hidden select-none 2xl:block">
+            Thao tác
+          </span>
           <SubmitButton
             pending={mutation.isPending}
             pendingLabel={contentText(content, "media.uploading", "Đang tải...")}
-            className="min-h-12 w-full 2xl:w-auto 2xl:min-w-32"
+            className="min-h-12 w-full whitespace-nowrap shadow-none hover:translate-y-0 active:translate-y-0 active:shadow-none"
           >
-            {contentText(content, "media.upload", "Chọn và tải lên")}
+            {contentText(content, "media.upload", "Tải lên")}
           </SubmitButton>
         </div>
       </div>

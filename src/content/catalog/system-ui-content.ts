@@ -84,10 +84,12 @@ export const adminContentEntries = defineContent("admin", {
     value: "Không tìm thấy câu chữ phù hợp.",
     description: "Thông báo khi tìm kiếm không có kết quả.",
   },
-  "media.uploadTitle": { value: "Thêm hình ảnh hoặc âm thanh", description: "Tiêu đề form tải tệp." },
+  "media.uploadTitle": {
+    value: "Thêm hình ảnh, âm thanh hoặc video",
+    description: "Tiêu đề form tải tệp.",
+  },
   "media.uploadDescription": {
-    value:
-      "Ảnh tối đa 10MB, âm thanh tối đa 20MB, video tối đa 50MB. Hãy viết mô tả ngắn để người dùng trình đọc màn hình hiểu nội dung.",
+    value: "Tải tệp lên thư viện và viết mô tả ngắn để người dùng trình đọc màn hình hiểu nội dung.",
     description: "Hướng dẫn tải tệp.",
   },
   "media.altLabel": { value: "Mô tả cho người không xem được nội dung", description: "Nhãn mô tả tệp." },
@@ -95,7 +97,7 @@ export const adminContentEntries = defineContent("admin", {
     value: "Ví dụ: Bống cầm kính lúp bên cây",
     description: "Gợi ý trong ô nhập mô tả tệp.",
   },
-  "media.upload": { value: "Chọn và tải lên", description: "Nhãn nút tải media." },
+  "media.upload": { value: "Tải lên", description: "Nhãn nút tải media." },
   "media.uploading": { value: "Đang tải...", description: "Nhãn khi tải media." },
   "media.uploadSuccess": {
     value: "Đã thêm vào thư viện",

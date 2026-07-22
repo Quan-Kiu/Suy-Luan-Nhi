@@ -146,7 +146,7 @@ export function QuestionOptionList({
                 onChange={(url) => update(index, { asset: url, altText: item.label })}
                 category="question-asset"
                 altText={item.label || `${title} ${index + 1}`}
-                description="Không bắt buộc. Chọn ảnh từ máy khi đáp án cần hình minh họa."
+                description="Không bắt buộc. Chọn ảnh đã có trong thư viện hoặc tải ảnh mới khi đáp án cần hình minh họa."
                 compact
               />
             </div>

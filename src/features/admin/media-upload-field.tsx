@@ -1,9 +1,9 @@
 "use client";
 
 import { useMutation, useQuery } from "@tanstack/react-query";
-import { CheckCircle2, FileAudio, ImageIcon, LoaderCircle, UploadCloud, Video } from "lucide-react";
+import { CheckCircle2, FileAudio, ImageIcon, Images, LoaderCircle, UploadCloud, Video } from "lucide-react";
 import Image from "next/image";
-import { useId, useRef } from "react";
+import { useId, useRef, useState } from "react";
 import { toast } from "sonner";
 import { mediaApi } from "@/api/admin/media";
 import {
@@ -11,10 +11,9 @@ import {
   validateImageFileForCategory,
 } from "@/features/admin/media-file-validation";
 import type { MediaCategory } from "@/domain/media";
+import { MediaLibraryPicker, type MediaKind } from "@/features/admin/media-library-picker";
 import { queryKeys } from "@/lib/query/keys";
 import { cn } from "@/lib/utils";
-
-type MediaKind = "image" | "audio" | "video";
 
 type Props = {
   label: string;
@@ -86,12 +85,13 @@ export function MediaUploadField({
   altText,
   accept = defaultAccept,
   allowedKinds = ["image"],
-  description = "Chọn tệp từ máy. Hệ thống sẽ tự tải lên và gắn vào nội dung.",
+  description = "Chọn tư liệu đã có trong thư viện hoặc tải tệp mới từ máy.",
   error,
   compact = false,
   previewFit = "contain",
 }: Props) {
   const inputId = useId();
+  const [libraryOpen, setLibraryOpen] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
   const triggerRef = useRef<HTMLButtonElement>(null);
   const policiesQuery = useQuery({
@@ -133,20 +133,37 @@ export function MediaUploadField({
         </p>
       </div>
       {value ? <Preview url={value} label={altText || label} fit={previewFit} compact={compact} /> : null}
-      <button
-        ref={triggerRef}
-        type="button"
-        disabled={mutation.isPending}
-        aria-labelledby={`${inputId}-label ${inputId}-action`}
-        aria-describedby={`${inputId}-description`}
-        onClick={() => inputRef.current?.click()}
-        className="type-action flex min-h-11 w-full cursor-pointer items-center justify-center gap-2 rounded-xl border-2 border-dashed border-[#d5c09b] bg-white px-4 transition hover:border-[#e9641a] hover:bg-[#fff7eb] disabled:cursor-wait disabled:opacity-60"
-      >
-        {mutation.isPending ? <LoaderCircle size={18} className="animate-spin" /> : <UploadCloud size={18} />}
-        <span id={`${inputId}-action`}>
-          {mutation.isPending ? "Đang tải lên..." : value ? "Thay tệp khác" : "Chọn tệp để tải lên"}
-        </span>
-      </button>
+      <div className="grid gap-2 sm:grid-cols-2">
+        <button
+          type="button"
+          disabled={mutation.isPending}
+          aria-labelledby={`${inputId}-label ${inputId}-library-action`}
+          aria-describedby={`${inputId}-description`}
+          onClick={() => setLibraryOpen(true)}
+          className="type-action flex min-h-11 w-full items-center justify-center gap-2 rounded-xl bg-[#3f392f] px-4 text-white transition hover:bg-[#2f2a24] disabled:opacity-60"
+        >
+          <Images size={18} />
+          <span id={`${inputId}-library-action`}>Chọn từ thư viện</span>
+        </button>
+        <button
+          ref={triggerRef}
+          type="button"
+          disabled={mutation.isPending}
+          aria-labelledby={`${inputId}-label ${inputId}-action`}
+          aria-describedby={`${inputId}-description`}
+          onClick={() => inputRef.current?.click()}
+          className="type-action flex min-h-11 w-full cursor-pointer items-center justify-center gap-2 rounded-xl border-2 border-dashed border-[#d5c09b] bg-white px-4 transition hover:border-[#e9641a] hover:bg-[#fff7eb] disabled:cursor-wait disabled:opacity-60"
+        >
+          {mutation.isPending ? (
+            <LoaderCircle size={18} className="animate-spin" />
+          ) : (
+            <UploadCloud size={18} />
+          )}
+          <span id={`${inputId}-action`}>
+            {mutation.isPending ? "Đang tải lên..." : value ? "Tải tệp khác" : "Tải tệp mới"}
+          </span>
+        </button>
+      </div>
       <input
         ref={inputRef}
         type="file"
@@ -183,6 +200,19 @@ export function MediaUploadField({
           {error}
         </p>
       ) : null}
+      <MediaLibraryPicker
+        open={libraryOpen}
+        label={label}
+        category={category}
+        allowedKinds={allowedKinds}
+        currentUrl={value}
+        onClose={() => setLibraryOpen(false)}
+        onSelect={(item) => {
+          onChange(item.url);
+          setLibraryOpen(false);
+          toast.success("Đã chọn tư liệu từ thư viện");
+        }}
+      />
     </div>
   );
 }
