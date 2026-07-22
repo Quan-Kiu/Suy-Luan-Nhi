@@ -49,6 +49,29 @@ describe("GlobalFeedbackWidget", () => {
     expect(await screen.findByRole("button", { name: "Gửi góp ý về trang này" })).toBeVisible();
   });
 
+  it("keeps the header and actions fixed while only the content region scrolls", async () => {
+    vi.spyOn(feedbackApi, "getUploadConfig").mockResolvedValue({
+      enabled: true,
+      maxAttachments: 0,
+      policies: defaultImageUploadPolicies,
+    });
+    const user = userEvent.setup();
+    renderWidget();
+
+    await user.click(await screen.findByRole("button", { name: "Gửi góp ý về trang này" }));
+
+    const dialog = screen.getByRole("dialog");
+    const header = dialog.querySelector<HTMLElement>("[data-feedback-header]");
+    const scrollRegion = dialog.querySelector<HTMLElement>("[data-feedback-scroll-region]");
+    const actions = dialog.querySelector<HTMLElement>("[data-feedback-actions]");
+
+    expect(header).toBeInTheDocument();
+    expect(scrollRegion).toHaveClass("overflow-y-auto");
+    expect(actions).toBeInTheDocument();
+    expect(scrollRegion).not.toContainElement(header);
+    expect(scrollRegion).not.toContainElement(actions);
+  });
+
   it("allows text-only feedback when image attachments are disabled", async () => {
     vi.spyOn(feedbackApi, "getUploadConfig").mockResolvedValue({
       enabled: true,
@@ -67,7 +90,11 @@ describe("GlobalFeedbackWidget", () => {
 
     await user.click(await screen.findByRole("button", { name: "Gửi góp ý về trang này" }));
 
-    expect(screen.getByText("Ảnh đính kèm đang được tắt. Bạn vẫn có thể gửi nội dung góp ý.")).toBeVisible();
+    await waitFor(() =>
+      expect(
+        screen.getByText("Ảnh đính kèm đang được tắt. Bạn vẫn có thể gửi nội dung góp ý."),
+      ).toBeVisible(),
+    );
     expect(screen.getByText("Ảnh đính kèm đang tắt.")).toBeVisible();
     expect(screen.queryByRole("button", { name: "Chụp lại trang" })).not.toBeInTheDocument();
 
