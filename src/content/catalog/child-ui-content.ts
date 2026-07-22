@@ -3,6 +3,7 @@ import { defineContent } from "@/content/define";
 export const childContentEntries = defineContent("child", {
   "header.home": { value: "Bản đồ nhiệm vụ", description: "Nhãn trang chính chế độ bé." },
   "header.profiles": { value: "Hồ sơ của bé", description: "Nhãn quản lý hồ sơ của bé." },
+  "header.badges": { value: "Bộ sưu tập huy hiệu", description: "Nhãn mở bộ sưu tập huy hiệu của bé." },
   "header.parent": { value: "Dành cho ba mẹ", description: "Nhãn mở khu vực phụ huynh." },
   "header.openMenu": { value: "Mở menu chế độ bé", description: "Nhãn mở menu mobile." },
   "header.closeMenu": { value: "Đóng menu chế độ bé", description: "Nhãn đóng menu mobile." },
@@ -21,6 +22,60 @@ export const childContentEntries = defineContent("child", {
   "journey.description": {
     value: "Mỗi lần hoàn thành, bé sẽ mở thêm nhiệm vụ mới. Không có xếp hạng hay so sánh.",
     description: "Mô tả cách mở khóa nhiệm vụ.",
+  },
+  "badges.eyebrow": { value: "Bộ sưu tập thành tích", description: "Nhãn nhỏ trên đầu trang huy hiệu." },
+  "badges.title": { value: "Huy hiệu của {childName}", description: "Tiêu đề bộ sưu tập huy hiệu." },
+  "badges.avatarAlt": { value: "Avatar của {childName}", description: "Mô tả avatar tại trang huy hiệu." },
+  "badges.description": {
+    value: "Mỗi huy hiệu lưu lại một điều con đã quan sát, suy nghĩ hoặc kiên trì làm được.",
+    description: "Giải thích ý nghĩa của bộ sưu tập huy hiệu.",
+  },
+  "badges.progressLabel": { value: "Tiến độ bộ sưu tập", description: "Nhãn hỗ trợ thanh tiến độ huy hiệu." },
+  "badges.progress": {
+    value: "Đã nhận {earned}/{total} huy hiệu",
+    description: "Tóm tắt số huy hiệu đã nhận.",
+  },
+  "badges.latest": { value: "Mới nhận gần đây", description: "Nhãn huy hiệu mới nhất." },
+  "badges.openLatest": {
+    value: "Xem huy hiệu mới nhất: {badgeName}",
+    description: "Nhãn truy cập huy hiệu mới nhất.",
+  },
+  "badges.emptyTitle": {
+    value: "Huy hiệu đầu tiên đang chờ con",
+    description: "Trạng thái chưa có huy hiệu.",
+  },
+  "badges.exploreMissions": { value: "Khám phá nhiệm vụ", description: "Nút mở bản đồ từ trang huy hiệu." },
+  "badges.collectionTitle": { value: "Tủ huy hiệu", description: "Tiêu đề lưới huy hiệu." },
+  "badges.collectionDescription": {
+    value: "Chạm vào một huy hiệu để xem câu chuyện của nó.",
+    description: "Hướng dẫn xem chi tiết huy hiệu.",
+  },
+  "badges.filterAll": { value: "Tất cả", description: "Bộ lọc tất cả huy hiệu." },
+  "badges.filterEarned": { value: "Đã nhận", description: "Bộ lọc huy hiệu đã nhận." },
+  "badges.filterLocked": { value: "Chưa mở", description: "Bộ lọc huy hiệu chưa mở." },
+  "badges.earned": { value: "Đã nhận", description: "Trạng thái huy hiệu đã nhận." },
+  "badges.locked": { value: "Chưa mở", description: "Trạng thái huy hiệu chưa mở." },
+  "badges.new": { value: "Mới", description: "Nhãn huy hiệu vừa nhận trong bảy ngày." },
+  "badges.openEarned": { value: "Xem huy hiệu {badgeName}", description: "Nhãn mở huy hiệu đã nhận." },
+  "badges.openLocked": {
+    value: "Xem cách mở huy hiệu {badgeName}",
+    description: "Nhãn mở huy hiệu chưa nhận.",
+  },
+  "badges.noEarnedInFilter": {
+    value: "Con chưa nhận huy hiệu nào.",
+    description: "Trạng thái bộ lọc chưa có huy hiệu đã nhận.",
+  },
+  "badges.noLockedInFilter": {
+    value: "Con đã mở tất cả huy hiệu rồi!",
+    description: "Trạng thái không còn huy hiệu bị khóa.",
+  },
+  "badges.closeDetails": { value: "Đóng chi tiết huy hiệu", description: "Nhãn đóng modal huy hiệu." },
+  "badges.earnedDate": { value: "Nhận ngày {date}", description: "Ngày bé nhận huy hiệu." },
+  "badges.fromMission": { value: "Từ nhiệm vụ: {missionName}", description: "Nhiệm vụ đã trao huy hiệu." },
+  "badges.skill": { value: "Con đã luyện: {skillName}", description: "Kỹ năng gắn với huy hiệu." },
+  "badges.exploreToUnlock": {
+    value: "Khám phá nhiệm vụ để mở",
+    description: "Nút tiếp tục nhiệm vụ từ huy hiệu chưa mở.",
   },
   "completion.imageAlt": {
     value: "Bé và Bống ăn mừng hoàn thành nhiệm vụ",

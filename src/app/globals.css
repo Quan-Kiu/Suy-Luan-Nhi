@@ -220,6 +220,12 @@ a {
   line-height: 1.25;
 }
 
+@media (min-width: 1024px) {
+  .child-shell:has([data-child-layout="wide"]) {
+    max-width: 1120px;
+  }
+}
+
 .paper-texture {
   background-color: #fffaf0;
   background-image:

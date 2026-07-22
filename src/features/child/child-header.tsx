@@ -1,7 +1,7 @@
 "use client";
 
 import { AnimatePresence, motion } from "motion/react";
-import { ArrowLeft, LoaderCircle, LogOut, Menu, ShieldCheck, UserRound, X } from "lucide-react";
+import { ArrowLeft, LoaderCircle, LogOut, Menu, ShieldCheck, Trophy, UserRound, X } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
@@ -12,6 +12,7 @@ import { cn } from "@/lib/utils";
 
 const navigation = [
   { href: "/missions", labelKey: "header.home", fallback: "Bản đồ nhiệm vụ", icon: ShieldCheck },
+  { href: "/badges", labelKey: "header.badges", fallback: "Bộ sưu tập huy hiệu", icon: Trophy },
   { href: "/profiles", labelKey: "header.profiles", fallback: "Hồ sơ bé", icon: UserRound },
   { href: "/parent", labelKey: "header.parent", fallback: "Khu vực phụ huynh", icon: ShieldCheck },
 ] as const;
