@@ -77,6 +77,19 @@ export function MediaCard({
     },
   });
 
+  const deleteErrorMessage =
+    mutation.isError && mutation.variables === "delete" ? mutation.error.message : undefined;
+
+  function openDeleteDialog() {
+    mutation.reset();
+    setDeleteOpen(true);
+  }
+
+  function closeDeleteDialog() {
+    mutation.reset();
+    setDeleteOpen(false);
+  }
+
   return (
     <article className="overflow-hidden rounded-2xl border bg-white">
       <div className="relative grid h-44 place-items-center bg-[#f6f2ea]">
@@ -161,7 +174,7 @@ export function MediaCard({
                 type="button"
                 aria-label={contentText(content, "media.delete", "Xóa tệp")}
                 disabled={mutation.isPending}
-                onClick={() => setDeleteOpen(true)}
+                onClick={openDeleteDialog}
                 className="rounded-lg border p-2 text-red-700 disabled:opacity-50"
               >
                 {mutation.isPending && mutation.variables === "delete" ? (
@@ -174,8 +187,8 @@ export function MediaCard({
           </div>
         </div>
         <FormStatus
-          status={mutation.isError ? "error" : "idle"}
-          message={mutation.error?.message}
+          status={mutation.isError && mutation.variables !== "delete" ? "error" : "idle"}
+          message={mutation.variables !== "delete" ? mutation.error?.message : undefined}
           className="mt-3"
         />
         <details className="mt-3 rounded-lg bg-[#f5f2ec] p-2 text-[10px]">
@@ -200,11 +213,12 @@ export function MediaCard({
                 "Tệp sẽ bị xóa vĩnh viễn nếu chưa được dùng trong nhiệm vụ hoặc bài viết.",
               )
         }
-        confirmLabel="Xóa tệp"
+        confirmLabel={deleteErrorMessage ? "Thử xóa lại" : "Xóa tệp"}
         pendingLabel="Đang xóa..."
         tone="danger"
         pending={mutation.isPending && mutation.variables === "delete"}
-        onClose={() => setDeleteOpen(false)}
+        errorMessage={deleteErrorMessage}
+        onClose={closeDeleteDialog}
         onConfirm={() => mutation.mutate("delete")}
       />
     </article>

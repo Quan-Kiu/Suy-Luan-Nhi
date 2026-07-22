@@ -1,7 +1,7 @@
 "use client";
 
 import { AnimatePresence, motion } from "motion/react";
-import { AlertTriangle, Archive, LoaderCircle, Trash2, X } from "lucide-react";
+import { AlertCircle, AlertTriangle, Archive, LoaderCircle, Trash2, X } from "lucide-react";
 import { useEffect, useId, useRef } from "react";
 import { cn } from "@/lib/utils";
 
@@ -16,6 +16,7 @@ type ConfirmDialogProps = {
   pendingLabel?: string;
   tone?: Tone;
   pending?: boolean;
+  errorMessage?: string;
   onConfirm: () => void;
   onClose: () => void;
 };
@@ -34,11 +35,13 @@ export function ConfirmDialog({
   pendingLabel = "Đang xử lý...",
   tone = "default",
   pending = false,
+  errorMessage,
   onConfirm,
   onClose,
 }: ConfirmDialogProps) {
   const titleId = useId();
   const descriptionId = useId();
+  const errorId = useId();
   const cancelRef = useRef<HTMLButtonElement>(null);
   const styles = toneStyles[tone];
   const Icon = styles.icon;
@@ -74,7 +77,7 @@ export function ConfirmDialog({
             role="alertdialog"
             aria-modal="true"
             aria-labelledby={titleId}
-            aria-describedby={descriptionId}
+            aria-describedby={errorMessage ? `${descriptionId} ${errorId}` : descriptionId}
             className="w-full max-w-md rounded-[28px] border border-[#eadfc9] bg-[#fffdf8] p-5 shadow-2xl sm:p-6"
             initial={{ opacity: 0, scale: 0.96, y: 12 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}
@@ -102,6 +105,16 @@ export function ConfirmDialog({
                 <X size={18} />
               </button>
             </div>
+            {errorMessage ? (
+              <div
+                id={errorId}
+                role="alert"
+                className="mt-5 flex items-start gap-3 rounded-2xl border border-red-200 bg-red-50 p-4 text-sm leading-5 font-bold text-red-800"
+              >
+                <AlertCircle className="mt-0.5 size-5 shrink-0" aria-hidden="true" />
+                <span>{errorMessage}</span>
+              </div>
+            ) : null}
             <div className="mt-6 grid gap-3 sm:grid-cols-2">
               <button
                 ref={cancelRef}

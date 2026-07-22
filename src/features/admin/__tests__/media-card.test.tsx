@@ -67,6 +67,28 @@ describe("MediaCard", () => {
     expect(toast.success).toHaveBeenCalledWith("Đã sao chép liên kết");
     expect(screen.getByRole("button", { name: "Đã sao chép liên kết" })).toBeInTheDocument();
   });
+  it("keeps a deletion error inside the confirmation dialog and clears it after closing", async () => {
+    const user = userEvent.setup();
+    vi.spyOn(mediaApi, "remove").mockRejectedValueOnce(
+      new Error("Tệp đang được dùng trong nhiệm vụ. Hãy thay tệp trước khi xóa."),
+    );
+
+    renderCard({ canDelete: true });
+    await user.click(screen.getByRole("button", { name: "Xóa tệp" }));
+    const dialog = screen.getByRole("alertdialog", { name: "Xóa tệp này?" });
+    await user.click(within(dialog).getByRole("button", { name: "Xóa tệp" }));
+
+    const error = await within(dialog).findByRole("alert");
+    expect(error).toHaveTextContent("Tệp đang được dùng trong nhiệm vụ");
+    expect(error.closest('[role="alertdialog"]')).toBe(dialog);
+    expect(within(dialog).getByRole("button", { name: "Thử xóa lại" })).toBeEnabled();
+
+    await user.click(within(dialog).getByRole("button", { name: "Hủy" }));
+    await user.click(screen.getByRole("button", { name: "Xóa tệp" }));
+
+    expect(within(screen.getByRole("alertdialog")).queryByRole("alert")).not.toBeInTheDocument();
+  });
+
   it("explains that deleting a feedback image also removes it from the feedback", async () => {
     const user = userEvent.setup();
     const onDeleted = vi.fn();
