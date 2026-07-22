@@ -1,6 +1,6 @@
 import * as motion from "motion/react-client";
 import Image from "next/image";
-import { Check, PlayCircle, ShieldCheck } from "lucide-react";
+import { Check, HeartHandshake, PlayCircle, Puzzle, ShieldCheck, UserRoundPlus } from "lucide-react";
 import { contentText } from "@/content/resolve";
 import { assets } from "@/domain/content";
 import { AuthAwareEntryLink } from "@/features/landing/auth-aware-entry-link";
@@ -14,6 +14,35 @@ export default async function HomePage() {
     t("hero.trust.publicRanking", "Không bảng xếp hạng công khai"),
     t("hero.trust.privacy", "Ưu tiên quyền riêng tư"),
     t("hero.trust.positive", "Nội dung ngắn và tích cực"),
+  ];
+  const howSteps = [
+    {
+      icon: UserRoundPlus,
+      number: "1",
+      title: t("how.step1.title", "Ba mẹ tạo hồ sơ cho bé"),
+      description: t(
+        "how.step1.description",
+        "Chỉ cần tên ở nhà, nhóm tuổi và một ảnh đại diện. Không cần thông tin nhạy cảm.",
+      ),
+    },
+    {
+      icon: Puzzle,
+      number: "2",
+      title: t("how.step2.title", "Bé chọn một nhiệm vụ ngắn"),
+      description: t(
+        "how.step2.description",
+        "Mỗi nhiệm vụ chỉ mất vài phút, có hướng dẫn rõ ràng và gợi ý khi bé cần.",
+      ),
+    },
+    {
+      icon: HeartHandshake,
+      number: "3",
+      title: t("how.step3.title", "Ba mẹ xem bé đã luyện gì"),
+      description: t(
+        "how.step3.description",
+        "Xem kỹ năng bé vừa dùng và gợi ý đồng hành, không có xếp hạng hay so sánh.",
+      ),
+    },
   ];
   const safeCards = [
     {
@@ -62,7 +91,7 @@ export default async function HomePage() {
               href="#how"
               className="inline-flex min-h-14 items-center justify-center gap-2 rounded-2xl border-2 border-[#dac7a7] bg-white px-6 font-black"
             >
-              <PlayCircle size={20} /> {t("hero.secondaryCta", "Xem cách hoạt động")}
+              <PlayCircle size={20} /> {t("hero.secondaryCta", "Xem 3 bước bắt đầu")}
             </a>
           </div>
           <div className="mt-5 flex flex-wrap gap-x-5 gap-y-2 text-sm font-bold text-[#6c7d58]">
@@ -86,7 +115,64 @@ export default async function HomePage() {
           />
         </div>
       </motion.section>
-      <section id="safe" className="mx-auto max-w-7xl px-5 pb-20 lg:px-10">
+
+      <section id="how" aria-labelledby="how-title" className="scroll-mt-6 bg-[#edf4df] px-5 py-16 lg:py-20">
+        <div className="mx-auto max-w-7xl">
+          <div className="mx-auto max-w-3xl text-center">
+            <p className="text-sm font-black tracking-[0.16em] text-[#6d844f] uppercase">
+              {t("how.eyebrow", "Bắt đầu rất đơn giản")}
+            </p>
+            <h2 id="how-title" className="mt-3 text-3xl font-black text-[#40321f] sm:text-4xl">
+              {t("how.title", "Ba bước để bé bắt đầu một nhiệm vụ")}
+            </h2>
+            <p className="mx-auto mt-4 max-w-2xl text-base leading-7 text-[#617149] sm:text-lg">
+              {t(
+                "how.description",
+                "Ba mẹ tạo hồ sơ một lần. Sau đó bé chọn nhiệm vụ phù hợp, làm theo hướng dẫn và có thể nhận gợi ý bất cứ lúc nào.",
+              )}
+            </p>
+          </div>
+
+          <ol className="mt-10 grid gap-5 lg:grid-cols-3">
+            {howSteps.map((step) => {
+              const Icon = step.icon;
+              return (
+                <motion.li
+                  key={step.number}
+                  className="relative rounded-[30px] border border-[#d9e6c6] bg-white/90 p-6 text-left shadow-[0_16px_40px_rgba(75,101,49,.08)]"
+                  initial={{ opacity: 0, y: 16 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true, amount: 0.25 }}
+                  whileHover={{ y: -4 }}
+                >
+                  <div className="flex items-center justify-between gap-4">
+                    <span className="grid size-14 place-items-center rounded-2xl bg-[#fff0df] text-[#d65a16]">
+                      <Icon size={28} aria-hidden="true" />
+                    </span>
+                    <span className="grid size-9 place-items-center rounded-full bg-[#5f7846] text-sm font-black text-white">
+                      {step.number}
+                    </span>
+                  </div>
+                  <h3 className="mt-5 text-xl font-black text-[#40321f]">{step.title}</h3>
+                  <p className="mt-3 leading-7 text-[#75684f]">{step.description}</p>
+                </motion.li>
+              );
+            })}
+          </ol>
+
+          <div className="mx-auto mt-8 flex max-w-3xl flex-col items-center gap-5 rounded-[28px] border border-[#d4e0c2] bg-[#f8fbf2] px-5 py-6 text-center sm:px-8">
+            <p className="leading-7 font-bold text-[#53673d]">
+              {t(
+                "how.note",
+                "Bé được thử lại thoải mái. Hệ thống ghi nhận nỗ lực, không phạt khi bé trả lời chưa đúng.",
+              )}
+            </p>
+            <AuthAwareEntryLink content={content} />
+          </div>
+        </div>
+      </section>
+
+      <section id="safe" className="mx-auto max-w-7xl scroll-mt-6 px-5 py-20 lg:px-10">
         <h2 className="text-center text-3xl font-black">
           {t("safe.title", "An tâm cho bé, vui học mỗi ngày")}
         </h2>
@@ -112,22 +198,6 @@ export default async function HomePage() {
             </motion.article>
           ))}
         </div>
-      </section>
-      <section id="how" className="bg-[#edf4df] px-5 py-16 text-center">
-        <Image
-          src={assets.hedgehogThumb}
-          width={100}
-          height={100}
-          alt="Nhím phụ tá giơ ngón tay cái"
-          className="mx-auto h-24 w-24 object-contain"
-        />
-        <h2 className="text-3xl font-black">{t("how.title", "Một nhiệm vụ nhỏ, một thói quen nghĩ mới")}</h2>
-        <p className="mx-auto mt-3 max-w-2xl text-[#617149]">
-          {t(
-            "how.description",
-            "Chọn thế giới, quan sát câu hỏi, nhận gợi ý dịu dàng và cùng bé chúc mừng từng lần thử.",
-          )}
-        </p>
       </section>
     </main>
   );

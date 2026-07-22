@@ -23,7 +23,7 @@ function NavigationLinks({
   return (
     <>
       <a href="#how" onClick={onNavigate} className={className}>
-        {contentText(content, "header.how", "Cách hoạt động")}
+        {contentText(content, "header.how", "Bé bắt đầu ra sao?")}
       </a>
       <a href="#safe" onClick={onNavigate} className={className}>
         {contentText(content, "header.safe", "An toàn cho bé")}

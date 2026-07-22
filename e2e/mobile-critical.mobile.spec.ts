@@ -17,6 +17,27 @@ test("landing page exposes an accessible mobile navigation menu", async ({ page 
   await expect(page.getByRole("link", { name: "Khu vực phụ huynh" })).toBeVisible();
 });
 
+test("landing explains the product in three clear steps", async ({ page }) => {
+  await page.goto("/");
+  const howLink = page.getByRole("link", { name: "Xem 3 bước bắt đầu" });
+  await expect(howLink).toBeVisible();
+
+  await howLink.click();
+  await expect(page).toHaveURL(/#how$/);
+  await expect(page.getByRole("heading", { name: "Ba bước để bé bắt đầu một nhiệm vụ" })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Ba mẹ tạo hồ sơ cho bé" })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Bé chọn một nhiệm vụ ngắn" })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Ba mẹ xem bé đã luyện gì" })).toBeVisible();
+
+  await expect
+    .poll(() => page.locator("#how").evaluate((element) => Math.round(element.getBoundingClientRect().top)))
+    .toBeLessThan(80);
+  const howTop = await page
+    .locator("#how")
+    .evaluate((element) => Math.round(element.getBoundingClientRect().top));
+  expect(howTop).toBeGreaterThanOrEqual(0);
+});
+
 test("admin CMS exposes an accessible mobile navigation drawer", async ({ page }) => {
   await page.goto("/auth/sign-in");
   await page.getByLabel("Email").fill("content@demo.local");

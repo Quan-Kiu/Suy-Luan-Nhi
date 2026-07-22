@@ -1,7 +1,7 @@
 import { defineContent } from "@/content/define";
 
 export const landingContentEntries = defineContent("landing", {
-  "header.how": { value: "Bé sẽ chơi thế nào?", description: "Liên kết điều hướng tới phần cách hoạt động." },
+  "header.how": { value: "Bé bắt đầu ra sao?", description: "Liên kết tới phần ba bước bắt đầu." },
   "header.safe": { value: "Vì sao an toàn?", description: "Liên kết điều hướng tới phần an toàn." },
   "header.parent": { value: "Khu vực phụ huynh", description: "Liên kết tới khu vực phụ huynh." },
   "header.admin": {
@@ -38,7 +38,7 @@ export const landingContentEntries = defineContent("landing", {
     value: "Mở trang quản trị",
     description: "lối tắt cho nhân viên quản trị đã đăng nhập.",
   },
-  "hero.secondaryCta": { value: "Xem bé sẽ chơi thế nào", description: "Nhãn lối tắt xem phần giới thiệu." },
+  "hero.secondaryCta": { value: "Xem 3 bước bắt đầu", description: "Nhãn lối tắt xem ba bước bắt đầu." },
   "hero.trust.publicRanking": {
     value: "Không xếp hạng hay so sánh",
     description: "Điểm tin cậy về bảng xếp hạng.",
@@ -64,13 +64,33 @@ export const landingContentEntries = defineContent("landing", {
     value: "Bé được gợi ý nhẹ nhàng và có thể thử lại.",
     description: "Mô tả thẻ học qua chơi.",
   },
+  "how.eyebrow": { value: "Bắt đầu rất đơn giản", description: "Dòng giới thiệu ngắn cho ba bước bắt đầu." },
   "how.title": {
-    value: "Mỗi nhiệm vụ ngắn, thêm một cách nghĩ mới",
-    description: "Tiêu đề phần cách hoạt động.",
+    value: "Ba bước để bé bắt đầu một nhiệm vụ",
+    description: "Tiêu đề phần ba bước bắt đầu.",
   },
   "how.description": {
     value:
-      "Bé chọn một chủ đề, quan sát câu hỏi, nhận gợi ý nhẹ nhàng và được chúc mừng sau mỗi lần cố gắng.",
-    description: "Mô tả phần cách hoạt động.",
+      "Ba mẹ tạo hồ sơ một lần. Sau đó bé chọn nhiệm vụ phù hợp, làm theo hướng dẫn và có thể nhận gợi ý bất cứ lúc nào.",
+    description: "Mô tả tổng quan ba bước bắt đầu.",
+  },
+  "how.step1.title": { value: "Ba mẹ tạo hồ sơ cho bé", description: "Tiêu đề bước tạo hồ sơ." },
+  "how.step1.description": {
+    value: "Chỉ cần tên ở nhà, nhóm tuổi và một ảnh đại diện. Không cần thông tin nhạy cảm.",
+    description: "Mô tả bước tạo hồ sơ.",
+  },
+  "how.step2.title": { value: "Bé chọn một nhiệm vụ ngắn", description: "Tiêu đề bước chọn nhiệm vụ." },
+  "how.step2.description": {
+    value: "Mỗi nhiệm vụ chỉ mất vài phút, có hướng dẫn rõ ràng và gợi ý khi bé cần.",
+    description: "Mô tả bước bé làm nhiệm vụ.",
+  },
+  "how.step3.title": { value: "Ba mẹ xem bé đã luyện gì", description: "Tiêu đề bước xem kết quả." },
+  "how.step3.description": {
+    value: "Xem kỹ năng bé vừa dùng và gợi ý đồng hành, không có xếp hạng hay so sánh.",
+    description: "Mô tả bước phụ huynh xem kết quả.",
+  },
+  "how.note": {
+    value: "Bé được thử lại thoải mái. Hệ thống ghi nhận nỗ lực, không phạt khi bé trả lời chưa đúng.",
+    description: "Lời nhắc về cách hệ thống khuyến khích bé.",
   },
 });
