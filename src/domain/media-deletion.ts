@@ -1,4 +1,5 @@
 export type MediaReferenceCounts = {
+  childAvatars: number;
   missionCovers: number;
   badgeIcons: number;
   worldCovers: number;
@@ -11,6 +12,7 @@ export type MediaReferenceCounts = {
 export type BlockingMediaReference = Exclude<keyof MediaReferenceCounts, "feedbackAttachments">;
 
 const mediaReferenceLabels: Record<BlockingMediaReference, string> = {
+  childAvatars: "hồ sơ bé",
   missionCovers: "nhiệm vụ",
   badgeIcons: "huy hiệu",
   worldCovers: "chủ đề",

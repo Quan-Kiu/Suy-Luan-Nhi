@@ -3,6 +3,7 @@ import { db } from "@/db/client";
 import {
   auditLogs,
   badges,
+  childProfiles,
   mediaAssets,
   missions,
   missionVersions,
@@ -12,6 +13,7 @@ import {
   systemFeedbackAttachments,
 } from "@/db/schema";
 import type { MediaCategory } from "@/domain/media";
+import { CHILD_AVATAR_CATEGORY } from "@/domain/child-avatar";
 import {
   getBlockingMediaReferences,
   MediaInUseError,
@@ -92,6 +94,9 @@ export async function uploadMedia(
   if (!altText.trim()) {
     throw new MediaValidationError("Mô tả hình ảnh là bắt buộc để đảm bảo khả năng tiếp cận");
   }
+  if (category === CHILD_AVATAR_CATEGORY && !file.type.startsWith("image/")) {
+    throw new MediaValidationError("Avatar bé phải là tệp hình ảnh");
+  }
   const imagePolicy = await getImageUploadPolicy(category);
   const stored = await storeMedia(file, { imagePolicy });
   const [asset] = await db
@@ -126,6 +131,7 @@ export async function deleteMedia(mediaId: string, actorId: string | null) {
   if (!asset || asset.deletedAt) return false;
   const [references] = await db
     .select({
+      childAvatars: sql<number>`(select count(*)::int from ${childProfiles} where ${childProfiles.avatarAssetId} = ${asset.id})`,
       missionCovers: sql<number>`(select count(*)::int from ${missions} where ${missions.coverUrl} = ${asset.url})`,
       badgeIcons: sql<number>`(select count(*)::int from ${badges} where ${badges.iconUrl} = ${asset.url} or ${badges.iconAssetId} = ${asset.id})`,
       worldCovers: sql<number>`(select count(*)::int from ${missionWorlds} where ${missionWorlds.coverUrl} = ${asset.url})`,
@@ -137,6 +143,7 @@ export async function deleteMedia(mediaId: string, actorId: string | null) {
     .from(mediaAssets)
     .where(eq(mediaAssets.id, mediaId));
   const referenceCounts: MediaReferenceCounts = {
+    childAvatars: references?.childAvatars ?? 0,
     missionCovers: references?.missionCovers ?? 0,
     badgeIcons: references?.badgeIcons ?? 0,
     worldCovers: references?.worldCovers ?? 0,

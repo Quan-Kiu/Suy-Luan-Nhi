@@ -13,6 +13,7 @@ import {
   missionSecondarySkills,
   missionVersions,
   missionWorlds,
+  mediaAssets,
   missions,
   parentProfiles,
   parentResources,
@@ -28,6 +29,12 @@ import { defaultContentEntries } from "@/content/defaults";
 import { badgeSeeds, missionSeeds, skillSeeds, worldSeeds } from "@/content/catalog/game-content";
 import { conversationSuggestionSeeds, parentResourceSeeds } from "@/content/catalog/parent-content";
 import { ageGroupSeeds, safetyChecklistDefinitions } from "@/content/catalog/taxonomy-content";
+import {
+  CHILD_AVATAR_CATEGORY,
+  DEFAULT_CHILD_AVATARS,
+  DEFAULT_CHILD_AVATAR_ASSET_ID,
+  DEFAULT_CHILD_AVATAR_URL,
+} from "@/domain/child-avatar";
 
 const seedPassword = process.env.SEED_PASSWORD ?? "LocalDemo-2026!";
 const accountSeeds = [
@@ -38,7 +45,38 @@ const accountSeeds = [
   { email: "admin@demo.local", name: "Super Admin Demo", role: "super_admin" },
 ] as const;
 
-async function seedAccounts() {
+async function seedDefaultChildAvatar() {
+  for (const avatar of DEFAULT_CHILD_AVATARS) {
+    await db
+      .insert(mediaAssets)
+      .values({
+        id: avatar.id,
+        type: "image",
+        storageProvider: "local",
+        storageKey: avatar.storageKey,
+        category: CHILD_AVATAR_CATEGORY,
+        url: avatar.url,
+        altText: avatar.altText,
+        fileName: avatar.fileName,
+        mimeType: "image/png",
+        size: 0,
+        safetyStatus: "approved",
+      })
+      .onConflictDoNothing();
+  }
+
+  const avatar = await db.query.mediaAssets.findFirst({
+    where: eq(mediaAssets.id, DEFAULT_CHILD_AVATAR_ASSET_ID),
+  });
+  if (!avatar) throw new Error("Missing default child avatar");
+  await db
+    .update(childProfiles)
+    .set({ avatarAssetId: avatar.id })
+    .where(and(eq(childProfiles.avatarUrl, DEFAULT_CHILD_AVATAR_URL), isNull(childProfiles.avatarAssetId)));
+  return avatar.id;
+}
+
+async function seedAccounts(defaultAvatarAssetId: string) {
   for (const accountSeed of accountSeeds) {
     let existing = await db.query.user.findFirst({ where: eq(user.email, accountSeed.email) });
     if (!existing) {
@@ -75,7 +113,8 @@ async function seedAccounts() {
       parentProfileId: parentProfile.id,
       displayName: "Bống",
       ageGroup: "6-8",
-      avatarUrl: "/assets/mascots/mascot-dog-bong-avatar.png",
+      avatarAssetId: defaultAvatarAssetId,
+      avatarUrl: DEFAULT_CHILD_AVATAR_URL,
       mascotId: "bong",
     });
   }
@@ -328,7 +367,8 @@ async function seedParentContent() {
 }
 
 async function main() {
-  await seedAccounts();
+  const defaultAvatarAssetId = await seedDefaultChildAvatar();
+  await seedAccounts(defaultAvatarAssetId);
   await seedTaxonomy();
   await seedSystemContent();
   await seedBadges();

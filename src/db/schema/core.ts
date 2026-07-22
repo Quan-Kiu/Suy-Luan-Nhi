@@ -109,6 +109,7 @@ export const childProfiles = pgTable(
       .references(() => parentProfiles.id, { onDelete: "cascade" }),
     displayName: text("display_name").notNull(),
     ageGroup: ageGroupCode("age_group").notNull(),
+    avatarAssetId: uuid("avatar_asset_id").references(() => mediaAssets.id, { onDelete: "restrict" }),
     avatarUrl: text("avatar_url").notNull(),
     mascotId: text("mascot_id").default("bong").notNull(),
     currentRank: text("current_rank").default("Nhà thám hiểm nhí").notNull(),

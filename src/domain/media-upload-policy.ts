@@ -7,6 +7,7 @@ export const imageUploadCategories = [
   "mission-cover",
   "world-cover",
   "badge-icon",
+  "child-avatar",
   "question-asset",
   "resource-cover",
   "feedback-attachment",

@@ -3,6 +3,7 @@ import { apiJson } from "@/lib/api-response";
 import { requireApiRoles } from "@/auth/api";
 import { ChildProfileLimitError, createChild, listChildren } from "@/modules/family/family";
 import { createChildSchema } from "@/modules/family/schemas";
+import { InvalidChildAvatarError } from "@/modules/family/child-avatars";
 
 export async function GET(request: Request) {
   const authResult = await requireApiRoles(request, ["parent", "super_admin"]);
@@ -25,6 +26,9 @@ export async function POST(request: Request) {
     revalidatePath("/onboarding");
     return apiJson(child, { status: 201 });
   } catch (error) {
+    if (error instanceof InvalidChildAvatarError) {
+      return apiJson({ code: error.code, message: error.message }, { status: error.status });
+    }
     if (error instanceof ChildProfileLimitError) {
       return apiJson(
         { code: "CHILD_PROFILE_LIMIT_REACHED", message: error.message, limit: error.limit },

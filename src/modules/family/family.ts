@@ -14,6 +14,7 @@ import {
 } from "@/db/schema";
 import { hashPin } from "@/modules/family/pin";
 import { getOperationalSystemSettings } from "@/modules/system-settings/runtime";
+import { getSelectableChildAvatar, InvalidChildAvatarError } from "@/modules/family/child-avatars";
 import type { z } from "zod";
 import type { createChildSchema, updateChildSchema, updateParentSettingsSchema } from "./schemas";
 
@@ -57,10 +58,17 @@ export async function createChild(
   parentName: string,
   input: z.infer<typeof createChildSchema>,
 ) {
-  const [parent, systemSettings] = await Promise.all([
+  const [parent, systemSettings, avatar] = await Promise.all([
     getOrCreateParentProfile(userId, parentName),
     getOperationalSystemSettings(),
+    getSelectableChildAvatar(input.avatarAssetId),
   ]);
+  if (!avatar) throw new InvalidChildAvatarError();
+  const profileInput = {
+    displayName: input.displayName,
+    ageGroup: input.ageGroup,
+    mascotId: input.mascotId,
+  };
   return db.transaction(async (tx) => {
     await tx.execute(
       sql`select 1 from ${parentProfiles} where ${parentProfiles.id} = ${parent.id} for update`,
@@ -74,7 +82,12 @@ export async function createChild(
     }
     const [child] = await tx
       .insert(childProfiles)
-      .values({ parentProfileId: parent.id, ...input })
+      .values({
+        parentProfileId: parent.id,
+        ...profileInput,
+        avatarAssetId: avatar.id,
+        avatarUrl: avatar.url,
+      })
       .returning();
     await tx.insert(auditLogs).values({
       actorId: userId,
@@ -90,9 +103,20 @@ export async function createChild(
 export async function updateChild(userId: string, childId: string, input: z.infer<typeof updateChildSchema>) {
   const owned = await getOwnedChild(userId, childId);
   if (!owned) return null;
+  const avatar = input.avatarAssetId ? await getSelectableChildAvatar(input.avatarAssetId) : null;
+  if (input.avatarAssetId && !avatar) throw new InvalidChildAvatarError();
+  const profileInput = {
+    ...(input.displayName !== undefined ? { displayName: input.displayName } : {}),
+    ...(input.ageGroup !== undefined ? { ageGroup: input.ageGroup } : {}),
+    ...(input.mascotId !== undefined ? { mascotId: input.mascotId } : {}),
+  };
   const [updated] = await db
     .update(childProfiles)
-    .set({ ...input, updatedAt: new Date() })
+    .set({
+      ...profileInput,
+      ...(avatar ? { avatarAssetId: avatar.id, avatarUrl: avatar.url } : {}),
+      updatedAt: new Date(),
+    })
     .where(eq(childProfiles.id, childId))
     .returning();
   await db.insert(auditLogs).values({

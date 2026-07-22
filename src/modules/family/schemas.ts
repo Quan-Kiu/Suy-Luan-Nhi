@@ -1,15 +1,24 @@
 import { z } from "zod";
 import { ageGroupCodes } from "@/domain/age-groups";
+import { DEFAULT_CHILD_AVATAR_ASSET_ID } from "@/domain/child-avatar";
+
+const displayNameSchema = z.string().trim().min(1, "Hãy nhập tên thân mật").max(20, "Tên tối đa 20 ký tự");
+const avatarAssetIdSchema = z.string().uuid("Hãy chọn avatar cho bé");
 
 export const createChildSchema = z.object({
-  displayName: z.string().trim().min(1, "Hãy nhập tên thân mật").max(20, "Tên tối đa 20 ký tự"),
+  displayName: displayNameSchema,
   ageGroup: z.enum(ageGroupCodes),
-  avatarUrl: z.string().default("/assets/mascots/mascot-dog-bong-avatar.png"),
+  avatarAssetId: avatarAssetIdSchema.default(DEFAULT_CHILD_AVATAR_ASSET_ID),
   mascotId: z.string().default("bong"),
 });
 
-export const updateChildSchema = createChildSchema
-  .partial()
+export const updateChildSchema = z
+  .object({
+    displayName: displayNameSchema.optional(),
+    ageGroup: z.enum(ageGroupCodes).optional(),
+    avatarAssetId: avatarAssetIdSchema.optional(),
+    mascotId: z.string().optional(),
+  })
   .refine((value) => Object.keys(value).length > 0, "Không có thay đổi");
 
 export const updateParentSettingsSchema = z.object({

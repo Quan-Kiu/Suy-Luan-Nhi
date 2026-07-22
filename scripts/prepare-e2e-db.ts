@@ -13,7 +13,7 @@ if (!/(_e2e|_test)$/.test(databaseName)) {
 function run(command: string, args: string[]) {
   const result = spawnSync(command, args, {
     cwd: process.cwd(),
-    env: { ...process.env, DATABASE_URL: databaseUrl },
+    env: { ...process.env, DATABASE_URL: databaseUrl, DRIZZLE_DATABASE_URL: databaseUrl },
     stdio: "inherit",
   });
   if (result.status !== 0) process.exit(result.status ?? 1);

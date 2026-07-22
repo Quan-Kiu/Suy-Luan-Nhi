@@ -1,4 +1,5 @@
 import { describe, expect, it } from "vitest";
+import { DEFAULT_CHILD_AVATAR_ASSET_ID } from "@/domain/child-avatar";
 import {
   createChildProfileSchema,
   missionEditorSchema,
@@ -34,9 +35,16 @@ function validEditorInput() {
 
 describe("Child Profile validation", () => {
   it("accepts a privacy-minimal nickname and age group", () => {
-    expect(createChildProfileSchema.parse({ displayName: "Bống", ageGroup: "6-8" })).toEqual({
+    expect(
+      createChildProfileSchema.parse({
+        displayName: "Bống",
+        ageGroup: "6-8",
+        avatarAssetId: DEFAULT_CHILD_AVATAR_ASSET_ID,
+      }),
+    ).toEqual({
       displayName: "Bống",
       ageGroup: "6-8",
+      avatarAssetId: DEFAULT_CHILD_AVATAR_ASSET_ID,
     });
   });
 

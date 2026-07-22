@@ -3,6 +3,7 @@ import { apiJson } from "@/lib/api-response";
 import { requireApiRoles } from "@/auth/api";
 import { getOwnedChild, softDeleteChild, updateChild } from "@/modules/family/family";
 import { updateChildSchema } from "@/modules/family/schemas";
+import { InvalidChildAvatarError } from "@/modules/family/child-avatars";
 
 export async function GET(request: Request, { params }: { params: Promise<{ childId: string }> }) {
   const authResult = await requireApiRoles(request, ["parent", "super_admin"]);
@@ -22,10 +23,17 @@ export async function PATCH(request: Request, { params }: { params: Promise<{ ch
       { status: 400 },
     );
   const { childId } = await params;
-  const child = await updateChild(authResult.session.user.id, childId, input.data);
-  if (!child) return apiJson({ message: "Không tìm thấy hồ sơ bé" }, { status: 404 });
-  revalidatePath("/profiles");
-  return apiJson(child);
+  try {
+    const child = await updateChild(authResult.session.user.id, childId, input.data);
+    if (!child) return apiJson({ message: "Không tìm thấy hồ sơ bé" }, { status: 404 });
+    revalidatePath("/profiles");
+    return apiJson(child);
+  } catch (error) {
+    if (error instanceof InvalidChildAvatarError) {
+      return apiJson({ code: error.code, message: error.message }, { status: error.status });
+    }
+    throw error;
+  }
 }
 
 export async function DELETE(request: Request, { params }: { params: Promise<{ childId: string }> }) {

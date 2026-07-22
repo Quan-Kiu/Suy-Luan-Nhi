@@ -10,6 +10,23 @@ export const profileContentEntries = defineContent("profile", {
     value: "Ví dụ: Bống, Mít...",
     description: "Gợi ý trong ô nhập tên thân mật của bé.",
   },
+  "avatar.label": { value: "Chọn avatar cho bé", description: "Nhãn chọn avatar hồ sơ bé." },
+  "avatar.description": {
+    value: "Chọn một hình bé thích. Ba/mẹ có thể đổi lại sau.",
+    description: "Mô tả khu vực chọn avatar hồ sơ bé.",
+  },
+  "avatar.error": {
+    value: "Chưa tải được avatar. Hãy thử lại.",
+    description: "Thông báo khi danh sách avatar không tải được.",
+  },
+  "avatar.loading": {
+    value: "Đang tải avatar...",
+    description: "Thông báo khi đang tải danh sách avatar.",
+  },
+  "avatar.empty": {
+    value: "Hệ thống chưa có avatar phù hợp. Vui lòng liên hệ quản trị viên.",
+    description: "Thông báo khi chưa có avatar đã duyệt.",
+  },
   "create.ageLabel": { value: "Bé thuộc nhóm tuổi nào?", description: "Nhãn chọn nhóm tuổi." },
   "create.ageDescription": {
     value: "Để ứng dụng gợi ý nhiệm vụ vừa sức với bé.",

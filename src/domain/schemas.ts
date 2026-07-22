@@ -15,9 +15,10 @@ export const childProfileSchema = z.object({
 });
 export type ChildProfile = z.infer<typeof childProfileSchema>;
 
-export const createChildProfileSchema = childProfileSchema.pick({
-  displayName: true,
-  ageGroup: true,
+export const createChildProfileSchema = z.object({
+  displayName: childProfileSchema.shape.displayName,
+  ageGroup: ageGroupSchema,
+  avatarAssetId: z.string().uuid("Hãy chọn avatar cho bé"),
 });
 export type CreateChildProfileInput = z.infer<typeof createChildProfileSchema>;
 

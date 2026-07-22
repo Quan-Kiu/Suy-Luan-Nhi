@@ -6,6 +6,7 @@ import {
 } from "@/domain/media-deletion";
 
 const emptyReferences: MediaReferenceCounts = {
+  childAvatars: 0,
   missionCovers: 0,
   badgeIcons: 0,
   worldCovers: 0,
@@ -18,6 +19,12 @@ const emptyReferences: MediaReferenceCounts = {
 describe("media deletion policy", () => {
   it("allows deleting an image that is only attached to system feedback", () => {
     expect(getBlockingMediaReferences({ ...emptyReferences, feedbackAttachments: 2 })).toEqual([]);
+  });
+
+  it("blocks deletion while the file is used by a child profile", () => {
+    const references = getBlockingMediaReferences({ ...emptyReferences, childAvatars: 1 });
+    expect(references).toEqual(["childAvatars"]);
+    expect(new MediaInUseError(references).message).toContain("hồ sơ bé");
   });
 
   it("blocks deletion while the file is used by published or editable content", () => {
