@@ -88,10 +88,10 @@ export function ConfirmDialog({
                 <Icon size={24} />
               </span>
               <div className="min-w-0 flex-1">
-                <h2 id={titleId} className="text-xl font-black text-[#342f28]">
+                <h2 id={titleId} className="type-section-title">
                   {title}
                 </h2>
-                <p id={descriptionId} className="mt-2 text-sm leading-6 text-[#6f6558]">
+                <p id={descriptionId} className="type-supporting mt-2 text-[#6f6558]">
                   {description}
                 </p>
               </div>
@@ -109,7 +109,7 @@ export function ConfirmDialog({
               <div
                 id={errorId}
                 role="alert"
-                className="mt-5 flex items-start gap-3 rounded-2xl border border-red-200 bg-red-50 p-4 text-sm leading-5 font-bold text-red-800"
+                className="type-label mt-5 flex items-start gap-3 rounded-2xl border border-red-200 bg-red-50 p-4 font-bold text-red-800"
               >
                 <AlertCircle className="mt-0.5 size-5 shrink-0" aria-hidden="true" />
                 <span>{errorMessage}</span>

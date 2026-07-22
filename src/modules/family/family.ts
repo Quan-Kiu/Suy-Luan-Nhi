@@ -1,4 +1,4 @@
-import { and, desc, eq, isNull, sql } from "drizzle-orm";
+import { and, desc, eq, isNotNull, isNull, sql } from "drizzle-orm";
 import { cache } from "react";
 import { db } from "@/db/client";
 import {
@@ -42,6 +42,21 @@ export async function getOwnedChild(userId: string, childId: string) {
     .innerJoin(parentProfiles, eq(childProfiles.parentProfileId, parentProfiles.id))
     .where(
       and(eq(parentProfiles.userId, userId), eq(childProfiles.id, childId), isNull(childProfiles.deletedAt)),
+    )
+    .then((rows) => rows[0] ?? null);
+}
+
+export async function getOwnedDeletedChild(userId: string, childId: string) {
+  return db
+    .select({ child: childProfiles, parent: parentProfiles })
+    .from(childProfiles)
+    .innerJoin(parentProfiles, eq(childProfiles.parentProfileId, parentProfiles.id))
+    .where(
+      and(
+        eq(parentProfiles.userId, userId),
+        eq(childProfiles.id, childId),
+        isNotNull(childProfiles.deletedAt),
+      ),
     )
     .then((rows) => rows[0] ?? null);
 }
@@ -132,20 +147,79 @@ export async function updateChild(userId: string, childId: string, input: z.infe
 
 export async function softDeleteChild(userId: string, childId: string) {
   const owned = await getOwnedChild(userId, childId);
-  if (!owned) return false;
+  if (!owned) return null;
   const now = new Date();
-  await db
+  const [deleted] = await db
     .update(childProfiles)
     .set({ status: "pending_deletion", deletionRequestedAt: now, deletedAt: now, updatedAt: now })
-    .where(eq(childProfiles.id, childId));
+    .where(and(eq(childProfiles.id, childId), isNull(childProfiles.deletedAt)))
+    .returning();
+  if (!deleted) return null;
   await db.insert(auditLogs).values({
     actorId: userId,
     action: "child.delete_requested",
     resourceType: "child_profile",
     resourceId: childId,
     beforeState: owned.child,
+    afterState: deleted,
   });
-  return true;
+  return deleted;
+}
+
+export async function restoreChild(userId: string, childId: string) {
+  const [owned, systemSettings] = await Promise.all([
+    getOwnedDeletedChild(userId, childId),
+    getOperationalSystemSettings(),
+  ]);
+  if (!owned) return null;
+  return db.transaction(async (tx) => {
+    await tx.execute(
+      sql`select 1 from ${parentProfiles} where ${parentProfiles.id} = ${owned.parent.id} for update`,
+    );
+    const [{ count }] = await tx
+      .select({ count: sql<number>`count(*)::int` })
+      .from(childProfiles)
+      .where(and(eq(childProfiles.parentProfileId, owned.parent.id), isNull(childProfiles.deletedAt)));
+    if ((count ?? 0) >= systemSettings.limits.maxChildProfiles) {
+      throw new ChildProfileLimitError(systemSettings.limits.maxChildProfiles);
+    }
+    const now = new Date();
+    const [restored] = await tx
+      .update(childProfiles)
+      .set({ status: "active", deletionRequestedAt: null, deletedAt: null, updatedAt: now })
+      .where(and(eq(childProfiles.id, childId), isNotNull(childProfiles.deletedAt)))
+      .returning();
+    if (!restored) return null;
+    await tx.insert(auditLogs).values({
+      actorId: userId,
+      action: "child.restored",
+      resourceType: "child_profile",
+      resourceId: childId,
+      beforeState: owned.child,
+      afterState: restored,
+    });
+    return restored;
+  });
+}
+
+export async function permanentlyDeleteChild(userId: string, childId: string) {
+  const owned = await getOwnedDeletedChild(userId, childId);
+  if (!owned) return null;
+  return db.transaction(async (tx) => {
+    const [deleted] = await tx
+      .delete(childProfiles)
+      .where(and(eq(childProfiles.id, childId), isNotNull(childProfiles.deletedAt)))
+      .returning();
+    if (!deleted) return null;
+    await tx.insert(auditLogs).values({
+      actorId: userId,
+      action: "child.deleted_permanently",
+      resourceType: "child_profile",
+      resourceId: childId,
+      beforeState: owned.child,
+    });
+    return deleted;
+  });
 }
 
 export async function resetChildProgress(userId: string, childId: string) {

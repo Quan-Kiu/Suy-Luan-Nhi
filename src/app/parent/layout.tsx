@@ -1,4 +1,5 @@
 import { redirect } from "next/navigation";
+import { hasRole, staffRoles } from "@/auth/roles";
 import { requireParent } from "@/auth/session";
 import { ParentGateView } from "@/features/parent/parent-gate-view";
 import { ParentShell } from "@/features/parent/parent-shell";
@@ -39,6 +40,7 @@ export default async function ParentLayout({ children }: { children: React.React
       unread={unread}
       content={content}
       resourcesEnabled={systemSettings.features.parentResourcesEnabled}
+      canAccessAdmin={hasRole(session.user.role, staffRoles)}
     >
       {children}
     </ParentShell>

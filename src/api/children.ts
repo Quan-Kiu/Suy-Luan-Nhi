@@ -10,6 +10,14 @@ export type ChildSummary = {
 export type ChildProfile = ChildSummary & {
   avatarAssetId: string | null;
   avatarUrl: string;
+  currentRank: string;
+  status: "active" | "pending_deletion";
+  deletionRequestedAt: string | null;
+};
+
+export type DeletedChildProfile = ChildProfile & {
+  status: "pending_deletion";
+  deletionRequestedAt: string;
 };
 
 export type UpdateChildInput = Pick<ChildProfile, "displayName" | "ageGroup"> & {
@@ -36,6 +44,15 @@ export const childrenApi = {
     });
   },
   remove(childId: string) {
-    return apiRequest<{ deleted: true }>({ url: `/api/children/${childId}`, method: "DELETE" });
+    return apiRequest<DeletedChildProfile>({ url: `/api/children/${childId}`, method: "DELETE" });
+  },
+  restore(childId: string) {
+    return apiRequest<ChildProfile>({ url: `/api/children/${childId}/restore`, method: "POST" });
+  },
+  removePermanently(childId: string) {
+    return apiRequest<{ deleted: true; childId: string }>({
+      url: `/api/children/${childId}/permanent`,
+      method: "DELETE",
+    });
   },
 };

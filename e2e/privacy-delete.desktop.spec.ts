@@ -23,7 +23,7 @@ test("family deletion request is parent-gated and super-admin anonymizes the acc
     error: { message: /Parent Gate/ },
   });
   await unlockParentGate(page);
-  await expect(page.getByRole("heading", { name: /Tuần của Bé Xóa E2E/i })).toBeVisible();
+  await expect(page.getByRole("heading", { name: /Tuần này của Bé Xóa E2E/i })).toBeVisible();
 
   const request = await apiData<{ id: string; status: string }>(
     await page.request.post("/api/parent/delete-data-request"),

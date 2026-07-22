@@ -19,14 +19,14 @@ export default async function OnboardingPage() {
   return (
     <main className="paper-texture px-5 pt-5 pb-8">
       <div className="mb-6 text-center">
-        <p className="text-sm font-black text-[#d56617]">
+        <p className="type-label font-black text-[#d56617]">
           {contentText(
             content,
             isFirstProfile ? "create.firstProfileBadge" : "create.pageBadge",
             isFirstProfile ? "Bước 2/2 · Hồ sơ của bé" : "Hồ sơ riêng tư tối giản",
           )}
         </p>
-        <h1 className="mt-3 text-3xl font-black">
+        <h1 className="type-child-page-title mt-3">
           {contentText(
             content,
             isFirstProfile ? "create.firstProfileTitle" : "create.pageTitle",

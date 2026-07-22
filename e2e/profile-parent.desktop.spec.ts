@@ -3,7 +3,7 @@ import { apiData, getDemoChild, selectChild, signIn, unlockParentGate } from "./
 
 test.describe.configure({ mode: "serial" });
 
-test("parent creates, edits and soft-deletes a child profile through the UI", async ({ page }) => {
+test("parent moves a child profile to trash, restores it and deletes it permanently", async ({ page }) => {
   await signIn(page, "parent@demo.local");
   const demoChild = await getDemoChild(page);
   await selectChild(page, demoChild.id);
@@ -23,12 +23,28 @@ test("parent creates, edits and soft-deletes a child profile through the UI", as
   await page.getByRole("button", { name: "Lưu thay đổi" }).click();
   await expect(page).toHaveURL(/\/profiles$/);
   await expect(page.getByRole("heading", { name: "Mít Đã Sửa" })).toBeVisible();
+
   await page.getByLabel("Xóa Mít Đã Sửa").click();
   await page
-    .getByRole("alertdialog", { name: "Xóa hồ sơ Mít Đã Sửa?" })
-    .getByRole("button", { name: "Chuyển sang chờ xóa" })
+    .getByRole("alertdialog", { name: "Đưa hồ sơ Mít Đã Sửa vào thùng rác?" })
+    .getByRole("button", { name: "Đưa vào thùng rác" })
     .click();
   await expect(page.getByRole("heading", { name: "Mít Đã Sửa" })).toHaveCount(0);
+  await expect(page.getByRole("button", { name: /Hồ sơ đã xóa/ })).toHaveAttribute("aria-expanded", "true");
+  await page.getByRole("button", { name: "Khôi phục hồ sơ Mít Đã Sửa" }).click();
+  await expect(page.getByRole("heading", { name: "Mít Đã Sửa" })).toBeVisible();
+
+  await page.getByLabel("Xóa Mít Đã Sửa").click();
+  await page
+    .getByRole("alertdialog", { name: "Đưa hồ sơ Mít Đã Sửa vào thùng rác?" })
+    .getByRole("button", { name: "Đưa vào thùng rác" })
+    .click();
+  await page.getByRole("button", { name: "Xóa vĩnh viễn hồ sơ Mít Đã Sửa" }).click();
+  await page
+    .getByRole("alertdialog", { name: "Xóa vĩnh viễn hồ sơ Mít Đã Sửa?" })
+    .getByRole("button", { name: "Xóa vĩnh viễn", exact: true })
+    .click();
+  await expect(page.getByText("Mít Đã Sửa", { exact: true })).toHaveCount(0);
 
   const children = await apiData<Array<{ displayName: string }>>(await page.request.get("/api/children"));
   expect(children.some((child) => child.displayName === "Mít Đã Sửa")).toBe(false);
@@ -54,7 +70,7 @@ test("parent gate rejects a wrong answer, supports PIN and exports family data",
   await expect(page.getByLabel("PIN phụ huynh")).toHaveAttribute("placeholder", /Nhập PIN/);
   await page.getByLabel("PIN phụ huynh").fill("2468");
   await page.getByRole("button", { name: /Mở khu vực phụ huynh/i }).click();
-  await expect(page.getByRole("heading", { name: /Tuần của Bống/i })).toBeVisible();
+  await expect(page.getByRole("heading", { name: /Tuần này của Bống/i })).toBeVisible();
 
   await page.goto("/parent/settings");
   const downloadPromise = page.waitForEvent("download");

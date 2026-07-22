@@ -1,4 +1,5 @@
 import { revalidatePath } from "next/cache";
+import { cookies } from "next/headers";
 import { apiJson } from "@/lib/api-response";
 import { requireApiRoles } from "@/auth/api";
 import { getOwnedChild, softDeleteChild, updateChild } from "@/modules/family/family";
@@ -42,7 +43,11 @@ export async function DELETE(request: Request, { params }: { params: Promise<{ c
   const { childId } = await params;
   const deleted = await softDeleteChild(authResult.session.user.id, childId);
   if (!deleted) return apiJson({ message: "Không tìm thấy hồ sơ bé" }, { status: 404 });
+  const cookieStore = await cookies();
+  if (cookieStore.get("sln_active_child")?.value === childId) cookieStore.delete("sln_active_child");
   revalidatePath("/profiles");
   revalidatePath("/onboarding");
-  return apiJson({ deleted: true, resource: "child_profile" });
+  revalidatePath("/parent");
+  revalidatePath("/missions");
+  return apiJson(deleted);
 }

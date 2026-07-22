@@ -14,7 +14,23 @@ export default async function ProfilesPage() {
     getContentNamespace("profile"),
     getOperationalSystemSettings(),
   ]);
-  const children = await listChildren(session.user.id, session.user.name);
+  const allChildren = await listChildren(session.user.id, session.user.name, true);
+  const children = allChildren.filter((child) => !child.deletedAt);
+  const deletedChildren = allChildren.flatMap((child) => {
+    const deletedAt = child.deletionRequestedAt ?? child.deletedAt;
+    return deletedAt
+      ? [
+          {
+            id: child.id,
+            displayName: child.displayName,
+            ageGroup: child.ageGroup,
+            avatarUrl: child.avatarUrl,
+            currentRank: child.currentRank,
+            deletionRequestedAt: deletedAt.toISOString(),
+          },
+        ]
+      : [];
+  });
   const hasProfiles = children.length > 0;
   return (
     <main className="paper-texture min-h-[calc(100vh-5rem)] px-5 py-7">
@@ -28,11 +44,11 @@ export default async function ProfilesPage() {
           className="mx-auto h-36 w-56 rounded-[26px] object-cover"
         />
         {!hasProfiles ? (
-          <p className="mt-4 text-sm font-black text-[#d56617]">
+          <p className="type-label mt-4 font-black text-[#d56617]">
             {contentText(content, "list.emptyPageBadge", "Bước 2/2 · Hồ sơ của bé")}
           </p>
         ) : null}
-        <h1 className={hasProfiles ? "mt-4 text-3xl font-black" : "mt-2 text-3xl font-black"}>
+        <h1 className={hasProfiles ? "type-child-page-title mt-4" : "type-child-page-title mt-2"}>
           {contentText(
             content,
             hasProfiles ? "list.pageTitle" : "list.emptyPageTitle",
@@ -50,14 +66,18 @@ export default async function ProfilesPage() {
         </p>
       </div>
       <div className="mt-6">
-        {children.length ? (
-          <ProfileManager profiles={children} maxProfiles={systemSettings.limits.maxChildProfiles} />
+        {allChildren.length ? (
+          <ProfileManager
+            profiles={children}
+            deletedProfiles={deletedChildren}
+            maxProfiles={systemSettings.limits.maxChildProfiles}
+          />
         ) : (
           <Card className="p-6 text-center">
             <p className="font-black">
               {contentText(content, "list.firstProfileTitle", "Thêm hồ sơ đầu tiên")}
             </p>
-            <p className="mt-2 text-sm text-[#806d54]">
+            <p className="type-supporting mt-2 text-[#806d54]">
               {contentText(
                 content,
                 "list.emptyDescription",

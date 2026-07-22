@@ -62,7 +62,7 @@ export function ParentNav({
               key={href}
               href={href}
               className={cn(
-                "flex items-center gap-2 rounded-xl px-3 py-2 text-sm font-bold",
+                "type-action flex items-center gap-2 rounded-xl px-3 py-2",
                 isActive(pathname, href, exact) && "bg-[#fff0df] text-[#bd4910]",
               )}
             >
@@ -77,7 +77,7 @@ export function ParentNav({
           >
             <Bell size={18} />
             {unread > 0 ? (
-              <span className="absolute -top-1 -right-1 grid size-5 place-items-center rounded-full bg-red-600 text-[10px] text-white">
+              <span className="type-caption absolute -top-1 -right-1 grid size-5 place-items-center rounded-full bg-red-600 leading-none text-white">
                 {Math.min(unread, 9)}
               </span>
             ) : null}
@@ -100,12 +100,12 @@ export function ParentNav({
             key={href}
             href={href}
             className={cn(
-              "text-center text-[11px] font-bold",
+              "type-caption flex min-w-0 flex-1 flex-col items-center justify-center gap-1 px-0.5 text-center",
               isActive(pathname, href, exact) && "text-[#bd4910]",
             )}
           >
-            <Icon className="mx-auto" size={20} />
-            {label}
+            <Icon className="shrink-0" size={20} />
+            <span className="block max-w-[74px] leading-[1.15] text-balance">{label}</span>
           </Link>
         ))}
       </nav>

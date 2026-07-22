@@ -31,11 +31,11 @@ export function ProfileCard({ profile, pending, labels, onSelect, onDelete }: Pr
           className="size-[76px] rounded-full bg-[#f1eadc] object-contain sm:size-[88px]"
         />
         <div className="min-w-0">
-          <h2 className="truncate text-2xl font-black text-[#342f28]">{profile.displayName}</h2>
-          <p className="mt-1 text-sm leading-5 font-bold text-[#6f604b]">
+          <h2 className="type-section-title truncate">{profile.displayName}</h2>
+          <p className="type-supporting mt-1 font-bold text-[#6f604b]">
             {labels.ageGroup} {profile.ageGroup} tuổi
           </p>
-          <p className="mt-1 line-clamp-2 text-sm leading-5 text-[#806d54]">{profile.currentRank}</p>
+          <p className="type-supporting mt-1 line-clamp-2 text-[#806d54]">{profile.currentRank}</p>
         </div>
       </div>
       <div className="grid grid-cols-[minmax(0,1fr)_48px_48px] gap-2 border-t border-[#eadfc9] bg-[#fffdf8] p-4 sm:grid-cols-[minmax(180px,1fr)_auto_auto]">
