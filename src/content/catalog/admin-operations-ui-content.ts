@@ -33,8 +33,8 @@ export const adminOperationsContentEntries = defineContent("admin", {
     description: "Điều hướng đến phần quản lý nội dung hiển thị trong ứng dụng.",
   },
   "nav.contentVariables": {
-    value: "Biến trong nội dung",
-    description: "Điều hướng đến phần cấu hình tag động dành cho Super Admin.",
+    value: "Thông tin tự điền",
+    description: "Điều hướng đến phần quản lý thông tin được tự điền vào nội dung dành cho Super Admin.",
   },
   "nav.worlds": { value: "Các chủ đề", description: "Điều hướng thế giới nhiệm vụ." },
   "nav.badges": { value: "Huy hiệu", description: "Điều hướng quản lý huy hiệu phần thưởng." },

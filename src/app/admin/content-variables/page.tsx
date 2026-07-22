@@ -11,8 +11,8 @@ export default async function Page() {
     <div className="space-y-6">
       <AdminPageHeader
         eyebrow="Chỉ dành cho Super Admin"
-        title="Biến trong nội dung"
-        description="Quản lý các tag người soạn có thể chèn vào nhiệm vụ, ví dụ {{name}}. Hệ thống sẽ thay tag bằng dữ liệu của bé đang sử dụng."
+        title="Thông tin tự điền"
+        description="Quản lý những thông tin hệ thống có thể tự điền vào nội dung, chẳng hạn tên bé. Ví dụ: {{name}} sẽ được thay bằng tên của bé đang sử dụng."
         icon={Braces}
       />
       <ContentVariableManager initial={variables} />

@@ -2,7 +2,7 @@
 
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { Braces, Plus, Trash2 } from "lucide-react";
+import { Braces, ChevronDown, Plus, Trash2 } from "lucide-react";
 import { useState } from "react";
 import { FormProvider, useFieldArray, useForm, useWatch, type Resolver } from "react-hook-form";
 import { toast } from "sonner";
@@ -61,7 +61,7 @@ export function ContentVariableManager({ initial }: { initial: ContentVariableDe
         onSubmit={form.handleSubmit((values) => mutation.mutate(values))}
         noValidate
       >
-        <Card className="rounded-3xl border-[#dfd2bd] bg-[#fffaf0] p-5">
+        <Card className="rounded-2xl border-[#dfd2bd] bg-[#fffaf0] p-4 shadow-sm">
           <div className="flex items-start gap-3">
             <span className="grid size-11 shrink-0 place-items-center rounded-2xl bg-[#fff0df] text-[#b9470d]">
               <Braces size={21} />
@@ -100,15 +100,42 @@ export function ContentVariableManager({ initial }: { initial: ContentVariableDe
             const error = form.formState.errors.variables?.[index];
             const persisted = index < persistedCount;
             return (
-              <Card key={field.id} className="rounded-3xl p-5 shadow-sm">
-                <div className="flex flex-wrap items-start justify-between gap-3">
-                  <div>
-                    <p className="text-xs font-black tracking-wider text-[#8a6b39] uppercase">
+              <details
+                key={field.id}
+                className="group rounded-2xl border border-[#dfd2bd] bg-white shadow-sm"
+              >
+                <summary className="flex min-h-16 cursor-pointer list-none items-center justify-between gap-3 px-4 py-3 marker:hidden">
+                  <div className="min-w-0">
+                    <p className="text-[11px] font-black tracking-wider text-[#8a6b39] uppercase">
                       Tag {index + 1}
                     </p>
-                    <h3 className="mt-1 text-lg font-black">{`{{${variables[index]?.key || "tag_moi"}}}`}</h3>
+                    <div className="mt-1 flex flex-wrap items-center gap-2">
+                      <h3 className="font-mono text-base font-black">{`{{${variables[index]?.key || "tag_moi"}}}`}</h3>
+                      <span className="truncate text-sm font-bold text-[#6f6558]">
+                        {variables[index]?.label || "Chưa đặt tên dễ hiểu"}
+                      </span>
+                    </div>
                   </div>
-                  <div className="flex flex-wrap items-center justify-end gap-2">
+                  <div className="flex shrink-0 items-center gap-2">
+                    <span className="hidden rounded-full bg-[#f5f2ec] px-2.5 py-1 text-xs font-bold text-[#6f6558] sm:inline">
+                      {contentVariableSourceOptions.find(
+                        (option) => option.value === variables[index]?.source,
+                      )?.label ?? "Nguồn dữ liệu"}
+                    </span>
+                    <span
+                      className={`rounded-full px-2.5 py-1 text-xs font-black ${
+                        variables[index]?.enabled
+                          ? "bg-green-100 text-green-800"
+                          : "bg-stone-200 text-stone-700"
+                      }`}
+                    >
+                      {variables[index]?.enabled ? "Đang dùng" : "Đang tắt"}
+                    </span>
+                    <ChevronDown size={18} className="transition group-open:rotate-180" />
+                  </div>
+                </summary>
+                <div className="border-t border-[#eadfc9] p-4">
+                  <div className="flex flex-wrap items-center justify-between gap-2">
                     <CheckboxField
                       label="Cho phép dùng tag này"
                       registration={form.register(`variables.${index}.enabled` as const)}
@@ -123,64 +150,64 @@ export function ContentVariableManager({ initial }: { initial: ContentVariableDe
                       </button>
                     ) : null}
                   </div>
+                  <div className="mt-3 grid gap-3 lg:grid-cols-2">
+                    <TextField
+                      label="Tên tag"
+                      placeholder="name"
+                      description={
+                        persisted
+                          ? "Mã tag được khóa để nội dung đã tạo không bị hỏng."
+                          : "Người soạn sẽ chèn theo dạng {{ten_tag}}."
+                      }
+                      disabled={persisted}
+                      registration={form.register(`variables.${index}.key` as const)}
+                      error={error?.key?.message}
+                    />
+                    <TextField
+                      label="Tên dễ hiểu"
+                      placeholder="Tên bé"
+                      registration={form.register(`variables.${index}.label` as const)}
+                      error={error?.label?.message}
+                    />
+                    <SelectField
+                      label="Dữ liệu được lấy từ"
+                      description="Chỉ các nguồn an toàn trong danh sách này mới được phép sử dụng."
+                      registration={form.register(`variables.${index}.source` as const)}
+                      options={contentVariableSourceOptions.map((option) => ({
+                        value: option.value,
+                        label: option.label,
+                      }))}
+                      error={error?.source?.message}
+                    />
+                    <TextField
+                      label="Dữ liệu xem trước"
+                      placeholder="Bống"
+                      description="Hiển thị trong màn hình xem thử của người soạn."
+                      registration={form.register(`variables.${index}.example` as const)}
+                      error={error?.example?.message}
+                    />
+                    <TextField
+                      label="Nội dung dự phòng"
+                      placeholder="bé"
+                      description="Dùng khi hồ sơ chưa có dữ liệu tương ứng."
+                      registration={form.register(`variables.${index}.fallback` as const)}
+                      error={error?.fallback?.message}
+                    />
+                    <TextareaField
+                      label="Mô tả cho người soạn"
+                      rows={2}
+                      registration={form.register(`variables.${index}.description` as const)}
+                      error={error?.description?.message}
+                    />
+                  </div>
+                  {!variables[index]?.enabled ? (
+                    <p className="mt-3 rounded-xl bg-[#f5f2ec] px-3 py-2 text-sm text-[#6f6558]">
+                      Tag đang tắt nên sẽ không xuất hiện trong gợi ý khi viết nội dung. Nội dung cũ vẫn được
+                      thay thế bằng dữ liệu hoặc giá trị dự phòng.
+                    </p>
+                  ) : null}
                 </div>
-                <div className="mt-4 grid gap-4 lg:grid-cols-2">
-                  <TextField
-                    label="Tên tag"
-                    placeholder="name"
-                    description={
-                      persisted
-                        ? "Mã tag được khóa để nội dung đã tạo không bị hỏng."
-                        : "Người soạn sẽ chèn theo dạng {{ten_tag}}."
-                    }
-                    disabled={persisted}
-                    registration={form.register(`variables.${index}.key` as const)}
-                    error={error?.key?.message}
-                  />
-                  <TextField
-                    label="Tên dễ hiểu"
-                    placeholder="Tên bé"
-                    registration={form.register(`variables.${index}.label` as const)}
-                    error={error?.label?.message}
-                  />
-                  <SelectField
-                    label="Dữ liệu được lấy từ"
-                    description="Chỉ các nguồn an toàn trong danh sách này mới được phép sử dụng."
-                    registration={form.register(`variables.${index}.source` as const)}
-                    options={contentVariableSourceOptions.map((option) => ({
-                      value: option.value,
-                      label: option.label,
-                    }))}
-                    error={error?.source?.message}
-                  />
-                  <TextField
-                    label="Dữ liệu xem trước"
-                    placeholder="Bống"
-                    description="Hiển thị trong màn hình xem thử của người soạn."
-                    registration={form.register(`variables.${index}.example` as const)}
-                    error={error?.example?.message}
-                  />
-                  <TextField
-                    label="Nội dung dự phòng"
-                    placeholder="bé"
-                    description="Dùng khi hồ sơ chưa có dữ liệu tương ứng."
-                    registration={form.register(`variables.${index}.fallback` as const)}
-                    error={error?.fallback?.message}
-                  />
-                  <TextareaField
-                    label="Mô tả cho người soạn"
-                    rows={3}
-                    registration={form.register(`variables.${index}.description` as const)}
-                    error={error?.description?.message}
-                  />
-                </div>
-                {!variables[index]?.enabled ? (
-                  <p className="mt-3 rounded-xl bg-[#f5f2ec] px-3 py-2 text-sm text-[#6f6558]">
-                    Tag đang tắt nên sẽ không xuất hiện trong gợi ý khi viết nội dung. Nội dung cũ vẫn được
-                    thay thế bằng dữ liệu hoặc giá trị dự phòng.
-                  </p>
-                ) : null}
-              </Card>
+              </details>
             );
           })}
         </div>
