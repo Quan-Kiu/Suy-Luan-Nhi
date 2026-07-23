@@ -21,6 +21,19 @@ describe("system feedback schemas", () => {
     expect(systemFeedbackMaxAttachments).toBe(10);
   });
 
+  it("accepts mixed automatic and uploaded attachments", () => {
+    const result = createSystemFeedbackSchema.safeParse({
+      content: "Ảnh tự chụp và ảnh từ máy cùng mô tả một lỗi giao diện.",
+      pagePath: "/missions/demo",
+      viewportWidth: 390,
+      viewportHeight: 844,
+      devicePixelRatio: 3,
+      captureMode: "mixed",
+    });
+
+    expect(result.success).toBe(true);
+  });
+
   it("rejects short content and unsupported statuses", () => {
     expect(
       createSystemFeedbackSchema.safeParse({

@@ -8,6 +8,11 @@ import { defaultImageUploadPolicies } from "@/domain/media-upload-policy";
 import { GlobalFeedbackWidget } from "@/features/feedback/global-feedback-widget";
 
 vi.mock("next/navigation", () => ({ usePathname: () => "/missions/demo" }));
+vi.mock("@zumer/snapdom", () => ({
+  snapdom: {
+    toCanvas: vi.fn(() => Promise.reject(new Error("capture unavailable in unit tests"))),
+  },
+}));
 
 function renderWidget() {
   const client = new QueryClient({
@@ -23,6 +28,14 @@ function renderWidget() {
 describe("GlobalFeedbackWidget", () => {
   beforeEach(() => {
     vi.restoreAllMocks();
+    Object.defineProperty(URL, "createObjectURL", {
+      configurable: true,
+      value: vi.fn(() => "blob:feedback-preview"),
+    });
+    Object.defineProperty(URL, "revokeObjectURL", {
+      configurable: true,
+      value: vi.fn(),
+    });
     vi.spyOn(contentApi, "getNamespace").mockResolvedValue({});
   });
 
@@ -114,5 +127,51 @@ describe("GlobalFeedbackWidget", () => {
         }),
       ),
     );
+  });
+
+  it("keeps earlier uploads when images are added across multiple selections", async () => {
+    vi.spyOn(console, "error").mockImplementation(() => undefined);
+    vi.spyOn(feedbackApi, "getUploadConfig").mockResolvedValue({
+      enabled: true,
+      maxAttachments: 5,
+      policies: defaultImageUploadPolicies,
+    });
+    const user = userEvent.setup();
+    renderWidget();
+
+    await user.click(await screen.findByRole("button", { name: "Gửi góp ý về trang này" }));
+    const input = await screen.findByLabelText("Thêm ảnh từ máy");
+    await waitFor(() => expect(input).toBeEnabled());
+
+    await user.upload(input, new File(["first"], "first.png", { type: "image/png" }));
+    expect(await screen.findByText("first.png")).toBeVisible();
+
+    await user.upload(input, new File(["second"], "second.png", { type: "image/png" }));
+
+    expect(await screen.findByText("first.png")).toBeVisible();
+    expect(screen.getByText("second.png")).toBeVisible();
+    expect(screen.getByText(/đã chọn 2\/5 ảnh/i)).toBeVisible();
+  });
+
+  it("opens an annotation editor for each selected image", async () => {
+    vi.spyOn(console, "error").mockImplementation(() => undefined);
+    vi.spyOn(feedbackApi, "getUploadConfig").mockResolvedValue({
+      enabled: true,
+      maxAttachments: 5,
+      policies: defaultImageUploadPolicies,
+    });
+    const user = userEvent.setup();
+    renderWidget();
+
+    await user.click(await screen.findByRole("button", { name: "Gửi góp ý về trang này" }));
+    const input = await screen.findByLabelText("Thêm ảnh từ máy");
+    await waitFor(() => expect(input).toBeEnabled());
+    await user.upload(input, new File(["marked"], "needs-marking.png", { type: "image/png" }));
+
+    await user.click(await screen.findByRole("button", { name: "Đánh dấu ảnh 1" }));
+
+    expect(screen.getByRole("dialog", { name: "Vẽ vào khu vực cần chúng tôi chú ý" })).toBeVisible();
+    expect(screen.getByRole("button", { name: "Hoàn tác nét vẽ" })).toBeDisabled();
+    expect(screen.getByRole("button", { name: "Lưu ảnh đã đánh dấu" })).toBeDisabled();
   });
 });

@@ -30,7 +30,7 @@ export const createSystemFeedbackSchema = z.object({
   viewportWidth: z.coerce.number().int().min(1).max(10000),
   viewportHeight: z.coerce.number().int().min(1).max(10000),
   devicePixelRatio: z.coerce.number().min(0.5).max(10),
-  captureMode: z.enum(["auto", "upload", "none"]),
+  captureMode: z.enum(["auto", "upload", "mixed", "none"]),
 });
 
 export const updateSystemFeedbackSchema = z.object({

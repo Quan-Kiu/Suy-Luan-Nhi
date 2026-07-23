@@ -3,48 +3,34 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { AnimatePresence, motion } from "motion/react";
-import {
-  Camera,
-  CheckCircle2,
-  ImagePlus,
-  LoaderCircle,
-  MessageSquarePlus,
-  RefreshCw,
-  Trash2,
-  X,
-} from "lucide-react";
-import Image from "next/image";
+import { MessageSquarePlus, X } from "lucide-react";
 import { usePathname } from "next/navigation";
-import { useCallback, useEffect, useId, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useId, useRef, useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { z } from "zod";
 import { feedbackApi } from "@/api/feedback";
 import type { SnapdomPlugin } from "@zumer/snapdom";
 import { FormStatus, SubmitButton, TextareaField } from "@/components/form";
+import { contentText, useContent } from "@/content/client";
+import { systemFeedbackContentSchema } from "@/domain/system-feedback";
 import {
   redactFeedbackCaptureClone,
   shouldIncludeInFeedbackCapture,
 } from "@/features/feedback/capture-privacy";
-import { contentText, useContent } from "@/content/client";
-import { systemFeedbackContentSchema } from "@/domain/system-feedback";
+import { FeedbackAttachmentsPanel } from "@/features/feedback/feedback-attachments-panel";
+import {
+  createFeedbackAttachment,
+  feedbackFileKey,
+  getFeedbackCaptureMode,
+  type FeedbackAttachmentDraft,
+} from "@/features/feedback/feedback-image-attachment";
+import { FeedbackImageAnnotator } from "@/features/feedback/feedback-image-annotator";
 import { getImageUploadPolicySummary, validateImageFileForCategory } from "@/lib/media/image-file-validation";
 import { queryKeys } from "@/lib/query/keys";
 
 const schema = z.object({ content: systemFeedbackContentSchema });
 type FormValues = z.infer<typeof schema>;
-type ImageSource = "auto" | "upload" | "none";
-
-function fileKey(file: File) {
-  return `${file.name}-${file.size}-${file.lastModified}`;
-}
-
-function PreviewImage({ file, alt }: { file: File; alt: string }) {
-  const url = useMemo(() => URL.createObjectURL(file), [file]);
-  useEffect(() => () => URL.revokeObjectURL(url), [url]);
-  return <Image src={url} fill unoptimized alt={alt} className="object-cover" />;
-}
-
 async function canvasToScreenshotFile(canvas: HTMLCanvasElement) {
   const maxWidth = 1600;
   const maxHeight = 1200;
@@ -99,10 +85,10 @@ export function GlobalFeedbackWidget() {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [open, setOpen] = useState(false);
   const [capturing, setCapturing] = useState(false);
+  const [addingUploads, setAddingUploads] = useState(false);
   const [captureError, setCaptureError] = useState<string>();
-  const [imageSource, setImageSource] = useState<ImageSource>("none");
-  const [autoScreenshot, setAutoScreenshot] = useState<File | null>(null);
-  const [uploadedImages, setUploadedImages] = useState<File[]>([]);
+  const [attachments, setAttachments] = useState<FeedbackAttachmentDraft[]>([]);
+  const [editingAttachmentId, setEditingAttachmentId] = useState<string>();
 
   const configQuery = useQuery({
     queryKey: queryKeys.feedback.uploadConfig,
@@ -113,17 +99,16 @@ export function GlobalFeedbackWidget() {
   const mutation = useMutation({
     mutationFn: (values: FormValues) => {
       const configuredLimit = configQuery.data?.maxAttachments ?? 0;
-      const selectedImages = imageSource === "auto" && autoScreenshot ? [autoScreenshot] : uploadedImages;
-      const images = configuredLimit > 0 ? selectedImages.slice(0, configuredLimit) : [];
+      const selectedAttachments = configuredLimit > 0 ? attachments.slice(0, configuredLimit) : [];
       return feedbackApi.create({
         content: values.content,
-        images,
+        images: selectedAttachments.map((attachment) => attachment.file),
         pagePath: pathname,
         pageTitle: document.title,
         viewportWidth: window.innerWidth,
         viewportHeight: window.innerHeight,
         devicePixelRatio: window.devicePixelRatio || 1,
-        captureMode: images.length ? imageSource : "none",
+        captureMode: getFeedbackCaptureMode(selectedAttachments),
       });
     },
     onSuccess: () => {
@@ -136,10 +121,10 @@ export function GlobalFeedbackWidget() {
     if (mutation.isPending) return;
     setOpen(false);
     setCapturing(false);
+    setAddingUploads(false);
     setCaptureError(undefined);
-    setImageSource("none");
-    setAutoScreenshot(null);
-    setUploadedImages([]);
+    setAttachments([]);
+    setEditingAttachmentId(undefined);
     form.reset({ content: "" });
     if (fileInputRef.current) fileInputRef.current.value = "";
   }, [form, mutation.isPending]);
@@ -150,7 +135,7 @@ export function GlobalFeedbackWidget() {
     document.body.style.overflow = "hidden";
     const timer = window.setTimeout(() => form.setFocus("content"), 80);
     function onKeyDown(event: KeyboardEvent) {
-      if (event.key === "Escape" && !mutation.isPending) closeDialog();
+      if (event.key === "Escape" && !editingAttachmentId && !mutation.isPending) closeDialog();
     }
     document.addEventListener("keydown", onKeyDown);
     return () => {
@@ -158,26 +143,28 @@ export function GlobalFeedbackWidget() {
       document.body.style.overflow = previousOverflow;
       document.removeEventListener("keydown", onKeyDown);
     };
-  }, [closeDialog, form, mutation.isPending, open]);
+  }, [closeDialog, editingAttachmentId, form, mutation.isPending, open]);
 
   async function takeScreenshot() {
-    if ((configQuery.data?.maxAttachments ?? 0) <= 0) {
-      setAutoScreenshot(null);
-      setUploadedImages([]);
-      setImageSource("none");
-      return;
-    }
+    const maxAttachments = configQuery.data?.maxAttachments ?? 0;
+    if (maxAttachments <= 0) return;
     setCapturing(true);
     setCaptureError(undefined);
-    setUploadedImages([]);
     try {
       const screenshot = await captureViewport();
-      setAutoScreenshot(screenshot);
-      setImageSource("auto");
+      const autoAttachment = createFeedbackAttachment(screenshot, "auto");
+      const existingAutoIndex = attachments.findIndex((attachment) => attachment.source === "auto");
+      if (existingAutoIndex >= 0) {
+        setAttachments((items) =>
+          items.map((attachment) => (attachment.source === "auto" ? autoAttachment : attachment)),
+        );
+      } else if (attachments.length >= maxAttachments) {
+        setCaptureError(`Đã đủ ${maxAttachments} ảnh. Hãy bỏ một ảnh trước khi chụp lại trang.`);
+      } else {
+        setAttachments((items) => [autoAttachment, ...items]);
+      }
     } catch (error) {
       console.error("[feedback.capture_failed]", error);
-      setAutoScreenshot(null);
-      setImageSource("none");
       setCaptureError("Chưa chụp được trang này. Bạn vẫn có thể gửi góp ý hoặc chọn ảnh từ máy.");
     } finally {
       setCapturing(false);
@@ -191,35 +178,70 @@ export function GlobalFeedbackWidget() {
     }
   }
 
-  async function replaceWithUploads(files: File[]) {
+  async function addUploads(files: File[]) {
     const maxAttachments = configQuery.data?.maxAttachments ?? 5;
     if (!files.length) return;
-    if (files.length > maxAttachments) {
-      setCaptureError(`Chỉ được chọn tối đa ${maxAttachments} ảnh`);
-      return;
-    }
-    setCapturing(true);
+    setAddingUploads(true);
     setCaptureError(undefined);
+
+    const existingKeys = new Set(attachments.map((attachment) => attachment.selectionKey));
+    const accepted: File[] = [];
+    const messages: string[] = [];
+    let duplicateCount = 0;
+
     try {
       for (const file of files) {
-        if (!file.type.startsWith("image/")) throw new Error("Phần đính kèm chỉ nhận tệp hình ảnh");
-        await validateImageFileForCategory(file, "feedback-attachment", configQuery.data?.policies);
+        if (
+          existingKeys.has(feedbackFileKey(file)) ||
+          accepted.some((item) => feedbackFileKey(item) === feedbackFileKey(file))
+        ) {
+          duplicateCount += 1;
+          continue;
+        }
+        if (!file.type.startsWith("image/")) {
+          messages.push(`${file.name}: phần đính kèm chỉ nhận tệp hình ảnh.`);
+          continue;
+        }
+        try {
+          await validateImageFileForCategory(file, "feedback-attachment", configQuery.data?.policies);
+          accepted.push(file);
+        } catch (error) {
+          messages.push(`${file.name}: ${error instanceof Error ? error.message : "ảnh chưa hợp lệ"}.`);
+        }
       }
-      setUploadedImages(files);
-      setAutoScreenshot(null);
-      setImageSource("upload");
-    } catch (error) {
-      setCaptureError(error instanceof Error ? error.message : "Ảnh chưa hợp lệ. Hãy chọn ảnh khác.");
+
+      const remainingSlots = Math.max(0, maxAttachments - attachments.length);
+      const filesToAdd = accepted.slice(0, remainingSlots);
+      if (filesToAdd.length) {
+        setAttachments((items) => [
+          ...items,
+          ...filesToAdd.map((file) => createFeedbackAttachment(file, "upload")),
+        ]);
+      }
+      if (accepted.length > remainingSlots) {
+        messages.push(`Chỉ thêm ${remainingSlots} ảnh còn trống trong giới hạn ${maxAttachments} ảnh.`);
+      }
+      if (duplicateCount) messages.push(`Đã bỏ qua ${duplicateCount} ảnh trùng.`);
+      setCaptureError(messages.length ? messages.join(" ") : undefined);
     } finally {
-      setCapturing(false);
+      setAddingUploads(false);
       if (fileInputRef.current) fileInputRef.current.value = "";
     }
   }
 
+  async function saveAnnotatedImage(attachmentId: string, file: File) {
+    await validateImageFileForCategory(file, "feedback-attachment", configQuery.data?.policies);
+    setAttachments((items) =>
+      items.map((attachment) =>
+        attachment.id === attachmentId ? { ...attachment, file, annotated: true } : attachment,
+      ),
+    );
+  }
+
   if (!configQuery.data || (!configQuery.data.enabled && !open)) return null;
-  const rawSelectedImages = imageSource === "auto" && autoScreenshot ? [autoScreenshot] : uploadedImages;
-  const selectedImages = rawSelectedImages.slice(0, configQuery.data.maxAttachments);
+  const selectedAttachments = attachments.slice(0, configQuery.data.maxAttachments);
   const policySummary = getImageUploadPolicySummary("feedback-attachment", configQuery.data.policies);
+  const editingAttachment = attachments.find((attachment) => attachment.id === editingAttachmentId);
 
   return (
     <>
@@ -250,6 +272,8 @@ export function GlobalFeedbackWidget() {
               role="dialog"
               aria-modal="true"
               aria-labelledby={dialogTitleId}
+              aria-hidden={editingAttachment ? true : undefined}
+              inert={editingAttachment ? true : undefined}
               className="flex max-h-[92dvh] w-full flex-col overflow-hidden rounded-t-[28px] bg-[#fffdf8] shadow-2xl sm:max-w-2xl sm:rounded-[28px]"
               initial={{ opacity: 0, y: 24, scale: 0.98 }}
               animate={{ opacity: 1, y: 0, scale: 1 }}
@@ -268,7 +292,7 @@ export function GlobalFeedbackWidget() {
                   </h2>
                   <p className="type-supporting mt-1 text-[#6f604b]">
                     {configQuery.data.maxAttachments > 0
-                      ? "Ảnh trang hiện tại sẽ được chuẩn bị sẵn. Bạn chỉ cần nhập nội dung và gửi."
+                      ? "Ảnh trang hiện tại sẽ được chuẩn bị sẵn. Bạn có thể thêm và đánh dấu nhiều ảnh."
                       : "Bạn chỉ cần nhập nội dung và gửi góp ý."}
                   </p>
                 </div>
@@ -304,114 +328,32 @@ export function GlobalFeedbackWidget() {
                     error={form.formState.errors.content?.message}
                   />
 
-                  <section className="rounded-2xl border border-[#eadfc9] bg-[#fff8ec] p-4">
-                    <div className="flex flex-wrap items-start justify-between gap-3">
-                      <div>
-                        <h3 className="type-card-title flex items-center gap-2">
-                          <Camera size={18} /> Ảnh đính kèm
-                        </h3>
-                        <p className="type-caption mt-1 font-bold text-[#806d54]">
-                          {configQuery.data.maxAttachments > 0
-                            ? `${policySummary} mỗi ảnh · tối đa ${configQuery.data.maxAttachments} ảnh.`
-                            : "Ảnh đính kèm đang tắt."}
-                        </p>
-                      </div>
-                      {configQuery.data.maxAttachments > 0 ? (
-                        <div className="flex flex-wrap gap-2">
-                          <button
-                            type="button"
-                            disabled={capturing || mutation.isPending}
-                            onClick={() => void takeScreenshot()}
-                            className="type-action inline-flex min-h-10 cursor-pointer items-center gap-2 rounded-xl border bg-white px-3 hover:bg-[#fff2df] disabled:cursor-wait disabled:opacity-60"
-                          >
-                            {capturing ? (
-                              <LoaderCircle size={16} className="animate-spin" />
-                            ) : (
-                              <RefreshCw size={16} />
-                            )}
-                            Chụp lại trang
-                          </button>
-                          <label className="type-label inline-flex min-h-10 cursor-pointer items-center gap-2 rounded-xl border bg-white px-3 font-black hover:bg-[#fff2df]">
-                            <ImagePlus size={16} /> Thay bằng ảnh từ máy
-                            <input
-                              ref={fileInputRef}
-                              type="file"
-                              multiple
-                              disabled={capturing || mutation.isPending}
-                              accept="image/png,image/jpeg,image/webp,image/gif,image/avif"
-                              className="sr-only"
-                              onChange={(event) =>
-                                void replaceWithUploads(Array.from(event.currentTarget.files ?? []))
-                              }
-                            />
-                          </label>
-                        </div>
-                      ) : null}
-                    </div>
-
-                    {configQuery.data.maxAttachments === 0 ? (
-                      <p className="type-supporting mt-4 rounded-xl border border-dashed bg-white p-4 text-center text-[#806d54]">
-                        {contentText(
-                          common,
-                          "feedback.attachmentsDisabled",
-                          "Ảnh đính kèm đang được tắt. Bạn vẫn có thể gửi nội dung góp ý.",
-                        )}
-                      </p>
-                    ) : capturing ? (
-                      <div className="type-label mt-4 flex min-h-36 items-center justify-center gap-2 rounded-xl border border-dashed bg-white font-bold text-[#6f604b]">
-                        <LoaderCircle size={20} className="animate-spin" /> Đang chuẩn bị ảnh trang hiện
-                        tại...
-                      </div>
-                    ) : selectedImages.length ? (
-                      <div className="mt-4 grid gap-3 sm:grid-cols-2">
-                        {selectedImages.map((file, index) => (
-                          <div key={fileKey(file)} className="overflow-hidden rounded-xl border bg-white">
-                            <div className="relative aspect-video bg-[#eee7dc]">
-                              <PreviewImage file={file} alt={`Ảnh góp ý ${index + 1}`} />
-                            </div>
-                            <div className="flex items-center justify-between gap-2 p-3">
-                              <span className="type-caption flex min-w-0 items-center gap-2 truncate font-bold text-[#6f604b]">
-                                {imageSource === "auto" ? (
-                                  <CheckCircle2 size={15} className="text-green-700" />
-                                ) : null}
-                                {imageSource === "auto" ? "Ảnh trang hiện tại" : file.name}
-                              </span>
-                              <button
-                                type="button"
-                                onClick={() => {
-                                  if (imageSource === "auto") setAutoScreenshot(null);
-                                  else setUploadedImages((items) => items.filter((item) => item !== file));
-                                  if (selectedImages.length === 1) setImageSource("none");
-                                }}
-                                aria-label="Bỏ ảnh đính kèm"
-                                className="grid size-9 cursor-pointer place-items-center rounded-xl border text-red-700 hover:bg-red-50"
-                              >
-                                <Trash2 size={16} />
-                              </button>
-                            </div>
-                          </div>
-                        ))}
-                      </div>
-                    ) : (
-                      <p className="type-supporting mt-4 rounded-xl border border-dashed bg-white p-4 text-center text-[#806d54]">
-                        Không có ảnh đính kèm. Góp ý vẫn có thể được gửi.
-                      </p>
+                  <FeedbackAttachmentsPanel
+                    attachments={selectedAttachments}
+                    maxAttachments={configQuery.data.maxAttachments}
+                    policySummary={policySummary}
+                    capturing={capturing}
+                    addingUploads={addingUploads}
+                    disabled={mutation.isPending}
+                    error={captureError}
+                    attachmentsDisabledText={contentText(
+                      common,
+                      "feedback.attachmentsDisabled",
+                      "Ảnh đính kèm đang được tắt. Bạn vẫn có thể gửi nội dung góp ý.",
                     )}
-                    {captureError ? (
-                      <p role="alert" className="type-supporting mt-3 font-bold text-amber-800">
-                        {captureError}
-                      </p>
-                    ) : null}
-                    {configQuery.data.maxAttachments > 0 ? (
-                      <p className="type-caption mt-3 text-[#806d54]">
-                        {contentText(
-                          common,
-                          "feedback.capturePrivacy",
-                          "Nội dung đang nhập trong biểu mẫu và các vùng riêng tư sẽ được ẩn khỏi ảnh tự chụp.",
-                        )}
-                      </p>
-                    ) : null}
-                  </section>
+                    capturePrivacyText={contentText(
+                      common,
+                      "feedback.capturePrivacy",
+                      "Nội dung đang nhập trong biểu mẫu và các vùng riêng tư sẽ được ẩn khỏi ảnh tự chụp.",
+                    )}
+                    fileInputRef={fileInputRef}
+                    onCapture={() => void takeScreenshot()}
+                    onAddFiles={(files) => void addUploads(files)}
+                    onEdit={setEditingAttachmentId}
+                    onRemove={(attachmentId) =>
+                      setAttachments((items) => items.filter((item) => item.id !== attachmentId))
+                    }
+                  />
 
                   <FormStatus
                     status={mutation.isError ? "error" : "idle"}
@@ -439,6 +381,15 @@ export function GlobalFeedbackWidget() {
           </motion.div>
         ) : null}
       </AnimatePresence>
+
+      {editingAttachment ? (
+        <FeedbackImageAnnotator
+          key={editingAttachment.id}
+          file={editingAttachment.file}
+          onClose={() => setEditingAttachmentId(undefined)}
+          onSave={(file) => saveAnnotatedImage(editingAttachment.id, file)}
+        />
+      ) : null}
     </>
   );
 }
