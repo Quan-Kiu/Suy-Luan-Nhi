@@ -2,16 +2,18 @@
 "use client";
 
 import {
-  closestCenter,
   DndContext,
   DragOverlay,
   KeyboardSensor,
+  pointerWithin,
   PointerSensor,
+  rectIntersection,
   TouchSensor,
   useDraggable,
   useDroppable,
   useSensor,
   useSensors,
+  type CollisionDetection,
   type DragEndEvent,
   type DragStartEvent,
 } from "@dnd-kit/core";
@@ -34,6 +36,10 @@ type Props = {
   disabled: boolean;
   renderMedia: (asset: string | undefined, label: string) => React.ReactNode;
 };
+
+export const strictDropCollisionDetection: CollisionDetection = (args) =>
+  args.pointerCoordinates ? pointerWithin(args) : rectIntersection(args);
+
 function DraggableItem({
   item,
   selected,
@@ -86,6 +92,7 @@ function DroppableSlot({
   disabled,
   onAssign,
   onClear,
+  renderMedia,
 }: {
   slot: Slot;
   item?: Item;
@@ -93,18 +100,30 @@ function DroppableSlot({
   disabled: boolean;
   onAssign: () => void;
   onClear: () => void;
+  renderMedia: Props["renderMedia"];
 }) {
   const droppable = useDroppable({ id: slot.id, disabled });
   return (
     <div
       ref={droppable.setNodeRef}
       className={cn(
-        "grid min-h-24 grid-cols-[44px_minmax(0,1fr)_auto] items-center gap-3 rounded-[22px] border-2 border-dashed p-3 transition",
+        "grid min-h-24 grid-cols-[64px_minmax(0,1fr)_auto] items-center gap-3 rounded-[22px] border-2 border-dashed p-3 transition",
         droppable.isOver ? "scale-[1.01] border-[#e9641a] bg-[#fff0df]" : "border-[#cbb58d] bg-[#fff8e9]",
       )}
     >
-      <span className="grid size-11 place-items-center rounded-full bg-white shadow-sm">
-        <Check size={19} />
+      <span
+        className={cn(
+          "relative grid size-16 place-items-center overflow-hidden bg-white shadow-sm",
+          item ? "rounded-2xl border border-[#eadfc9]" : "rounded-full",
+          "[&_img]:h-full [&_img]:w-full [&_img]:object-contain",
+        )}
+      >
+        {item ? renderMedia(item.asset, item.label) : <Check size={19} />}
+        {item ? (
+          <span className="absolute right-0.5 bottom-0.5 grid size-5 place-items-center rounded-full bg-[#e9641a] text-white shadow">
+            <Check size={13} strokeWidth={3} aria-hidden />
+          </span>
+        ) : null}
       </span>
       <button
         type="button"
@@ -168,14 +187,18 @@ export function DragDropQuestion({ question, value, onChange, disabled, renderMe
     const itemId = String(event.active.id);
     const slotId = event.over ? String(event.over.id) : null;
     if (slotId) assign(itemId, slotId);
+    else setSelectedId(null);
     setActiveId(null);
   }
   return (
     <DndContext
       sensors={sensors}
-      collisionDetection={closestCenter}
+      collisionDetection={strictDropCollisionDetection}
       onDragStart={handleDragStart}
-      onDragCancel={() => setActiveId(null)}
+      onDragCancel={() => {
+        setActiveId(null);
+        setSelectedId(null);
+      }}
       onDragEnd={handleDragEnd}
     >
       <p id={instructionsId} className="sr-only">
@@ -209,6 +232,7 @@ export function DragDropQuestion({ question, value, onChange, disabled, renderMe
                 selectedItemId={selectedId}
                 disabled={disabled}
                 onAssign={() => selectedId && assign(selectedId, slot.id)}
+                renderMedia={renderMedia}
                 onClear={() => {
                   const next = { ...assignments };
                   delete next[slot.id];
