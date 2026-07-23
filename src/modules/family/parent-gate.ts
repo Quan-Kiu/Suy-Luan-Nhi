@@ -4,13 +4,28 @@ import { env } from "@/config/env";
 import { PARENT_GATE_COOKIE_NAME } from "@/modules/family/parent-gate-constants";
 import { getOperationalSystemSettings } from "@/modules/system-settings/runtime";
 
-type GatePayload = { parentProfileId: string; pinKey: string; expiresAt: number };
+type GateMethod = "pin" | "admin";
+type GatePayload = {
+  parentProfileId: string;
+  accessKey: string;
+  method: GateMethod;
+  expiresAt: number;
+};
 
-function pinKey(pinHash: string) {
-  return createHmac("sha256", env.BETTER_AUTH_SECRET)
-    .update(`parent-gate:${pinHash}`)
-    .digest("base64url")
-    .slice(0, 32);
+function keyedAccess(value: string) {
+  return createHmac("sha256", env.BETTER_AUTH_SECRET).update(value).digest("base64url").slice(0, 32);
+}
+
+function pinAccessKey(pinHash: string) {
+  return keyedAccess(`parent-gate:pin:${pinHash}`);
+}
+
+function legacyPinAccessKey(pinHash: string) {
+  return keyedAccess(`parent-gate:${pinHash}`);
+}
+
+function adminAccessKey(sessionToken: string) {
+  return keyedAccess(`parent-gate:admin-session:${sessionToken}`);
 }
 
 function encode(payload: GatePayload) {
@@ -28,40 +43,74 @@ function decode(value: string): GatePayload | null {
   );
   const actual = Buffer.from(signature, "utf8");
   if (actual.length !== expected.length || !timingSafeEqual(actual, expected)) return null;
+
   try {
-    const payload = JSON.parse(Buffer.from(body, "base64url").toString("utf8")) as Partial<GatePayload>;
+    const payload = JSON.parse(Buffer.from(body, "base64url").toString("utf8")) as {
+      parentProfileId?: unknown;
+      accessKey?: unknown;
+      method?: unknown;
+      expiresAt?: unknown;
+      pinKey?: unknown;
+    };
+    const legacyPinPayload = payload.method === undefined && typeof payload.pinKey === "string";
+    const method = legacyPinPayload ? "pin" : payload.method;
+    const accessKey = legacyPinPayload ? payload.pinKey : payload.accessKey;
+
     if (
       typeof payload.parentProfileId !== "string" ||
-      typeof payload.pinKey !== "string" ||
-      typeof payload.expiresAt !== "number"
+      typeof accessKey !== "string" ||
+      (method !== "pin" && method !== "admin") ||
+      typeof payload.expiresAt !== "number" ||
+      payload.expiresAt <= Date.now()
     ) {
       return null;
     }
-    return payload.expiresAt > Date.now() ? (payload as GatePayload) : null;
+    return {
+      parentProfileId: payload.parentProfileId,
+      accessKey,
+      method,
+      expiresAt: payload.expiresAt,
+    };
   } catch {
     return null;
   }
 }
 
-export async function grantParentGate(parentProfileId: string, pinHash: string) {
+async function grantGate(parentProfileId: string, method: GateMethod, accessKey: string) {
   const systemSettings = await getOperationalSystemSettings();
   const expiresAt = Date.now() + systemSettings.security.parentGateSessionMinutes * 60_000;
-  (await cookies()).set(
-    PARENT_GATE_COOKIE_NAME,
-    encode({ parentProfileId, pinKey: pinKey(pinHash), expiresAt }),
-    {
-      httpOnly: true,
-      secure: new URL(env.BETTER_AUTH_URL).protocol === "https:",
-      sameSite: "strict",
-      path: "/",
-    },
+  (await cookies()).set(PARENT_GATE_COOKIE_NAME, encode({ parentProfileId, accessKey, method, expiresAt }), {
+    httpOnly: true,
+    secure: new URL(env.BETTER_AUTH_URL).protocol === "https:",
+    sameSite: "strict",
+    path: "/",
+  });
+}
+
+async function hasGate(parentProfileId: string, method: GateMethod, accessKeys: readonly string[]) {
+  const value = (await cookies()).get(PARENT_GATE_COOKIE_NAME)?.value;
+  const payload = value ? decode(value) : null;
+  return (
+    payload?.parentProfileId === parentProfileId &&
+    payload.method === method &&
+    accessKeys.includes(payload.accessKey)
   );
 }
 
-export async function hasParentGate(parentProfileId: string, pinHash: string) {
-  const value = (await cookies()).get(PARENT_GATE_COOKIE_NAME)?.value;
-  const payload = value ? decode(value) : null;
-  return payload?.parentProfileId === parentProfileId && payload.pinKey === pinKey(pinHash);
+export function grantParentGate(parentProfileId: string, pinHash: string) {
+  return grantGate(parentProfileId, "pin", pinAccessKey(pinHash));
+}
+
+export function hasParentGate(parentProfileId: string, pinHash: string) {
+  return hasGate(parentProfileId, "pin", [pinAccessKey(pinHash), legacyPinAccessKey(pinHash)]);
+}
+
+export function grantAdminParentGate(parentProfileId: string, sessionToken: string) {
+  return grantGate(parentProfileId, "admin", adminAccessKey(sessionToken));
+}
+
+export function hasAdminParentGate(parentProfileId: string, sessionToken: string) {
+  return hasGate(parentProfileId, "admin", [adminAccessKey(sessionToken)]);
 }
 
 export async function revokeParentGate() {

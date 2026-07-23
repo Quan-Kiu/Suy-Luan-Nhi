@@ -7,7 +7,7 @@ import { ParentShell } from "@/features/parent/parent-shell";
 import { getContentNamespace } from "@/modules/content/content";
 import { getActiveChild } from "@/modules/family/active-child";
 import { getOrCreateParentProfile } from "@/modules/family/family";
-import { hasParentGate } from "@/modules/family/parent-gate";
+import { resolveParentWorkspaceAccess } from "@/modules/parent/access-policy";
 import { getUnreadNotificationCount } from "@/modules/parent/parent-data";
 import { getOperationalSystemSettings } from "@/modules/system-settings/runtime";
 
@@ -18,10 +18,16 @@ export default async function ParentLayout({ children }: { children: React.React
     getOperationalSystemSettings(),
   ]);
   const parent = await getOrCreateParentProfile(session.user.id, session.user.name);
-  if (!parent.pinHash) redirect(buildParentPinSetupPath("/parent"));
-  const unlocked = await hasParentGate(parent.id, parent.pinHash);
-
-  if (!unlocked) return <ParentGateView content={content} />;
+  const access = await resolveParentWorkspaceAccess({
+    role: session.user.role,
+    parentProfileId: parent.id,
+    pinHash: parent.pinHash,
+    sessionToken: session.session.token,
+  });
+  if (!access.granted && access.reason === "pin_not_set") {
+    redirect(buildParentPinSetupPath("/parent"));
+  }
+  if (!access.granted) return <ParentGateView content={content} />;
 
   const active = await getActiveChild();
   if (!active) redirect("/onboarding");

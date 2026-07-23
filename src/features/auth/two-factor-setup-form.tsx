@@ -202,6 +202,7 @@ export function TwoFactorSetupForm({ requiresPassword }: { requiresPassword: boo
         />
         <FormStatus status={verifyMessage ? "error" : "idle"} message={verifyMessage} />
         <SubmitButton
+          className="whitespace-nowrap"
           pending={verifyMutation.isPending || navigation.isPending}
           pendingLabel="Đang xác minh..."
         >

@@ -6,7 +6,10 @@ describe("AdminNavigation", () => {
   it("shows the parent-area shortcut for super admins", () => {
     render(<AdminNavigation pathname="/admin" role="super_admin" content={{}} />);
 
-    expect(screen.getByRole("link", { name: "Khu vực phụ huynh" })).toHaveAttribute("href", "/parent");
+    expect(screen.getByRole("link", { name: "Khu vực phụ huynh" })).toHaveAttribute(
+      "href",
+      "/admin/parent-access",
+    );
   });
 
   it("shows system feedback for every staff role", () => {
