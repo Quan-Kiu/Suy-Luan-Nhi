@@ -9,14 +9,22 @@ import { toast } from "sonner";
 import type { z } from "zod";
 import { signUp } from "@/auth/client";
 import { buildEmailVerificationCallback } from "@/auth/email-verification";
+import { buildAuthCompletePath, buildParentPinSetupPath } from "@/auth/navigation";
 import { FormStatus, PasswordField, SubmitButton, TextField } from "@/components/form";
 import { contentText, useContent } from "@/content/client";
 import { getAuthErrorMessage, toAuthFlowError } from "@/features/auth/auth-errors";
 import { EmailVerificationStep } from "@/features/auth/email-verification-step";
+import { GoogleAuthButton } from "@/features/auth/google-auth-button";
 import { signUpSchema } from "@/features/auth/schemas";
 import { usePendingRouter } from "@/hooks/use-pending-router";
 
-export function SignUpForm() {
+export function SignUpForm({
+  googleAuthEnabled = false,
+  oauthError,
+}: {
+  googleAuthEnabled?: boolean;
+  oauthError?: string | null;
+}) {
   const content = useContent("auth");
   const navigation = usePendingRouter();
   const [verificationEmail, setVerificationEmail] = useState<string | null>(null);
@@ -29,7 +37,7 @@ export function SignUpForm() {
       void _;
       const result = await signUp.email({
         ...values,
-        callbackURL: buildEmailVerificationCallback("/profiles"),
+        callbackURL: buildEmailVerificationCallback(buildParentPinSetupPath("/onboarding")),
       });
       if (result.error) throw toAuthFlowError(result.error, "SIGN_UP_FAILED");
       return result.data;
@@ -40,7 +48,7 @@ export function SignUpForm() {
         return;
       }
       toast.success(contentText(content, "signUp.success", "Tài khoản đã được tạo"));
-      navigation.push("/profiles");
+      navigation.push(buildParentPinSetupPath("/onboarding"));
     },
   });
 
@@ -65,6 +73,14 @@ export function SignUpForm() {
     : undefined;
   return (
     <form className="space-y-4" onSubmit={form.handleSubmit((values) => mutation.mutate(values))} noValidate>
+      {googleAuthEnabled ? (
+        <GoogleAuthButton
+          mode="sign-up"
+          callbackURL={buildAuthCompletePath("/onboarding")}
+          errorCallbackURL="/auth/sign-up?oauth=google"
+          callbackError={oauthError}
+        />
+      ) : null}
       <TextField
         autoComplete="name"
         label={contentText(content, "signUp.parentNameLabel", "Tên ba/mẹ")}

@@ -34,6 +34,9 @@ const envSchema = z.object({
   BETTER_AUTH_TRUSTED_ORIGINS: csvOrigins,
   AUTH_REQUIRE_EMAIL_VERIFICATION: booleanString.default(false),
   AUTH_RATE_LIMIT_ENABLED: booleanString.default(true),
+  AUTH_STAFF_MFA_REQUIRED: booleanString.default(true),
+  GOOGLE_CLIENT_ID: optionalString,
+  GOOGLE_CLIENT_SECRET: optionalString,
   SMTP_HOST: z.string().min(1).default(developmentDefaults.SMTP_HOST),
   SMTP_PORT: z.coerce.number().int().positive().default(1025),
   SMTP_SECURE: booleanString.default(false),
@@ -73,6 +76,9 @@ if (isProductionRuntime && parsed.data.BETTER_AUTH_SECRET === developmentDefault
 }
 if (isProductionRuntime && !parsed.data.AUTH_REQUIRE_EMAIL_VERIFICATION) {
   throw new Error("AUTH_REQUIRE_EMAIL_VERIFICATION must be true in production");
+}
+if (Boolean(parsed.data.GOOGLE_CLIENT_ID) !== Boolean(parsed.data.GOOGLE_CLIENT_SECRET)) {
+  throw new Error("GOOGLE_CLIENT_ID and GOOGLE_CLIENT_SECRET must be configured together");
 }
 if (parsed.data.STORAGE_DRIVER === "s3") {
   for (const key of [

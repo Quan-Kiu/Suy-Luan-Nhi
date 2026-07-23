@@ -1,14 +1,18 @@
 import { drizzleAdapter } from "@better-auth/drizzle-adapter";
 import { i18n } from "@better-auth/i18n";
 import { betterAuth } from "better-auth";
+import { APIError, createAuthMiddleware } from "better-auth/api";
 import { nextCookies } from "better-auth/next-js";
+import { twoFactor } from "better-auth/plugins";
 import { eq } from "drizzle-orm";
+import { isActiveBan } from "@/auth/access-policy";
+import { authTranslations, resolveAuthLocale } from "@/auth/translations";
+import { googleAuthConfigured } from "@/config/auth-providers";
 import { env } from "@/config/env";
 import { db } from "@/db/client";
 import * as schema from "@/db/schema";
-import { parentProfiles } from "@/db/schema";
+import { user as userTable } from "@/db/schema";
 import { sendTransactionalEmail } from "@/email/mailer";
-import { authTranslations, resolveAuthLocale } from "@/auth/translations";
 
 const rateLimitEnabled =
   process.env["AUTH_RATE_LIMIT_ENABLED"] === undefined
@@ -31,6 +35,39 @@ export const auth = betterAuth({
     schema,
     transaction: true,
   }),
+  socialProviders: googleAuthConfigured
+    ? {
+        google: {
+          clientId: env.GOOGLE_CLIENT_ID!,
+          clientSecret: env.GOOGLE_CLIENT_SECRET!,
+          disableImplicitSignUp: true,
+          prompt: "select_account",
+        },
+      }
+    : {},
+  account: {
+    encryptOAuthTokens: true,
+    accountLinking: {
+      enabled: true,
+      disableImplicitLinking: false,
+    },
+  },
+  databaseHooks: {
+    session: {
+      create: {
+        before: async (session) => {
+          const sessionUser = await db.query.user.findFirst({
+            where: eq(userTable.id, session.userId),
+          });
+          if (sessionUser && isActiveBan(sessionUser)) {
+            throw new APIError("FORBIDDEN", {
+              message: "Tài khoản đã bị tạm ngưng. Vui lòng liên hệ quản trị viên.",
+            });
+          }
+        },
+      },
+    },
+  },
   emailAndPassword: {
     enabled: true,
     minPasswordLength: 10,
@@ -85,27 +122,41 @@ export const auth = betterAuth({
     customRules: {
       "/sign-in/email": { window: 60, max: 8 },
       "/sign-up/email": { window: 60 * 10, max: 5 },
+      "/sign-in/social": { window: 60, max: 12 },
       "/forget-password": { window: 60 * 15, max: 5 },
       "/reset-password": { window: 60 * 15, max: 5 },
     },
   },
-  databaseHooks: {
-    user: {
-      create: {
-        after: async (createdUser) => {
-          const role = typeof createdUser.role === "string" ? createdUser.role : "parent";
-          if (role !== "parent") return;
-          const existing = await db.query.parentProfiles.findFirst({
-            where: eq(parentProfiles.userId, createdUser.id),
-          });
-          if (!existing) {
-            await db.insert(parentProfiles).values({ userId: createdUser.id, displayName: createdUser.name });
-          }
-        },
+  plugins: [
+    {
+      id: "banned-user-guard",
+      hooks: {
+        before: [
+          {
+            matcher: (context) => context.path === "/sign-in/email",
+            handler: createAuthMiddleware(async (context) => {
+              const email =
+                typeof context.body?.email === "string" ? context.body.email.trim().toLowerCase() : null;
+              if (!email) return;
+              const signInUser = await db.query.user.findFirst({
+                where: eq(userTable.email, email),
+              });
+              if (signInUser && isActiveBan(signInUser)) {
+                throw new APIError("FORBIDDEN", {
+                  message: "Tài khoản đã bị tạm ngưng. Vui lòng liên hệ quản trị viên.",
+                });
+              }
+            }),
+          },
+        ],
       },
     },
-  },
-  plugins: [
+    twoFactor({
+      issuer: "Suy Luận Nhí",
+      accountLockout: { enabled: true, maxFailedAttempts: 8, durationSeconds: 15 * 60 },
+      twoFactorCookieMaxAge: 10 * 60,
+      trustDeviceMaxAge: 30 * 24 * 60 * 60,
+    }),
     i18n({
       translations: authTranslations,
       defaultLocale: "vi",

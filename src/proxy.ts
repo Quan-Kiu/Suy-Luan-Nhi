@@ -28,8 +28,16 @@ function isMaintenanceBypass(pathname: string) {
   return maintenanceBypassPrefixes.some((prefix) => matchesPrefix(pathname, prefix));
 }
 
-function isSignUpRequest(request: NextRequest) {
-  return request.method === "POST" && request.nextUrl.pathname.startsWith("/api/auth/sign-up");
+async function isSignUpRequest(request: NextRequest) {
+  if (request.method !== "POST") return false;
+  if (request.nextUrl.pathname.startsWith("/api/auth/sign-up")) return true;
+  if (request.nextUrl.pathname !== "/api/auth/sign-in/social") return false;
+
+  const body = await request
+    .clone()
+    .json()
+    .catch(() => null);
+  return Boolean(body && typeof body === "object" && "requestSignUp" in body && body.requestSignUp === true);
 }
 
 export async function proxy(request: NextRequest) {
@@ -46,7 +54,7 @@ export async function proxy(request: NextRequest) {
     return response;
   };
 
-  if (isSignUpRequest(request) && !settings.features.registrationEnabled) {
+  if ((await isSignUpRequest(request)) && !settings.features.registrationEnabled) {
     return apiJson(
       { code: "REGISTRATION_DISABLED", message: "Hệ thống đang tạm dừng tiếp nhận tài khoản mới" },
       { status: 403 },

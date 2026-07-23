@@ -1,4 +1,5 @@
 import { Suspense } from "react";
+import { googleAuthConfigured } from "@/config/auth-providers";
 import { AuthShell } from "@/features/auth/auth-shell";
 import { SignInForm } from "@/features/auth/auth-forms";
 export default function Page() {
@@ -8,7 +9,7 @@ export default function Page() {
       subtitle="Đăng nhập để xem hồ sơ gia đình và tiếp tục hoạt động của bé trên thiết bị này."
     >
       <Suspense>
-        <SignInForm />
+        <SignInForm googleAuthEnabled={googleAuthConfigured} />
       </Suspense>
     </AuthShell>
   );

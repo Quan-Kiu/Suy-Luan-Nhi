@@ -1,6 +1,6 @@
 "use client";
 
-import { inferAdditionalFields } from "better-auth/client/plugins";
+import { inferAdditionalFields, twoFactorClient } from "better-auth/client/plugins";
 import { createAuthClient } from "better-auth/react";
 import type { auth } from "@/auth/auth";
 
@@ -12,7 +12,7 @@ export const authClient = createAuthClient({
       return context;
     },
   },
-  plugins: [inferAdditionalFields<typeof auth>()],
+  plugins: [twoFactorClient({ twoFactorPage: "/auth/two-factor" }), inferAdditionalFields<typeof auth>()],
 });
 
 export const { signIn, signUp, signOut, useSession } = authClient;

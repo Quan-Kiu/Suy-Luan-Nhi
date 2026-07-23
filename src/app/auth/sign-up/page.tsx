@@ -1,18 +1,25 @@
 import Link from "next/link";
 import { UserRoundX } from "lucide-react";
 import { connection } from "next/server";
+import { googleAuthConfigured } from "@/config/auth-providers";
 import { contentText } from "@/content/resolve";
 import { AuthShell } from "@/features/auth/auth-shell";
 import { SignUpForm } from "@/features/auth/auth-forms";
 import { getContentNamespace } from "@/modules/content/content";
 import { getOperationalSystemSettings } from "@/modules/system-settings/runtime";
 
-export default async function Page() {
+export default async function Page({
+  searchParams,
+}: {
+  searchParams: Promise<Record<string, string | string[] | undefined>>;
+}) {
   await connection();
-  const [settings, content] = await Promise.all([
+  const [settings, content, params] = await Promise.all([
     getOperationalSystemSettings(),
     getContentNamespace("auth"),
+    searchParams,
   ]);
+  const oauthError = params.oauth === "google" && typeof params.error === "string" ? params.error : null;
   if (!settings.features.registrationEnabled) {
     return (
       <AuthShell
@@ -43,28 +50,26 @@ export default async function Page() {
       subtitle={contentText(
         content,
         "signUp.pageSubtitle",
-        "Sau khi xác minh email, ba mẹ sẽ tạo hồ sơ cho bé ở bước 2.",
+        "Sau khi xác minh email, ba mẹ sẽ tạo mã PIN rồi thiết lập hồ sơ cho bé.",
       )}
     >
       <div
         aria-label="Tiến trình thiết lập"
-        className="mb-5 grid grid-cols-[1fr_auto_1fr] items-center gap-3"
+        className="mb-5 grid grid-cols-[1fr_auto_1fr_auto_1fr] items-center gap-2"
       >
-        <div className="type-caption rounded-2xl bg-[#fff0df] px-3 py-2 text-center font-black text-[#b9470d]">
-          <span className="mr-1 inline-grid size-5 place-items-center rounded-full bg-[#b9470d] text-white">
-            1
-          </span>
-          {contentText(content, "signUp.stepAccount", "Tài khoản ba mẹ")}
+        <div className="type-caption rounded-2xl bg-[#fff0df] px-2 py-2 text-center font-black text-[#b9470d]">
+          1 · {contentText(content, "signUp.stepAccount", "Tài khoản")}
         </div>
-        <span aria-hidden="true" className="h-px w-5 bg-[#dcc8a7]" />
-        <div className="type-caption rounded-2xl border border-[#e8dcc8] bg-[#faf7f1] px-3 py-2 text-center font-bold text-[#88755d]">
-          <span className="mr-1 inline-grid size-5 place-items-center rounded-full bg-[#e4d8c5] text-[#75624b]">
-            2
-          </span>
-          {contentText(content, "signUp.stepProfile", "Hồ sơ của bé")}
+        <span aria-hidden="true" className="h-px w-3 bg-[#dcc8a7]" />
+        <div className="type-caption rounded-2xl border border-[#e8dcc8] bg-[#faf7f1] px-2 py-2 text-center font-bold text-[#88755d]">
+          2 · {contentText(content, "signUp.stepPin", "Mã PIN")}
+        </div>
+        <span aria-hidden="true" className="h-px w-3 bg-[#dcc8a7]" />
+        <div className="type-caption rounded-2xl border border-[#e8dcc8] bg-[#faf7f1] px-2 py-2 text-center font-bold text-[#88755d]">
+          3 · {contentText(content, "signUp.stepProfile", "Hồ sơ bé")}
         </div>
       </div>
-      <SignUpForm />
+      <SignUpForm googleAuthEnabled={googleAuthConfigured} oauthError={oauthError} />
     </AuthShell>
   );
 }

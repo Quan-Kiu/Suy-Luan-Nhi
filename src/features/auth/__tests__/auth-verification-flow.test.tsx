@@ -8,6 +8,7 @@ import { SignUpForm } from "@/features/auth/sign-up-form";
 
 const mocks = vi.hoisted(() => ({
   signInEmail: vi.fn(),
+  signInSocial: vi.fn(),
   signUpEmail: vi.fn(),
   sendVerificationEmail: vi.fn(),
   push: vi.fn(),
@@ -15,7 +16,7 @@ const mocks = vi.hoisted(() => ({
 }));
 
 vi.mock("@/auth/client", () => ({
-  signIn: { email: mocks.signInEmail },
+  signIn: { email: mocks.signInEmail, social: mocks.signInSocial },
   signUp: { email: mocks.signUpEmail },
   authClient: { sendVerificationEmail: mocks.sendVerificationEmail },
 }));
@@ -41,9 +42,37 @@ function renderWithQuery(ui: React.ReactNode) {
 beforeEach(() => {
   vi.clearAllMocks();
   mocks.sendVerificationEmail.mockResolvedValue({ data: { status: true }, error: null });
+  mocks.signInSocial.mockResolvedValue({ data: { redirect: true }, error: null });
 });
 
 describe("authentication verification UX", () => {
+  it("starts Google sign-in without implicitly creating a new account", async () => {
+    renderWithQuery(<SignInForm googleAuthEnabled />);
+
+    await userEvent.click(screen.getByRole("button", { name: "Đăng nhập bằng Google" }));
+
+    expect(mocks.signInSocial).toHaveBeenCalledWith({
+      provider: "google",
+      callbackURL: "/auth/complete",
+      newUserCallbackURL: "/auth/complete",
+      errorCallbackURL: "/auth/sign-in?oauth=google",
+      requestSignUp: false,
+    });
+  });
+
+  it("starts Google registration with the parent onboarding callback", async () => {
+    renderWithQuery(<SignUpForm googleAuthEnabled />);
+
+    await userEvent.click(screen.getByRole("button", { name: "Đăng ký bằng Google" }));
+
+    expect(mocks.signInSocial).toHaveBeenCalledWith({
+      provider: "google",
+      callbackURL: "/auth/complete?next=%2Fonboarding",
+      newUserCallbackURL: "/auth/complete?next=%2Fonboarding",
+      errorCallbackURL: "/auth/sign-up?oauth=google",
+      requestSignUp: true,
+    });
+  });
   it("shows a success modal after the verification callback", () => {
     renderWithQuery(<EmailVerificationResultDialog result="success" continueHref="/profiles" />);
 
@@ -110,7 +139,7 @@ describe("authentication verification UX", () => {
       name: "Nguyễn Minh",
       email: "new@example.com",
       password: "StrongPass123!",
-      callbackURL: "/auth/verify-email?next=%2Fprofiles",
+      callbackURL: "/auth/verify-email?next=%2Fauth%2Fsetup-pin%3Fnext%3D%252Fonboarding",
     });
     expect(mocks.push).not.toHaveBeenCalled();
   });

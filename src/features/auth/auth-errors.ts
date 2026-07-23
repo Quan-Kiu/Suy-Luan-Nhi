@@ -25,6 +25,13 @@ const errorCopy: Record<string, ErrorCopy> = {
   },
   SIGN_IN_FAILED: { key: "errors.signIn", fallback: "Không thể đăng nhập lúc này." },
   SIGN_UP_FAILED: { key: "errors.signUp", fallback: "Không thể tạo tài khoản lúc này." },
+  OAUTH_ERROR: { key: "errors.oauth", fallback: "Chưa thể kết nối với Google." },
+  ACCESS_DENIED: { key: "errors.oauthDenied", fallback: "Bạn đã hủy đăng nhập Google." },
+  ACCOUNT_NOT_LINKED: {
+    key: "errors.accountNotLinked",
+    fallback: "Tài khoản Google này chưa được liên kết.",
+  },
+  SIGNUP_DISABLED: { key: "errors.signupDisabled", fallback: "Hệ thống đang tạm dừng tạo tài khoản mới." },
   PASSWORD_RESET_REQUEST_FAILED: {
     key: "errors.forgot",
     fallback: "Không thể gửi liên kết đặt lại lúc này.",

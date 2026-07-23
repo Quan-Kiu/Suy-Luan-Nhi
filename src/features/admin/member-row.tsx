@@ -12,6 +12,7 @@ export type MemberItem = {
   email: string;
   role: string;
   banned: boolean;
+  twoFactorEnabled: boolean;
   emailVerified: boolean;
   createdAt: Date;
 };
@@ -63,10 +64,20 @@ function RoleSelect({
 }
 
 function MemberStatus({ item }: { item: MemberItem }) {
+  const staff = ["content_admin", "reviewer", "super_admin"].includes(item.role);
   return (
-    <span className={item.banned ? "type-label text-red-700" : "type-label text-green-700"}>
-      {item.banned ? "Tạm ngưng" : "Hoạt động"}
-    </span>
+    <div>
+      <span className={item.banned ? "type-label block text-red-700" : "type-label block text-green-700"}>
+        {item.banned ? "Tạm ngưng" : "Hoạt động"}
+      </span>
+      {staff ? (
+        <span
+          className={`type-caption mt-1 block ${item.twoFactorEnabled ? "text-green-700" : "text-amber-700"}`}
+        >
+          {item.twoFactorEnabled ? "Đã bật xác thực hai lớp" : "Chưa bật xác thực hai lớp"}
+        </span>
+      ) : null}
+    </div>
   );
 }
 function AccessButton({

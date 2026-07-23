@@ -1,5 +1,6 @@
 import { and, asc, desc, eq, gte, sql } from "drizzle-orm";
 import { db } from "@/db/client";
+import { assertMemberUpdatePolicy } from "@/modules/admin/member-policy";
 import { clearOperationalSystemSettingsCache } from "@/modules/system-settings/runtime";
 import {
   ageGroups,
@@ -114,6 +115,7 @@ export async function listMembers() {
       email: user.email,
       role: user.role,
       banned: user.banned,
+      twoFactorEnabled: user.twoFactorEnabled,
       emailVerified: user.emailVerified,
       createdAt: user.createdAt,
       parentProfileId: parentProfiles.id,
@@ -128,28 +130,79 @@ export async function updateMember(
   userId: string,
   input: { role?: string; banned?: boolean; banReason?: string | null },
 ) {
-  const current = await db.query.user.findFirst({ where: eq(user.id, userId) });
-  if (!current) return null;
-  const [updated] = await db
-    .update(user)
-    .set({
-      role: input.role ?? current.role,
-      banned: input.banned ?? current.banned,
-      banReason: input.banned ? (input.banReason ?? "Tạm ngưng bởi quản trị viên") : null,
-      banExpires: null,
-      updatedAt: new Date(),
-    })
-    .where(eq(user.id, userId))
-    .returning();
-  await db.insert(auditLogs).values({
-    actorId,
-    action: "member.updated",
-    resourceType: "user",
-    resourceId: userId,
-    beforeState: { ...current, email: "[redacted]" },
-    afterState: { ...updated, email: "[redacted]" },
+  return db.transaction(async (tx) => {
+    await tx.execute(sql`select pg_advisory_xact_lock(hashtext('sln:member-policy'))`);
+    await tx.execute(sql`select pg_advisory_xact_lock(hashtext(${`sln:user-session:${userId}`}))`);
+
+    const current = await tx.query.user.findFirst({ where: eq(user.id, userId) });
+    if (!current) return null;
+
+    const nextRole = input.role ?? current.role;
+    const nextBanned = input.banned ?? current.banned;
+    const policyInput = {
+      actorId,
+      userId,
+      currentRole: current.role,
+      currentBanned: current.banned,
+      nextRole,
+      nextBanned,
+      roleWasProvided: input.role !== undefined,
+      banWasRequested: input.banned === true,
+    };
+    assertMemberUpdatePolicy(policyInput);
+
+    const removesActiveSuperAdmin =
+      current.role === "super_admin" && !current.banned && (nextRole !== "super_admin" || nextBanned);
+    if (removesActiveSuperAdmin) {
+      const activeSuperAdmins = await tx
+        .select({ count: sql<number>`count(*)::int` })
+        .from(user)
+        .where(and(eq(user.role, "super_admin"), eq(user.banned, false)));
+      assertMemberUpdatePolicy({
+        ...policyInput,
+        activeSuperAdminCount: activeSuperAdmins[0]?.count ?? 0,
+      });
+    }
+
+    const revokedSessions = nextBanned
+      ? await tx.delete(session).where(eq(session.userId, userId)).returning({ id: session.id })
+      : [];
+    const [updated] = await tx
+      .update(user)
+      .set({
+        role: nextRole,
+        banned: nextBanned,
+        banReason: nextBanned
+          ? (input.banReason ?? current.banReason ?? "Tạm ngưng bởi quản trị viên")
+          : null,
+        banExpires: null,
+        updatedAt: new Date(),
+      })
+      .where(eq(user.id, userId))
+      .returning();
+
+    await tx.insert(auditLogs).values({
+      actorId,
+      action: "member.updated",
+      resourceType: "user",
+      resourceId: userId,
+      beforeState: { ...current, email: "[redacted]" },
+      afterState: { ...updated, email: "[redacted]" },
+    });
+    if (nextBanned) {
+      await tx.insert(auditLogs).values({
+        actorId,
+        action: "session.revoked_by_ban",
+        resourceType: "user_session",
+        resourceId: userId,
+        metadata: {
+          revokedSessionCount: revokedSessions.length,
+          reason: updated.banReason,
+        },
+      });
+    }
+    return updated;
   });
-  return updated;
 }
 
 export async function createWorld(

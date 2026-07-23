@@ -8,19 +8,27 @@ import { useState } from "react";
 import { useForm } from "react-hook-form";
 import type { z } from "zod";
 import { signIn } from "@/auth/client";
-import { getAuthenticatedHome } from "@/auth/navigation";
+import {
+  buildAuthCompletePath,
+  buildParentPinSetupPath,
+  getAuthenticatedHome,
+  isParentExperiencePath,
+  PARENT_PIN_SETUP_PATH,
+} from "@/auth/navigation";
 import { CheckboxField, FormStatus, PasswordField, SubmitButton, TextField } from "@/components/form";
 import { contentText, useContent } from "@/content/client";
 import { EmailVerificationDialog } from "@/features/auth/email-verification-dialog";
 import { getAuthErrorMessage, isAuthError, toAuthFlowError } from "@/features/auth/auth-errors";
+import { GoogleAuthButton } from "@/features/auth/google-auth-button";
 import { signInSchema } from "@/features/auth/schemas";
 import { usePendingRouter } from "@/hooks/use-pending-router";
 
-export function SignInForm() {
+export function SignInForm({ googleAuthEnabled = false }: { googleAuthEnabled?: boolean }) {
   const content = useContent("auth");
   const navigation = usePendingRouter();
   const params = useSearchParams();
   const requestedCallback = params.get("callbackUrl");
+  const oauthError = params.get("oauth") === "google" ? params.get("error") : null;
   const [verificationEmail, setVerificationEmail] = useState<string | null>(null);
   const form = useForm<z.infer<typeof signInSchema>>({
     resolver: zodResolver(signInSchema),
@@ -28,15 +36,27 @@ export function SignInForm() {
   });
   const mutation = useMutation({
     mutationFn: async (values: z.infer<typeof signInSchema>) => {
+      const callbackURL =
+        requestedCallback && isParentExperiencePath(requestedCallback)
+          ? buildParentPinSetupPath(requestedCallback)
+          : requestedCallback;
       const result = await signIn.email({
         ...values,
-        ...(requestedCallback ? { callbackURL: requestedCallback } : {}),
+        ...(callbackURL ? { callbackURL } : {}),
       });
       if (result.error) throw toAuthFlowError(result.error, "SIGN_IN_FAILED");
       return result.data;
     },
     onSuccess: (data) => {
-      navigation.push(requestedCallback ?? getAuthenticatedHome(data?.user.role));
+      if (data && "twoFactorRedirect" in data && data.twoFactorRedirect) return;
+      const destination = requestedCallback ?? getAuthenticatedHome(data?.user.role);
+      const needsParentPinSetup = data?.user.role === "parent" || isParentExperiencePath(destination);
+      const target = destination.startsWith(PARENT_PIN_SETUP_PATH)
+        ? destination
+        : needsParentPinSetup
+          ? buildParentPinSetupPath(destination)
+          : destination;
+      navigation.push(target);
     },
     onError: (error, values) => {
       if (isAuthError(error, "EMAIL_NOT_VERIFIED")) setVerificationEmail(values.email);
@@ -55,6 +75,14 @@ export function SignInForm() {
         onSubmit={form.handleSubmit((values) => mutation.mutate(values))}
         noValidate
       >
+        {googleAuthEnabled ? (
+          <GoogleAuthButton
+            mode="sign-in"
+            callbackURL={buildAuthCompletePath(requestedCallback)}
+            errorCallbackURL="/auth/sign-in?oauth=google"
+            callbackError={oauthError}
+          />
+        ) : null}
         <TextField
           type="email"
           autoComplete="email"

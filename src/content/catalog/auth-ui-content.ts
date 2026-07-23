@@ -20,16 +20,24 @@ export const authContentEntries = defineContent("auth", {
   "signIn.submitting": { value: "Đang đăng nhập...", description: "Nhãn khi đang đăng nhập." },
   "signIn.forgot": { value: "Quên mật khẩu?", description: "Liên kết quên mật khẩu." },
   "signIn.createAccount": { value: "Tạo tài khoản", description: "Liên kết tạo tài khoản." },
+  "social.googleSignIn": { value: "Đăng nhập bằng Google", description: "Nhãn nút đăng nhập Google." },
+  "social.googleSignUp": { value: "Đăng ký bằng Google", description: "Nhãn nút đăng ký Google." },
+  "social.googlePending": { value: "Đang kết nối Google...", description: "Trạng thái kết nối Google." },
+  "social.emailDivider": {
+    value: "hoặc tiếp tục bằng email",
+    description: "Nhãn phân cách phương thức đăng nhập.",
+  },
   "signUp.pageTitle": {
     value: "Bước 1: Tạo tài khoản ba mẹ",
     description: "Tiêu đề trang đăng ký trong quy trình thiết lập gia đình.",
   },
   "signUp.pageSubtitle": {
-    value: "Sau khi xác minh email, ba mẹ sẽ tạo hồ sơ cho bé ở bước 2.",
-    description: "Mô tả rõ bước tiếp theo sau khi tạo tài khoản.",
+    value: "Sau khi xác minh email, ba mẹ sẽ tạo mã PIN rồi thiết lập hồ sơ cho bé.",
+    description: "Mô tả rõ các bước tiếp theo sau khi tạo tài khoản.",
   },
-  "signUp.stepAccount": { value: "Tài khoản ba mẹ", description: "Tên bước tạo tài khoản ba mẹ." },
-  "signUp.stepProfile": { value: "Hồ sơ của bé", description: "Tên bước tạo hồ sơ cho bé." },
+  "signUp.stepAccount": { value: "Tài khoản", description: "Tên bước tạo tài khoản ba mẹ." },
+  "signUp.stepPin": { value: "Mã PIN", description: "Tên bước tạo mã PIN phụ huynh." },
+  "signUp.stepProfile": { value: "Hồ sơ bé", description: "Tên bước tạo hồ sơ cho bé." },
   "signUp.parentNameLabel": { value: "Tên ba/mẹ", description: "Nhãn tên phụ huynh." },
   "signUp.parentNamePlaceholder": {
     value: "Ví dụ: Nguyễn Minh Anh",
@@ -64,6 +72,40 @@ export const authContentEntries = defineContent("auth", {
     description: "Thông báo đăng ký thành công.",
   },
   "signUp.hasAccount": { value: "Đã có tài khoản?", description: "Lời dẫn liên kết đăng nhập." },
+  "pinSetup.title": { value: "Tạo mã PIN phụ huynh", description: "Tiêu đề bước thiết lập mã PIN." },
+  "pinSetup.subtitle": {
+    value: "Đây là bước bảo vệ riêng trước khi tạo hồ sơ hoặc xem thông tin của bé.",
+    description: "Mô tả bước thiết lập mã PIN phụ huynh.",
+  },
+  "pinSetup.whyTitle": { value: "Bảo vệ phần dành cho ba mẹ", description: "Lý do cần mã PIN." },
+  "pinSetup.whyDescription": {
+    value: "Mã PIN giúp bé không vô tình mở tiến độ, cài đặt và dữ liệu gia đình.",
+    description: "Giải thích ngắn về tác dụng của mã PIN.",
+  },
+  "pinSetup.pinLabel": { value: "Tạo mã PIN 6 chữ số", description: "Nhãn ô tạo mã PIN." },
+  "pinSetup.pinDescription": {
+    value: "Tránh dùng 123456, ngày sinh hoặc một chữ số lặp lại.",
+    description: "Hướng dẫn chọn mã PIN khó đoán.",
+  },
+  "pinSetup.pinPlaceholder": { value: "Nhập 6 chữ số", description: "Gợi ý ô tạo mã PIN." },
+  "pinSetup.confirmLabel": { value: "Nhập lại mã PIN", description: "Nhãn xác nhận mã PIN." },
+  "pinSetup.confirmPlaceholder": {
+    value: "Nhập lại 6 chữ số",
+    description: "Gợi ý ô xác nhận mã PIN.",
+  },
+  "pinSetup.changeHint": {
+    value: "Ba mẹ có thể đổi mã PIN sau trong phần Cài đặt gia đình.",
+    description: "Gợi ý cách đổi mã PIN sau này.",
+  },
+  "pinSetup.submit": { value: "Lưu mã PIN và tiếp tục", description: "Nhãn nút lưu mã PIN." },
+  "pinSetup.submitting": {
+    value: "Đang bảo vệ khu vực phụ huynh...",
+    description: "Trạng thái đang lưu mã PIN.",
+  },
+  "pinSetup.success": {
+    value: "Mã PIN phụ huynh đã được thiết lập",
+    description: "Thông báo thiết lập mã PIN thành công.",
+  },
   "forgot.emailLabel": { value: "Email tài khoản", description: "Nhãn email quên mật khẩu." },
   "forgot.submit": { value: "Gửi liên kết đặt lại", description: "Nhãn nút gửi đặt lại mật khẩu." },
   "forgot.submitting": { value: "Đang gửi...", description: "Nhãn khi đang gửi email." },
@@ -96,15 +138,15 @@ export const authContentEntries = defineContent("auth", {
     description: "Tiêu đề xác minh sau đăng ký.",
   },
   "verification.signUpFlowTitle": {
-    value: "Kiểm tra email để sang bước 2",
+    value: "Kiểm tra email để tiếp tục thiết lập",
     description: "Tiêu đề xác minh email trong quy trình tạo tài khoản và hồ sơ bé.",
   },
   "verification.signUpFlowDescription": {
-    value: "Tài khoản ba mẹ đã được tạo. Hãy xác minh email, sau đó quay lại để tạo hồ sơ cho bé.",
+    value: "Tài khoản đã được tạo. Hãy xác minh email, sau đó quay lại để tạo mã PIN và hồ sơ cho bé.",
     description: "Mô tả bước xác minh và bước tạo hồ sơ tiếp theo.",
   },
   "verification.signUpFlowReturn": {
-    value: "Quay lại Suy Luận Nhí và tạo hồ sơ cho bé",
+    value: "Quay lại Suy Luận Nhí và tiếp tục thiết lập",
     description: "Bước cuối trong hướng dẫn xác minh email sau đăng ký.",
   },
   "verification.signUpDescription": {
@@ -224,6 +266,22 @@ export const authContentEntries = defineContent("auth", {
   },
   "errors.signIn": { value: "Không thể đăng nhập lúc này.", description: "Lỗi đăng nhập mặc định." },
   "errors.signUp": { value: "Không thể tạo tài khoản lúc này.", description: "Lỗi đăng ký mặc định." },
+  "errors.oauth": {
+    value: "Chưa thể kết nối với Google. Hãy thử lại hoặc dùng email.",
+    description: "Lỗi chung khi xác thực Google.",
+  },
+  "errors.oauthDenied": {
+    value: "Bạn đã đóng hoặc từ chối đăng nhập Google.",
+    description: "Lỗi khi người dùng hủy cấp quyền Google.",
+  },
+  "errors.accountNotLinked": {
+    value: "Tài khoản Google này chưa được liên kết. Hãy đăng nhập bằng cách đã dùng trước đó.",
+    description: "Lỗi tài khoản Google chưa liên kết.",
+  },
+  "errors.signupDisabled": {
+    value: "Hệ thống đang tạm dừng tạo tài khoản mới.",
+    description: "Lỗi đăng ký Google khi tắt đăng ký.",
+  },
   "errors.forgot": {
     value: "Không thể gửi liên kết đặt lại lúc này.",
     description: "Lỗi gửi email đặt lại.",

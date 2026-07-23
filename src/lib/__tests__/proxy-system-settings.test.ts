@@ -16,7 +16,7 @@ function settings(overrides: Array<{ key: string; value: unknown }> = []) {
   return resolveOperationalSystemSettings(overrides);
 }
 
-function request(pathname: string, init?: { method?: string; headers?: Record<string, string> }) {
+function request(pathname: string, init?: ConstructorParameters<typeof NextRequest>[1]) {
   return new NextRequest(`http://localhost:3000${pathname}`, init);
 }
 
@@ -68,5 +68,41 @@ describe("proxy system settings", () => {
       success: false,
       error: { code: "REGISTRATION_DISABLED" },
     });
+  });
+
+  it("blocks Google account creation when registration is disabled", async () => {
+    mocks.getOperationalSystemSettings.mockResolvedValue(
+      settings([{ key: "features.registrationEnabled", value: false }]),
+    );
+
+    const response = await proxy(
+      request("/api/auth/sign-in/social", {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({ provider: "google", requestSignUp: true }),
+      }),
+    );
+
+    expect(response.status).toBe(403);
+    await expect(response.json()).resolves.toMatchObject({
+      success: false,
+      error: { code: "REGISTRATION_DISABLED" },
+    });
+  });
+
+  it("allows existing Google accounts to sign in when registration is disabled", async () => {
+    mocks.getOperationalSystemSettings.mockResolvedValue(
+      settings([{ key: "features.registrationEnabled", value: false }]),
+    );
+
+    const response = await proxy(
+      request("/api/auth/sign-in/social", {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({ provider: "google", requestSignUp: false }),
+      }),
+    );
+
+    expect(response.headers.get("x-middleware-next")).toBe("1");
   });
 });
