@@ -66,6 +66,12 @@ describe("two-factor setup account capability", () => {
     await waitFor(() => {
       expect(mocks.enable).toHaveBeenCalledWith({ issuer: "Suy Luận Nhí" });
     });
+
+    expect(await screen.findByRole("button", { name: "Xác minh và tiếp tục" })).toHaveClass(
+      "inline-flex",
+      "items-center",
+      "whitespace-nowrap",
+    );
   });
 
   it("keeps password confirmation for a credential account", async () => {
