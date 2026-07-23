@@ -6,6 +6,7 @@ import { useSession } from "@/auth/client";
 import { contentText } from "@/content/resolve";
 import type { ContentDictionary } from "@/content/types";
 import { resolveLandingEntryState } from "@/features/landing/landing-entry-state";
+import { useHydrated } from "@/hooks/use-hydrated";
 import { cn } from "@/lib/utils";
 
 export function AuthAwareEntryLink({
@@ -22,8 +23,9 @@ export function AuthAwareEntryLink({
   className?: string;
 }) {
   const session = useSession();
+  const hydrated = useHydrated();
   const state = resolveLandingEntryState({
-    isPending: session.isPending,
+    isPending: !hydrated || session.isPending,
     isRefetching: session.isRefetching,
     hasUser: Boolean(session.data?.user),
     role: session.data?.user.role,

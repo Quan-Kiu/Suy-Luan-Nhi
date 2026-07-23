@@ -3,13 +3,13 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation } from "@tanstack/react-query";
 import { KeyRound, ShieldCheck } from "lucide-react";
+import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { parentApi } from "@/api/parent";
 import { FormStatus, PasswordField, SubmitButton } from "@/components/form";
 import { contentText, useContent } from "@/content/client";
 import { PARENT_PIN_LENGTH, parentPinSetupSchema, type ParentPinSetupInput } from "@/domain/parent-pin";
-import { usePendingRouter } from "@/hooks/use-pending-router";
 
 function keepPinDigits(event: React.ChangeEvent<HTMLInputElement>) {
   event.target.value = event.target.value.replace(/\D/g, "").slice(0, PARENT_PIN_LENGTH);
@@ -17,7 +17,7 @@ function keepPinDigits(event: React.ChangeEvent<HTMLInputElement>) {
 
 export function ParentPinSetupForm({ nextPath }: { nextPath: string }) {
   const content = useContent("auth");
-  const navigation = usePendingRouter();
+  const [navigating, setNavigating] = useState(false);
   const form = useForm<ParentPinSetupInput>({
     resolver: zodResolver(parentPinSetupSchema),
     defaultValues: { pin: "", confirmPin: "" },
@@ -25,8 +25,9 @@ export function ParentPinSetupForm({ nextPath }: { nextPath: string }) {
   const mutation = useMutation({
     mutationFn: ({ pin }: ParentPinSetupInput) => parentApi.setupPin({ pin }),
     onSuccess: () => {
+      setNavigating(true);
       toast.success(contentText(content, "pinSetup.success", "Mã PIN phụ huynh đã được thiết lập"));
-      navigation.replace(nextPath);
+      window.location.replace(nextPath);
     },
   });
 
@@ -82,7 +83,7 @@ export function ParentPinSetupForm({ nextPath }: { nextPath: string }) {
       </p>
       <FormStatus status={mutation.isError ? "error" : "idle"} message={mutation.error?.message} />
       <SubmitButton
-        pending={mutation.isPending || navigation.isPending}
+        pending={mutation.isPending || navigating}
         pendingLabel={contentText(content, "pinSetup.submitting", "Đang bảo vệ khu vực phụ huynh...")}
       >
         {contentText(content, "pinSetup.submit", "Lưu mã PIN và tiếp tục")}

@@ -2,23 +2,20 @@
 
 import { useCallback, useState } from "react";
 import { signOut } from "@/auth/client";
-import { usePendingRouter } from "@/hooks/use-pending-router";
 
 export function useSignOutNavigation(target: string) {
-  const navigation = usePendingRouter();
-  const [signingOut, setSigningOut] = useState(false);
-  const pending = signingOut || navigation.isPending;
+  const [pending, setPending] = useState(false);
 
   const signOutAndNavigate = useCallback(async () => {
     if (pending) return;
-    setSigningOut(true);
+    setPending(true);
     try {
       await signOut();
-      navigation.push(target);
+      window.location.replace(target);
     } catch {
-      setSigningOut(false);
+      setPending(false);
     }
-  }, [navigation, pending, target]);
+  }, [pending, target]);
 
   return { pending, signOutAndNavigate };
 }
