@@ -3,9 +3,11 @@ import { defineConfig, devices } from "@playwright/test";
 const databaseUrl = process.env.E2E_DATABASE_URL ?? "postgresql://sln@127.0.0.1:54329/sln_e2e";
 const baseURL = "http://127.0.0.1:3100";
 const production = process.env.E2E_SERVER_MODE === "production";
+// Keep E2E cache isolated so cleanup cannot corrupt a developer's running Next.js server.
+const e2eDistDir = ".next-e2e";
 const serverCommand = production
   ? "rm -rf .next/standalone/public .next/standalone/.next/static .next/standalone/.next/cache && cp -R public .next/standalone/public && mkdir -p .next/standalone/.next && cp -R .next/static .next/standalone/.next/static && cd .next/standalone && HOSTNAME=127.0.0.1 PORT=3100 node server.js"
-  : "rm -rf .next/dev .next/cache/fetch-cache && npm run dev -- --hostname 127.0.0.1 --port 3100";
+  : `rm -rf ${e2eDistDir} && NEXT_DIST_DIR=${e2eDistDir} npm run dev -- --hostname 127.0.0.1 --port 3100`;
 const environment = [
   `DATABASE_URL='${databaseUrl}'`,
   `E2E_DATABASE_URL='${databaseUrl}'`,
@@ -13,6 +15,7 @@ const environment = [
   "BETTER_AUTH_SECRET='e2e-only-secret-with-more-than-thirty-two-characters'",
   `AUTH_REQUIRE_EMAIL_VERIFICATION='${production ? "true" : "false"}'`,
   "AUTH_RATE_LIMIT_ENABLED='false'",
+  "AUTH_STAFF_MFA_REQUIRED='false'",
   "STORAGE_DRIVER='local'",
   "LOCAL_UPLOAD_DIR='public/uploads/e2e'",
   "PUBLIC_UPLOAD_BASE_URL='/uploads/e2e'",
