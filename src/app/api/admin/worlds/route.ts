@@ -2,6 +2,7 @@ import { apiJson } from "@/lib/api-response";
 import { invalidateTaxonomyCaches } from "@/lib/cache/invalidation";
 import { z } from "zod";
 import { requireApiRoles } from "@/auth/api";
+import { ageGroupCodes } from "@/domain/age-groups";
 import { createWorld } from "@/modules/admin/operations";
 const schema = z.object({
   slug: z.string().regex(/^[a-z0-9-]+$/),
@@ -11,6 +12,7 @@ const schema = z.object({
   sortOrder: z.number().int().positive(),
   themeColor: z.string().min(3),
   coverUrl: z.string().min(1),
+  ageGroups: z.array(z.enum(ageGroupCodes)).min(1, "Hãy chọn ít nhất 1 nhóm tuổi"),
 });
 export async function POST(request: Request) {
   const authResult = await requireApiRoles(request, ["content_admin", "super_admin"]);

@@ -9,6 +9,7 @@ import { z } from "zod";
 import { worldsApi, type WorldInput, type WorldStatus } from "@/api/admin/worlds";
 import { FormStatus, SelectField, SubmitButton, TextareaField, TextField } from "@/components/form";
 import { contentText, useContent } from "@/content/client";
+import { ageGroupCodes, type AgeGroup } from "@/domain/age-groups";
 import { MediaUploadField } from "@/features/admin/media-upload-field";
 import { usePendingRouter } from "@/hooks/use-pending-router";
 import { queryKeys } from "@/lib/query/keys";
@@ -25,6 +26,7 @@ const schema = z.object({
   sortOrder: z.number().int().positive(),
   themeColor: z.string().min(3),
   coverUrl: z.string().trim().min(1, "Hãy nhập cover URL"),
+  ageGroups: z.array(z.enum(ageGroupCodes)).min(1, "Hãy chọn ít nhất 1 nhóm tuổi"),
   status: z.enum(["draft", "published", "archived"]),
 });
 
@@ -45,6 +47,7 @@ function toInput(values: FormValues, mode: "create" | "edit"): WorldInput {
     sortOrder: values.sortOrder,
     themeColor: values.themeColor,
     coverUrl: values.coverUrl,
+    ageGroups: values.ageGroups,
   };
   if (mode === "create") input.slug = values.slug;
   if (mode === "edit") input.status = values.status;
@@ -67,6 +70,13 @@ export function WorldForm({
   const form = useForm<FormValues>({ resolver: zodResolver(schema), defaultValues: initial });
   const title = useWatch({ control: form.control, name: "title" });
   const coverUrl = useWatch({ control: form.control, name: "coverUrl" });
+  const selectedAgeGroups = useWatch({ control: form.control, name: "ageGroups" });
+  const toggleAgeGroup = (ageGroup: AgeGroup) => {
+    const next = selectedAgeGroups.includes(ageGroup)
+      ? selectedAgeGroups.filter((item) => item !== ageGroup)
+      : [...selectedAgeGroups, ageGroup];
+    form.setValue("ageGroups", next, { shouldDirty: true, shouldValidate: true });
+  };
   const mutation = useMutation({
     mutationFn: (values: FormValues) => {
       const input = toInput(values, mode);
@@ -131,6 +141,39 @@ export function WorldForm({
         registration={form.register("description")}
         error={form.formState.errors.description?.message}
       />
+      <fieldset className="rounded-xl border border-[#eadfc9] bg-[#fffdf8] p-3">
+        <legend className="type-label px-1">
+          {contentText(content, "world.ageGroupsLabel", "Nhóm tuổi có thể nhìn thấy chủ đề")}
+        </legend>
+        <p className="type-supporting mt-1 text-[#806d54]">
+          {contentText(
+            content,
+            "world.ageGroupsDescription",
+            "Nhiệm vụ chỉ xuất hiện khi nhóm tuổi của bé được bật ở cả chủ đề và nhiệm vụ.",
+          )}
+        </p>
+        <div className="mt-3 flex flex-wrap gap-2">
+          {ageGroupCodes.map((ageGroup) => (
+            <label
+              key={ageGroup}
+              className="type-label flex items-center gap-2 rounded-xl border bg-white px-3 py-2 font-bold"
+            >
+              <input
+                type="checkbox"
+                checked={selectedAgeGroups.includes(ageGroup)}
+                onChange={() => toggleAgeGroup(ageGroup)}
+                className="size-5 accent-[#e9641a]"
+              />
+              {ageGroup} tuổi
+            </label>
+          ))}
+        </div>
+        {form.formState.errors.ageGroups?.message ? (
+          <p role="alert" className="type-supporting mt-2 font-bold text-red-700">
+            {form.formState.errors.ageGroups.message}
+          </p>
+        ) : null}
+      </fieldset>
       <div className="grid gap-3 xl:grid-cols-3">
         <TextField
           id={`${fieldPrefix}-sort-order`}

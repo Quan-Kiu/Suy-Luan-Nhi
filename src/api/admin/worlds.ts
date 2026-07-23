@@ -1,3 +1,4 @@
+import type { AgeGroup } from "@/domain/age-groups";
 import { apiRequest } from "@/lib/api/client";
 
 export type WorldStatus = "draft" | "published" | "archived";
@@ -9,6 +10,7 @@ export type WorldInput = {
   sortOrder: number;
   themeColor: string;
   coverUrl: string;
+  ageGroups: AgeGroup[];
   status?: WorldStatus;
 };
 
