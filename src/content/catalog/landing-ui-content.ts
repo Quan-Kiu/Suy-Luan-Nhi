@@ -40,7 +40,7 @@ export const landingContentEntries = defineContent("landing", {
   },
   "hero.parentCta": {
     value: "Vào khu vực phụ huynh",
-    description: "Tên CTA cũ được giữ để tương thích nội dung đã cấu hình.",
+    description: "Tên nút cũ được giữ để nội dung đã cấu hình tiếp tục hoạt động.",
   },
   "hero.manageFamily": {
     value: "Quản lý gia đình",
