@@ -1,7 +1,7 @@
 import { cache } from "react";
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
-import { isActiveBan, requiresStaffMfa } from "@/auth/access-policy";
+import { isActiveBan, requiresStaffMfa, requiresStaffMfaChallenge } from "@/auth/access-policy";
 import { auth } from "@/auth/auth";
 import { hasRole, type AppRole } from "@/auth/roles";
 import { env } from "@/config/env";
@@ -26,6 +26,9 @@ export async function requireRoles(roles: readonly AppRole[]) {
   const session = await requireSession();
   if (!hasRole(session.user.role, roles)) redirect("/auth/error?reason=forbidden");
   if (env.AUTH_STAFF_MFA_REQUIRED && requiresStaffMfa(session.user)) redirect("/auth/mfa/setup");
+  if (env.AUTH_STAFF_MFA_REQUIRED && requiresStaffMfaChallenge(session.user, session.session)) {
+    redirect("/auth/two-factor");
+  }
   return session;
 }
 

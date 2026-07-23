@@ -6,6 +6,9 @@ export type AuthAccessUser = {
   banExpires?: Date | string | null;
   twoFactorEnabled?: boolean | null;
 };
+export type AuthAccessSession = {
+  mfaVerifiedAt?: Date | string | null;
+};
 
 export function isActiveBan(user: AuthAccessUser, now = new Date()) {
   if (!user.banned) return false;
@@ -20,4 +23,8 @@ export function isStaffAccount(user: AuthAccessUser) {
 
 export function requiresStaffMfa(user: AuthAccessUser) {
   return isStaffAccount(user) && user.twoFactorEnabled !== true;
+}
+
+export function requiresStaffMfaChallenge(user: AuthAccessUser, session: AuthAccessSession) {
+  return isStaffAccount(user) && user.twoFactorEnabled === true && !session.mfaVerifiedAt;
 }
