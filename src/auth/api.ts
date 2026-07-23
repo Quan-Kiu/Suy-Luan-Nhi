@@ -65,10 +65,18 @@ export async function requireApiRoles(request: Request, roles: readonly AppRole[
 export async function requireApiParentGate(request: Request) {
   const authResult = await requireApiRoles(request, ["parent", "super_admin"]);
   if ("error" in authResult) return authResult;
-  const { getOrCreateParentProfile } = await import("@/modules/family/family");
-  const { hasParentGate } = await import("@/modules/family/parent-gate");
+  const [{ getOrCreateParentProfile }, { resolveParentWorkspaceAccess }] = await Promise.all([
+    import("@/modules/family/family"),
+    import("@/modules/parent/access-policy"),
+  ]);
   const parent = await getOrCreateParentProfile(authResult.session.user.id, authResult.session.user.name);
-  if (!parent.pinHash || !(await hasParentGate(parent.id, parent.pinHash))) {
+  const access = await resolveParentWorkspaceAccess({
+    role: authResult.session.user.role,
+    parentProfileId: parent.id,
+    pinHash: parent.pinHash,
+    sessionToken: authResult.session.session.token,
+  });
+  if (!access.granted) {
     return {
       error: apiJson(
         { message: "Cần mở Parent Gate trước khi thực hiện thao tác nhạy cảm" },

@@ -42,7 +42,7 @@ const navGroups = [
         exact: true,
       },
       {
-        href: "/parent",
+        href: "/admin/parent-access",
         labelKey: "nav.parentArea",
         fallback: "Khu vực phụ huynh",
         icon: House,

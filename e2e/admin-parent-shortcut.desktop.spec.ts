@@ -6,7 +6,7 @@ test("super admin sees a parent-area shortcut in admin navigation", async ({ pag
 
   const shortcut = page.getByRole("link", { name: "Khu vực phụ huynh" });
   await expect(shortcut).toBeVisible();
-  await expect(shortcut).toHaveAttribute("href", "/parent");
+  await expect(shortcut).toHaveAttribute("href", "/admin/parent-access");
 });
 
 test("other staff roles do not see the parent-area shortcut", async ({ page }) => {
@@ -15,7 +15,7 @@ test("other staff roles do not see the parent-area shortcut", async ({ page }) =
   await expect(page.getByRole("link", { name: "Khu vực phụ huynh" })).toHaveCount(0);
 });
 
-test("super admin can return to the admin workspace from the parent header", async ({ page }) => {
+test("super admin enters the parent area without a PIN challenge and can return", async ({ page }) => {
   await signIn(page, "admin@demo.local", "/admin");
 
   let children = await apiData<Array<{ id: string }>>(await page.request.get("/api/children"));
@@ -28,8 +28,10 @@ test("super admin can return to the admin workspace from the parent header", asy
     children = [child];
   }
   await selectChild(page, children[0].id);
-  await unlockParentGate(page);
+  await page.getByRole("link", { name: "Khu vực phụ huynh" }).click();
 
+  await expect(page).toHaveURL(/\/parent$/);
+  await expect(page.getByRole("textbox", { name: "Mã PIN phụ huynh", exact: true })).toHaveCount(0);
   await expect(page.getByText("Xin chào, ba mẹ!", { exact: true })).toBeVisible();
   await expect(page.getByRole("heading", { name: /Tuần này của/i })).toBeVisible();
   await expect(page.getByText("Super Admin Demo", { exact: true })).toHaveCount(0);
