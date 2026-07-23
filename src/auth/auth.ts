@@ -6,6 +6,7 @@ import { nextCookies } from "better-auth/next-js";
 import { twoFactor } from "better-auth/plugins";
 import { eq } from "drizzle-orm";
 import { isActiveBan } from "@/auth/access-policy";
+import { staffMfaSessionMarker } from "@/auth/staff-mfa-session-marker";
 import { authTranslations, resolveAuthLocale } from "@/auth/translations";
 import { googleAuthConfigured } from "@/config/auth-providers";
 import { env } from "@/config/env";
@@ -110,6 +111,7 @@ export const auth = betterAuth({
   session: {
     additionalFields: {
       impersonatedBy: { type: "string", required: false, input: false },
+      mfaVerifiedAt: { type: "date", required: false, input: false },
     },
     expiresIn: 60 * 60 * 24 * 30,
     updateAge: 60 * 60 * 24,
@@ -153,10 +155,12 @@ export const auth = betterAuth({
     },
     twoFactor({
       issuer: "Suy Luận Nhí",
+      allowPasswordless: true,
       accountLockout: { enabled: true, maxFailedAttempts: 8, durationSeconds: 15 * 60 },
       twoFactorCookieMaxAge: 10 * 60,
       trustDeviceMaxAge: 30 * 24 * 60 * 60,
     }),
+    staffMfaSessionMarker,
     i18n({
       translations: authTranslations,
       defaultLocale: "vi",

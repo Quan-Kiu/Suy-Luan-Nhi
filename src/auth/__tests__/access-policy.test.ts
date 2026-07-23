@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { isActiveBan, requiresStaffMfa } from "@/auth/access-policy";
+import { isActiveBan, requiresStaffMfa, requiresStaffMfaChallenge } from "@/auth/access-policy";
 
 describe("auth access policy", () => {
   it("treats permanent and future bans as active", () => {
@@ -21,9 +21,24 @@ describe("auth access policy", () => {
     ).toBe(false);
   });
 
-  it("requires MFA only for staff without an enabled factor", () => {
+  it("requires MFA setup only for staff without an enabled factor", () => {
     expect(requiresStaffMfa({ role: "super_admin", twoFactorEnabled: false })).toBe(true);
     expect(requiresStaffMfa({ role: "reviewer", twoFactorEnabled: true })).toBe(false);
     expect(requiresStaffMfa({ role: "parent", twoFactorEnabled: false })).toBe(false);
+  });
+
+  it("requires a per-session MFA challenge for staff with an unverified session", () => {
+    expect(
+      requiresStaffMfaChallenge({ role: "super_admin", twoFactorEnabled: true }, { mfaVerifiedAt: null }),
+    ).toBe(true);
+    expect(
+      requiresStaffMfaChallenge(
+        { role: "reviewer", twoFactorEnabled: true },
+        { mfaVerifiedAt: new Date("2026-07-23T09:00:00.000Z") },
+      ),
+    ).toBe(false);
+    expect(
+      requiresStaffMfaChallenge({ role: "parent", twoFactorEnabled: true }, { mfaVerifiedAt: null }),
+    ).toBe(false);
   });
 });

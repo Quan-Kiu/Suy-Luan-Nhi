@@ -16,12 +16,13 @@ const passwordSchema = z.object({ password: z.string().min(1, "Hãy nhập mật
 const codeSchema = z.object({ code: z.string().regex(/^\d{6}$/, "Mã xác thực gồm 6 chữ số") });
 
 type SetupData = { totpURI: string; backupCodes: string[] };
+type SetupStartInput = { password?: string };
 
 function authErrorMessage(error: unknown, fallback: string) {
   if (error instanceof Error && error.message) return error.message;
   return fallback;
 }
-export function TwoFactorSetupForm() {
+export function TwoFactorSetupForm({ requiresPassword }: { requiresPassword: boolean }) {
   const navigation = usePendingRouter();
   const [setup, setSetup] = useState<SetupData | null>(null);
   const passwordForm = useForm<z.infer<typeof passwordSchema>>({
@@ -34,8 +35,11 @@ export function TwoFactorSetupForm() {
   });
 
   const enableMutation = useMutation({
-    mutationFn: async ({ password }: z.infer<typeof passwordSchema>) => {
-      const result = await authClient.twoFactor.enable({ password, issuer: "Suy Luận Nhí" });
+    mutationFn: async ({ password }: SetupStartInput) => {
+      const result = await authClient.twoFactor.enable({
+        ...(password ? { password } : {}),
+        issuer: "Suy Luận Nhí",
+      });
       if (result.error) throw new Error(result.error.message);
       if (!result.data?.totpURI || !result.data.backupCodes) {
         throw new Error("Không thể tạo thông tin xác thực hai lớp");
@@ -73,25 +77,35 @@ export function TwoFactorSetupForm() {
     return (
       <form
         className="space-y-4"
-        onSubmit={passwordForm.handleSubmit((values) => enableMutation.mutate(values))}
+        onSubmit={
+          requiresPassword
+            ? passwordForm.handleSubmit((values) => enableMutation.mutate(values))
+            : (event) => {
+                event.preventDefault();
+                enableMutation.mutate({});
+              }
+        }
         noValidate
       >
         <div className="rounded-2xl bg-amber-50 p-4 text-amber-950">
           <div className="flex items-start gap-3">
             <KeyRound className="mt-0.5 shrink-0" size={20} />
             <p className="type-supporting">
-              Tài khoản nhân sự phải dùng ứng dụng Authenticator. Mật khẩu được yêu cầu lại để bảo vệ thao tác
-              này.
+              {requiresPassword
+                ? "Tài khoản nhân sự phải dùng ứng dụng Authenticator. Mật khẩu được yêu cầu lại để bảo vệ thao tác này."
+                : "Tài khoản này đăng nhập bằng Google và không có mật khẩu riêng tại Suy Luận Nhí. Phiên đăng nhập hiện tại sẽ được dùng để bắt đầu thiết lập Authenticator."}
             </p>
           </div>
         </div>
-        <PasswordField
-          autoComplete="current-password"
-          label="Mật khẩu hiện tại"
-          placeholder="Nhập mật khẩu của bạn"
-          registration={passwordForm.register("password")}
-          error={passwordForm.formState.errors.password?.message}
-        />
+        {requiresPassword ? (
+          <PasswordField
+            autoComplete="current-password"
+            label="Mật khẩu hiện tại"
+            placeholder="Nhập mật khẩu của bạn"
+            registration={passwordForm.register("password")}
+            error={passwordForm.formState.errors.password?.message}
+          />
+        ) : null}
         <FormStatus status={message ? "error" : "idle"} message={message} />
         <SubmitButton pending={enableMutation.isPending} pendingLabel="Đang tạo mã bảo mật...">
           Bắt đầu thiết lập
@@ -151,7 +165,7 @@ export function TwoFactorSetupForm() {
 
       <section className="rounded-2xl border border-amber-200 bg-amber-50 p-4">
         <div className="flex items-center justify-between gap-3">
-          <h2 className="type-label text-amber-950">Lưu mã dự phòng ở nơi an toàn</h2>
+          <h2 className="type-card-title text-amber-950">Lưu mã dự phòng ở nơi an toàn</h2>
           <button
             type="button"
             onClick={downloadBackupCodes}

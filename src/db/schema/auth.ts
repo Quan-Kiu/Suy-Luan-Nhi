@@ -30,6 +30,7 @@ export const session = pgTable(
       .notNull()
       .references(() => user.id, { onDelete: "cascade" }),
     impersonatedBy: text("impersonated_by"),
+    mfaVerifiedAt: timestamp("mfa_verified_at", { withTimezone: true }),
   },
   (table) => [index("session_user_id_idx").on(table.userId)],
 );

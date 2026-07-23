@@ -1,5 +1,5 @@
 import { apiJson } from "@/lib/api-response";
-import { isActiveBan, requiresStaffMfa } from "@/auth/access-policy";
+import { isActiveBan, requiresStaffMfa, requiresStaffMfaChallenge } from "@/auth/access-policy";
 import { auth } from "@/auth/auth";
 import { hasRole, type AppRole } from "@/auth/roles";
 import { env } from "@/config/env";
@@ -40,6 +40,20 @@ export async function requireApiRoles(request: Request, roles: readonly AppRole[
         {
           code: "MFA_SETUP_REQUIRED",
           message: "Tài khoản nhân sự cần bật xác thực hai lớp trước khi tiếp tục.",
+        },
+        { status: 403 },
+      ),
+    } as const;
+  }
+  if (
+    env.AUTH_STAFF_MFA_REQUIRED &&
+    requiresStaffMfaChallenge(authResult.session.user, authResult.session.session)
+  ) {
+    return {
+      error: apiJson(
+        {
+          code: "MFA_CHALLENGE_REQUIRED",
+          message: "Hãy nhập mã xác thực hai lớp để hoàn tất phiên đăng nhập này.",
         },
         { status: 403 },
       ),

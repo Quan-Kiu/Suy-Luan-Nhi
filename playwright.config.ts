@@ -15,7 +15,7 @@ const environment = [
   "BETTER_AUTH_SECRET='e2e-only-secret-with-more-than-thirty-two-characters'",
   `AUTH_REQUIRE_EMAIL_VERIFICATION='${production ? "true" : "false"}'`,
   "AUTH_RATE_LIMIT_ENABLED='false'",
-  "AUTH_STAFF_MFA_REQUIRED='false'",
+  `AUTH_STAFF_MFA_REQUIRED='${process.env.E2E_AUTH_STAFF_MFA_REQUIRED === "true" ? "true" : "false"}'`,
   "SMTP_HOST='127.0.0.1'",
   "SMTP_PORT='1025'",
   "SMTP_SECURE='false'",
