@@ -39,13 +39,25 @@ export const parentPinUnlockSchema = z
   .trim()
   .regex(/^\d{4,8}$/, "Mã PIN chưa đúng định dạng");
 
+const parentPinConfirmationShape = {
+  pin: parentPinValueSchema,
+  confirmPin: z
+    .string()
+    .trim()
+    .regex(/^\d{6}$/, "Mã PIN nhập lại cần đủ 6 chữ số"),
+};
+
 export const parentPinSetupSchema = z
+  .object(parentPinConfirmationShape)
+  .refine((values) => values.pin === values.confirmPin, {
+    path: ["confirmPin"],
+    message: "Mã PIN nhập lại chưa khớp",
+  });
+
+export const parentPinResetSchema = z
   .object({
-    pin: parentPinValueSchema,
-    confirmPin: z
-      .string()
-      .trim()
-      .regex(/^\d{6}$/, "Mã PIN nhập lại cần đủ 6 chữ số"),
+    token: z.string().trim().min(32, "Liên kết đặt lại mã PIN không hợp lệ").max(256),
+    ...parentPinConfirmationShape,
   })
   .refine((values) => values.pin === values.confirmPin, {
     path: ["confirmPin"],

@@ -19,7 +19,7 @@ export default async function ParentLayout({ children }: { children: React.React
   ]);
   const parent = await getOrCreateParentProfile(session.user.id, session.user.name);
   if (!parent.pinHash) redirect(buildParentPinSetupPath("/parent"));
-  const unlocked = await hasParentGate(parent.id);
+  const unlocked = await hasParentGate(parent.id, parent.pinHash);
 
   if (!unlocked) return <ParentGateView content={content} />;
 

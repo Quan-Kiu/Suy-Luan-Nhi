@@ -255,6 +255,7 @@ export const parentContentEntries = defineContent("parent", {
     value: "Nhập mã PIN",
     description: "Gợi ý trong ô nhập PIN bước xác nhận phụ huynh.",
   },
+  "gate.forgotPin": { value: "Quên mã PIN?", description: "Liên kết khôi phục mã PIN phụ huynh." },
   "gate.submit": { value: "Mở khu vực phụ huynh", description: "Nhãn nút mở bước xác nhận phụ huynh." },
   "gate.submitting": { value: "Đang kiểm tra...", description: "Nhãn khi kiểm tra bước xác nhận phụ huynh." },
   "gate.error": {

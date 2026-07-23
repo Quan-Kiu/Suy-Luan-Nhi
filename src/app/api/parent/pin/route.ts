@@ -20,7 +20,7 @@ export async function POST(request: Request) {
       authResult.session.user.name,
       parsed.data,
     );
-    await grantParentGate(parent.id);
+    await grantParentGate(parent.id, parent.pinHash!);
     return apiJson({ configured: true });
   } catch (error) {
     if (error instanceof ParentPinAlreadyConfiguredError) {
