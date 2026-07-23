@@ -1,5 +1,7 @@
 import { and, asc, desc, eq, inArray, isNull, lte, ne, sql } from "drizzle-orm";
 import { db } from "@/db/client";
+import type { AgeGroup } from "@/domain/age-groups";
+import { missingWorldAgeGroups } from "@/domain/mission-publication";
 import {
   auditLogs,
   badges,
@@ -17,6 +19,7 @@ import {
   sessionQuestionStates,
   safetyChecklistEntries,
   skills,
+  worldAgeGroups,
 } from "@/db/schema";
 import { adminMissionDraftSchema, safetyKeys, type AdminMissionDraft } from "@/modules/admin/schemas";
 import { validateMissionTemplateVariables } from "@/modules/admin/mission-template-variables";
@@ -754,7 +757,21 @@ export async function rejectMissionVersion(
   });
 }
 
-export async function publishMissionVersion(missionId: string, versionId: string, publisherId: string) {
+export type MissionPublicationFailure =
+  | { error: "not_approved" }
+  | { error: "invalid_snapshot" }
+  | { error: "world_not_published" }
+  | { error: "world_age_groups_incomplete"; missingAgeGroups: AgeGroup[] }
+  | { error: "invalid_schedule" };
+
+type MissionPublicationContext = {
+  version: typeof missionVersions.$inferSelect;
+};
+
+async function getMissionPublicationContext(
+  missionId: string,
+  versionId: string,
+): Promise<MissionPublicationContext | MissionPublicationFailure> {
   const version = await db.query.missionVersions.findFirst({
     where: and(
       eq(missionVersions.id, versionId),
@@ -762,9 +779,42 @@ export async function publishMissionVersion(missionId: string, versionId: string
       eq(missionVersions.status, "approved"),
     ),
   });
-  if (!version) return null;
+  if (!version) return { error: "not_approved" };
+
+  let snapshot: ReturnType<typeof parseMissionSnapshot>;
+  try {
+    snapshot = parseMissionSnapshot(version.snapshot);
+  } catch {
+    return { error: "invalid_snapshot" };
+  }
+
+  const world = snapshot.worldId
+    ? await db.query.missionWorlds.findFirst({ where: eq(missionWorlds.id, snapshot.worldId) })
+    : snapshot.worldSlug
+      ? await db.query.missionWorlds.findFirst({ where: eq(missionWorlds.slug, snapshot.worldSlug) })
+      : null;
+  if (!world || world.status !== "published") return { error: "world_not_published" };
+
+  const ageRows = await db
+    .select({ ageGroup: worldAgeGroups.ageGroup })
+    .from(worldAgeGroups)
+    .where(eq(worldAgeGroups.worldId, world.id));
+  const missingAgeGroups = missingWorldAgeGroups(
+    snapshot.ageGroups,
+    ageRows.map((row) => row.ageGroup),
+  );
+  if (missingAgeGroups.length) {
+    return { error: "world_age_groups_incomplete", missingAgeGroups };
+  }
+
+  return { version };
+}
+
+export async function publishMissionVersion(missionId: string, versionId: string, publisherId: string) {
+  const context = await getMissionPublicationContext(missionId, versionId);
+  if ("error" in context) return context;
   const now = new Date();
-  return db.transaction(async (tx) => {
+  const published = await db.transaction(async (tx) => {
     await tx
       .update(missionVersions)
       .set({ status: "archived" })
@@ -775,7 +825,7 @@ export async function publishMissionVersion(missionId: string, versionId: string
           ne(missionVersions.id, versionId),
         ),
       );
-    const [published] = await tx
+    const [publishedVersion] = await tx
       .update(missionVersions)
       .set({ status: "published", publishedAt: now })
       .where(eq(missionVersions.id, versionId))
@@ -799,8 +849,9 @@ export async function publishMissionVersion(missionId: string, versionId: string
       resourceType: "mission_version",
       resourceId: versionId,
     });
-    return published;
+    return publishedVersion;
   });
+  return { version: published } as const;
 }
 
 export async function scheduleMissionVersion(
@@ -809,20 +860,16 @@ export async function scheduleMissionVersion(
   publisherId: string,
   scheduledFor: Date,
 ) {
-  const version = await db.query.missionVersions.findFirst({
-    where: and(
-      eq(missionVersions.id, versionId),
-      eq(missionVersions.missionId, missionId),
-      eq(missionVersions.status, "approved"),
-    ),
-  });
-  if (!version || scheduledFor.getTime() <= Date.now()) return null;
+  if (scheduledFor.getTime() <= Date.now()) return { error: "invalid_schedule" } as const;
+  const context = await getMissionPublicationContext(missionId, versionId);
+  if ("error" in context) return context;
+
   const [mission] = await db
     .update(missions)
     .set({ scheduledFor, updatedBy: publisherId, updatedAt: new Date() })
     .where(and(eq(missions.id, missionId), eq(missions.status, "approved")))
     .returning();
-  if (!mission) return null;
+  if (!mission) return { error: "not_approved" } as const;
   await db.insert(reviewHistories).values({
     missionId,
     missionVersionId: versionId,
@@ -837,7 +884,7 @@ export async function scheduleMissionVersion(
     resourceId: versionId,
     afterState: { scheduledFor: scheduledFor.toISOString() },
   });
-  return mission;
+  return { mission } as const;
 }
 
 export async function publishDueScheduledMissions(actorId: string | null = null) {
@@ -858,7 +905,7 @@ export async function publishDueScheduledMissions(actorId: string | null = null)
   const published: string[] = [];
   for (const item of due) {
     const result = await publishMissionVersion(item.missionId, item.versionId, actorId ?? "system");
-    if (result) {
+    if ("version" in result) {
       await db.update(missions).set({ scheduledFor: null }).where(eq(missions.id, item.missionId));
       published.push(item.missionId);
     }

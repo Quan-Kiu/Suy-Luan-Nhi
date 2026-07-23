@@ -35,7 +35,9 @@ export function WorldManager({ initial }: { initial: WorldItem[] }) {
                   </span>
                 </div>
                 <p className="type-supporting mt-1 truncate font-bold text-[#6f6558]">{item.subtitle}</p>
-                <p className="type-caption mt-1 text-[#806d54]">Vị trí {item.sortOrder} trên bản đồ</p>
+                <p className="type-caption mt-1 text-[#806d54]">
+                  Vị trí {item.sortOrder} · {item.ageGroups.join(", ")} tuổi
+                </p>
               </div>
               <ChevronDown size={19} className="shrink-0 transition group-open:rotate-180" />
             </summary>
@@ -75,6 +77,7 @@ export function WorldManager({ initial }: { initial: WorldItem[] }) {
                 sortOrder: initial.length + 1,
                 themeColor: "green",
                 coverUrl: "/assets/cards/world-card-detective-rules.png",
+                ageGroups: ["6-8", "9-10", "11-12"],
                 status: "draft",
               }}
             />

@@ -1,14 +1,12 @@
-import { asc } from "drizzle-orm";
 import { Layers3 } from "lucide-react";
 import { requireRoles } from "@/auth/session";
-import { db } from "@/db/client";
-import { missionWorlds } from "@/db/schema";
 import { AdminPageHeader } from "@/features/admin/admin-page-header";
 import { WorldManager } from "@/features/admin/world-manager";
+import { listAdminWorlds } from "@/modules/admin/operations";
 
 export default async function Page() {
   await requireRoles(["content_admin", "super_admin"]);
-  const items = await db.select().from(missionWorlds).orderBy(asc(missionWorlds.sortOrder));
+  const items = await listAdminWorlds();
   return (
     <div className="space-y-6">
       <AdminPageHeader

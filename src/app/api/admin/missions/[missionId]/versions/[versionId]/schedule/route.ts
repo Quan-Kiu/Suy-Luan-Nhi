@@ -19,12 +19,28 @@ export async function POST(
     authResult.session.user.id,
     new Date(input.data.scheduledFor),
   );
-  if (!result) {
+  if ("error" in result) {
+    const message =
+      result.error === "invalid_schedule"
+        ? "Thời gian hiển thị phải ở tương lai"
+        : result.error === "world_not_published"
+          ? "Hãy bật hiển thị chủ đề nhiệm vụ trước khi lên lịch"
+          : result.error === "world_age_groups_incomplete"
+            ? `Chủ đề chưa bật nhóm tuổi: ${result.missingAgeGroups.join(", ")}`
+            : result.error === "invalid_snapshot"
+              ? "Phiên bản nhiệm vụ không hợp lệ; hãy gửi duyệt lại"
+              : "Chỉ phiên bản đã duyệt mới được lên lịch";
     return apiJson(
-      { message: "Chỉ phiên bản approved và thời gian tương lai mới được lên lịch" },
+      {
+        message,
+        code: result.error,
+        ...(result.error === "world_age_groups_incomplete"
+          ? { missingAgeGroups: result.missingAgeGroups }
+          : {}),
+      },
       { status: 409 },
     );
   }
   invalidateAdminMissionViews(missionId);
-  return apiJson(result);
+  return apiJson(result.mission);
 }

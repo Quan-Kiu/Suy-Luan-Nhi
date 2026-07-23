@@ -1,5 +1,8 @@
 import { and, asc, desc, eq, gte, sql } from "drizzle-orm";
 import { db } from "@/db/client";
+import { ageGroupCodes, type AgeGroup } from "@/domain/age-groups";
+import { missingWorldAgeGroups } from "@/domain/mission-publication";
+import { parseMissionSnapshot } from "@/modules/catalog/snapshot";
 import { assertMemberUpdatePolicy } from "@/modules/admin/member-policy";
 import { clearOperationalSystemSettingsCache } from "@/modules/system-settings/runtime";
 import {
@@ -14,6 +17,7 @@ import {
   missionVersions,
   missionWorlds,
   missions,
+  worldAgeGroups,
   notifications,
   parentProfiles,
   questionAttempts,
@@ -205,61 +209,140 @@ export async function updateMember(
   });
 }
 
-export async function createWorld(
-  actorId: string,
-  input: {
-    slug: string;
-    title: string;
-    subtitle: string;
-    description: string;
-    sortOrder: number;
-    themeColor: string;
-    coverUrl: string;
-  },
-) {
-  const [created] = await db
-    .insert(missionWorlds)
-    .values({ ...input, status: "draft" })
-    .returning();
-  await db.insert(auditLogs).values({
-    actorId,
-    action: "world.created",
-    resourceType: "mission_world",
-    resourceId: created.id,
-    afterState: created,
+function sortWorldAgeGroups(values: readonly AgeGroup[]) {
+  return ageGroupCodes.filter((ageGroup) => values.includes(ageGroup));
+}
+
+function requireWorldAgeGroups(values: readonly AgeGroup[]) {
+  const normalized = sortWorldAgeGroups(values);
+  if (!normalized.length) throw new Error("WORLD_AGE_GROUP_REQUIRED");
+  return normalized;
+}
+
+export class WorldAudienceConflictError extends Error {
+  constructor(readonly missingAgeGroups: AgeGroup[]) {
+    super(`Chủ đề đang có nhiệm vụ đã xuất bản cho nhóm tuổi: ${missingAgeGroups.join(", ")}`);
+    this.name = "WorldAudienceConflictError";
+  }
+}
+
+export class WorldPublishedMissionConflictError extends Error {
+  constructor(readonly publishedMissionCount: number) {
+    super(
+      `Chủ đề đang có ${publishedMissionCount} nhiệm vụ hiển thị. Hãy lưu trữ các nhiệm vụ trước khi ẩn chủ đề.`,
+    );
+    this.name = "WorldPublishedMissionConflictError";
+  }
+}
+
+async function getPublishedWorldDependencies(worldId: string) {
+  const rows = await db
+    .select({ missionId: missions.id, snapshot: missionVersions.snapshot })
+    .from(missions)
+    .leftJoin(missionVersions, eq(missionVersions.id, missions.publishedVersionId))
+    .where(and(eq(missions.worldId, worldId), eq(missions.status, "published")));
+  const required = new Set<AgeGroup>();
+  for (const row of rows) {
+    if (!row.snapshot) continue;
+    for (const ageGroup of parseMissionSnapshot(row.snapshot).ageGroups) required.add(ageGroup);
+  }
+  return {
+    publishedMissionCount: rows.length,
+    requiredAgeGroups: ageGroupCodes.filter((ageGroup) => required.has(ageGroup)),
+  };
+}
+
+export type AdminWorldInput = {
+  slug: string;
+  title: string;
+  subtitle: string;
+  description: string;
+  sortOrder: number;
+  themeColor: string;
+  coverUrl: string;
+  ageGroups: AgeGroup[];
+};
+
+export async function listAdminWorlds() {
+  const [worlds, ageRows] = await Promise.all([
+    db.select().from(missionWorlds).orderBy(asc(missionWorlds.sortOrder)),
+    db.select().from(worldAgeGroups),
+  ]);
+  return worlds.map((world) => ({
+    ...world,
+    ageGroups: sortWorldAgeGroups(
+      ageRows.filter((row) => row.worldId === world.id).map((row) => row.ageGroup),
+    ),
+  }));
+}
+
+export async function createWorld(actorId: string, input: AdminWorldInput) {
+  const { ageGroups, ...worldInput } = input;
+  const selectedAgeGroups = requireWorldAgeGroups(ageGroups);
+  return db.transaction(async (tx) => {
+    const [created] = await tx
+      .insert(missionWorlds)
+      .values({ ...worldInput, status: "draft" })
+      .returning();
+    await tx
+      .insert(worldAgeGroups)
+      .values(selectedAgeGroups.map((ageGroup) => ({ worldId: created.id, ageGroup })));
+    await tx.insert(auditLogs).values({
+      actorId,
+      action: "world.created",
+      resourceType: "mission_world",
+      resourceId: created.id,
+      afterState: { ...created, ageGroups: selectedAgeGroups },
+    });
+    return { ...created, ageGroups: selectedAgeGroups };
   });
-  return created;
 }
 
 export async function updateWorld(
   actorId: string,
   worldId: string,
-  input: Partial<{
-    title: string;
-    subtitle: string;
-    description: string;
-    sortOrder: number;
-    themeColor: string;
-    coverUrl: string;
-    status: "draft" | "published" | "archived";
-  }>,
+  input: Partial<Omit<AdminWorldInput, "slug">> & {
+    status?: "draft" | "published" | "archived";
+  },
 ) {
   const current = await db.query.missionWorlds.findFirst({ where: eq(missionWorlds.id, worldId) });
   if (!current) return null;
-  const [updated] = await db
-    .update(missionWorlds)
-    .set({ ...input, updatedAt: new Date() })
-    .where(eq(missionWorlds.id, worldId))
-    .returning();
-  await db.insert(auditLogs).values({
-    actorId,
-    action: "world.updated",
-    resourceType: "mission_world",
-    resourceId: worldId,
-    beforeState: current,
-    afterState: updated,
+  const currentAgeGroups = await db
+    .select({ ageGroup: worldAgeGroups.ageGroup })
+    .from(worldAgeGroups)
+    .where(eq(worldAgeGroups.worldId, worldId));
+  const previousAgeGroups = sortWorldAgeGroups(currentAgeGroups.map((row) => row.ageGroup));
+  const { ageGroups, ...worldInput } = input;
+  const selectedAgeGroups = ageGroups ? requireWorldAgeGroups(ageGroups) : previousAgeGroups;
+  const resultingStatus = input.status ?? current.status;
+  const dependencies = await getPublishedWorldDependencies(worldId);
+  if (resultingStatus !== "published" && dependencies.publishedMissionCount > 0) {
+    throw new WorldPublishedMissionConflictError(dependencies.publishedMissionCount);
+  }
+  if (resultingStatus === "published") {
+    const missingAgeGroups = missingWorldAgeGroups(dependencies.requiredAgeGroups, selectedAgeGroups);
+    if (missingAgeGroups.length) throw new WorldAudienceConflictError(missingAgeGroups);
+  }
+  return db.transaction(async (tx) => {
+    const [updated] = await tx
+      .update(missionWorlds)
+      .set({ ...worldInput, updatedAt: new Date() })
+      .where(eq(missionWorlds.id, worldId))
+      .returning();
+    if (ageGroups) {
+      await tx.delete(worldAgeGroups).where(eq(worldAgeGroups.worldId, worldId));
+      await tx.insert(worldAgeGroups).values(selectedAgeGroups.map((ageGroup) => ({ worldId, ageGroup })));
+    }
+    await tx.insert(auditLogs).values({
+      actorId,
+      action: "world.updated",
+      resourceType: "mission_world",
+      resourceId: worldId,
+      beforeState: { ...current, ageGroups: previousAgeGroups },
+      afterState: { ...updated, ageGroups: selectedAgeGroups },
+    });
+    return { ...updated, ageGroups: selectedAgeGroups };
   });
-  return updated;
 }
 
 export async function createSkill(
