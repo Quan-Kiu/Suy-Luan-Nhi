@@ -120,6 +120,13 @@
       "when": 1784782030025,
       "tag": "0016_parent_pin_only",
       "breakpoints": true
+    },
+    {
+      "idx": 17,
+      "version": "7",
+      "when": 1784790984238,
+      "tag": "0017_parent_area_label",
+      "breakpoints": true
     }
   ]
 }

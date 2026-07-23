@@ -133,7 +133,7 @@ test.describe("follow-up issue regressions", () => {
     const adminEntry = page.getByRole("link", { name: "Trang quản trị" });
     await expect(adminEntry).toBeVisible();
     await expect(adminEntry).toHaveAttribute("href", "/admin");
-    await expect(page.getByRole("link", { name: "Quản lý gia đình" })).toHaveCount(0);
+    await expect(page.getByRole("link", { name: "Khu vực phụ huynh" })).toHaveCount(0);
     await expect(page.getByRole("link", { name: "Mở trang quản trị" })).toHaveCount(0);
     await expect(page.getByRole("link", { name: /Bắt đầu cho bé/ })).toHaveCount(0);
   });

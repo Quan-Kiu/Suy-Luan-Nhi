@@ -46,6 +46,13 @@ describe("AuthAwareEntryLink", () => {
     expect(screen.queryByRole("link")).not.toBeInTheDocument();
   });
 
+  it("uses the parent-area label in compact navigation", () => {
+    mocks.session.data = { user: { role: "parent" } };
+    render(<AuthAwareEntryLink content={{}} compact />);
+
+    expect(screen.getByRole("link", { name: "Khu vực phụ huynh" })).toHaveAttribute("href", "/parent");
+  });
+
   it("keeps the parent destination direct after sign-in", () => {
     mocks.session.data = { user: { role: "parent" } };
     render(<AuthAwareEntryLink content={{}} />);

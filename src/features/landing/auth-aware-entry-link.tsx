@@ -64,7 +64,7 @@ export function AuthAwareEntryLink({
         ? contentText(
             content,
             staff ? "header.adminAction" : parent ? "header.manageFamily" : "header.signIn",
-            staff ? "Trang quản trị" : parent ? "Quản lý gia đình" : "Đăng nhập",
+            staff ? "Trang quản trị" : parent ? "Khu vực phụ huynh" : "Đăng nhập",
           )
         : contentText(
             content,
