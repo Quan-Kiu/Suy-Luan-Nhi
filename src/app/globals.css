@@ -37,7 +37,7 @@ body {
   margin: 0;
   background: var(--cream);
   color: var(--ink);
-  font-family: ui-rounded, "Arial Rounded MT Bold", "Trebuchet MS", system-ui, sans-serif;
+  font-family: var(--font-app);
   font-size: var(--type-body-size);
   line-height: 1.5;
   text-rendering: optimizeLegibility;

@@ -1,8 +1,16 @@
 import type { Metadata } from "next";
+import { Nunito } from "next/font/google";
 import "./globals.css";
 import { Providers } from "@/components/providers";
 import { GlobalFeedbackWidget } from "@/features/feedback/global-feedback-widget";
 import "@/lib/validation/zod-locale";
+
+const appFont = Nunito({
+  subsets: ["latin", "vietnamese"],
+  display: "swap",
+  variable: "--font-app",
+  fallback: ["Arial", "sans-serif"],
+});
 
 export const metadata: Metadata = {
   title: "Suy Luận Nhí",
@@ -11,7 +19,7 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <html lang="vi" data-scroll-behavior="smooth">
+    <html lang="vi" className={appFont.variable} data-scroll-behavior="smooth">
       <body>
         <Providers>
           {children}
