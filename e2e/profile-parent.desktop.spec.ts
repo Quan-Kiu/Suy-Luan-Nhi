@@ -1,5 +1,5 @@
 import { expect, test } from "@playwright/test";
-import { apiData, getDemoChild, selectChild, signIn, unlockParentGate } from "./helpers";
+import { apiData, demoParentPin, getDemoChild, selectChild, signIn, unlockParentGate } from "./helpers";
 
 test.describe.configure({ mode: "serial" });
 
@@ -52,25 +52,28 @@ test("parent moves a child profile to trash, restores it and deletes it permanen
   expect(children.some((child) => child.displayName === "Mít Đã Sửa")).toBe(false);
 });
 
-test("parent gate rejects a wrong answer, supports PIN and exports family data", async ({ page }) => {
+test("parent gate rejects a wrong PIN and exports family data", async ({ page }) => {
   await signIn(page, "parent@demo.local");
   const child = await getDemoChild(page);
   await selectChild(page, child.id);
 
   await page.goto("/parent");
-  await page.getByLabel("Kết quả phép tính").fill("99");
+  await page.getByRole("textbox", { name: "Mã PIN phụ huynh", exact: true }).fill("999998");
   await page.getByRole("button", { name: /Mở khu vực phụ huynh/i }).click();
-  await expect(page.getByText("Câu trả lời chưa đúng, ba/mẹ thử lại nhé.")).toBeVisible();
+  await expect(page.getByText("Mã PIN chưa đúng, ba/mẹ thử lại nhé.")).toBeVisible();
   await unlockParentGate(page);
 
   await page.goto("/parent/settings");
-  await page.getByPlaceholder("PIN mới").fill("2468");
+  await page.getByPlaceholder("PIN mới").fill(demoParentPin);
   await page.getByRole("button", { name: "Lưu cài đặt" }).click();
   await expect(page.getByText("Đã lưu cài đặt")).toBeVisible();
   await page.context().clearCookies({ name: "sln_parent_gate" });
   await page.goto("/parent");
-  await expect(page.getByLabel("PIN phụ huynh")).toHaveAttribute("placeholder", /Nhập PIN/);
-  await page.getByLabel("PIN phụ huynh").fill("2468");
+  await expect(page.getByRole("textbox", { name: "Mã PIN phụ huynh", exact: true })).toHaveAttribute(
+    "placeholder",
+    /Nhập mã PIN/,
+  );
+  await page.getByRole("textbox", { name: "Mã PIN phụ huynh", exact: true }).fill(demoParentPin);
   await page.getByRole("button", { name: /Mở khu vực phụ huynh/i }).click();
   await expect(page.getByRole("heading", { name: /Tuần này của Bống/i })).toBeVisible();
 
@@ -88,4 +91,28 @@ test("parent gate rejects a wrong answer, supports PIN and exports family data",
   };
   expect(exported.parent.displayName).toBeTruthy();
   expect(exported.children.some((item) => item.profile.displayName === "Bống")).toBe(true);
+});
+
+test("parent without a PIN must finish PIN setup after sign-in", async ({ page }) => {
+  await page.goto("/auth/sign-in?callbackUrl=/onboarding");
+  await page.getByLabel("Email").fill("privacy@demo.local");
+  await page.locator('input[name="password"]').fill("LocalDemo-2026!");
+  await page.getByRole("button", { name: "Đăng nhập", exact: true }).click();
+
+  await expect(page).toHaveURL(/\/auth\/setup-pin\?next=%2Fonboarding/);
+  await expect(page.getByRole("heading", { name: "Tạo mã PIN phụ huynh" })).toBeVisible();
+
+  const pin = page.getByRole("textbox", { name: "Tạo mã PIN 6 chữ số", exact: true });
+  const confirmation = page.getByRole("textbox", { name: "Nhập lại mã PIN", exact: true });
+  await pin.fill("123456");
+  await confirmation.fill("123456");
+  await page.getByRole("button", { name: "Lưu mã PIN và tiếp tục" }).click();
+  await expect(page.getByText("Hãy chọn mã PIN khó đoán hơn")).toBeVisible();
+
+  await pin.fill("246813");
+  await confirmation.fill("246813");
+  await page.getByRole("button", { name: "Lưu mã PIN và tiếp tục" }).click();
+
+  await expect(page).toHaveURL(/\/onboarding$/);
+  await expect(page.getByText("Bước 3/3 · Hồ sơ của bé")).toBeVisible();
 });

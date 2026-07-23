@@ -23,7 +23,7 @@ export default async function OnboardingPage() {
           {contentText(
             content,
             isFirstProfile ? "create.firstProfileBadge" : "create.pageBadge",
-            isFirstProfile ? "Bước 2/2 · Hồ sơ của bé" : "Hồ sơ riêng tư tối giản",
+            isFirstProfile ? "Bước 3/3 · Hồ sơ của bé" : "Hồ sơ riêng tư tối giản",
           )}
         </p>
         <h1 className="type-child-page-title mt-3">
@@ -38,7 +38,7 @@ export default async function OnboardingPage() {
             content,
             isFirstProfile ? "create.firstProfileDescription" : "create.pageDescription",
             isFirstProfile
-              ? "Tài khoản ba mẹ đã sẵn sàng. Chỉ cần tên ở nhà và nhóm tuổi để bắt đầu."
+              ? "Tài khoản và mã PIN đã sẵn sàng. Chỉ cần tên ở nhà và nhóm tuổi để bắt đầu."
               : "Chỉ mất một chút để bé có hành trình phù hợp nhất.",
           )}
         </p>

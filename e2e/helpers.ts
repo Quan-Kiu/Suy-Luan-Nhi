@@ -1,6 +1,7 @@
 import { expect, type APIResponse, type Page } from "@playwright/test";
 
 export const demoPassword = "LocalDemo-2026!";
+export const demoParentPin = "246824";
 
 export async function signIn(page: Page, email: string, callbackUrl = "/profiles") {
   await page.goto(`/auth/sign-in?callbackUrl=${encodeURIComponent(callbackUrl)}`);
@@ -35,32 +36,17 @@ export async function selectChild(page: Page, childId: string) {
   await apiData(await page.request.post(`/api/children/${childId}/select`));
 }
 
-export async function unlockParentGate(page: Page, answer?: string) {
+export async function unlockParentGate(page: Page, pin = demoParentPin) {
   await page.goto("/parent");
   const dashboard = page.getByRole("heading", { name: /Tuần(?: này)? của/i });
-  const input = page.getByLabel(/Kết quả phép tính|PIN phụ huynh/);
+  const input = page.getByRole("textbox", { name: "Mã PIN phụ huynh", exact: true });
   const gateVisible = await input
     .waitFor({ state: "visible", timeout: 5_000 })
     .then(() => true)
     .catch(() => false);
 
   if (gateVisible) {
-    const placeholder = await input.getAttribute("placeholder");
-    let gateAnswer = answer;
-    if (!gateAnswer && placeholder?.includes("PIN")) gateAnswer = "2468";
-    if (!gateAnswer) {
-      const prompt = await page
-        .locator("p")
-        .filter({ hasText: /\d+\s*[+-]\s*\d+\s*=\s*\?/ })
-        .first()
-        .textContent();
-      const match = prompt?.match(/(\d+)\s*([+-])\s*(\d+)/);
-      if (!match) throw new Error("Không đọc được phép toán Parent Gate");
-      const left = Number(match[1]);
-      const right = Number(match[3]);
-      gateAnswer = String(match[2] === "+" ? left + right : left - right);
-    }
-    await input.fill(gateAnswer);
+    await input.fill(pin);
     await page.getByRole("button", { name: /Mở khu vực phụ huynh/i }).click();
   }
   await expect(dashboard).toBeVisible();

@@ -248,6 +248,47 @@ export async function resetChildProgress(userId: string, childId: string) {
   return true;
 }
 
+export class ParentPinAlreadyConfiguredError extends Error {
+  constructor() {
+    super("Mã PIN phụ huynh đã được thiết lập");
+    this.name = "ParentPinAlreadyConfiguredError";
+  }
+}
+
+export async function setupParentPin(userId: string, parentName: string, pin: string) {
+  const [parent, pinHash] = await Promise.all([getOrCreateParentProfile(userId, parentName), hashPin(pin)]);
+  return db.transaction(async (tx) => {
+    await tx.execute(
+      sql`select 1 from ${parentProfiles} where ${parentProfiles.id} = ${parent.id} for update`,
+    );
+    const current = await tx.query.parentProfiles.findFirst({
+      where: eq(parentProfiles.id, parent.id),
+    });
+    if (!current) throw new Error("Không tìm thấy hồ sơ phụ huynh");
+    if (current.pinHash) throw new ParentPinAlreadyConfiguredError();
+
+    const [updated] = await tx
+      .update(parentProfiles)
+      .set({
+        pinHash,
+        pinFailedAttempts: 0,
+        pinLockedUntil: null,
+        updatedAt: new Date(),
+      })
+      .where(eq(parentProfiles.id, parent.id))
+      .returning();
+    await tx.insert(auditLogs).values({
+      actorId: userId,
+      action: "parent.pin_created",
+      resourceType: "parent_profile",
+      resourceId: parent.id,
+      beforeState: { ...current, pinHash: null },
+      afterState: { ...updated, pinHash: "[redacted]" },
+    });
+    return updated;
+  });
+}
+
 export async function updateParentSettings(
   userId: string,
   parentName: string,

@@ -12,6 +12,7 @@ import { ConfirmDialog } from "@/components/confirm-dialog";
 import { ControlledCheckboxField, FormStatus, PasswordField, SubmitButton } from "@/components/form";
 import { Card } from "@/components/ui";
 import { contentText, useContent } from "@/content/client";
+import { PARENT_PIN_LENGTH } from "@/domain/parent-pin";
 import { type ParentSettingsFormValues, parentSettingsSchema } from "@/features/parent/settings-schema";
 import { SettingsSection } from "@/features/parent/settings-section";
 import { useHydrated } from "@/hooks/use-hydrated";
@@ -141,13 +142,13 @@ export function SettingsForm({ initial, childId }: { initial: Settings; childId:
           <PasswordField
             autoComplete="new-password"
             inputMode="numeric"
-            maxLength={8}
+            maxLength={PARENT_PIN_LENGTH}
             label={contentText(content, "settings.pinTitle", "PIN phụ huynh")}
-            description={contentText(content, "settings.pinDescription", "Đặt 4–8 chữ số.")}
+            description={contentText(content, "settings.pinDescription", "Đổi mã PIN 6 chữ số.")}
             placeholder={contentText(content, "settings.pinPlaceholder", "PIN mới")}
             registration={form.register("pin", {
               onChange: (event) => {
-                event.target.value = event.target.value.replace(/\D/g, "").slice(0, 8);
+                event.target.value = event.target.value.replace(/\D/g, "").slice(0, PARENT_PIN_LENGTH);
               },
             })}
             error={form.formState.errors.pin?.message}

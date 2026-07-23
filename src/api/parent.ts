@@ -18,7 +18,10 @@ export const parentApi = {
   requestDeletion() {
     return apiRequest({ url: "/api/parent/delete-data-request", method: "POST" });
   },
-  unlock(input: { answer: string; method: "pin" | "math"; challengeToken?: string }) {
+  setupPin(input: { pin: string }) {
+    return apiRequest({ url: "/api/parent/pin", method: "POST", data: input });
+  },
+  unlock(input: { pin: string }) {
     return apiRequest({ url: "/api/parent/unlock", method: "POST", data: input });
   },
   getDashboard() {

@@ -1,6 +1,7 @@
 import { z } from "zod";
 import { ageGroupCodes } from "@/domain/age-groups";
 import { DEFAULT_CHILD_AVATAR_ASSET_ID } from "@/domain/child-avatar";
+import { parentPinValueSchema } from "@/domain/parent-pin";
 
 const displayNameSchema = z.string().trim().min(1, "Hãy nhập tên thân mật").max(20, "Tên tối đa 20 ký tự");
 const avatarAssetIdSchema = z.string().uuid("Hãy chọn avatar cho bé");
@@ -27,8 +28,5 @@ export const updateParentSettingsSchema = z.object({
   effectsEnabled: z.boolean().optional(),
   notificationSettings: z.record(z.string(), z.boolean()).optional(),
   privacySettings: z.record(z.string(), z.boolean()).optional(),
-  pin: z
-    .string()
-    .regex(/^\d{4,8}$/, "PIN cần từ 4 đến 8 chữ số")
-    .optional(),
+  pin: parentPinValueSchema.optional(),
 });

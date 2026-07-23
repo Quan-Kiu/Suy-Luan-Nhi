@@ -1,10 +1,10 @@
-import { apiJson } from "@/lib/api-response";
 import { eq } from "drizzle-orm";
 import { requireApiRoles } from "@/auth/api";
 import { db } from "@/db/client";
 import { parentProfiles } from "@/db/schema";
+import { parentPinUnlockSchema } from "@/domain/parent-pin";
+import { apiJson } from "@/lib/api-response";
 import { getOrCreateParentProfile } from "@/modules/family/family";
-import { verifyParentMathChallenge } from "@/modules/family/parent-challenge";
 import { grantParentGate } from "@/modules/family/parent-gate";
 import { verifyPin } from "@/modules/family/pin";
 import { getOperationalSystemSettings } from "@/modules/system-settings/runtime";
@@ -12,21 +12,22 @@ import { getOperationalSystemSettings } from "@/modules/system-settings/runtime"
 export async function POST(request: Request) {
   const authResult = await requireApiRoles(request, ["parent", "super_admin"]);
   if ("error" in authResult) return authResult.error;
-  const body = (await request.json().catch(() => null)) as {
-    answer?: unknown;
-    method?: unknown;
-    challengeToken?: unknown;
-  } | null;
-  const answer = typeof body?.answer === "string" ? body.answer.trim() : "";
-  const method = body?.method === "pin" || body?.method === "math" ? body.method : null;
-  const challengeToken = typeof body?.challengeToken === "string" ? body.challengeToken : "";
-  if (!answer || !method) {
-    return apiJson({ message: "Thiếu phương thức hoặc câu trả lời xác nhận" }, { status: 400 });
+  const body = (await request.json().catch(() => null)) as { pin?: unknown } | null;
+  const parsed = parentPinUnlockSchema.safeParse(body?.pin);
+  if (!parsed.success) {
+    return apiJson({ code: "INVALID_PARENT_PIN", message: parsed.error.issues[0]?.message }, { status: 400 });
   }
+
   const [parent, systemSettings] = await Promise.all([
     getOrCreateParentProfile(authResult.session.user.id, authResult.session.user.name),
     getOperationalSystemSettings(),
   ]);
+  if (!parent.pinHash) {
+    return apiJson(
+      { code: "PIN_SETUP_REQUIRED", message: "Ba/mẹ cần tạo mã PIN trước khi tiếp tục." },
+      { status: 409 },
+    );
+  }
   if (parent.pinLockedUntil && parent.pinLockedUntil > new Date()) {
     return apiJson(
       { message: "Khu vực phụ huynh đang tạm khóa. Ba/mẹ thử lại sau vài phút." },
@@ -34,10 +35,7 @@ export async function POST(request: Request) {
     );
   }
 
-  const valid =
-    method === "pin"
-      ? Boolean(parent.pinHash) && (await verifyPin(answer, parent.pinHash!))
-      : verifyParentMathChallenge(challengeToken, answer);
+  const valid = await verifyPin(parsed.data, parent.pinHash);
   if (!valid) {
     const attempts = parent.pinFailedAttempts + 1;
     const locked = attempts >= systemSettings.security.parentGateMaxAttempts;
@@ -55,7 +53,7 @@ export async function POST(request: Request) {
       {
         message: locked
           ? "Ba/mẹ đã thử nhiều lần. Khu vực được tạm khóa để bảo vệ dữ liệu."
-          : "Câu trả lời chưa đúng, ba/mẹ thử lại nhé.",
+          : "Mã PIN chưa đúng, ba/mẹ thử lại nhé.",
       },
       { status: locked ? 429 : 400 },
     );

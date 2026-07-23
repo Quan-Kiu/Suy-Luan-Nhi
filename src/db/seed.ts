@@ -29,6 +29,7 @@ import { defaultContentEntries } from "@/content/defaults";
 import { badgeSeeds, missionSeeds, skillSeeds, worldSeeds } from "@/content/catalog/game-content";
 import { conversationSuggestionSeeds, parentResourceSeeds } from "@/content/catalog/parent-content";
 import { ageGroupSeeds, safetyChecklistDefinitions } from "@/content/catalog/taxonomy-content";
+import { hashPin } from "@/modules/family/pin";
 import {
   CHILD_AVATAR_CATEGORY,
   DEFAULT_CHILD_AVATARS,
@@ -37,6 +38,7 @@ import {
 } from "@/domain/child-avatar";
 
 const seedPassword = process.env.SEED_PASSWORD ?? "LocalDemo-2026!";
+const seedParentPin = process.env.SEED_PARENT_PIN ?? "246824";
 const accountSeeds = [
   { email: "parent@demo.local", name: "Phụ huynh Demo", role: "parent" },
   { email: "privacy@demo.local", name: "Phụ huynh Privacy Test", role: "parent" },
@@ -104,6 +106,14 @@ async function seedAccounts(defaultAvatarAssetId: string) {
       .insert(parentProfiles)
       .values({ userId: parentUser.id, displayName: parentUser.name })
       .returning();
+  }
+  if (!parentProfile.pinHash) {
+    const [updatedParent] = await db
+      .update(parentProfiles)
+      .set({ pinHash: await hashPin(seedParentPin), updatedAt: new Date() })
+      .where(eq(parentProfiles.id, parentProfile.id))
+      .returning();
+    parentProfile = updatedParent;
   }
   const existingChild = await db.query.childProfiles.findFirst({
     where: and(eq(childProfiles.parentProfileId, parentProfile.id), eq(childProfiles.displayName, "Bống")),
@@ -378,6 +388,7 @@ async function main() {
     `Seeded ${accountSeeds.length} accounts, ${worldSeeds.length} worlds and ${missionSeeds.length} missions.`,
   );
   console.log(`Demo password: ${seedPassword}`);
+  console.log(`Demo parent PIN: ${seedParentPin}`);
 }
 
 main()

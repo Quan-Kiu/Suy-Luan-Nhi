@@ -57,7 +57,7 @@ export default async function ProfilesPage() {
         />
         {!hasProfiles ? (
           <p className="type-label mt-4 font-black text-[#d56617]">
-            {contentText(content, "list.emptyPageBadge", "Bước 2/2 · Hồ sơ của bé")}
+            {contentText(content, "list.emptyPageBadge", "Bước 3/3 · Hồ sơ của bé")}
           </p>
         ) : null}
         <h1 className={hasProfiles ? "type-child-page-title mt-4" : "type-child-page-title mt-2"}>

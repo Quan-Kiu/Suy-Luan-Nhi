@@ -118,7 +118,7 @@ export const profileContentEntries = defineContent("profile", {
     description: "Nhãn đầu trang tạo hồ sơ của bé.",
   },
   "create.firstProfileBadge": {
-    value: "Bước 2/2 · Hồ sơ của bé",
+    value: "Bước 3/3 · Hồ sơ của bé",
     description: "Nhãn quy trình khi tạo hồ sơ bé đầu tiên.",
   },
   "create.firstProfileTitle": {
@@ -126,7 +126,7 @@ export const profileContentEntries = defineContent("profile", {
     description: "Tiêu đề khi tạo hồ sơ bé đầu tiên sau đăng ký.",
   },
   "create.firstProfileDescription": {
-    value: "Tài khoản ba mẹ đã sẵn sàng. Chỉ cần tên ở nhà và nhóm tuổi để bắt đầu.",
+    value: "Tài khoản và mã PIN đã sẵn sàng. Chỉ cần tên ở nhà và nhóm tuổi để bắt đầu.",
     description: "Mô tả bước tạo hồ sơ bé đầu tiên.",
   },
   "create.pageTitle": { value: "Tạo hồ sơ cho bé", description: "Tiêu đề trang tạo hồ sơ của bé." },
@@ -141,7 +141,7 @@ export const profileContentEntries = defineContent("profile", {
     description: "Mô tả trang chọn hồ sơ của bé.",
   },
   "list.emptyPageBadge": {
-    value: "Bước 2/2 · Hồ sơ của bé",
+    value: "Bước 3/3 · Hồ sơ của bé",
     description: "Nhãn quy trình trên trang hồ sơ khi gia đình chưa có hồ sơ bé.",
   },
   "list.emptyPageTitle": {
@@ -149,7 +149,7 @@ export const profileContentEntries = defineContent("profile", {
     description: "Tiêu đề trang hồ sơ khi chưa có hồ sơ bé.",
   },
   "list.emptyPageDescription": {
-    value: "Tài khoản ba mẹ đã sẵn sàng. Thêm hồ sơ đầu tiên để bé bắt đầu khám phá.",
+    value: "Tài khoản và mã PIN đã sẵn sàng. Thêm hồ sơ đầu tiên để bé bắt đầu khám phá.",
     description: "Mô tả trang hồ sơ khi chưa có hồ sơ bé.",
   },
   "list.firstProfileTitle": {
@@ -234,7 +234,7 @@ export const parentContentEntries = defineContent("parent", {
   },
   "gate.title": { value: "Khu vực phụ huynh", description: "Tiêu đề bước xác nhận phụ huynh." },
   "gate.description": {
-    value: "Hãy xác nhận bạn là người lớn trước khi xem tiến độ và cài đặt của gia đình.",
+    value: "Nhập mã PIN để xem tiến độ và quản lý cài đặt gia đình.",
     description: "Mô tả bước xác nhận phụ huynh.",
   },
   "gate.imageAlt": {
@@ -242,21 +242,17 @@ export const parentContentEntries = defineContent("parent", {
     description: "Mô tả hình ảnh bước xác nhận phụ huynh.",
   },
 
-  "gate.mathQuestion": {
-    value: "17 + 6 = ?",
-    description: "Phép tính mặc định của bước xác nhận phụ huynh.",
-  },
-  "gate.answerPlaceholder": {
-    value: "Nhập kết quả",
-    description: "Gợi ý trong ô nhập câu trả lời bước xác nhận phụ huynh.",
-  },
   "gate.confirmTitle": {
-    value: "Ba/mẹ xác nhận để tiếp tục",
+    value: "Ba/mẹ nhập mã PIN để tiếp tục",
     description: "Tiêu đề form bước xác nhận phụ huynh.",
   },
-  "gate.pinPrompt": { value: "Nhập PIN phụ huynh", description: "Yêu cầu nhập PIN bước xác nhận phụ huynh." },
+  "gate.pinPrompt": { value: "Mã PIN phụ huynh", description: "Nhãn nhập PIN bước xác nhận phụ huynh." },
+  "gate.pinHelp": {
+    value: "Mã PIN bảo vệ tiến độ, cài đặt và dữ liệu gia đình khỏi thao tác nhầm.",
+    description: "Giải thích ngắn tại bước nhập PIN.",
+  },
   "gate.pinPlaceholder": {
-    value: "Nhập PIN 4–8 chữ số",
+    value: "Nhập mã PIN",
     description: "Gợi ý trong ô nhập PIN bước xác nhận phụ huynh.",
   },
   "gate.submit": { value: "Mở khu vực phụ huynh", description: "Nhãn nút mở bước xác nhận phụ huynh." },
@@ -296,7 +292,7 @@ export const parentContentEntries = defineContent("parent", {
   },
   "settings.pinTitle": { value: "PIN phụ huynh", description: "Tiêu đề nhóm PIN." },
   "settings.pinDescription": {
-    value: "Đặt mã 4–8 chữ số để mở khu vực phụ huynh thay cho câu hỏi tính.",
+    value: "Đổi mã PIN 6 chữ số dùng để mở khu vực phụ huynh.",
     description: "Mô tả cài đặt PIN.",
   },
   "settings.pinPlaceholder": { value: "PIN mới", description: "Gợi ý trong ô nhập PIN mới." },

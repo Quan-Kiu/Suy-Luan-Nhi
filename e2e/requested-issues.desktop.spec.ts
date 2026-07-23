@@ -53,7 +53,7 @@ test.describe("requested issue regressions", () => {
     await dialog.getByRole("button", { name: "Hủy" }).click();
     await expect(dialog).toBeHidden();
   });
-  test("parent gate supports math and locks again after leaving parent area", async ({ page }) => {
+  test("parent gate uses PIN and locks again after leaving parent area", async ({ page }) => {
     await signIn(page, "parent@demo.local", "/profiles");
     const child = await getDemoChild(page);
     await selectChild(page, child.id);
@@ -63,7 +63,7 @@ test.describe("requested issue regressions", () => {
     await page.waitForLoadState("domcontentloaded");
     await page.goto("/parent", { waitUntil: "domcontentloaded" });
     await expect(page.getByRole("heading", { name: "Khu vực phụ huynh" })).toBeVisible();
-    await expect(page.getByLabel(/PIN phụ huynh|Kết quả phép tính/)).toBeVisible();
+    await expect(page.getByRole("textbox", { name: "Mã PIN phụ huynh", exact: true })).toBeVisible();
   });
 
   test("resource management is available in admin", async ({ page }) => {

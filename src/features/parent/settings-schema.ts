@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { parentPinValueSchema } from "@/domain/parent-pin";
 
 export const parentSettingsSchema = z.object({
   soundEnabled: z.boolean(),
@@ -9,7 +10,7 @@ export const parentSettingsSchema = z.object({
     weeklySummary: z.boolean(),
   }),
   privacySettings: z.object({ analytics: z.boolean() }),
-  pin: z.string().regex(/^$|^\d{4,8}$/, "PIN phải gồm 4–8 chữ số"),
+  pin: z.union([z.literal(""), parentPinValueSchema]),
 });
 
 export type ParentSettingsFormValues = z.infer<typeof parentSettingsSchema>;

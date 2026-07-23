@@ -162,8 +162,8 @@ test("parent gate exposes a clear mobile placeholder", async ({ page }) => {
   await page.waitForURL(/\/missions$/);
 
   await page.goto("/parent");
-  const gateInput = page.getByLabel(/Kết quả phép tính|PIN phụ huynh/);
-  await expect(gateInput).toHaveAttribute("placeholder", /Nhập kết quả|Nhập PIN/);
+  const gateInput = page.getByRole("textbox", { name: "Mã PIN phụ huynh", exact: true });
+  await expect(gateInput).toHaveAttribute("placeholder", /Nhập mã PIN/);
   await unlockParentGate(page);
 
   const parentHeader = page.getByTestId("parent-header");

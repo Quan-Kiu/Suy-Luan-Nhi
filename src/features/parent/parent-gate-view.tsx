@@ -2,17 +2,8 @@ import Image from "next/image";
 import { contentText } from "@/content/resolve";
 import type { ContentDictionary } from "@/content/types";
 import { ParentGateForm } from "@/features/parent/parent-gate-form";
-import type { ParentMathChallenge } from "@/modules/family/parent-challenge";
 
-export function ParentGateView({
-  hasPin,
-  challenge,
-  content,
-}: {
-  hasPin: boolean;
-  challenge: ParentMathChallenge;
-  content: ContentDictionary;
-}) {
+export function ParentGateView({ content }: { content: ContentDictionary }) {
   return (
     <main className="paper-texture min-h-screen px-5 py-10">
       <div className="mx-auto max-w-md text-center">
@@ -20,7 +11,7 @@ export function ParentGateView({
           src="/assets/props/badge-privacy-shield-lock.png"
           width={120}
           height={120}
-          alt={contentText(content, "gate.imageAlt", "Lá chắn Parent Gate")}
+          alt={contentText(content, "gate.imageAlt", "Hình chiếc khiên bảo vệ khu vực phụ huynh")}
           className="mx-auto size-28 object-contain"
         />
         <h1 className="type-page-title mt-3">{contentText(content, "gate.title", "Khu vực phụ huynh")}</h1>
@@ -28,11 +19,11 @@ export function ParentGateView({
           {contentText(
             content,
             "gate.description",
-            "Xác nhận người lớn trước khi hiển thị tiến độ và cài đặt gia đình.",
+            "Nhập mã PIN để xem tiến độ và quản lý cài đặt gia đình.",
           )}
         </p>
       </div>
-      <ParentGateForm hasPin={hasPin} challenge={challenge} />
+      <ParentGateForm />
     </main>
   );
 }
