@@ -90,6 +90,39 @@ describe("proxy system settings", () => {
     });
   });
 
+  it("blocks social sign-in when social login is disabled", async () => {
+    mocks.getOperationalSystemSettings.mockResolvedValue(
+      settings([{ key: "features.socialLoginEnabled", value: false }]),
+    );
+
+    const response = await proxy(
+      request("/api/auth/sign-in/social", {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({ provider: "google", requestSignUp: false }),
+      }),
+    );
+
+    expect(response.status).toBe(403);
+    await expect(response.json()).resolves.toMatchObject({
+      success: false,
+      error: { code: "SOCIAL_LOGIN_DISABLED" },
+    });
+  });
+
+  it("stops an OAuth callback when social login is disabled", async () => {
+    mocks.getOperationalSystemSettings.mockResolvedValue(
+      settings([{ key: "features.socialLoginEnabled", value: false }]),
+    );
+
+    const response = await proxy(request("/api/auth/callback/google?code=test&state=test"));
+
+    expect(response.status).toBe(307);
+    expect(response.headers.get("location")).toContain(
+      "/auth/sign-in?oauth=google&error=SOCIAL_LOGIN_DISABLED",
+    );
+  });
+
   it("allows existing Google accounts to sign in when registration is disabled", async () => {
     mocks.getOperationalSystemSettings.mockResolvedValue(
       settings([{ key: "features.registrationEnabled", value: false }]),

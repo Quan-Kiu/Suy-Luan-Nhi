@@ -46,6 +46,12 @@ beforeEach(() => {
 });
 
 describe("authentication verification UX", () => {
+  it("hides Google sign-in when social login is disabled", () => {
+    renderWithQuery(<SignInForm googleAuthEnabled={false} />);
+
+    expect(screen.queryByRole("button", { name: "Đăng nhập bằng Google" })).not.toBeInTheDocument();
+  });
+
   it("starts Google sign-in without implicitly creating a new account", async () => {
     renderWithQuery(<SignInForm googleAuthEnabled />);
 

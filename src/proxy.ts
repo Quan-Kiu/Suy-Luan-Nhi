@@ -28,10 +28,21 @@ function isMaintenanceBypass(pathname: string) {
   return maintenanceBypassPrefixes.some((prefix) => matchesPrefix(pathname, prefix));
 }
 
+function isSocialAuthStartRequest(request: NextRequest) {
+  return request.method === "POST" && request.nextUrl.pathname === "/api/auth/sign-in/social";
+}
+
+function getSocialCallbackProvider(pathname: string) {
+  const prefix = "/api/auth/callback/";
+  if (!pathname.startsWith(prefix)) return null;
+  const provider = pathname.slice(prefix.length).split("/")[0];
+  return provider || null;
+}
+
 async function isSignUpRequest(request: NextRequest) {
   if (request.method !== "POST") return false;
   if (request.nextUrl.pathname.startsWith("/api/auth/sign-up")) return true;
-  if (request.nextUrl.pathname !== "/api/auth/sign-in/social") return false;
+  if (!isSocialAuthStartRequest(request)) return false;
 
   const body = await request
     .clone()
@@ -53,6 +64,23 @@ export async function proxy(request: NextRequest) {
     if (shouldRelockParent) response.cookies.delete(PARENT_GATE_COOKIE_NAME);
     return response;
   };
+
+  const socialCallbackProvider = getSocialCallbackProvider(pathname);
+  if (
+    !settings.features.socialLoginEnabled &&
+    (isSocialAuthStartRequest(request) || socialCallbackProvider)
+  ) {
+    if (socialCallbackProvider && request.method === "GET") {
+      const target = new URL("/auth/sign-in", request.url);
+      target.searchParams.set("oauth", socialCallbackProvider);
+      target.searchParams.set("error", "SOCIAL_LOGIN_DISABLED");
+      return NextResponse.redirect(target);
+    }
+    return apiJson(
+      { code: "SOCIAL_LOGIN_DISABLED", message: "Đăng nhập bằng tài khoản mạng xã hội đang tạm tắt" },
+      { status: 403 },
+    );
+  }
 
   if ((await isSignUpRequest(request)) && !settings.features.registrationEnabled) {
     return apiJson(

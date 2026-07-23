@@ -8,6 +8,7 @@ Expose operational, non-secret settings in the super-admin dashboard and make th
 
 - Maintenance enabled, title, and message.
 - New account registration enabled.
+- Social login enabled.
 - Parent resource library enabled.
 - System feedback enabled.
 - Maximum child profiles per family.
@@ -26,4 +27,4 @@ Expose operational, non-secret settings in the super-admin dashboard and make th
 - Settings appear without manually creating technical keys.
 - Each saved value is schema-validated and audited.
 - Maintenance blocks public, parent, and child routes while preserving admin access.
-- Registration, resources, feedback, profile limits, and Parent Gate use the saved values.
+- Registration, social login, resources, feedback, profile limits, and Parent Gate use the saved values.

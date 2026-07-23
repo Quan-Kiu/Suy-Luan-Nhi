@@ -23,6 +23,12 @@ describe("auth error normalization", () => {
     );
   });
 
+  it("shows a safe message when social login is disabled", () => {
+    expect(getAuthErrorMessage({}, { code: "SOCIAL_LOGIN_DISABLED" }, "OAUTH_ERROR")).toBe(
+      "Đăng nhập bằng Google đang tạm tắt. Vui lòng dùng email.",
+    );
+  });
+
   it("normalizes verification and rate-limit failures", () => {
     expect(isAuthError({ code: "EMAIL_NOT_VERIFIED" }, "EMAIL_NOT_VERIFIED")).toBe(true);
     expect(getAuthErrorCode({ status: 429 }, "SIGN_IN_FAILED")).toBe("TOO_MANY_REQUESTS");

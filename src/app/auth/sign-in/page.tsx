@@ -1,15 +1,20 @@
 import { Suspense } from "react";
+import { connection } from "next/server";
 import { googleAuthConfigured } from "@/config/auth-providers";
 import { AuthShell } from "@/features/auth/auth-shell";
 import { SignInForm } from "@/features/auth/auth-forms";
-export default function Page() {
+import { getOperationalSystemSettings } from "@/modules/system-settings/runtime";
+
+export default async function Page() {
+  await connection();
+  const settings = await getOperationalSystemSettings();
   return (
     <AuthShell
       title="Đăng nhập vào Suy Luận Nhí"
       subtitle="Hệ thống sẽ đưa bạn đến phần phù hợp với tài khoản: quản lý gia đình hoặc trang quản trị."
     >
       <Suspense>
-        <SignInForm googleAuthEnabled={googleAuthConfigured} />
+        <SignInForm googleAuthEnabled={googleAuthConfigured && settings.features.socialLoginEnabled} />
       </Suspense>
     </AuthShell>
   );

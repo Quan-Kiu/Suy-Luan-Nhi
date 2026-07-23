@@ -11,6 +11,7 @@ describe("system settings", () => {
 
     expect(settings.maintenance.enabled).toBe(false);
     expect(settings.features.registrationEnabled).toBe(true);
+    expect(settings.features.socialLoginEnabled).toBe(true);
     expect(settings.features.parentResourcesEnabled).toBe(true);
     expect(settings.features.feedbackEnabled).toBe(true);
     expect(settings.limits.maxChildProfiles).toBe(6);
@@ -26,12 +27,14 @@ describe("system settings", () => {
     const settings = resolveOperationalSystemSettings([
       { key: "maintenance.enabled", value: true },
       { key: "maintenance.title", value: "Đang nâng cấp" },
+      { key: "features.socialLoginEnabled", value: false },
       { key: "limits.maxChildProfiles", value: 99 },
       { key: "security.parentGateLockMinutes", value: 15 },
     ]);
 
     expect(settings.maintenance.enabled).toBe(true);
     expect(settings.maintenance.title).toBe("Đang nâng cấp");
+    expect(settings.features.socialLoginEnabled).toBe(false);
     expect(settings.limits.maxChildProfiles).toBe(6);
     expect(settings.security.parentGateLockMinutes).toBe(15);
   });

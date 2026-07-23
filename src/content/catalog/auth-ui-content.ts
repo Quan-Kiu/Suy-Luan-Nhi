@@ -282,6 +282,10 @@ export const authContentEntries = defineContent("auth", {
     value: "Hệ thống đang tạm dừng tạo tài khoản mới.",
     description: "Lỗi đăng ký Google khi tắt đăng ký.",
   },
+  "errors.socialLoginDisabled": {
+    value: "Đăng nhập bằng Google đang tạm tắt. Vui lòng dùng email và mật khẩu.",
+    description: "Lỗi khi quản trị viên tắt đăng nhập mạng xã hội.",
+  },
   "errors.forgot": {
     value: "Không thể gửi liên kết đặt lại lúc này.",
     description: "Lỗi gửi email đặt lại.",

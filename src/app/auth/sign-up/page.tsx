@@ -69,7 +69,10 @@ export default async function Page({
           3 · {contentText(content, "signUp.stepProfile", "Hồ sơ bé")}
         </div>
       </div>
-      <SignUpForm googleAuthEnabled={googleAuthConfigured} oauthError={oauthError} />
+      <SignUpForm
+        googleAuthEnabled={googleAuthConfigured && settings.features.socialLoginEnabled}
+        oauthError={oauthError}
+      />
     </AuthShell>
   );
 }

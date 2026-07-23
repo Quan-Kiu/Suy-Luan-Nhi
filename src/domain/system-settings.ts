@@ -5,6 +5,7 @@ export const managedSystemSettingKeys = [
   "maintenance.title",
   "maintenance.message",
   "features.registrationEnabled",
+  "features.socialLoginEnabled",
   "features.parentResourcesEnabled",
   "features.feedbackEnabled",
   "limits.maxChildProfiles",
@@ -70,6 +71,16 @@ export const managedSystemSettingDefinitions: readonly ManagedSystemSettingDefin
     group: "features",
     label: "Cho phép tạo tài khoản mới",
     description: "Tắt khi cần tạm ngưng tiếp nhận phụ huynh mới; tài khoản hiện có vẫn đăng nhập được.",
+    kind: "boolean",
+    defaultValue: true,
+    schema: booleanSchema,
+  },
+  {
+    key: "features.socialLoginEnabled",
+    group: "features",
+    label: "Cho phép đăng nhập bằng tài khoản mạng xã hội",
+    description:
+      "Hiển thị lựa chọn đăng nhập Google và cho phép xử lý OAuth; đăng nhập bằng email vẫn hoạt động khi tắt.",
     kind: "boolean",
     defaultValue: true,
     schema: booleanSchema,
@@ -193,6 +204,7 @@ export type OperationalSystemSettings = {
   maintenance: { enabled: boolean; title: string; message: string };
   features: {
     registrationEnabled: boolean;
+    socialLoginEnabled: boolean;
     parentResourcesEnabled: boolean;
     feedbackEnabled: boolean;
   };
@@ -221,6 +233,7 @@ export function resolveOperationalSystemSettings(rows: readonly { key: string; v
     },
     features: {
       registrationEnabled: Boolean(values["features.registrationEnabled"]),
+      socialLoginEnabled: Boolean(values["features.socialLoginEnabled"]),
       parentResourcesEnabled: Boolean(values["features.parentResourcesEnabled"]),
       feedbackEnabled: Boolean(values["features.feedbackEnabled"]),
     },

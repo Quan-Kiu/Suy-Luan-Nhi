@@ -7,7 +7,7 @@ import { apiJson } from "@/lib/api-response";
 import { invalidatePublishedCatalog, invalidateSystemSettingsViews } from "@/lib/cache/invalidation";
 import { setSystemSetting } from "@/modules/admin/operations";
 
-const schema = z.object({ key: z.string().regex(/^[a-z0-9_.-]+$/), value: z.unknown() });
+const schema = z.object({ key: z.string().regex(/^[A-Za-z0-9_.-]+$/), value: z.unknown() });
 
 export async function PATCH(request: Request) {
   const authResult = await requireApiRoles(request, ["super_admin"]);

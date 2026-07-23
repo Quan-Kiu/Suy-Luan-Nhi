@@ -4,6 +4,7 @@ import { signIn } from "./helpers";
 const settingLabels = [
   "Bật chế độ bảo trì",
   "Cho phép tạo tài khoản mới",
+  "Cho phép đăng nhập bằng tài khoản mạng xã hội",
   "Hiển thị tài nguyên cho phụ huynh",
   "Cho phép gửi góp ý hệ thống",
   "Số hồ sơ bé tối đa mỗi gia đình",
@@ -63,5 +64,37 @@ test("super admin manages runtime settings and maintenance mode", async ({ page 
     await checkbox.uncheck();
     await saveButton.click();
     await expectMaintenanceRedirect(page, false);
+  }
+});
+
+test("super admin can disable social login without disabling email login", async ({ page }) => {
+  await signIn(page, "admin@demo.local", "/admin/settings");
+
+  const card = page
+    .locator("details")
+    .filter({ has: page.getByRole("heading", { name: "Cho phép đăng nhập bằng tài khoản mạng xã hội" }) });
+  await card.locator(":scope > summary").click();
+  const checkbox = card.getByRole("checkbox", { name: "Bật thiết lập này" });
+  const saveButton = card.getByRole("button", { name: "Lưu thay đổi" });
+
+  try {
+    await checkbox.uncheck();
+    await saveButton.click();
+    await expect(card.getByText("Thay đổi đã được ghi nhận", { exact: false })).toBeVisible();
+
+    const socialResponse = await page.request.post("/api/auth/sign-in/social", {
+      data: { provider: "google", requestSignUp: false },
+    });
+    expect(socialResponse.status()).toBe(403);
+    await expect(socialResponse.json()).resolves.toMatchObject({
+      success: false,
+      error: { code: "SOCIAL_LOGIN_DISABLED" },
+    });
+
+    const emailPageResponse = await page.request.get("/auth/sign-in");
+    expect(emailPageResponse.status()).toBe(200);
+  } finally {
+    await checkbox.check();
+    await saveButton.click();
   }
 });

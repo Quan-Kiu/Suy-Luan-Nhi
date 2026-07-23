@@ -32,6 +32,10 @@ const errorCopy: Record<string, ErrorCopy> = {
     fallback: "Tài khoản Google này chưa được liên kết.",
   },
   SIGNUP_DISABLED: { key: "errors.signupDisabled", fallback: "Hệ thống đang tạm dừng tạo tài khoản mới." },
+  SOCIAL_LOGIN_DISABLED: {
+    key: "errors.socialLoginDisabled",
+    fallback: "Đăng nhập bằng Google đang tạm tắt. Vui lòng dùng email.",
+  },
   PASSWORD_RESET_REQUEST_FAILED: {
     key: "errors.forgot",
     fallback: "Không thể gửi liên kết đặt lại lúc này.",
