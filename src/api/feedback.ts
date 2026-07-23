@@ -36,7 +36,7 @@ export const feedbackApi = {
     viewportWidth: number;
     viewportHeight: number;
     devicePixelRatio: number;
-    captureMode: "auto" | "upload" | "none";
+    captureMode: "auto" | "upload" | "mixed" | "none";
   }) {
     const data = new FormData();
     data.set("content", input.content);
