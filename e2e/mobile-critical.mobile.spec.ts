@@ -38,6 +38,63 @@ test("landing explains the product in three clear steps", async ({ page }) => {
   expect(howTop).toBeGreaterThanOrEqual(0);
 });
 
+test("admin logout settles the landing page as a guest even when session refetch fails", async ({ page }) => {
+  const pageErrors: string[] = [];
+  page.on("pageerror", (error) => pageErrors.push(error.message));
+
+  await signIn(page, "content@demo.local", "/admin");
+
+  await page.goto("/");
+  const landingMenuTrigger = page.locator('button[aria-controls="landing-mobile-nav"]');
+  await landingMenuTrigger.click();
+  const adminEntry = page
+    .getByRole("navigation", { name: "Điều hướng mobile" })
+    .getByRole("link", { name: "Trang quản trị" });
+  await expect(adminEntry).toBeVisible();
+  await adminEntry.click();
+  await page.waitForURL((url) => url.pathname === "/admin");
+
+  await page.route("**/api/auth/get-session**", (route) => route.abort("failed"));
+  await page.getByRole("button", { name: "Đăng xuất" }).click();
+  await page.waitForURL((url) => url.pathname === "/");
+
+  const trigger = page.locator('button[aria-controls="landing-mobile-nav"]');
+  await trigger.click();
+  const mobileNav = page.getByRole("navigation", { name: "Điều hướng mobile" });
+  await expect(mobileNav.getByRole("link", { name: "Đăng nhập" })).toBeVisible();
+  await expect(mobileNav.getByRole("link", { name: "Trang quản trị" })).toHaveCount(0);
+  expect(pageErrors).toEqual([]);
+});
+
+test("PIN setup uses a fresh mobile document navigation after the security state changes", async ({
+  page,
+}) => {
+  await page.goto("/auth/sign-up");
+  await page.getByLabel("Tên ba/mẹ").fill("Phụ huynh Mobile PIN");
+  await page.getByLabel("Email").fill("mobile-pin-navigation@demo.local");
+  await page.locator('input[name="password"]').fill(password);
+  await page.locator('input[name="confirmPassword"]').fill(password);
+  await page.getByRole("button", { name: "Tạo tài khoản ba mẹ" }).click();
+  await page.waitForURL((url) => url.pathname === "/auth/setup-pin");
+
+  let staleRouterRequests = 0;
+  await page.route("**/onboarding**", (route) => {
+    if (route.request().resourceType() === "document") {
+      return route.continue();
+    }
+    staleRouterRequests += 1;
+    return route.abort("failed");
+  });
+
+  await page.getByRole("textbox", { name: "Tạo mã PIN 6 chữ số", exact: true }).fill("246813");
+  await page.getByRole("textbox", { name: "Nhập lại mã PIN", exact: true }).fill("246813");
+  await page.getByRole("button", { name: "Lưu mã PIN và tiếp tục" }).click();
+
+  await page.waitForURL((url) => url.pathname === "/onboarding");
+  await expect(page.getByText("Bước 3/3 · Hồ sơ của bé")).toBeVisible();
+  expect(staleRouterRequests).toBe(0);
+});
+
 test("admin CMS exposes an accessible mobile navigation drawer", async ({ page }) => {
   await page.goto("/auth/sign-in");
   await page.getByLabel("Email").fill("content@demo.local");

@@ -38,7 +38,7 @@ export default defineConfig({
     video: "retain-on-failure",
   },
   webServer: {
-    command: `${environment} npm run e2e:prepare && ${environment} sh -c '${serverCommand}'`,
+    command: `NODE_OPTIONS='--conditions=react-server' ${environment} npm run e2e:prepare && env -u NODE_OPTIONS ${environment} sh -c '${serverCommand}'`,
     url: baseURL,
     reuseExistingServer: false,
     timeout: 180_000,
