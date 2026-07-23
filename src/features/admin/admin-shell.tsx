@@ -34,8 +34,34 @@ export function AdminShell({
     return () => document.removeEventListener("keydown", closeOnEscape);
   }, []);
 
+  useEffect(() => {
+    const root = document.documentElement;
+    const body = document.body;
+    const previousRootOverflow = root.style.overflow;
+    const previousRootOverscroll = root.style.overscrollBehavior;
+    const previousBodyOverflow = body.style.overflow;
+    const previousBodyOverscroll = body.style.overscrollBehavior;
+
+    window.scrollTo({ top: 0, left: 0, behavior: "auto" });
+    root.style.overflow = "hidden";
+    root.style.overscrollBehavior = "none";
+    body.style.overflow = "hidden";
+    body.style.overscrollBehavior = "none";
+
+    return () => {
+      root.style.overflow = previousRootOverflow;
+      root.style.overscrollBehavior = previousRootOverscroll;
+      body.style.overflow = previousBodyOverflow;
+      body.style.overscrollBehavior = previousBodyOverscroll;
+    };
+  }, []);
+
   return (
-    <div data-admin-shell className="h-[100dvh] overflow-hidden bg-[#f5f3ee] text-[#342f28]">
+    <div
+      data-admin-shell
+      className="grid h-screen w-full max-w-full grid-rows-[calc(4rem+var(--safe-area-top))_minmax(0,1fr)] overflow-hidden bg-[#f5f3ee] text-[#342f28]"
+      style={{ height: "100dvh" }}
+    >
       <header
         data-testid="admin-header"
         className="safe-area-header relative z-40 flex min-h-[calc(4rem+var(--safe-area-top))] items-center justify-between border-b bg-white px-4 sm:px-5"
@@ -122,15 +148,15 @@ export function AdminShell({
         ) : null}
       </AnimatePresence>
 
-      <div className="grid h-[calc(100dvh-4rem-var(--safe-area-top))] min-h-0 xl:grid-cols-[248px_minmax(0,1fr)]">
-        <aside className="hidden min-h-0 scrollbar-thin overflow-y-auto overscroll-contain border-r bg-white px-3 py-4 xl:block">
+      <div className="grid min-h-0 min-w-0 xl:grid-cols-[248px_minmax(0,1fr)]">
+        <aside className="hidden min-h-0 min-w-0 scrollbar-thin overflow-x-hidden overflow-y-auto overscroll-contain border-r bg-white px-3 py-4 xl:block">
           <AdminNavigation pathname={pathname} role={role} content={content} />
         </aside>
         <main
           id="admin-main-content"
           tabIndex={0}
           aria-label={contentText(content, "shell.mainContent", "Nội dung quản trị")}
-          className="min-h-0 min-w-0 scrollbar-thin overflow-y-auto overscroll-contain p-4 pb-[max(1rem,var(--safe-area-bottom))] outline-none focus-visible:ring-2 focus-visible:ring-[#d86a24] focus-visible:ring-inset sm:p-5 lg:p-6"
+          className="min-h-0 min-w-0 scrollbar-thin overflow-x-hidden overflow-y-auto overscroll-contain p-4 pb-[max(1rem,var(--safe-area-bottom))] outline-none focus-visible:ring-2 focus-visible:ring-[#d86a24] focus-visible:ring-inset sm:p-5 lg:p-6"
         >
           <div className="mx-auto w-full max-w-[1680px]">{children}</div>
         </main>
