@@ -21,8 +21,19 @@ import type { createChildSchema, updateChildSchema, updateParentSettingsSchema }
 export const getOrCreateParentProfile = cache(async (userId: string, displayName: string) => {
   const existing = await db.query.parentProfiles.findFirst({ where: eq(parentProfiles.userId, userId) });
   if (existing) return existing;
-  const [created] = await db.insert(parentProfiles).values({ userId, displayName }).returning();
-  return created;
+
+  const [created] = await db
+    .insert(parentProfiles)
+    .values({ userId, displayName })
+    .onConflictDoNothing({ target: parentProfiles.userId })
+    .returning();
+  if (created) return created;
+
+  const concurrent = await db.query.parentProfiles.findFirst({
+    where: eq(parentProfiles.userId, userId),
+  });
+  if (concurrent) return concurrent;
+  throw new Error("Không thể khởi tạo hồ sơ phụ huynh");
 });
 
 export async function listChildren(userId: string, displayName: string, includeDeleted = false) {
