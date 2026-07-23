@@ -1,5 +1,10 @@
 import { describe, expect, it } from "vitest";
-import { parentPinSetupSchema, parentPinUnlockSchema, parentPinValueSchema } from "@/domain/parent-pin";
+import {
+  parentPinResetSchema,
+  parentPinSetupSchema,
+  parentPinUnlockSchema,
+  parentPinValueSchema,
+} from "@/domain/parent-pin";
 
 describe("parent PIN validation", () => {
   it("accepts a non-trivial six-digit PIN", () => {
@@ -22,5 +27,18 @@ describe("parent PIN validation", () => {
   it("accepts legacy four-to-eight digit PINs when unlocking", () => {
     expect(parentPinUnlockSchema.safeParse("2468").success).toBe(true);
     expect(parentPinUnlockSchema.safeParse("24682468").success).toBe(true);
+  });
+
+  it("validates reset tokens and matching replacement PINs", () => {
+    expect(
+      parentPinResetSchema.safeParse({
+        token: "a".repeat(43),
+        pin: "246824",
+        confirmPin: "246824",
+      }).success,
+    ).toBe(true);
+    expect(
+      parentPinResetSchema.safeParse({ token: "short", pin: "246824", confirmPin: "246824" }).success,
+    ).toBe(false);
   });
 });

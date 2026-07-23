@@ -36,6 +36,18 @@ const intentionallyLocalMutations = new Map<string, string>([
   ],
   ["parent/export-data/route.ts", "Creates a one-off export and returns its download data directly."],
   [
+    "parent/pin/reset-request/route.ts",
+    "Creates a one-time verification token and sends email; no server-cached reader owns reset requests.",
+  ],
+  [
+    "parent/pin/reset/route.ts",
+    "PIN state is read directly and changing the hash invalidates existing signed parent-gate cookies.",
+  ],
+  [
+    "parent/pin/route.ts",
+    "PIN setup is read directly and the response immediately grants the signed parent-gate cookie.",
+  ],
+  [
     "parent/settings/route.ts",
     "Settings are read dynamically; the form refreshes and crossing into child routes remounts the child layout.",
   ],

@@ -54,7 +54,7 @@ export async function requireApiParentGate(request: Request) {
   const { getOrCreateParentProfile } = await import("@/modules/family/family");
   const { hasParentGate } = await import("@/modules/family/parent-gate");
   const parent = await getOrCreateParentProfile(authResult.session.user.id, authResult.session.user.name);
-  if (!(await hasParentGate(parent.id))) {
+  if (!parent.pinHash || !(await hasParentGate(parent.id, parent.pinHash))) {
     return {
       error: apiJson(
         { message: "Cần mở Parent Gate trước khi thực hiện thao tác nhạy cảm" },

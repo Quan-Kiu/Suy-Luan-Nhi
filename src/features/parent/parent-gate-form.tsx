@@ -3,6 +3,7 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation } from "@tanstack/react-query";
 import { LockKeyhole } from "lucide-react";
+import Link from "next/link";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { parentApi } from "@/api/parent";
@@ -65,6 +66,11 @@ export function ParentGateForm() {
           error={form.formState.errors.pin?.message}
           className="type-child-section-title min-h-14 text-center tracking-[0.3em]"
         />
+        <div className="flex justify-end">
+          <Link href="/auth/forgot-pin" className="font-bold text-[#c55312] underline underline-offset-4">
+            {contentText(content, "gate.forgotPin", "Quên mã PIN?")}
+          </Link>
+        </div>
         <FormStatus status={mutation.isError ? "error" : "idle"} message={mutation.error?.message} />
         <SubmitButton
           pending={mutation.isPending || navigation.isPending}

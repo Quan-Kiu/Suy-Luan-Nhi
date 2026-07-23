@@ -63,6 +63,6 @@ export async function POST(request: Request) {
     .update(parentProfiles)
     .set({ pinFailedAttempts: 0, pinLockedUntil: null, updatedAt: new Date() })
     .where(eq(parentProfiles.id, parent.id));
-  await grantParentGate(parent.id);
+  await grantParentGate(parent.id, parent.pinHash);
   return apiJson({ ok: true });
 }
