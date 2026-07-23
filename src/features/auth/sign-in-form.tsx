@@ -8,7 +8,7 @@ import { useState } from "react";
 import { useForm } from "react-hook-form";
 import type { z } from "zod";
 import { signIn } from "@/auth/client";
-import { getAuthenticatedHome } from "@/auth/navigation";
+import { getAuthenticatedHome, resolveSafeAuthCallbackPath } from "@/auth/navigation";
 import { CheckboxField, FormStatus, PasswordField, SubmitButton, TextField } from "@/components/form";
 import { contentText, useContent } from "@/content/client";
 import { EmailVerificationDialog } from "@/features/auth/email-verification-dialog";
@@ -20,7 +20,7 @@ export function SignInForm() {
   const content = useContent("auth");
   const navigation = usePendingRouter();
   const params = useSearchParams();
-  const requestedCallback = params.get("callbackUrl");
+  const requestedCallback = resolveSafeAuthCallbackPath(params.get("callbackUrl"));
   const [verificationEmail, setVerificationEmail] = useState<string | null>(null);
   const form = useForm<z.infer<typeof signInSchema>>({
     resolver: zodResolver(signInSchema),
