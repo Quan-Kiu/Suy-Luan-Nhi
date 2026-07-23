@@ -14,7 +14,7 @@ const navigation = [
   { href: "/missions", labelKey: "header.home", fallback: "Bản đồ nhiệm vụ", icon: ShieldCheck },
   { href: "/badges", labelKey: "header.badges", fallback: "Bộ sưu tập huy hiệu", icon: Trophy },
   { href: "/profiles", labelKey: "header.profiles", fallback: "Hồ sơ bé", icon: UserRound },
-  { href: "/parent", labelKey: "header.parent", fallback: "Khu vực phụ huynh", icon: ShieldCheck },
+  { href: "/parent", labelKey: "header.parent", fallback: "Dành cho ba mẹ", icon: ShieldCheck },
 ] as const;
 
 function getBackHref(pathname: string) {

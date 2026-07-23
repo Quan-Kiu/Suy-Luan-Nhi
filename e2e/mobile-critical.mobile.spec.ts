@@ -14,7 +14,7 @@ test("landing page exposes an accessible mobile navigation menu", async ({ page 
   await expect(trigger).toHaveAccessibleName("Đóng menu điều hướng");
   await expect(trigger).toHaveAttribute("aria-expanded", "true");
   await expect(page.getByRole("navigation", { name: "Điều hướng mobile" })).toBeVisible();
-  await expect(page.getByRole("link", { name: "Khu vực phụ huynh" })).toBeVisible();
+  await expect(page.getByRole("link", { name: "Đăng nhập" })).toBeVisible();
 });
 
 test("landing explains the product in three clear steps", async ({ page }) => {

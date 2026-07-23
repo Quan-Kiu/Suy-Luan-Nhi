@@ -126,20 +126,15 @@ test.describe("follow-up issue regressions", () => {
     await expect(player).toHaveAttribute("src", upload.url);
   });
 
-  test("landing entry actions stay as skeletons until the staff session resolves", async ({ page }) => {
+  test("landing keeps the staff workspace separate from parent and marketing actions", async ({ page }) => {
     await signIn(page, "content@demo.local", "/admin");
-    await page.route("**/api/auth/get-session", async (route) => {
-      await new Promise((resolve) => setTimeout(resolve, 1_200));
-      await route.continue();
-    });
 
     await page.goto("/");
-    await expect(page.getByRole("status", { name: "Đang đồng bộ quyền truy cập" })).toHaveCount(2);
-    await expect(page.getByRole("link", { name: "Khu vực phụ huynh" })).toHaveCount(0);
+    const adminEntry = page.getByRole("link", { name: "Trang quản trị" });
+    await expect(adminEntry).toBeVisible();
+    await expect(adminEntry).toHaveAttribute("href", "/admin");
+    await expect(page.getByRole("link", { name: "Quản lý gia đình" })).toHaveCount(0);
     await expect(page.getByRole("link", { name: "Mở trang quản trị" })).toHaveCount(0);
-
-    await expect(page.getByRole("link", { name: "Khu vực quản trị" })).toBeVisible();
-    await expect(page.getByRole("link", { name: "Mở trang quản trị" })).toBeVisible();
-    await expect(page.getByRole("status", { name: "Đang đồng bộ quyền truy cập" })).toHaveCount(0);
+    await expect(page.getByRole("link", { name: /Bắt đầu cho bé/ })).toHaveCount(0);
   });
 });

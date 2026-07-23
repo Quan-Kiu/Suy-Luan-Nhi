@@ -40,7 +40,7 @@ describe("AuthAwareEntryLink", () => {
     mocks.session.data = { user: { role: "super_admin" } };
 
     const { rerender } = render(<AuthAwareEntryLink content={{}} compact />);
-    expect(screen.getByRole("link", { name: "Khu vực quản trị" })).toHaveAttribute("href", "/admin");
+    expect(screen.getByRole("link", { name: "Trang quản trị" })).toHaveAttribute("href", "/admin");
 
     rerender(<AuthAwareEntryLink content={{}} hideForStaff />);
     expect(screen.queryByRole("link")).not.toBeInTheDocument();

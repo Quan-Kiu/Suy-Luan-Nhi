@@ -2,6 +2,7 @@ import { hasRole, staffRoles } from "@/auth/roles";
 
 export const PARENT_PIN_SETUP_PATH = "/auth/setup-pin";
 export const AUTH_COMPLETE_PATH = "/auth/complete";
+const AUTH_CALLBACK_BASE = "https://suy-luan-nhi.invalid";
 
 export function resolveSafeInternalPath(value: string | string[] | null | undefined, fallback: string) {
   const candidate = Array.isArray(value) ? value[0] : value;
@@ -17,6 +18,19 @@ export function resolveSafeInternalPath(value: string | string[] | null | undefi
     return fallback;
   }
   return candidate;
+}
+
+export function resolveSafeAuthCallbackPath(value: string | null | undefined) {
+  if (!value || !value.startsWith("/") || value.startsWith("//") || value.includes("\\")) return null;
+  if (/[\u0000-\u001F\u007F]/.test(value)) return null;
+
+  try {
+    const url = new URL(value, AUTH_CALLBACK_BASE);
+    if (url.origin !== AUTH_CALLBACK_BASE || url.pathname === "/auth/sign-in") return null;
+    return `${url.pathname}${url.search}${url.hash}`;
+  } catch {
+    return null;
+  }
 }
 
 export function buildAuthCompletePath(nextPath?: string | null) {

@@ -14,6 +14,7 @@ import {
   getAuthenticatedHome,
   isParentExperiencePath,
   PARENT_PIN_SETUP_PATH,
+  resolveSafeAuthCallbackPath,
 } from "@/auth/navigation";
 import { CheckboxField, FormStatus, PasswordField, SubmitButton, TextField } from "@/components/form";
 import { contentText, useContent } from "@/content/client";
@@ -27,7 +28,7 @@ export function SignInForm({ googleAuthEnabled = false }: { googleAuthEnabled?: 
   const content = useContent("auth");
   const navigation = usePendingRouter();
   const params = useSearchParams();
-  const requestedCallback = params.get("callbackUrl");
+  const requestedCallback = resolveSafeAuthCallbackPath(params.get("callbackUrl"));
   const oauthError = params.get("oauth") === "google" ? params.get("error") : null;
   const [verificationEmail, setVerificationEmail] = useState<string | null>(null);
   const form = useForm<z.infer<typeof signInSchema>>({
