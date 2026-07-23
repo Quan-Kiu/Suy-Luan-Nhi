@@ -93,13 +93,14 @@ test("parent gate rejects a wrong PIN and exports family data", async ({ page })
   expect(exported.children.some((item) => item.profile.displayName === "Bống")).toBe(true);
 });
 
-test("parent without a PIN must finish PIN setup after sign-in", async ({ page }) => {
-  await page.goto("/auth/sign-in?callbackUrl=/onboarding");
+test("parent without a PIN creates the first profile and sees it immediately", async ({ page }) => {
+  await page.setViewportSize({ width: 412, height: 915 });
+  await page.goto("/auth/sign-in?callbackUrl=/profiles");
   await page.getByLabel("Email").fill("privacy@demo.local");
   await page.locator('input[name="password"]').fill("LocalDemo-2026!");
   await page.getByRole("button", { name: "Đăng nhập", exact: true }).click();
 
-  await expect(page).toHaveURL(/\/auth\/setup-pin\?next=%2Fonboarding/);
+  await expect(page).toHaveURL(/\/auth\/setup-pin\?next=%2Fprofiles/);
   await expect(page.getByRole("heading", { name: "Tạo mã PIN phụ huynh" })).toBeVisible();
 
   const pin = page.getByRole("textbox", { name: "Tạo mã PIN 6 chữ số", exact: true });
@@ -113,6 +114,14 @@ test("parent without a PIN must finish PIN setup after sign-in", async ({ page }
   await confirmation.fill("246813");
   await page.getByRole("button", { name: "Lưu mã PIN và tiếp tục" }).click();
 
-  await expect(page).toHaveURL(/\/onboarding$/);
+  await expect(page).toHaveURL(/\/profiles$/);
   await expect(page.getByText("Bước 3/3 · Hồ sơ của bé")).toBeVisible();
+  await page.getByRole("link", { name: "Tạo hồ sơ đầu tiên" }).click();
+  await expect(page).toHaveURL(/\/onboarding$/);
+
+  await page.getByLabel("Tên thân mật của bé").fill("Mít Đầu Tiên");
+  await page.getByRole("button", { name: /Tạo hồ sơ và bắt đầu/i }).click();
+
+  await expect(page).toHaveURL(/\/profiles$/);
+  await expect(page.getByRole("heading", { name: "Mít Đầu Tiên" })).toBeVisible();
 });
