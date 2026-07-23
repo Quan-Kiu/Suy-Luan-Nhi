@@ -31,12 +31,17 @@ export function MissionMapPage() {
 
   return (
     <main className="paper-texture min-h-[calc(100vh-5rem)] px-5 pt-5 pb-8">
-      <Card className="mb-6 p-4">
-        <p className="type-supporting text-[#806d54]">
+      <Card className="mb-6 p-4" data-testid="mission-map-intro">
+        <p className="type-supporting text-[#806d54]" data-testid="mission-map-profile-label">
           {contentText(content, "journey.label", "Hành trình của")}
         </p>
-        <h1 className="type-child-page-title">{child.displayName}</h1>
-        <p className="type-supporting mt-1">
+        <h1
+          className="type-child-page-title mt-2 max-w-full break-words"
+          data-testid="mission-map-profile-name"
+        >
+          {child.displayName}
+        </h1>
+        <p className="type-supporting mt-2">
           {contentText(
             content,
             "journey.description",
