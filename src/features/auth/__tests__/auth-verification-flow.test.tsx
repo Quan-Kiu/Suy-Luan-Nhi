@@ -52,7 +52,21 @@ describe("authentication verification UX", () => {
     expect(screen.queryByRole("button", { name: "Đăng nhập bằng Google" })).not.toBeInTheDocument();
   });
 
-  it("starts Google sign-in without implicitly creating a new account", async () => {
+  it("allows Google sign-in to create a new account while registration is enabled", async () => {
+    renderWithQuery(<SignInForm googleAuthEnabled registrationEnabled />);
+
+    await userEvent.click(screen.getByRole("button", { name: "Đăng nhập bằng Google" }));
+
+    expect(mocks.signInSocial).toHaveBeenCalledWith({
+      provider: "google",
+      callbackURL: "/auth/complete",
+      newUserCallbackURL: "/auth/complete?next=%2Fonboarding",
+      errorCallbackURL: "/auth/sign-in?oauth=google",
+      requestSignUp: true,
+    });
+  });
+
+  it("limits Google sign-in to existing accounts while registration is disabled", async () => {
     renderWithQuery(<SignInForm googleAuthEnabled />);
 
     await userEvent.click(screen.getByRole("button", { name: "Đăng nhập bằng Google" }));
@@ -60,7 +74,7 @@ describe("authentication verification UX", () => {
     expect(mocks.signInSocial).toHaveBeenCalledWith({
       provider: "google",
       callbackURL: "/auth/complete",
-      newUserCallbackURL: "/auth/complete",
+      newUserCallbackURL: "/auth/complete?next=%2Fonboarding",
       errorCallbackURL: "/auth/sign-in?oauth=google",
       requestSignUp: false,
     });

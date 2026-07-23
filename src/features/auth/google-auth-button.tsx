@@ -10,7 +10,9 @@ import { AuthFlowError, getAuthErrorMessage, toAuthFlowError } from "@/features/
 type GoogleAuthButtonProps = {
   mode: "sign-in" | "sign-up";
   callbackURL: string;
+  newUserCallbackURL?: string;
   errorCallbackURL: string;
+  requestSignUp?: boolean;
   callbackError?: string | null;
 };
 
@@ -36,7 +38,9 @@ function GoogleMark() {
 export function GoogleAuthButton({
   mode,
   callbackURL,
+  newUserCallbackURL,
   errorCallbackURL,
+  requestSignUp,
   callbackError,
 }: GoogleAuthButtonProps) {
   const content = useContent("auth");
@@ -45,9 +49,9 @@ export function GoogleAuthButton({
       const result = await signIn.social({
         provider: "google",
         callbackURL,
-        newUserCallbackURL: callbackURL,
+        newUserCallbackURL: newUserCallbackURL ?? callbackURL,
         errorCallbackURL,
-        requestSignUp: mode === "sign-up",
+        requestSignUp: requestSignUp ?? mode === "sign-up",
       });
       if (result.error) throw toAuthFlowError(result.error, "OAUTH_ERROR");
       return result.data;

@@ -24,7 +24,13 @@ import { GoogleAuthButton } from "@/features/auth/google-auth-button";
 import { signInSchema } from "@/features/auth/schemas";
 import { usePendingRouter } from "@/hooks/use-pending-router";
 
-export function SignInForm({ googleAuthEnabled = false }: { googleAuthEnabled?: boolean }) {
+export function SignInForm({
+  googleAuthEnabled = false,
+  registrationEnabled = false,
+}: {
+  googleAuthEnabled?: boolean;
+  registrationEnabled?: boolean;
+}) {
   const content = useContent("auth");
   const navigation = usePendingRouter();
   const params = useSearchParams();
@@ -80,7 +86,9 @@ export function SignInForm({ googleAuthEnabled = false }: { googleAuthEnabled?: 
           <GoogleAuthButton
             mode="sign-in"
             callbackURL={buildAuthCompletePath(requestedCallback)}
+            newUserCallbackURL={buildAuthCompletePath("/onboarding")}
             errorCallbackURL="/auth/sign-in?oauth=google"
+            requestSignUp={registrationEnabled}
             callbackError={oauthError}
           />
         ) : null}

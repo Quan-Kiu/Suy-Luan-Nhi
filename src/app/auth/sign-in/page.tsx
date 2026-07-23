@@ -14,7 +14,10 @@ export default async function Page() {
       subtitle="Hệ thống sẽ đưa bạn đến phần phù hợp với tài khoản: quản lý gia đình hoặc trang quản trị."
     >
       <Suspense>
-        <SignInForm googleAuthEnabled={googleAuthConfigured && settings.features.socialLoginEnabled} />
+        <SignInForm
+          googleAuthEnabled={googleAuthConfigured && settings.features.socialLoginEnabled}
+          registrationEnabled={settings.features.registrationEnabled}
+        />
       </Suspense>
     </AuthShell>
   );
