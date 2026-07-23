@@ -6,7 +6,15 @@ export const landingContentEntries = defineContent("landing", {
   "header.parent": { value: "Khu vực phụ huynh", description: "Liên kết tới khu vực phụ huynh." },
   "header.admin": {
     value: "Khu vực quản trị",
-    description: "Liên kết tới khu vực quản trị cho tài khoản nhân viên quản trị.",
+    description: "Tên khu vực quản trị trong các ngữ cảnh mô tả.",
+  },
+  "header.manageFamily": {
+    value: "Quản lý gia đình",
+    description: "Hành động mở phần quản lý gia đình cho tài khoản phụ huynh đã đăng nhập.",
+  },
+  "header.adminAction": {
+    value: "Trang quản trị",
+    description: "Hành động mở trang quản trị cho tài khoản nhân viên đã đăng nhập.",
   },
   "header.signIn": { value: "Đăng nhập", description: "Liên kết đăng nhập khi chưa có lượt chơi." },
   "header.openMenu": { value: "Mở menu điều hướng", description: "Nhãn trợ năng nút mở menu mobile." },
@@ -32,7 +40,11 @@ export const landingContentEntries = defineContent("landing", {
   },
   "hero.parentCta": {
     value: "Vào khu vực phụ huynh",
-    description: "lối tắt cho Parent Account đã đăng nhập.",
+    description: "Tên CTA cũ được giữ để tương thích nội dung đã cấu hình.",
+  },
+  "hero.manageFamily": {
+    value: "Quản lý gia đình",
+    description: "Hành động mở phần quản lý gia đình cho Parent Account đã đăng nhập.",
   },
   "hero.adminCta": {
     value: "Mở trang quản trị",

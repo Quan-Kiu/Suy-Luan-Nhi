@@ -29,12 +29,30 @@ describe("AuthAwareEntryLink", () => {
     expect(link).toHaveTextContent("Ba mẹ tạo tài khoản trước, sau đó thêm hồ sơ cho bé.");
   });
 
-  it("keeps the parent destination direct after sign-in", () => {
-    mocks.session.data = { user: { role: "parent" } };
-    render(<AuthAwareEntryLink content={{}} />);
+  it("uses a familiar sign-in action for guests in public navigation", () => {
+    render(<AuthAwareEntryLink content={{}} compact />);
 
-    const link = screen.getByRole("link", { name: "Vào khu vực phụ huynh" });
-    expect(link).toHaveAttribute("href", "/parent");
-    expect(link).not.toHaveTextContent("tạo tài khoản trước");
+    expect(screen.getByRole("link", { name: "Đăng nhập" })).toHaveAttribute("href", "/auth/sign-in");
+  });
+
+  it("names the parent destination by its purpose after sign-in", () => {
+    mocks.session.data = { user: { role: "parent" } };
+    render(<AuthAwareEntryLink content={{}} compact />);
+
+    expect(screen.getByRole("link", { name: "Quản lý gia đình" })).toHaveAttribute("href", "/parent");
+  });
+
+  it("keeps staff navigation separate from the parent destination", () => {
+    mocks.session.data = { user: { role: "super_admin" } };
+    render(<AuthAwareEntryLink content={{}} compact />);
+
+    expect(screen.getByRole("link", { name: "Trang quản trị" })).toHaveAttribute("href", "/admin");
+  });
+
+  it("does not turn marketing CTAs into admin shortcuts", () => {
+    mocks.session.data = { user: { role: "content_admin" } };
+    render(<AuthAwareEntryLink content={{}} hideForStaff />);
+
+    expect(screen.queryByRole("link")).not.toBeInTheDocument();
   });
 });

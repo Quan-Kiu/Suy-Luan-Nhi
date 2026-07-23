@@ -11,11 +11,13 @@ import { cn } from "@/lib/utils";
 export function AuthAwareEntryLink({
   content,
   compact = false,
+  hideForStaff = false,
   onNavigate,
   className,
 }: {
   content: ContentDictionary;
   compact?: boolean;
+  hideForStaff?: boolean;
   onNavigate?: () => void;
   className?: string;
 }) {
@@ -44,6 +46,9 @@ export function AuthAwareEntryLink({
   const staff = state === "staff";
   const parent = state === "parent";
   const guest = state === "guest";
+
+  if (staff && hideForStaff) return null;
+
   const href = staff
     ? "/admin"
     : parent
@@ -59,13 +64,13 @@ export function AuthAwareEntryLink({
       : compact
         ? contentText(
             content,
-            staff ? "header.admin" : "header.parent",
-            staff ? "Khu vực quản trị" : "Khu vực phụ huynh",
+            staff ? "header.adminAction" : parent ? "header.manageFamily" : "header.signIn",
+            staff ? "Trang quản trị" : parent ? "Quản lý gia đình" : "Đăng nhập",
           )
         : contentText(
             content,
-            staff ? "hero.adminCta" : parent ? "hero.parentCta" : "hero.startCta",
-            staff ? "Mở trang quản trị" : parent ? "Vào khu vực phụ huynh" : "Bắt đầu cho bé",
+            staff ? "hero.adminCta" : parent ? "hero.manageFamily" : "hero.startCta",
+            staff ? "Mở trang quản trị" : parent ? "Quản lý gia đình" : "Bắt đầu cho bé",
           );
 
   return (

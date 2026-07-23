@@ -87,7 +87,7 @@ export default async function HomePage() {
             )}
           </p>
           <div className="mt-7 flex flex-col gap-3 sm:flex-row">
-            <AuthAwareEntryLink content={content} />
+            <AuthAwareEntryLink content={content} hideForStaff />
             <a
               href="#how"
               className="inline-flex min-h-14 items-center justify-center gap-2 rounded-2xl border-2 border-[#dac7a7] bg-white px-6 font-black"
@@ -168,7 +168,7 @@ export default async function HomePage() {
                 "Bé được thử lại thoải mái. Hệ thống ghi nhận nỗ lực, không phạt khi bé trả lời chưa đúng.",
               )}
             </p>
-            <AuthAwareEntryLink content={content} />
+            <AuthAwareEntryLink content={content} hideForStaff />
           </div>
         </div>
       </section>

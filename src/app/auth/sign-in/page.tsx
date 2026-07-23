@@ -4,8 +4,8 @@ import { SignInForm } from "@/features/auth/auth-forms";
 export default function Page() {
   return (
     <AuthShell
-      title="Đăng nhập"
-      subtitle="Đăng nhập để xem hồ sơ gia đình và tiếp tục hoạt động của bé trên thiết bị này."
+      title="Đăng nhập vào Suy Luận Nhí"
+      subtitle="Hệ thống sẽ đưa bạn đến phần phù hợp với tài khoản: quản lý gia đình hoặc trang quản trị."
     >
       <Suspense>
         <SignInForm />
