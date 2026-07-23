@@ -1,12 +1,13 @@
 "use client";
 
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import Link from "next/link";
 import { useState } from "react";
 import { toast } from "sonner";
 import { childrenApi, type ChildProfile } from "@/api/children";
 import { ConfirmDialog } from "@/components/confirm-dialog";
 import { FormStatus } from "@/components/form";
+import { Card } from "@/components/ui";
 import { contentText, useContent } from "@/content/client";
 import { useActiveChild, useSetActiveChild } from "@/features/child/active-child-context";
 import { ProfileCard, type ProfileListItem } from "@/features/profile/profile-card";
@@ -38,12 +39,7 @@ export function ProfileManager({
   const queryClient = useQueryClient();
   const activeChild = useActiveChild();
   const setActiveChild = useSetActiveChild();
-  const profilesQuery = useQuery({
-    queryKey: queryKeys.children.list,
-    queryFn: childrenApi.list,
-    initialData: profiles,
-  });
-  const activeProfiles = profilesQuery.data.map(toProfileListItem);
+  const activeProfiles = profiles.map(toProfileListItem);
   const [trashProfiles, setTrashProfiles] = useState(deletedProfiles);
   const [trashOpen, setTrashOpen] = useState(deletedProfiles.length > 0);
   const [deleteTarget, setDeleteTarget] = useState<ProfileListItem | null>(null);
@@ -130,11 +126,7 @@ export function ProfileManager({
     deleteForever: contentText(content, "trash.deleteForever", "Xóa vĩnh viễn"),
   };
   const error =
-    profilesQuery.error ??
-    selectMutation.error ??
-    deleteMutation.error ??
-    restoreMutation.error ??
-    permanentDeleteMutation.error;
+    selectMutation.error ?? deleteMutation.error ?? restoreMutation.error ?? permanentDeleteMutation.error;
   const trashPendingId = restoreMutation.isPending
     ? restoreMutation.variables.id
     : permanentDeleteMutation.isPending
@@ -159,6 +151,27 @@ export function ProfileManager({
           />
         );
       })}
+
+      {!activeProfiles.length && !trashProfiles.length ? (
+        <Card className="p-6 text-center">
+          <p className="font-black">
+            {contentText(content, "list.firstProfileTitle", "Thêm hồ sơ đầu tiên")}
+          </p>
+          <p className="type-supporting mt-2 text-[#806d54]">
+            {contentText(
+              content,
+              "list.emptyDescription",
+              "Tạo hồ sơ bằng tên thân mật và nhóm tuổi; không cần ngày sinh đầy đủ.",
+            )}
+          </p>
+          <Link
+            href="/onboarding"
+            className="mt-4 inline-block rounded-2xl bg-[#b9470d] px-5 py-3 font-black text-white"
+          >
+            {contentText(content, "list.emptyAction", "Tạo hồ sơ đầu tiên")}
+          </Link>
+        </Card>
+      ) : null}
 
       {!activeProfiles.length && trashProfiles.length ? (
         <div className="rounded-2xl border border-[#eadfc9] bg-white/80 p-5 text-center">
@@ -218,21 +231,23 @@ export function ProfileManager({
         onConfirm={() => permanentDeleteTarget && permanentDeleteMutation.mutate(permanentDeleteTarget)}
       />
 
-      {activeProfiles.length >= maxProfiles ? (
-        <div className="rounded-2xl border border-amber-200 bg-amber-50 p-5 text-center">
-          <p className="type-card-title text-amber-900">Đã đạt giới hạn {maxProfiles} hồ sơ bé</p>
-          <p className="type-supporting mt-2 text-amber-800">
-            Có thể đưa một hồ sơ không còn sử dụng vào thùng rác trước khi tạo hồ sơ mới.
-          </p>
-        </div>
-      ) : (
-        <Link
-          href="/onboarding"
-          className="type-action block rounded-2xl border-2 border-dashed border-[#d7c39d] bg-white/70 p-5 text-center text-[#6d5738]"
-        >
-          {contentText(content, "list.createMore", "+ Tạo thêm hồ sơ bé")}
-        </Link>
-      )}
+      {activeProfiles.length || trashProfiles.length ? (
+        activeProfiles.length >= maxProfiles ? (
+          <div className="rounded-2xl border border-amber-200 bg-amber-50 p-5 text-center">
+            <p className="type-card-title text-amber-900">Đã đạt giới hạn {maxProfiles} hồ sơ bé</p>
+            <p className="type-supporting mt-2 text-amber-800">
+              Có thể đưa một hồ sơ không còn sử dụng vào thùng rác trước khi tạo hồ sơ mới.
+            </p>
+          </div>
+        ) : (
+          <Link
+            href="/onboarding"
+            className="type-action block rounded-2xl border-2 border-dashed border-[#d7c39d] bg-white/70 p-5 text-center text-[#6d5738]"
+          >
+            {contentText(content, "list.createMore", "+ Tạo thêm hồ sơ bé")}
+          </Link>
+        )
+      ) : null}
       <ProfileTrash
         profiles={trashProfiles}
         open={trashOpen}
