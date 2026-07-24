@@ -10,6 +10,8 @@ export const queryKeys = {
     detail: (childId: string) => ["children", childId] as const,
     missionMap: (childId: string) => ["children", childId, "mission-map"] as const,
     noActiveMissionMap: ["children", "no-active-child", "mission-map"] as const,
+    badges: (childId: string) => ["children", childId, "badges"] as const,
+    noActiveBadges: ["children", "no-active-child", "badges"] as const,
   },
   feedback: {
     uploadConfig: ["feedback", "upload-config"] as const,

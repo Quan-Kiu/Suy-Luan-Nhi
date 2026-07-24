@@ -16,7 +16,7 @@ async function apiData<T>(response: { json(): Promise<unknown>; ok(): boolean })
 async function signIn(page: Page, email: string, callbackUrl = "/profiles") {
   await page.goto(`/auth/sign-in?callbackUrl=${encodeURIComponent(callbackUrl)}`);
   await page.getByLabel("Email").fill(email);
-  await page.getByLabel("Mật khẩu").fill(password);
+  await page.locator('input[name="password"]').fill(password);
   await page.getByRole("button", { name: "Đăng nhập", exact: true }).click();
   await page.waitForURL((url) => !url.pathname.startsWith("/auth/sign-in"));
 }
@@ -60,6 +60,11 @@ test("parent selects a real Child Profile, completes a DB mission and sees progr
   await page.getByRole("button", { name: /Nhận huy hiệu/i }).click();
   await expect(page.getByRole("heading", { name: "Tuyệt vời!" })).toBeVisible();
   await expect(page.getByText("Thám tử tinh mắt")).toBeVisible();
+
+  await page.getByRole("button", { name: "Mở menu chế độ bé" }).click();
+  await page.getByRole("link", { name: "Bộ sưu tập huy hiệu" }).click();
+  await expect(page).toHaveURL(/\/badges$/);
+  await expect(page.getByRole("button", { name: "Xem huy hiệu Thám tử tinh mắt" })).toBeVisible();
 
   await unlockParentGate(page);
   await expect(page.getByText("Thám tử dấu chân").first()).toBeVisible();

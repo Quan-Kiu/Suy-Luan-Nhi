@@ -4,6 +4,7 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { Lightbulb, LoaderCircle, LogOut } from "lucide-react";
 import { useState } from "react";
 import { catalogApi } from "@/api/catalog";
+import { childBadgesApi } from "@/api/child-badges";
 import { gameplayApi } from "@/api/gameplay";
 import { FormStatus } from "@/components/form";
 import { Button } from "@/components/ui";
@@ -62,11 +63,18 @@ export function SessionPlayer({ initialView }: { initialView: SessionView }) {
     onSuccess: () => {
       void sound.play("mission.complete");
       if (activeChild) {
-        const queryKey = queryKeys.children.missionMap(activeChild.id);
-        void queryClient.invalidateQueries({ queryKey });
+        const missionMapQueryKey = queryKeys.children.missionMap(activeChild.id);
+        const badgesQueryKey = queryKeys.children.badges(activeChild.id);
+        void queryClient.invalidateQueries({ queryKey: missionMapQueryKey });
+        void queryClient.invalidateQueries({ queryKey: badgesQueryKey });
         void queryClient.prefetchQuery({
-          queryKey,
+          queryKey: missionMapQueryKey,
           queryFn: () => catalogApi.getMissionMap(activeChild.id),
+          staleTime: 5 * 60_000,
+        });
+        void queryClient.prefetchQuery({
+          queryKey: badgesQueryKey,
+          queryFn: () => childBadgesApi.getCollection(activeChild.id),
           staleTime: 5 * 60_000,
         });
       }
