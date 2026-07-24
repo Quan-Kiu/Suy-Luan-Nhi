@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 import {
   buildParentPinSetupPath,
+  buildSignInPath,
   getAuthenticatedHome,
   isParentExperiencePath,
   resolveParentPinSetupNextPath,
@@ -25,6 +26,17 @@ describe("auth navigation", () => {
       expect(resolveSafeAuthCallbackPath(callback)).toBeNull();
     },
   );
+
+  it("builds a sign-in destination that preserves the current protected page", () => {
+    expect(buildSignInPath("/parent/notifications?filter=unread#latest")).toBe(
+      "/auth/sign-in?callbackUrl=%2Fparent%2Fnotifications%3Ffilter%3Dunread%23latest",
+    );
+  });
+
+  it("does not create a recursive or external sign-in callback", () => {
+    expect(buildSignInPath("/auth/sign-in?callbackUrl=/parent")).toBe("/auth/sign-in");
+    expect(buildSignInPath("https://example.com/admin")).toBe("/auth/sign-in");
+  });
 });
 
 describe("parent PIN navigation", () => {

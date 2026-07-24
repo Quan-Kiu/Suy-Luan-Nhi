@@ -1,6 +1,7 @@
 import axios, { AxiosError, type AxiosRequestConfig } from "axios";
 import { ApiRequestError } from "@/lib/api/error";
 import { isApiEnvelope, unwrapApiEnvelope } from "@/lib/api/envelope";
+import { redirectToSignInAfterUnauthorized } from "@/lib/api/unauthorized-redirect";
 
 export const apiClient = axios.create({
   headers: { Accept: "application/json" },
@@ -15,6 +16,7 @@ apiClient.interceptors.response.use(
 
     const status = error.response?.status;
     const body = error.response?.data;
+    redirectToSignInAfterUnauthorized(status);
     if (isApiEnvelope(body) && !body.success) {
       return Promise.reject(
         new ApiRequestError(

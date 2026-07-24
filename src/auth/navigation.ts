@@ -1,5 +1,6 @@
 import { hasRole, staffRoles } from "@/auth/roles";
 
+export const AUTH_SIGN_IN_PATH = "/auth/sign-in";
 export const PARENT_PIN_SETUP_PATH = "/auth/setup-pin";
 export const AUTH_COMPLETE_PATH = "/auth/complete";
 const AUTH_CALLBACK_BASE = "https://suy-luan-nhi.invalid";
@@ -26,11 +27,18 @@ export function resolveSafeAuthCallbackPath(value: string | null | undefined) {
 
   try {
     const url = new URL(value, AUTH_CALLBACK_BASE);
-    if (url.origin !== AUTH_CALLBACK_BASE || url.pathname === "/auth/sign-in") return null;
+    if (url.origin !== AUTH_CALLBACK_BASE || url.pathname === AUTH_SIGN_IN_PATH) return null;
     return `${url.pathname}${url.search}${url.hash}`;
   } catch {
     return null;
   }
+}
+
+export function buildSignInPath(callbackPath?: string | null) {
+  const safeCallbackPath = resolveSafeAuthCallbackPath(callbackPath);
+  return safeCallbackPath
+    ? `${AUTH_SIGN_IN_PATH}?callbackUrl=${encodeURIComponent(safeCallbackPath)}`
+    : AUTH_SIGN_IN_PATH;
 }
 
 export function buildAuthCompletePath(nextPath?: string | null) {
