@@ -11,7 +11,7 @@ export const metadata: Metadata = {
 
 export default async function Page() {
   await requireStaff();
-  const result = await listSystemFeedback({ page: 1, pageSize: 50 });
+  const result = await listSystemFeedback({ page: 1, pageSize: 100 });
   const initialData = {
     ...result,
     items: result.items.map((item) => ({
