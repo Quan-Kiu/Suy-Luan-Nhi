@@ -70,12 +70,12 @@ export function FeedbackAttachmentsPanel({
               type="button"
               disabled={processingImages || disabled}
               onClick={onCapture}
-              className="type-action inline-flex min-h-10 cursor-pointer items-center gap-2 rounded-xl border bg-white px-3 hover:bg-[#fff2df] disabled:cursor-wait disabled:opacity-60"
+              className="type-action inline-flex min-h-11 cursor-pointer items-center gap-2 rounded-xl border bg-white px-3 hover:bg-[#fff2df] disabled:cursor-wait disabled:opacity-60"
             >
               {capturing ? <LoaderCircle size={16} className="animate-spin" /> : <RefreshCw size={16} />}
               Chụp lại trang
             </button>
-            <label className="type-label inline-flex min-h-10 cursor-pointer items-center gap-2 rounded-xl border bg-white px-3 font-black hover:bg-[#fff2df] has-[:disabled]:cursor-wait has-[:disabled]:opacity-60">
+            <label className="type-label inline-flex min-h-11 cursor-pointer items-center gap-2 rounded-xl border bg-white px-3 font-black hover:bg-[#fff2df] has-[:disabled]:cursor-wait has-[:disabled]:opacity-60">
               {addingUploads ? <LoaderCircle size={16} className="animate-spin" /> : <ImagePlus size={16} />}
               Thêm ảnh từ máy
               <input
@@ -135,7 +135,7 @@ export function FeedbackAttachmentsPanel({
                     disabled={disabled}
                     onClick={() => onEdit(attachment.id)}
                     aria-label={`Đánh dấu ảnh ${index + 1}`}
-                    className="type-caption inline-flex min-h-9 cursor-pointer items-center gap-1.5 rounded-xl border px-3 font-black text-[#6f3d20] hover:bg-[#fff2df] disabled:cursor-not-allowed"
+                    className="type-caption inline-flex min-h-11 cursor-pointer items-center gap-1.5 rounded-xl border px-3 font-black text-[#6f3d20] hover:bg-[#fff2df] disabled:cursor-not-allowed"
                   >
                     <Pencil size={15} /> Đánh dấu
                   </button>
@@ -144,7 +144,7 @@ export function FeedbackAttachmentsPanel({
                     disabled={disabled}
                     onClick={() => onRemove(attachment.id)}
                     aria-label={`Bỏ ảnh đính kèm ${index + 1}`}
-                    className="grid size-9 cursor-pointer place-items-center rounded-xl border text-red-700 hover:bg-red-50 disabled:cursor-not-allowed"
+                    className="grid size-11 cursor-pointer place-items-center rounded-xl border text-red-700 hover:bg-red-50 disabled:cursor-not-allowed"
                   >
                     <Trash2 size={16} />
                   </button>

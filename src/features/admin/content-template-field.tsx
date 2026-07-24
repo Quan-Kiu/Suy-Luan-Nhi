@@ -122,7 +122,7 @@ export function ContentTemplateField({
             setTrigger(null);
             setOpen((current) => !current);
           }}
-          className="type-caption inline-flex items-center gap-1.5 rounded-lg border bg-[#fffaf0] px-2.5 py-1.5 font-black text-[#9b5615]"
+          className="type-caption inline-flex min-h-11 shrink-0 items-center gap-1.5 rounded-xl border bg-[#fffaf0] px-3 font-black text-[#9b5615]"
         >
           <Braces size={14} /> Chèn biến
         </button>
@@ -174,7 +174,7 @@ export function ContentTemplateField({
                   type="button"
                   onMouseDown={(event) => event.preventDefault()}
                   onClick={() => insertVariable(item.key)}
-                  className="flex w-full items-start gap-3 rounded-xl px-3 py-2 text-left hover:bg-[#fff5e7]"
+                  className="flex min-h-11 w-full items-start gap-3 rounded-xl px-3 py-2 text-left hover:bg-[#fff5e7]"
                 >
                   <code className="type-caption shrink-0 rounded-md bg-[#f2eee7] px-2 py-1 font-black text-[#9b5615]">
                     {contentVariableTag(item.key)}

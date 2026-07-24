@@ -100,7 +100,7 @@ export function ParentNav({
             key={href}
             href={href}
             className={cn(
-              "type-caption flex min-w-0 flex-1 flex-col items-center justify-center gap-1 px-0.5 text-center",
+              "type-caption flex min-h-11 min-w-0 flex-1 flex-col items-center justify-center gap-1 px-0.5 text-center",
               isActive(pathname, href, exact) && "text-[#bd4910]",
             )}
           >

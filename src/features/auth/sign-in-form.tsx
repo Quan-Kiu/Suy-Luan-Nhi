@@ -126,11 +126,17 @@ export function SignInForm({
         >
           {contentText(content, "signIn.submit", "Đăng nhập")}
         </SubmitButton>
-        <div className="type-supporting flex justify-between">
-          <Link href="/auth/forgot-password" className="font-bold text-[#c55312] underline">
+        <div className="type-supporting flex flex-wrap items-center justify-between gap-2">
+          <Link
+            href="/auth/forgot-password"
+            className="inline-flex min-h-11 items-center font-bold text-[#c55312] underline"
+          >
             {contentText(content, "signIn.forgot", "Quên mật khẩu?")}
           </Link>
-          <Link href="/auth/sign-up" className="font-bold text-[#50723e] underline">
+          <Link
+            href="/auth/sign-up"
+            className="inline-flex min-h-11 items-center font-bold text-[#50723e] underline"
+          >
             {contentText(content, "signIn.createAccount", "Tạo tài khoản")}
           </Link>
         </div>

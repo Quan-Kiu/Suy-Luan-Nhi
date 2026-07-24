@@ -68,7 +68,10 @@ export function ParentGateForm() {
           className="type-child-section-title min-h-14 text-center tracking-[0.3em]"
         />
         <div className="flex justify-end">
-          <Link href="/auth/forgot-pin" className="font-bold text-[#c55312] underline underline-offset-4">
+          <Link
+            href="/auth/forgot-pin"
+            className="inline-flex min-h-11 items-center font-bold text-[#c55312] underline underline-offset-4"
+          >
             {contentText(content, "gate.forgotPin", "Quên mã PIN?")}
           </Link>
         </div>

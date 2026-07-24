@@ -129,9 +129,12 @@ export function SignUpForm({
       >
         {contentText(content, "signUp.flowSubmit", "Tạo tài khoản ba mẹ")}
       </SubmitButton>
-      <p className="type-supporting text-center">
+      <p className="type-supporting flex flex-wrap items-center justify-center gap-x-1 text-center">
         {contentText(content, "signUp.hasAccount", "Đã có tài khoản?")}{" "}
-        <Link href="/auth/sign-in" className="font-bold text-[#c55312] underline">
+        <Link
+          href="/auth/sign-in"
+          className="inline-flex min-h-11 items-center font-bold text-[#c55312] underline"
+        >
           {contentText(content, "signIn.submit", "Đăng nhập")}
         </Link>
       </p>

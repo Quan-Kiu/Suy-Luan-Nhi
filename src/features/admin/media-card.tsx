@@ -135,9 +135,9 @@ export function MediaCard({
                 copied ? "Đã sao chép liên kết" : "Sao chép liên kết",
               )}
               onClick={copyLink}
-              className="rounded-lg border p-2 text-sky-700 transition hover:bg-sky-50 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-700"
+              className="grid size-11 place-items-center rounded-xl border text-sky-700 transition hover:bg-sky-50 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-700"
             >
-              {copied ? <Check size={15} aria-hidden="true" /> : <Copy size={15} aria-hidden="true" />}
+              {copied ? <Check size={17} aria-hidden="true" /> : <Copy size={17} aria-hidden="true" />}
             </button>
             {canReview ? (
               <>
@@ -146,12 +146,12 @@ export function MediaCard({
                   aria-label={contentText(content, "media.approve", "Đánh dấu phù hợp")}
                   disabled={mutation.isPending}
                   onClick={() => mutation.mutate("approve")}
-                  className="rounded-lg border p-2 text-green-700 disabled:opacity-50"
+                  className="grid size-11 place-items-center rounded-xl border text-green-700 disabled:opacity-50"
                 >
                   {mutation.isPending && mutation.variables === "approve" ? (
-                    <LoaderCircle size={15} className="animate-spin" />
+                    <LoaderCircle size={17} className="animate-spin" />
                   ) : (
-                    <CheckCircle2 size={15} />
+                    <CheckCircle2 size={17} />
                   )}
                 </button>
                 <button
@@ -159,12 +159,12 @@ export function MediaCard({
                   aria-label={contentText(content, "media.reject", "Đánh dấu cần thay")}
                   disabled={mutation.isPending}
                   onClick={() => mutation.mutate("reject")}
-                  className="rounded-lg border p-2 text-red-700 disabled:opacity-50"
+                  className="grid size-11 place-items-center rounded-xl border text-red-700 disabled:opacity-50"
                 >
                   {mutation.isPending && mutation.variables === "reject" ? (
-                    <LoaderCircle size={15} className="animate-spin" />
+                    <LoaderCircle size={17} className="animate-spin" />
                   ) : (
-                    <XCircle size={15} />
+                    <XCircle size={17} />
                   )}
                 </button>
               </>
@@ -175,12 +175,12 @@ export function MediaCard({
                 aria-label={contentText(content, "media.delete", "Xóa tệp")}
                 disabled={mutation.isPending}
                 onClick={openDeleteDialog}
-                className="rounded-lg border p-2 text-red-700 disabled:opacity-50"
+                className="grid size-11 place-items-center rounded-xl border text-red-700 disabled:opacity-50"
               >
                 {mutation.isPending && mutation.variables === "delete" ? (
-                  <LoaderCircle size={15} className="animate-spin" />
+                  <LoaderCircle size={17} className="animate-spin" />
                 ) : (
-                  <Trash2 size={15} />
+                  <Trash2 size={17} />
                 )}
               </button>
             ) : null}

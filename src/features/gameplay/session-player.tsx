@@ -179,7 +179,7 @@ export function SessionPlayer({ initialView }: { initialView: SessionView }) {
         onClick={() => exitMutation.mutate()}
         disabled={exitMutation.isPending || navigation.isPending}
         aria-busy={exitMutation.isPending || navigation.isPending}
-        className="type-action mt-6 flex w-full items-center justify-center gap-2 text-[#806d54] disabled:opacity-50"
+        className="type-action mt-6 flex min-h-11 w-full items-center justify-center gap-2 rounded-xl px-3 text-[#806d54] hover:bg-[#fff7e9] disabled:opacity-50"
       >
         {exitMutation.isPending || navigation.isPending ? (
           <LoaderCircle size={16} className="animate-spin" />
