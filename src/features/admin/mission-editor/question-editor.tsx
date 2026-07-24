@@ -1,6 +1,7 @@
 "use client";
 
 import { ArrowDown, ArrowUp, Trash2 } from "lucide-react";
+import { useState } from "react";
 import { Controller, useFormContext, useWatch } from "react-hook-form";
 import { ControlledSelectField, SelectField } from "@/components/form";
 import { Card } from "@/components/ui";
@@ -19,6 +20,19 @@ const typeFallbacks: Record<QuestionType, string> = {
   fill_answer: "Nhập câu trả lời",
   sorting: "Xếp theo thứ tự",
 };
+
+type DraftHint = AdminMissionDraft["questions"][number]["hints"][number];
+
+function parseHintsText(text: string): DraftHint[] {
+  return text
+    .split("\n")
+    .filter((line) => line.length > 0)
+    .map((hintText, hintIndex) => ({ level: hintIndex + 1, text: hintText }));
+}
+
+function serializeHints(hints: readonly DraftHint[]) {
+  return hints.map((hint) => hint.text).join("\n");
+}
 
 type Props = {
   index: number;
@@ -45,14 +59,15 @@ export function MissionQuestionEditor({
   const form = useFormContext<AdminMissionDraft>();
   const question = useWatch({ control: form.control, name: `questions.${index}` as const });
   const errors = form.formState.errors.questions?.[index];
+  const serializedHints = serializeHints(question.hints);
+  const [hintsText, setHintsText] = useState(serializedHints);
 
   function updateHints(text: string) {
-    const hints = text
-      .split("\n")
-      .filter(Boolean)
-      .slice(0, 3)
-      .map((hintText, hintIndex) => ({ level: hintIndex + 1, text: hintText }));
-    form.setValue(`questions.${index}.hints` as const, hints, { shouldDirty: true, shouldValidate: true });
+    setHintsText(text);
+    form.setValue(`questions.${index}.hints` as const, parseHintsText(text), {
+      shouldDirty: true,
+      shouldValidate: true,
+    });
   }
 
   return (
@@ -154,7 +169,7 @@ export function MissionQuestionEditor({
           <ContentTemplateField
             id={`question-${index}-hints`}
             label={contentText(content, "missionEditor.hints", "Các gợi ý, mỗi dòng một gợi ý")}
-            value={question.hints.map((hint) => hint.text).join("\n")}
+            value={hintsText}
             onValueChange={updateHints}
             variables={templateVariables}
             error={errors?.hints?.message}
