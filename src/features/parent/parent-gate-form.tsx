@@ -65,7 +65,7 @@ export function ParentGateForm() {
             },
           })}
           error={form.formState.errors.pin?.message}
-          className="type-child-section-title min-h-14 text-center tracking-[0.3em]"
+          className="type-child-section-title min-h-16 text-center tracking-[0.3em]"
         />
         <div className="flex justify-end">
           <Link
