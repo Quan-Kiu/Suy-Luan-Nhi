@@ -1,5 +1,5 @@
 import { apiRequest } from "@/lib/api/client";
-import type { SystemFeedbackStatus } from "@/domain/system-feedback";
+import { systemFeedbackColumnPageSize, type SystemFeedbackStatus } from "@/domain/system-feedback";
 import type { FeedbackAttachment } from "@/api/feedback";
 
 export type SystemFeedbackItem = {
@@ -28,12 +28,22 @@ export type SystemFeedbackPage = {
   totalPages: number;
 };
 
+export type SystemFeedbackColumnsInitialData = Record<SystemFeedbackStatus, SystemFeedbackPage>;
+
 export const adminFeedbackApi = {
-  list(status?: SystemFeedbackStatus) {
+  list({
+    status,
+    page = 1,
+    pageSize = systemFeedbackColumnPageSize,
+  }: {
+    status: SystemFeedbackStatus;
+    page?: number;
+    pageSize?: number;
+  }) {
     return apiRequest<SystemFeedbackPage>({
       url: "/api/admin/feedback",
       method: "GET",
-      params: { status, pageSize: 100 },
+      params: { status, page, pageSize },
     });
   },
   update(feedbackId: string, input: { status: SystemFeedbackStatus; adminNote?: string }) {

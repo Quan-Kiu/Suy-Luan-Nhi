@@ -1,5 +1,39 @@
 import { expect, test } from "@playwright/test";
+import { Pool } from "pg";
 import { apiData, signIn } from "./helpers";
+
+const e2eDatabaseUrl = process.env.E2E_DATABASE_URL ?? "postgresql://sln@127.0.0.1:54329/sln_e2e";
+
+async function insertFeedbackFixtures(titles: string[]) {
+  const pool = new Pool({ connectionString: e2eDatabaseUrl });
+  try {
+    await pool.query(
+      `
+        insert into system_feedback (
+          content,
+          page_path,
+          page_title,
+          context,
+          status,
+          created_at,
+          updated_at
+        )
+        select
+          'Kiểm tra tải thêm độc lập trong cột Kanban.',
+          '/missions/infinite-column-test',
+          fixture.title,
+          '{"viewportWidth":1440,"viewportHeight":900,"captureMode":"none"}'::jsonb,
+          'new',
+          now() - ((array_length($1::text[], 1) - fixture.position) * interval '1 second'),
+          now() - ((array_length($1::text[], 1) - fixture.position) * interval '1 second')
+        from unnest($1::text[]) with ordinality as fixture(title, position)
+      `,
+      [titles],
+    );
+  } finally {
+    await pool.end();
+  }
+}
 
 test("staff can move a feedback card between Kanban columns", async ({ page }) => {
   await page.setViewportSize({ width: 1440, height: 1000 });
@@ -111,6 +145,58 @@ test("Kanban board stays contained on tablet", async ({ page }) => {
   await page.waitForTimeout(350);
   await page.screenshot({
     path: ".verification/browser/admin-feedback-tablet-details.png",
+    fullPage: true,
+  });
+});
+
+test("each Kanban column scrolls and loads its own next page", async ({ page }) => {
+  await page.setViewportSize({ width: 1440, height: 900 });
+  await signIn(page, "admin@demo.local", "/admin/feedback");
+
+  const prefix = `Infinite column ${Date.now()}`;
+  const titles = Array.from({ length: 12 }, (_, index) => `${prefix} ${index}`);
+  await insertFeedbackFixtures(titles);
+
+  await page.goto("/admin/feedback");
+  const main = page.locator("#admin-main-content");
+  const newColumn = page.getByRole("region", { name: /Mới nhận, \d+ góp ý/ });
+  const columnScroll = page.getByTestId("feedback-column-scroll-new");
+  await expect(newColumn.getByRole("article", { name: `Góp ý: ${titles[11]}` })).toBeVisible();
+  await expect(newColumn.getByRole("article", { name: `Góp ý: ${titles[0]}` })).toHaveCount(0);
+
+  const mainMetricsBefore = await main.evaluate((element) => ({
+    clientHeight: element.clientHeight,
+    scrollHeight: element.scrollHeight,
+    scrollTop: element.scrollTop,
+  }));
+  expect(mainMetricsBefore.scrollHeight).toBeLessThanOrEqual(mainMetricsBefore.clientHeight + 1);
+  const nextPageResponse = page.waitForResponse((response) => {
+    const url = new URL(response.url());
+    return (
+      url.pathname === "/api/admin/feedback" &&
+      url.searchParams.get("status") === "new" &&
+      url.searchParams.get("page") === "2"
+    );
+  });
+
+  await columnScroll.evaluate((element) => {
+    element.scrollTop = element.scrollHeight;
+    element.dispatchEvent(new Event("scroll", { bubbles: true }));
+  });
+  await nextPageResponse;
+
+  await expect(newColumn.getByRole("article", { name: `Góp ý: ${titles[0]}` })).toBeVisible();
+  const scrollMetrics = await columnScroll.evaluate((element) => ({
+    clientHeight: element.clientHeight,
+    scrollHeight: element.scrollHeight,
+    scrollTop: element.scrollTop,
+  }));
+  expect(scrollMetrics.scrollHeight).toBeGreaterThan(scrollMetrics.clientHeight);
+  expect(scrollMetrics.scrollTop).toBeGreaterThan(0);
+  expect(await main.evaluate((element) => element.scrollTop)).toBe(mainMetricsBefore.scrollTop);
+
+  await page.screenshot({
+    path: ".verification/browser/admin-feedback-column-infinite-scroll.png",
     fullPage: true,
   });
 });
