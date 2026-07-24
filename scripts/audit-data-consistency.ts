@@ -23,6 +23,10 @@ const intentionallyLocalMutations = new Map<string, string>([
     "Member changes are read dynamically and the current workspace refreshes after mutation.",
   ],
   [
+    "admin/missions/[missionId]/autosave/route.ts",
+    "Autosave returns the updated draft version directly to the active editor; published mission caches are unchanged.",
+  ],
+  [
     "children/[childId]/select/route.ts",
     "Selection changes a cookie and the active-child provider is updated from the mutation result.",
   ],

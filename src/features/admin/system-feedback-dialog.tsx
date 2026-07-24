@@ -156,7 +156,7 @@ function FeedbackDialogPanel({
           </div>
 
           <section aria-labelledby={`${titleId}-content`}>
-            <h3 id={`${titleId}-content`} className="type-label mb-2 font-black text-[#4f463b]">
+            <h3 id={`${titleId}-content`} className="type-card-title mb-2 text-[#4f463b]">
               Nội dung góp ý
             </h3>
             <div className="rounded-2xl border border-[#f0d8b7] bg-[#fff8ec] p-4 leading-7 whitespace-pre-wrap text-[#493f35]">
@@ -168,7 +168,7 @@ function FeedbackDialogPanel({
             <section aria-labelledby={`${titleId}-attachments`}>
               <h3
                 id={`${titleId}-attachments`}
-                className="type-label mb-2 flex items-center gap-2 font-black text-[#4f463b]"
+                className="type-card-title mb-2 flex items-center gap-2 text-[#4f463b]"
               >
                 <ImageIcon size={17} aria-hidden="true" /> {item.attachments.length} ảnh đính kèm
               </h3>

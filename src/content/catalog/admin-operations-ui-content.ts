@@ -28,7 +28,7 @@ export const adminOperationsContentEntries = defineContent("admin", {
   },
   "nav.missions": { value: "Nhiệm vụ", description: "Điều hướng nhiệm vụ." },
   "nav.reviews": { value: "Nội dung chờ kiểm tra", description: "Điều hướng kiểm tra nội dung." },
-  "nav.media": { value: "Từ điển", description: "Điều hướng đến từ điển tư liệu." },
+  "nav.media": { value: "Từ điển", description: "Điều hướng đến từ điển hình ảnh và âm thanh." },
   "nav.content": {
     value: "Nội dung hiển thị",
     description: "Điều hướng đến phần quản lý nội dung hiển thị trong ứng dụng.",

@@ -195,7 +195,7 @@ function FeedbackColumn({ status, items, movingId, dragDisabled, onOpen }: Feedb
     >
       <header className="mb-3 flex items-center gap-2 px-1 py-1">
         <span className={cn("size-2.5 shrink-0 rounded-full", styles.dot)} aria-hidden="true" />
-        <h2 className="type-action min-w-0 flex-1 font-black text-[#342f28]">
+        <h2 className="type-card-title min-w-0 flex-1 text-[#342f28]">
           {systemFeedbackStatusLabels[status]}
         </h2>
         <span className={cn("type-caption rounded-full border px-2.5 py-1 font-black", styles.count)}>
