@@ -240,7 +240,10 @@ export function ResourceListWorkspace({
           </div>
           <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4">
             {data.items.map((item) => (
-              <article key={item.id} className="overflow-hidden rounded-2xl border bg-white shadow-sm">
+              <article
+                key={item.id}
+                className="flex h-full flex-col overflow-hidden rounded-2xl border bg-white shadow-sm"
+              >
                 <div className="relative h-28 bg-[#f5f0e6] sm:h-32">
                   {item.coverUrl ? (
                     <Image
@@ -252,8 +255,8 @@ export function ResourceListWorkspace({
                     />
                   ) : null}
                 </div>
-                <div className="p-3.5">
-                  <div className="flex flex-wrap items-start justify-between gap-2">
+                <div className="flex flex-1 flex-col p-3.5">
+                  <div className="grid grid-cols-[minmax(0,1fr)_auto] items-start gap-2">
                     <div className="min-w-0">
                       <p className="type-overline text-[#9f3d0b]">
                         {parentResourceTypeLabels[item.resourceType]}
@@ -279,10 +282,10 @@ export function ResourceListWorkspace({
                     </span>
                   </div>
                   {canEdit ? (
-                    <div className="mt-3 grid grid-cols-2 gap-2">
+                    <div className="mt-auto flex justify-between gap-2 pt-3">
                       <Link
                         href={`/admin/resources/${item.id}/edit`}
-                        className="type-action inline-flex min-h-10 items-center justify-center gap-1.5 rounded-xl border font-black"
+                        className="type-action inline-flex min-h-10 flex-1 items-center justify-center gap-1.5 rounded-xl border font-black"
                       >
                         <Edit3 size={17} /> Chỉnh sửa
                       </Link>
@@ -290,7 +293,7 @@ export function ResourceListWorkspace({
                         type="button"
                         disabled={item.status === "archived"}
                         onClick={() => setArchiveTarget(item)}
-                        className="type-action inline-flex min-h-10 items-center justify-center gap-1.5 rounded-xl border border-amber-200 bg-amber-50 text-amber-800 disabled:opacity-40"
+                        className="type-action inline-flex min-h-10 flex-1 items-center justify-center gap-1.5 rounded-xl border border-amber-200 bg-amber-50 text-amber-800 disabled:opacity-40"
                       >
                         <Archive size={17} /> Lưu trữ
                       </button>
