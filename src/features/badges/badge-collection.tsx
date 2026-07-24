@@ -1,6 +1,7 @@
 "use client";
 
 import { AnimatePresence, motion } from "motion/react";
+import type { ChildBadgeCollectionItem } from "@/api/child-badges";
 import { CalendarDays, Check, LockKeyhole, Map, Sparkles, Trophy, X } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
@@ -8,16 +9,7 @@ import { useEffect, useMemo, useState } from "react";
 import { contentTemplate, contentText, useContent } from "@/content/client";
 import { cn } from "@/lib/utils";
 
-export type BadgeCollectionItem = {
-  id: string;
-  name: string;
-  description: string;
-  iconUrl: string;
-  skillTitle: string | null;
-  earned: boolean;
-  unlockedAt: string | null;
-  sourceMissionTitle: string | null;
-};
+export type BadgeCollectionItem = ChildBadgeCollectionItem;
 
 type Filter = "all" | "earned" | "locked";
 
