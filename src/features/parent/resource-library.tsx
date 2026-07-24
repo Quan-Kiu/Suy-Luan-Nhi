@@ -157,14 +157,6 @@ export function ResourceLibrary({ initialData }: { initialData: ParentResourcePa
             Không tìm thấy tài nguyên phù hợp.
           </div>
         ) : null}
-        {query.isError ? (
-          <div
-            role="alert"
-            className="type-label mt-4 rounded-2xl border border-red-200 bg-red-50 p-4 font-bold text-red-800"
-          >
-            {query.error.message}
-          </div>
-        ) : null}
         {data.totalPages > 1 ? (
           <nav aria-label="Chuyển trang bài viết" className="mt-5 flex items-center justify-center gap-3">
             <button
