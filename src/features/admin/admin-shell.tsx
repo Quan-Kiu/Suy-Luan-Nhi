@@ -128,7 +128,9 @@ export function AdminShell({
         </aside>
         <main
           id="admin-main-content"
-          className="min-h-0 min-w-0 scrollbar-thin overflow-y-auto overscroll-contain p-4 pb-[max(1rem,var(--safe-area-bottom))] sm:p-5 lg:p-6"
+          tabIndex={0}
+          aria-label={contentText(content, "shell.mainContent", "Nội dung quản trị")}
+          className="min-h-0 min-w-0 scrollbar-thin overflow-y-auto overscroll-contain p-4 pb-[max(1rem,var(--safe-area-bottom))] outline-none focus-visible:ring-2 focus-visible:ring-[#d86a24] focus-visible:ring-inset sm:p-5 lg:p-6"
         >
           <div className="mx-auto w-full max-w-[1680px]">{children}</div>
         </main>

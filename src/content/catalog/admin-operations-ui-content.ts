@@ -9,6 +9,7 @@ export const adminOperationsContentEntries = defineContent("admin", {
   "shell.openMenu": { value: "Mở menu quản trị", description: "Nhãn mở menu quản trị trên điện thoại." },
   "shell.closeMenu": { value: "Đóng menu quản trị", description: "Nhãn đóng menu quản trị trên điện thoại." },
   "shell.logout": { value: "Đăng xuất", description: "Nhãn đăng xuất khỏi khu vực quản trị." },
+  "shell.mainContent": { value: "Nội dung quản trị", description: "Nhãn vùng nội dung cuộn quản trị." },
   "shell.workflowTitle": {
     value: "Các bước trước khi cho bé xem",
     description: "Tiêu đề quy trình an toàn.",
