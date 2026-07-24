@@ -33,6 +33,18 @@ test("parent moves a child profile to trash, restores it and deletes it permanen
     .click();
   await expect(page.getByRole("heading", { name: "Mít Đã Sửa" })).toHaveCount(0);
   await expect(page.getByRole("button", { name: /Hồ sơ đã xóa/ })).toHaveAttribute("aria-expanded", "true");
+
+  const deletedProfileDetails = page.getByText("Mít Đã Sửa", { exact: true }).locator("..");
+  const deletedProfileActions = page
+    .getByRole("button", { name: "Khôi phục hồ sơ Mít Đã Sửa" })
+    .locator("..");
+  const [detailsBox, actionsBox] = await Promise.all([
+    deletedProfileDetails.boundingBox(),
+    deletedProfileActions.boundingBox(),
+  ]);
+  if (!detailsBox || !actionsBox) throw new Error("Deleted profile layout is not measurable");
+  expect(actionsBox.y).toBeGreaterThan(detailsBox.y + detailsBox.height);
+
   await page.getByRole("button", { name: "Khôi phục hồ sơ Mít Đã Sửa" }).click();
   await expect(page.getByRole("heading", { name: "Mít Đã Sửa" })).toBeVisible();
 
