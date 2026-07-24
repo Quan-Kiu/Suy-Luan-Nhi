@@ -1,9 +1,14 @@
+import type { Metadata } from "next";
 import { Suspense } from "react";
 import { connection } from "next/server";
 import { googleAuthConfigured } from "@/config/auth-providers";
 import { AuthShell } from "@/features/auth/auth-shell";
 import { SignInForm } from "@/features/auth/auth-forms";
 import { getOperationalSystemSettings } from "@/modules/system-settings/runtime";
+
+export const metadata: Metadata = {
+  title: "Đăng nhập",
+};
 
 export default async function Page() {
   await connection();

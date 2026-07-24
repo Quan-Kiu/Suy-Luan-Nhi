@@ -6,7 +6,7 @@ import { connection } from "next/server";
 import { getOperationalSystemSettings } from "@/modules/system-settings/runtime";
 
 export const metadata: Metadata = {
-  title: "Đang bảo trì | Suy Luận Nhí",
+  title: "Đang bảo trì",
   robots: { index: false, follow: false },
 };
 

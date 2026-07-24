@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import { FileText, Plus } from "lucide-react";
 import Link from "next/link";
 import type { AdminMissionPage } from "@/api/admin/missions";
@@ -15,6 +16,10 @@ type SearchParams = {
   search?: string;
   page?: string;
   pageSize?: string;
+};
+
+export const metadata: Metadata = {
+  title: "Quản lý nhiệm vụ",
 };
 
 export default async function Page({ searchParams }: { searchParams: Promise<SearchParams> }) {

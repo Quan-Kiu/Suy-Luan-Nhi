@@ -1,6 +1,11 @@
+import type { Metadata } from "next";
 import { redirect } from "next/navigation";
 import { SettingsForm } from "@/features/parent/settings-form";
 import { getActiveChild } from "@/modules/family/active-child";
+
+export const metadata: Metadata = {
+  title: "Cài đặt gia đình",
+};
 
 export default async function Page() {
   const active = await getActiveChild();

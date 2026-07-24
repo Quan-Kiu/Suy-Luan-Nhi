@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import type { ChildProfile } from "@/api/children";
 import { requireParent } from "@/auth/session";
@@ -5,6 +6,10 @@ import { contentText } from "@/content/resolve";
 import { getOwnedChild } from "@/modules/family/family";
 import { EditProfileForm } from "@/features/profile/edit-profile-form";
 import { getContentNamespace } from "@/modules/content/content";
+export const metadata: Metadata = {
+  title: "Chỉnh sửa hồ sơ",
+};
+
 export default async function Page({ params }: { params: Promise<{ childId: string }> }) {
   const [session, content] = await Promise.all([requireParent(), getContentNamespace("profile")]);
   const { childId } = await params;

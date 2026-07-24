@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import { Bell } from "lucide-react";
 import Link from "next/link";
 import { redirect } from "next/navigation";
@@ -10,6 +11,10 @@ import { RecentActivityCard } from "@/features/parent/recent-activity-card";
 import { getContentNamespace } from "@/modules/content/content";
 import { getActiveChild } from "@/modules/family/active-child";
 import { getParentDashboard, getSuggestions } from "@/modules/parent/parent-data";
+
+export const metadata: Metadata = {
+  title: "Tổng quan phụ huynh",
+};
 
 export default async function Page() {
   const [, content, active] = await Promise.all([

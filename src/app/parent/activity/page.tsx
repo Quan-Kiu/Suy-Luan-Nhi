@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import { redirect } from "next/navigation";
 import { Card } from "@/components/ui";
 import { contentText } from "@/content/resolve";
@@ -7,6 +8,10 @@ import { normalizeDateQuery } from "@/lib/date-format";
 import { getContentNamespace } from "@/modules/content/content";
 import { getActiveChild } from "@/modules/family/active-child";
 import { getActivityHistory } from "@/modules/parent/parent-data";
+
+export const metadata: Metadata = {
+  title: "Lịch sử hoạt động",
+};
 
 export default async function Page({
   searchParams,

@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import { ArrowRight, BarChart3, ClipboardCheck, FilePlus2, ImageIcon, MonitorDot, Users } from "lucide-react";
 import Link from "next/link";
 import { requireStaff } from "@/auth/session";
@@ -13,6 +14,10 @@ import { AdminPageHeader } from "@/features/admin/admin-page-header";
 import { getPrimaryRole } from "@/features/admin/admin-role";
 import { getAdminDashboard } from "@/modules/admin/operations";
 import { getContentNamespace } from "@/modules/content/content";
+
+export const metadata: Metadata = {
+  title: "Tổng quan quản trị",
+};
 
 export default async function Page() {
   const [data, content, session] = await Promise.all([

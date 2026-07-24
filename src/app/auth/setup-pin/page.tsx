@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import { redirect } from "next/navigation";
 import { requireParent } from "@/auth/session";
 import { resolveParentPinSetupNextPath } from "@/auth/navigation";
@@ -6,6 +7,10 @@ import { AuthShell } from "@/features/auth/auth-shell";
 import { ParentPinSetupForm } from "@/features/auth/parent-pin-setup-form";
 import { getContentNamespace } from "@/modules/content/content";
 import { getOrCreateParentProfile } from "@/modules/family/family";
+
+export const metadata: Metadata = {
+  title: "Tạo mã PIN phụ huynh",
+};
 
 export default async function Page({
   searchParams,

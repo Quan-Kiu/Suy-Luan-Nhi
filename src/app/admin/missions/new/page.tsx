@@ -1,8 +1,13 @@
+import type { Metadata } from "next";
 import { requireRoles } from "@/auth/session";
 import { ProductionMissionEditor } from "@/features/admin/production-mission-editor";
 import { getAdminTaxonomy } from "@/modules/admin/mission-admin";
 import { getContentVariableDefinitions } from "@/modules/content/content-variables";
 import type { AdminMissionDraft } from "@/modules/admin/schemas";
+
+export const metadata: Metadata = {
+  title: "Tạo nhiệm vụ",
+};
 
 export default async function Page() {
   await requireRoles(["content_admin", "super_admin"]);

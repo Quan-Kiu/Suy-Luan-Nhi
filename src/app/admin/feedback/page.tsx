@@ -1,8 +1,13 @@
+import type { Metadata } from "next";
 import { MessageSquareText } from "lucide-react";
 import { requireStaff } from "@/auth/session";
 import { AdminPageHeader } from "@/features/admin/admin-page-header";
 import { SystemFeedbackManager } from "@/features/admin/system-feedback-manager";
 import { listSystemFeedback } from "@/modules/system-feedback/system-feedback";
+
+export const metadata: Metadata = {
+  title: "Góp ý hệ thống",
+};
 
 export default async function Page() {
   await requireStaff();

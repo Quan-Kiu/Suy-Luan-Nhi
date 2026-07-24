@@ -13,7 +13,10 @@ const appFont = Nunito({
 });
 
 export const metadata: Metadata = {
-  title: "Suy Luận Nhí",
+  title: {
+    default: "Suy Luận Nhí",
+    template: "%s | Suy Luận Nhí",
+  },
   description: "Nhiệm vụ vui giúp bé luyện cách nghĩ an toàn và tích cực.",
 };
 

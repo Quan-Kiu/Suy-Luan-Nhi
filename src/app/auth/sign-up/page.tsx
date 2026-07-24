@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import { UserRoundX } from "lucide-react";
 import { connection } from "next/server";
@@ -7,6 +8,10 @@ import { AuthShell } from "@/features/auth/auth-shell";
 import { SignUpForm } from "@/features/auth/auth-forms";
 import { getContentNamespace } from "@/modules/content/content";
 import { getOperationalSystemSettings } from "@/modules/system-settings/runtime";
+
+export const metadata: Metadata = {
+  title: "Tạo tài khoản ba mẹ",
+};
 
 export default async function Page({
   searchParams,

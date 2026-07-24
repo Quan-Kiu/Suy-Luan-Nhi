@@ -1,9 +1,14 @@
+import type { Metadata } from "next";
 import { BarChart3 } from "lucide-react";
 import { requireStaff } from "@/auth/session";
 import { Card, Pill } from "@/components/ui";
 import { analyticsEventLabels, friendlyLabel, sessionStatusLabels } from "@/features/admin/admin-labels";
 import { AdminPageHeader } from "@/features/admin/admin-page-header";
 import { getAdminReports } from "@/modules/admin/operations";
+
+export const metadata: Metadata = {
+  title: "Báo cáo sử dụng",
+};
 
 export default async function Page() {
   await requireStaff();

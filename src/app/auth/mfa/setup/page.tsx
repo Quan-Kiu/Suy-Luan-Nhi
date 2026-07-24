@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import { redirect } from "next/navigation";
 import { isStaffAccount } from "@/auth/access-policy";
 import { getAuthenticatedHome } from "@/auth/navigation";
@@ -5,6 +6,10 @@ import { requireSession } from "@/auth/session";
 import { AuthShell } from "@/features/auth/auth-shell";
 import { TwoFactorSetupForm } from "@/features/auth/auth-forms";
 import { hasPasswordCredential } from "@/modules/auth/account-capabilities";
+
+export const metadata: Metadata = {
+  title: "Bảo vệ tài khoản quản trị",
+};
 
 export default async function Page() {
   const session = await requireSession();

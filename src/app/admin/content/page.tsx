@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import { Languages } from "lucide-react";
 import type { ContentEntryListFilters } from "@/api/content";
 import { requireRoles } from "@/auth/session";
@@ -5,6 +6,10 @@ import { AdminPageHeader } from "@/features/admin/admin-page-header";
 import { ContentManager } from "@/features/admin/content-manager";
 import { contentValueTypes } from "@/domain/content-classification";
 import { listContentEntries } from "@/modules/content/content";
+
+export const metadata: Metadata = {
+  title: "Sửa câu chữ trong ứng dụng",
+};
 
 export default async function Page({
   searchParams,

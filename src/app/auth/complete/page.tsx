@@ -1,8 +1,13 @@
+import type { Metadata } from "next";
 import { redirect } from "next/navigation";
 import { buildParentPinSetupPath, getAuthenticatedHome, resolveSafeInternalPath } from "@/auth/navigation";
 import { hasRole, staffRoles } from "@/auth/roles";
 import { requireSession } from "@/auth/session";
 import { getOrCreateParentProfile } from "@/modules/family/family";
+
+export const metadata: Metadata = {
+  title: "Hoàn tất đăng nhập",
+};
 
 export default async function Page({
   searchParams,

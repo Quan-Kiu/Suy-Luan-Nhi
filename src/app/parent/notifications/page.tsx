@@ -1,9 +1,14 @@
+import type { Metadata } from "next";
 import { redirect } from "next/navigation";
 import { contentText } from "@/content/resolve";
 import { NotificationList } from "@/features/parent/notification-list";
 import { getContentNamespace } from "@/modules/content/content";
 import { getActiveChild } from "@/modules/family/active-child";
 import { getParentNotifications } from "@/modules/parent/parent-data";
+
+export const metadata: Metadata = {
+  title: "Thông báo",
+};
 
 export default async function Page() {
   const [active, content] = await Promise.all([getActiveChild(), getContentNamespace("parent")]);

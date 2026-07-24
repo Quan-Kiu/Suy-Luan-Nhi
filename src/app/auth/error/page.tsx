@@ -1,6 +1,11 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import { AuthShell } from "@/features/auth/auth-shell";
 import { SwitchAccountButton } from "@/features/auth/switch-account-button";
+
+export const metadata: Metadata = {
+  title: "Không thể truy cập",
+};
 
 export default async function Page({
   searchParams,

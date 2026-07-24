@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import { asc } from "drizzle-orm";
 import { Tags } from "lucide-react";
 import { requireRoles } from "@/auth/session";
@@ -5,6 +6,10 @@ import { db } from "@/db/client";
 import { ageGroups, skills } from "@/db/schema";
 import { AdminPageHeader } from "@/features/admin/admin-page-header";
 import { TaxonomyManager } from "@/features/admin/taxonomy-manager";
+
+export const metadata: Metadata = {
+  title: "Nhóm tuổi và kỹ năng",
+};
 
 export default async function Page() {
   await requireRoles(["content_admin", "super_admin"]);

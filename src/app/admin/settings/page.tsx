@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import { Settings } from "lucide-react";
 import { requireRoles } from "@/auth/session";
 import { AdminPageHeader } from "@/features/admin/admin-page-header";
@@ -5,6 +6,10 @@ import { ImageUploadPolicyManager } from "@/features/admin/image-upload-policy-m
 import { SystemSettingsManager } from "@/features/admin/system-settings-manager";
 import { getImageUploadPolicies } from "@/modules/media/upload-policy";
 import { getManagedSystemSettingsForDashboard } from "@/modules/system-settings/runtime";
+
+export const metadata: Metadata = {
+  title: "Cấu hình hệ thống",
+};
 
 export default async function Page() {
   await requireRoles(["super_admin"]);

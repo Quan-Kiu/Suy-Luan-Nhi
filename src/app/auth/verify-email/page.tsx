@@ -4,7 +4,7 @@ import { resolveEmailVerificationResult, resolveVerificationContinuePath } from 
 import { EmailVerificationResultDialog } from "@/features/auth/email-verification-result-dialog";
 
 export const metadata: Metadata = {
-  title: "Xác minh email | Suy Luận Nhí",
+  title: "Xác minh email",
 };
 
 export default async function Page({

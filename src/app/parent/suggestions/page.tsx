@@ -1,8 +1,13 @@
+import type { Metadata } from "next";
 import { MessageCircle } from "lucide-react";
 import { redirect } from "next/navigation";
 import { Card, Pill } from "@/components/ui";
 import { getActiveChild } from "@/modules/family/active-child";
 import { getSuggestions } from "@/modules/parent/parent-data";
+
+export const metadata: Metadata = {
+  title: "Gợi ý trò chuyện",
+};
 
 export default async function Page() {
   const active = await getActiveChild();

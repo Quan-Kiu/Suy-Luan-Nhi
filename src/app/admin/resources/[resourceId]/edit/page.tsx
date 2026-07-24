@@ -1,9 +1,14 @@
+import type { Metadata } from "next";
 import { FilePenLine } from "lucide-react";
 import { notFound } from "next/navigation";
 import { requireRoles } from "@/auth/session";
 import { AdminPageHeader } from "@/features/admin/admin-page-header";
 import { ResourceEditorForm } from "@/features/admin/resource-editor-form";
 import { getAdminResource } from "@/modules/admin/resource-admin";
+
+export const metadata: Metadata = {
+  title: "Chỉnh sửa bài viết",
+};
 
 export default async function Page({ params }: { params: Promise<{ resourceId: string }> }) {
   await requireRoles(["content_admin", "super_admin"]);

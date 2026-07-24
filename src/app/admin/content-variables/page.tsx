@@ -1,8 +1,13 @@
+import type { Metadata } from "next";
 import { Braces } from "lucide-react";
 import { requireRoles } from "@/auth/session";
 import { AdminPageHeader } from "@/features/admin/admin-page-header";
 import { ContentVariableManager } from "@/features/admin/content-variable-manager";
 import { getContentVariableDefinitions } from "@/modules/content/content-variables";
+
+export const metadata: Metadata = {
+  title: "Thông tin tự điền",
+};
 
 export default async function Page() {
   await requireRoles(["super_admin"]);

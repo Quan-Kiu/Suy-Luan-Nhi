@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import { redirect } from "next/navigation";
 import { requireParent } from "@/auth/session";
 import { contentText } from "@/content/resolve";
@@ -5,6 +6,10 @@ import { CreateProfileForm } from "@/features/profile/create-profile-form";
 import { getContentNamespace } from "@/modules/content/content";
 import { listChildren } from "@/modules/family/family";
 import { getOperationalSystemSettings } from "@/modules/system-settings/runtime";
+
+export const metadata: Metadata = {
+  title: "Tạo hồ sơ cho bé",
+};
 
 export default async function OnboardingPage() {
   const [session, content, systemSettings] = await Promise.all([

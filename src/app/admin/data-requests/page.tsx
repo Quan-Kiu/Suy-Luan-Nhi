@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import { desc, eq } from "drizzle-orm";
 import { ShieldCheck } from "lucide-react";
 import { requireRoles } from "@/auth/session";
@@ -5,6 +6,10 @@ import { AdminPageHeader } from "@/features/admin/admin-page-header";
 import { DataRequestManager } from "@/features/admin/data-request-manager";
 import { db } from "@/db/client";
 import { dataRequests, parentProfiles, user } from "@/db/schema";
+
+export const metadata: Metadata = {
+  title: "Xuất và xóa dữ liệu",
+};
 
 export default async function Page() {
   await requireRoles(["super_admin"]);

@@ -1,8 +1,13 @@
+import type { Metadata } from "next";
 import { Users } from "lucide-react";
 import { requireRoles } from "@/auth/session";
 import { AdminPageHeader } from "@/features/admin/admin-page-header";
 import { MemberManager } from "@/features/admin/member-manager";
 import { listMembers } from "@/modules/admin/operations";
+
+export const metadata: Metadata = {
+  title: "Tài khoản quản trị",
+};
 
 export default async function Page() {
   const session = await requireRoles(["super_admin"]);

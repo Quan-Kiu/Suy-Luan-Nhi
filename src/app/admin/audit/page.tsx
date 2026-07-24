@@ -1,9 +1,14 @@
+import type { Metadata } from "next";
 import { Database, Filter, X } from "lucide-react";
 import Link from "next/link";
 import { requireStaff } from "@/auth/session";
 import { auditActionLabels, friendlyLabel, resourceTypeLabels } from "@/features/admin/admin-labels";
 import { AdminPageHeader } from "@/features/admin/admin-page-header";
 import { listAuditLogs } from "@/modules/admin/operations";
+
+export const metadata: Metadata = {
+  title: "Các thay đổi gần đây",
+};
 
 export default async function Page({
   searchParams,

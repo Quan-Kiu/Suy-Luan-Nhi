@@ -1,6 +1,11 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import { DatabaseZap } from "lucide-react";
 import { Card } from "@/components/ui";
+
+export const metadata: Metadata = {
+  title: "Hệ thống tạm gián đoạn",
+};
 
 export default function ServiceUnavailablePage() {
   return (

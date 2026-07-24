@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import { BookOpen, Plus } from "lucide-react";
 import Link from "next/link";
 import { hasRole } from "@/auth/roles";
@@ -12,6 +13,10 @@ import {
   type ParentResourceType,
 } from "@/domain/parent-resources";
 import { listAdminResources } from "@/modules/admin/resource-admin";
+
+export const metadata: Metadata = {
+  title: "Bài viết cho phụ huynh",
+};
 
 export default async function Page({
   searchParams,

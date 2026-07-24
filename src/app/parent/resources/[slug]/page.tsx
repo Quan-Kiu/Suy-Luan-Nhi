@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import Image from "next/image";
 import { notFound, redirect } from "next/navigation";
 import { requireParent } from "@/auth/session";
@@ -10,6 +11,10 @@ import {
 } from "@/domain/parent-resources";
 import { getResource } from "@/modules/parent/parent-data";
 import { getOperationalSystemSettings } from "@/modules/system-settings/runtime";
+
+export const metadata: Metadata = {
+  title: "Bài viết cho phụ huynh",
+};
 
 export default async function Page({ params }: { params: Promise<{ slug: string }> }) {
   const [, systemSettings] = await Promise.all([requireParent(), getOperationalSystemSettings()]);

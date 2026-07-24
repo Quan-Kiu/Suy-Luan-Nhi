@@ -1,6 +1,11 @@
+import type { Metadata } from "next";
 import { Suspense } from "react";
 import { AuthShell } from "@/features/auth/auth-shell";
 import { ResetPasswordForm } from "@/features/auth/auth-forms";
+export const metadata: Metadata = {
+  title: "Đặt mật khẩu mới",
+};
+
 export default function Page() {
   return (
     <AuthShell

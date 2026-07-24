@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
 import { ArrowRight, ClipboardCheck } from "lucide-react";
@@ -6,6 +7,10 @@ import { contentTemplate, contentText } from "@/content/resolve";
 import { AdminPageHeader } from "@/features/admin/admin-page-header";
 import { getPendingReviews } from "@/modules/admin/mission-admin";
 import { getContentNamespace } from "@/modules/content/content";
+
+export const metadata: Metadata = {
+  title: "Nhiệm vụ đang chờ kiểm tra",
+};
 
 export default async function Page() {
   await requireRoles(["reviewer", "super_admin"]);

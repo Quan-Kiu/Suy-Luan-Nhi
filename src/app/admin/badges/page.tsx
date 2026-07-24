@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import { Award } from "lucide-react";
 import { requireRoles } from "@/auth/session";
 import { db } from "@/db/client";
@@ -6,6 +7,10 @@ import { AdminPageHeader } from "@/features/admin/admin-page-header";
 import { BadgeManager } from "@/features/admin/badge-manager";
 import { listBadges } from "@/modules/admin/badge-admin";
 import { asc } from "drizzle-orm";
+
+export const metadata: Metadata = {
+  title: "Huy hiệu",
+};
 
 export default async function Page() {
   await requireRoles(["content_admin", "super_admin"]);

@@ -1,8 +1,13 @@
+import type { Metadata } from "next";
 import type { ChildProfile } from "@/api/children";
 import { requireParent } from "@/auth/session";
 import { ProfilesPageContent } from "@/features/profile/profiles-page-content";
 import { listChildren } from "@/modules/family/family";
 import { getOperationalSystemSettings } from "@/modules/system-settings/runtime";
+
+export const metadata: Metadata = {
+  title: "Hồ sơ của bé",
+};
 
 export default async function ProfilesPage() {
   const [session, systemSettings] = await Promise.all([requireParent(), getOperationalSystemSettings()]);

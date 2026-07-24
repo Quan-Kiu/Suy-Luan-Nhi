@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import { eq } from "drizzle-orm";
 import { ArrowLeft, ClipboardCheck } from "lucide-react";
 import Link from "next/link";
@@ -12,6 +13,10 @@ import { Card, Pill } from "@/components/ui";
 import { db } from "@/db/client";
 import { missionVersions, missions } from "@/db/schema";
 import { parseMissionSnapshot } from "@/modules/catalog/snapshot";
+
+export const metadata: Metadata = {
+  title: "Kiểm tra nhiệm vụ",
+};
 
 export default async function Page({ params }: { params: Promise<{ versionId: string }> }) {
   await requireRoles(["reviewer", "super_admin"]);

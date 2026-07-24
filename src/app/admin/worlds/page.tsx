@@ -1,8 +1,13 @@
+import type { Metadata } from "next";
 import { Layers3 } from "lucide-react";
 import { requireRoles } from "@/auth/session";
 import { AdminPageHeader } from "@/features/admin/admin-page-header";
 import { WorldManager } from "@/features/admin/world-manager";
 import { listAdminWorlds } from "@/modules/admin/operations";
+
+export const metadata: Metadata = {
+  title: "Chủ đề nhiệm vụ",
+};
 
 export default async function Page() {
   await requireRoles(["content_admin", "super_admin"]);

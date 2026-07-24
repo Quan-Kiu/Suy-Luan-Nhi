@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import { redirect } from "next/navigation";
 import type { ParentResourcePage } from "@/api/parent-resources";
 import { requireParent } from "@/auth/session";
@@ -5,6 +6,10 @@ import { ResourceLibrary } from "@/features/parent/resource-library";
 import { getActiveChild } from "@/modules/family/active-child";
 import { getResources } from "@/modules/parent/parent-data";
 import { getOperationalSystemSettings } from "@/modules/system-settings/runtime";
+
+export const metadata: Metadata = {
+  title: "Hướng dẫn cho ba mẹ",
+};
 
 export default async function Page() {
   const [, systemSettings] = await Promise.all([requireParent(), getOperationalSystemSettings()]);

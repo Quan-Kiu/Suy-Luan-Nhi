@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
@@ -7,6 +8,10 @@ import { Card } from "@/components/ui";
 import { contentTemplate, contentText } from "@/content/resolve";
 import { getContentNamespace } from "@/modules/content/content";
 import { getCompletionSummary } from "@/modules/gameplay/session";
+export const metadata: Metadata = {
+  title: "Hoàn thành nhiệm vụ",
+};
+
 export default async function Page({ params }: { params: Promise<{ sessionId: string }> }) {
   const auth = await requireParent();
   const { sessionId } = await params;

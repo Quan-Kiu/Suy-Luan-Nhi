@@ -1,7 +1,12 @@
+import type { Metadata } from "next";
 import { redirect } from "next/navigation";
 import { BadgeCollection } from "@/features/badges/badge-collection";
 import { getActiveChild } from "@/modules/family/active-child";
 import { getChildBadgeCollection } from "@/modules/family/child-badges";
+
+export const metadata: Metadata = {
+  title: "Bộ sưu tập huy hiệu",
+};
 
 export default async function BadgesPage() {
   const active = await getActiveChild();
