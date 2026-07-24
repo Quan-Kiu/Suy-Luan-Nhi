@@ -69,7 +69,6 @@ a {
 
 :where(input, textarea, select) {
   color: inherit;
-  opacity: 1;
 }
 
 /* Tailwind's screen utilities use legacy vh. Prefer viewport units that account for mobile browser chrome. */

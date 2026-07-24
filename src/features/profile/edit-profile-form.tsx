@@ -73,7 +73,7 @@ export function EditProfileForm({ child }: { child: ChildProfile }) {
       onSubmit={form.handleSubmit((values) => mutation.mutate(values))}
       noValidate
     >
-      <Card className="space-y-4 p-5">
+      <Card className="space-y-5 p-5" data-testid="edit-profile-card">
         <TextField
           label={contentText(content, "edit.nameLabel", "Tên thân mật")}
           placeholder={contentText(content, "edit.namePlaceholder", "Tên thân mật của bé")}
@@ -116,15 +116,18 @@ export function EditProfileForm({ child }: { child: ChildProfile }) {
           error={form.formState.errors.ageGroup?.message}
           options={getAgeGroupOptions(content).map((option) => ({ value: option.id, label: option.title }))}
         />
+        <div className="flex flex-col gap-3 border-t border-[#eadfc9] pt-5">
+          <FormStatus status={mutation.isError ? "error" : "idle"} message={mutation.error?.message} />
+          <SubmitButton
+            className="w-full sm:w-auto"
+            pending={mutation.isPending || navigation.isPending}
+            disabled={avatarsQuery.isPending || avatarsQuery.isError || !avatarsQuery.data?.length}
+            pendingLabel={contentText(content, "edit.submitting", "Đang lưu...")}
+          >
+            {contentText(content, "edit.submit", "Lưu thay đổi")}
+          </SubmitButton>
+        </div>
       </Card>
-      <FormStatus status={mutation.isError ? "error" : "idle"} message={mutation.error?.message} />
-      <SubmitButton
-        pending={mutation.isPending || navigation.isPending}
-        disabled={avatarsQuery.isPending || avatarsQuery.isError || !avatarsQuery.data?.length}
-        pendingLabel={contentText(content, "edit.submitting", "Đang lưu...")}
-      >
-        {contentText(content, "edit.submit", "Lưu thay đổi")}
-      </SubmitButton>
     </HydrationSafeForm>
   );
 }
