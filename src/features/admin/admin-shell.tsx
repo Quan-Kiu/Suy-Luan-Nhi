@@ -38,7 +38,7 @@ export function AdminShell({
     <div data-admin-shell className="h-[100dvh] overflow-hidden bg-[#f5f3ee] text-[#342f28]">
       <header
         data-testid="admin-header"
-        className="relative z-40 flex h-16 items-center justify-between border-b bg-white px-4 sm:px-5"
+        className="safe-area-header relative z-40 flex min-h-[calc(4rem+var(--safe-area-top))] items-center justify-between border-b bg-white px-4 sm:px-5"
       >
         <div className="flex min-w-0 items-center gap-2">
           <button
@@ -103,7 +103,7 @@ export function AdminShell({
             <motion.aside
               id="admin-mobile-navigation"
               aria-label="Điều hướng quản trị mobile"
-              className="h-full w-[min(86vw,320px)] overflow-y-auto bg-white px-4 pt-20 pb-6 shadow-2xl"
+              className="h-full w-[min(86vw,320px)] overflow-y-auto bg-white px-4 pt-[calc(5rem+var(--safe-area-top))] pb-[max(1.5rem,var(--safe-area-bottom))] shadow-2xl [-webkit-overflow-scrolling:touch]"
               initial={{ x: "-100%" }}
               animate={{ x: 0 }}
               exit={{ x: "-100%" }}
@@ -122,13 +122,13 @@ export function AdminShell({
         ) : null}
       </AnimatePresence>
 
-      <div className="grid h-[calc(100dvh-4rem)] min-h-0 xl:grid-cols-[248px_minmax(0,1fr)]">
+      <div className="grid h-[calc(100dvh-4rem-var(--safe-area-top))] min-h-0 xl:grid-cols-[248px_minmax(0,1fr)]">
         <aside className="hidden min-h-0 scrollbar-thin overflow-y-auto overscroll-contain border-r bg-white px-3 py-4 xl:block">
           <AdminNavigation pathname={pathname} role={role} content={content} />
         </aside>
         <main
           id="admin-main-content"
-          className="min-h-0 min-w-0 scrollbar-thin overflow-y-auto overscroll-contain p-4 sm:p-5 lg:p-6"
+          className="min-h-0 min-w-0 scrollbar-thin overflow-y-auto overscroll-contain p-4 pb-[max(1rem,var(--safe-area-bottom))] sm:p-5 lg:p-6"
         >
           <div className="mx-auto w-full max-w-[1680px]">{children}</div>
         </main>

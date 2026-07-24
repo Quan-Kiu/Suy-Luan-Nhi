@@ -31,7 +31,7 @@ export function MissionDetailView({
   const storyIntro = renderContentTemplate(data.mission.storyIntro, templateVariables, context);
 
   return (
-    <main className="paper-texture min-h-[calc(100vh-5rem)] px-5 pt-4 pb-8">
+    <main className="paper-texture min-h-[calc(100svh-5rem)] px-5 pt-4 pb-8">
       <Card className="overflow-hidden border-2 border-[#d9bf91] p-0">
         <div className="relative">
           <Image

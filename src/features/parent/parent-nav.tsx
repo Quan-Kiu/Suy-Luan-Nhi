@@ -94,7 +94,7 @@ export function ParentNav({
           </button>
         </div>
       </nav>
-      <nav className="fixed inset-x-0 bottom-0 z-40 mx-auto flex h-20 max-w-[520px] items-center justify-around border-t border-[#eadfc9] bg-[#fffaf0]/95 px-2 backdrop-blur sm:hidden">
+      <nav className="safe-area-bottom-nav fixed inset-x-0 bottom-0 z-40 mx-auto flex max-w-[520px] items-center justify-around border-t border-[#eadfc9] bg-[#fffaf0]/95 backdrop-blur sm:hidden">
         {links.map(({ href, label, icon: Icon, exact = false }) => (
           <Link
             key={href}

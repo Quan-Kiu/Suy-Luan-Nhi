@@ -16,7 +16,7 @@ export default async function Page({ params }: { params: Promise<{ sessionId: st
   ]);
   if (!summary) notFound();
   return (
-    <main className="paper-texture min-h-[calc(100vh-5rem)] px-5 pt-4 pb-8">
+    <main className="paper-texture min-h-[calc(100svh-5rem)] px-5 pt-4 pb-8">
       <div className="relative overflow-hidden rounded-[28px]">
         <Image
           src="/assets/scenes/scene-mission-complete-celebration.png"

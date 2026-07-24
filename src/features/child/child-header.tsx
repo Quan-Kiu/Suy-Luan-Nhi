@@ -48,7 +48,7 @@ export function ChildHeader() {
   return (
     <header
       data-testid="child-header"
-      className="sticky top-0 z-50 flex h-20 items-center justify-between border-b border-[#eadfc9]/80 bg-[#fffaf0]/95 px-5 shadow-[0_6px_18px_rgba(73,52,25,0.06)] backdrop-blur"
+      className="safe-area-header sticky top-0 z-50 flex min-h-[calc(5rem+var(--safe-area-top))] items-center justify-between border-b border-[#eadfc9]/80 bg-[#fffaf0]/95 px-5 shadow-[0_6px_18px_rgba(73,52,25,0.06)] backdrop-blur"
     >
       <div className="flex min-w-0 items-center gap-1">
         {backHref ? (
@@ -96,7 +96,7 @@ export function ChildHeader() {
             <motion.button
               type="button"
               aria-label="Đóng menu"
-              className="fixed inset-0 top-20 z-30 bg-black/25"
+              className="fixed inset-0 top-[calc(5rem+var(--safe-area-top))] z-30 bg-black/25"
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}

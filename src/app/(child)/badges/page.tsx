@@ -12,7 +12,7 @@ export default async function BadgesPage() {
   return (
     <main
       data-child-layout="wide"
-      className="paper-texture min-h-[calc(100vh-5rem)] px-4 py-5 pb-10 sm:px-6 sm:py-7"
+      className="paper-texture min-h-[calc(100svh-5rem)] px-4 py-5 pb-10 sm:px-6 sm:py-7"
     >
       <BadgeCollection
         childName={active.child.displayName}

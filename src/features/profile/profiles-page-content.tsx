@@ -28,7 +28,7 @@ export function ProfilesPageContent({
   const hasProfiles = activeProfiles.length > 0;
 
   return (
-    <main className="paper-texture min-h-[calc(100vh-5rem)] px-5 py-7">
+    <main className="paper-texture min-h-[calc(100svh-5rem)] px-5 py-7">
       <div className="text-center">
         <Image
           src="/assets/scenes/scene-profile-dog-treehouse.png"

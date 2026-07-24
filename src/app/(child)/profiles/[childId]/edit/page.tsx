@@ -21,7 +21,7 @@ export default async function Page({ params }: { params: Promise<{ childId: stri
     deletionRequestedAt: owned.child.deletionRequestedAt?.toISOString() ?? null,
   };
   return (
-    <main className="paper-texture min-h-[calc(100vh-5rem)] px-5 py-7">
+    <main className="paper-texture min-h-[calc(100svh-5rem)] px-5 py-7">
       <h1 className="type-child-page-title">{contentText(content, "edit.pageTitle", "Chỉnh sửa hồ sơ")}</h1>
       <p className="type-supporting mt-2 mb-6 text-[#806d54]">
         {contentText(content, "edit.pageDescription", "Chỉ lưu tên thân mật và nhóm tuổi phù hợp.")}

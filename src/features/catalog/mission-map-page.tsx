@@ -30,7 +30,7 @@ export function MissionMapPage() {
   if (!child) return null;
 
   return (
-    <main className="paper-texture min-h-[calc(100vh-5rem)] px-5 pt-5 pb-8">
+    <main className="paper-texture min-h-[calc(100svh-5rem)] px-5 pt-5 pb-8">
       <Card className="mb-6 p-4" data-testid="mission-map-intro">
         <p className="type-supporting text-[#806d54]" data-testid="mission-map-profile-label">
           {contentText(content, "journey.label", "Hành trình của")}

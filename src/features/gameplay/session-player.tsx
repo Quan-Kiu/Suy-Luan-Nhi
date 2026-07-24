@@ -101,7 +101,7 @@ export function SessionPlayer({ initialView }: { initialView: SessionView }) {
   }
 
   return (
-    <main className="paper-texture min-h-[calc(100vh-4rem)] px-5 pt-5 pb-8">
+    <main className="paper-texture min-h-[calc(100svh-4rem)] px-5 pt-5 pb-8">
       <SessionProgress current={view.progress.current} total={view.progress.total} />
       <div className="text-center">
         <p className="type-overline font-black tracking-[.16em] text-[#d78517] uppercase">

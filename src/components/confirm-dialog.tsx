@@ -65,7 +65,7 @@ export function ConfirmDialog({
     <AnimatePresence>
       {open ? (
         <motion.div
-          className="fixed inset-0 z-[100] grid place-items-center bg-black/45 p-4 backdrop-blur-[2px]"
+          className="safe-area-overlay fixed inset-0 z-[100] grid place-items-center overflow-y-auto bg-black/45 backdrop-blur-[2px]"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
@@ -78,7 +78,7 @@ export function ConfirmDialog({
             aria-modal="true"
             aria-labelledby={titleId}
             aria-describedby={errorMessage ? `${descriptionId} ${errorId}` : descriptionId}
-            className="w-full max-w-md rounded-[28px] border border-[#eadfc9] bg-[#fffdf8] p-5 shadow-2xl sm:p-6"
+            className="max-h-full w-full max-w-md overflow-y-auto rounded-[28px] border border-[#eadfc9] bg-[#fffdf8] p-5 shadow-2xl [-webkit-overflow-scrolling:touch] sm:p-6"
             initial={{ opacity: 0, scale: 0.96, y: 12 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.97, y: 8 }}

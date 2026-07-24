@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Nunito } from "next/font/google";
 import "./globals.css";
 import { Providers } from "@/components/providers";
@@ -15,6 +15,13 @@ const appFont = Nunito({
 export const metadata: Metadata = {
   title: "Suy Luận Nhí",
   description: "Nhiệm vụ vui giúp bé luyện cách nghĩ an toàn và tích cực.",
+};
+
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
+  viewportFit: "cover",
+  themeColor: "#fffaf0",
 };
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
