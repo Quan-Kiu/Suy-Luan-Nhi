@@ -1,4 +1,4 @@
-import { CheckCircle2, LockKeyhole, Rocket, ShieldCheck, Sparkles, Wrench } from "lucide-react";
+import { CheckCircle2, Rocket, ShieldCheck, Sparkles, Wrench } from "lucide-react";
 import { Card, Pill } from "@/components/ui";
 import { ReleaseNotesSeenMarker } from "@/features/parent/release-notes-seen";
 import { cn } from "@/lib/utils";
@@ -37,31 +37,17 @@ export function ReleaseNotesPage({ releases }: { releases: ReleaseNote[] }) {
   return (
     <>
       {latest ? <ReleaseNotesSeenMarker version={latest.version} /> : null}
-      <div className="flex flex-wrap items-start justify-between gap-4">
-        <div className="max-w-2xl">
-          <div className="mb-3 flex items-center gap-3 text-[#b9470d]">
-            <div className="grid size-11 place-items-center rounded-2xl bg-[#fff0df]">
-              <Sparkles size={22} aria-hidden="true" />
-            </div>
-            <Pill>Có gì mới</Pill>
+      <div className="max-w-2xl">
+        <div className="mb-3 flex items-center gap-3 text-[#b9470d]">
+          <div className="grid size-11 place-items-center rounded-2xl bg-[#fff0df]">
+            <Sparkles size={22} aria-hidden="true" />
           </div>
-          <h1 className="type-page-title">Những thay đổi dành cho gia đình</h1>
-          <p className="type-supporting mt-2 text-[#6f604b]">
-            Chỉ những tính năng, cải thiện và sửa lỗi ảnh hưởng trực tiếp đến ba mẹ và bé mới xuất hiện ở đây.
-            Thay đổi kỹ thuật nội bộ được theo dõi riêng.
-          </p>
+          <Pill>Có gì mới</Pill>
         </div>
-        <Card className="max-w-sm p-4 shadow-none">
-          <div className="flex gap-3">
-            <LockKeyhole className="mt-0.5 shrink-0 text-[#50723e]" size={21} aria-hidden="true" />
-            <div>
-              <strong className="type-label">Không dùng để theo dõi cá nhân</strong>
-              <p className="type-caption mt-1 text-[#6f604b]">
-                Trạng thái đã xem chỉ được lưu trên thiết bị hiện tại và không ghi vào hồ sơ gia đình.
-              </p>
-            </div>
-          </div>
-        </Card>
+        <h1 className="type-page-title">Cập nhật mới của hệ thống</h1>
+        <p className="type-supporting mt-2 text-[#6f604b]">
+          Theo dõi các tính năng, cải thiện và sửa lỗi mới nhất.
+        </p>
       </div>
 
       <div className="mt-6 space-y-5">
@@ -118,7 +104,7 @@ export function ReleaseNotesPage({ releases }: { releases: ReleaseNote[] }) {
             <CheckCircle2 className="mx-auto text-[#50723e]" size={40} aria-hidden="true" />
             <h2 className="type-section-title mt-4">Chưa có thông báo cập nhật</h2>
             <p className="type-supporting mt-2 text-[#6f604b]">
-              Khi có thay đổi ảnh hưởng trực tiếp đến gia đình, nội dung sẽ được đăng tại đây.
+              Các bản cập nhật mới sẽ được thông báo tại đây.
             </p>
           </div>
         </Card>

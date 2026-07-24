@@ -16,9 +16,12 @@ test("parent release notes announce once and pass desktop UX checks", async ({ p
   await expect(page.getByText("Có cập nhật mới")).toBeVisible();
   await page.getByRole("link", { name: "Xem thay đổi" }).click();
   await page.waitForURL("**/parent/whats-new");
-  await expect(page.getByRole("heading", { name: "Những thay đổi dành cho gia đình" })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Cập nhật mới của hệ thống" })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Các thay đổi mới nhất" })).toBeVisible();
   await expect(page.getByText("Tính năng mới").first()).toBeVisible();
   await expect(page.getByText("Bảo mật").first()).toBeVisible();
+  await expect(page.getByText("Không dùng để theo dõi cá nhân")).toHaveCount(0);
+  await expect(page.getByText("Theo dõi những thay đổi đáng chú ý")).toHaveCount(0);
 
   await auditRoute(page, testInfo, "/parent/whats-new", "desktop-parent-whats-new");
   await page.goto("/parent");

@@ -16,7 +16,7 @@ test("parent release notes stay usable on mobile", async ({ page }, testInfo) =>
   await expect(page.getByText("Có cập nhật mới")).toBeVisible();
   await page.getByRole("link", { name: "Xem thay đổi" }).click();
   await page.waitForURL("**/parent/whats-new");
-  await expect(page.getByRole("heading", { name: "Những thay đổi dành cho gia đình" })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Cập nhật mới của hệ thống" })).toBeVisible();
 
   await auditRoute(page, testInfo, "/parent/whats-new", "mobile-parent-whats-new");
   await page.getByRole("button", { name: "Mở menu phụ huynh" }).click();

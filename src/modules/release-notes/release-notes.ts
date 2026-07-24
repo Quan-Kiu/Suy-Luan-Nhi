@@ -20,17 +20,12 @@ export type ReleaseNote = {
 export const releaseNotes = [
   {
     version: "2026.07.24",
-    title: "Trải nghiệm phụ huynh rõ ràng hơn",
+    title: "Các thay đổi mới nhất",
     summary:
-      "Ba mẹ dễ theo dõi thay đổi quan trọng, bảo vệ khu vực gia đình và tiếp tục sử dụng sau các thao tác cập nhật.",
+      "Bổ sung khả năng đặt lại mã PIN, cải thiện trải nghiệm trên điện thoại và tăng độ ổn định khi hiển thị dữ liệu.",
     publishedAt: "2026-07-24T08:00:00+07:00",
     announcement: true,
     items: [
-      {
-        kind: "feature",
-        title: "Theo dõi những thay đổi đáng chú ý",
-        description: "Mục Có gì mới chỉ tổng hợp tính năng và sửa lỗi có ảnh hưởng trực tiếp đến gia đình.",
-      },
       {
         kind: "feature",
         title: "Khôi phục mã PIN phụ huynh",
