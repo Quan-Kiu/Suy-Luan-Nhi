@@ -34,6 +34,65 @@ test("iOS auth controls avoid focus zoom and unstable viewport sizing", async ({
   await expectNoHorizontalOverflow(page);
 });
 
+test("iOS profile edit keeps avatar images visible and native radios hidden", async ({ page }) => {
+  await signIn(page, "parent@demo.local");
+  const child = await getDemoChild(page);
+  await page.goto(`/profiles/${child.id}/edit`);
+
+  const options = page.getByTestId("child-avatar-options");
+  const cards = options.locator("label");
+  const radios = options.locator('input[type="radio"]');
+  await expect(cards).toHaveCount(4);
+  await expect(radios).toHaveCount(4);
+
+  const controls = await radios.evaluateAll((elements) =>
+    elements.map((element) => {
+      const style = getComputedStyle(element);
+      const box = element.getBoundingClientRect();
+      return { opacity: style.opacity, appearance: style.appearance, width: box.width, height: box.height };
+    }),
+  );
+  expect(controls.every((control) => control.opacity === "0")).toBe(true);
+  expect(controls.every((control) => control.appearance === "none")).toBe(true);
+  expect(controls.every((control) => control.width >= 44 && control.height >= 44)).toBe(true);
+
+  await expect
+    .poll(() =>
+      options
+        .locator("img")
+        .evaluateAll((images) =>
+          images.every(
+            (image) => (image as HTMLImageElement).complete && (image as HTMLImageElement).naturalWidth > 0,
+          ),
+        ),
+    )
+    .toBe(true);
+
+  const cardBoxes = await cards.evaluateAll((elements) =>
+    elements.map((element) => {
+      const box = element.getBoundingClientRect();
+      return { x: box.x, y: box.y, width: box.width, height: box.height };
+    }),
+  );
+  expect(
+    Math.max(...cardBoxes.map((box) => box.y)) - Math.min(...cardBoxes.map((box) => box.y)),
+  ).toBeLessThan(2);
+  expect(cardBoxes.every((box) => box.width >= 44 && box.height >= 44)).toBe(true);
+
+  await cards.nth(2).click();
+  await expect(radios.nth(2)).toBeChecked();
+  await expect(options.locator('input[type="radio"]:checked')).toHaveCount(1);
+
+  const formCard = page.getByTestId("edit-profile-card");
+  const saveButton = page.getByRole("button", { name: "Lưu thay đổi" });
+  const [formBox, saveBox] = await Promise.all([formCard.boundingBox(), saveButton.boundingBox()]);
+  expect(formBox).not.toBeNull();
+  expect(saveBox).not.toBeNull();
+  expect(saveBox!.y + saveBox!.height).toBeLessThanOrEqual(formBox!.y + formBox!.height);
+  expect(saveBox!.width).toBeGreaterThan(formBox!.width - 50);
+  await expectNoHorizontalOverflow(page);
+});
+
 test("iOS parent navigation clears the home indicator", async ({ page }) => {
   await signIn(page, "parent@demo.local");
   await page.waitForURL((url) => url.pathname === "/profiles");
