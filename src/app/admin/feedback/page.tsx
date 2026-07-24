@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 import { MessageSquareText } from "lucide-react";
+import type { SystemFeedbackColumnsInitialData, SystemFeedbackPage } from "@/api/admin/feedback";
 import { requireStaff } from "@/auth/session";
+import { systemFeedbackColumnPageSize, systemFeedbackStatuses } from "@/domain/system-feedback";
 import { AdminPageHeader } from "@/features/admin/admin-page-header";
 import { SystemFeedbackManager } from "@/features/admin/system-feedback-manager";
 import { listSystemFeedback } from "@/modules/system-feedback/system-feedback";
@@ -9,10 +11,8 @@ export const metadata: Metadata = {
   title: "Góp ý hệ thống",
 };
 
-export default async function Page() {
-  await requireStaff();
-  const result = await listSystemFeedback({ page: 1, pageSize: 100 });
-  const initialData = {
+function serializeFeedbackPage(result: Awaited<ReturnType<typeof listSystemFeedback>>): SystemFeedbackPage {
+  return {
     ...result,
     items: result.items.map((item) => ({
       ...item,
@@ -21,6 +21,19 @@ export default async function Page() {
       handledAt: item.handledAt?.toISOString() ?? null,
     })),
   };
+}
+
+export default async function Page() {
+  await requireStaff();
+  const results = await Promise.all(
+    systemFeedbackStatuses.map((status) =>
+      listSystemFeedback({ status, page: 1, pageSize: systemFeedbackColumnPageSize }),
+    ),
+  );
+  const initialData = Object.fromEntries(
+    systemFeedbackStatuses.map((status, index) => [status, serializeFeedbackPage(results[index])]),
+  ) as SystemFeedbackColumnsInitialData;
+
   return (
     <div className="space-y-6">
       <AdminPageHeader

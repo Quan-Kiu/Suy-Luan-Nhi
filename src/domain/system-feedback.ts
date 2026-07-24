@@ -10,6 +10,7 @@ export const systemFeedbackStatusLabels: Record<SystemFeedbackStatus, string> = 
   dismissed: "Đã đóng",
 };
 
+export const systemFeedbackColumnPageSize = 10;
 export const systemFeedbackMaxAttachments = 10;
 
 export const systemFeedbackContentSchema = z

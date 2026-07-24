@@ -1,3 +1,5 @@
+import type { SystemFeedbackStatus } from "@/domain/system-feedback";
+
 export const queryKeys = {
   content: {
     all: ["content"] as const,
@@ -31,5 +33,6 @@ export const queryKeys = {
     taxonomy: ["admin", "taxonomy"] as const,
     missions: ["admin", "missions"] as const,
     feedback: ["admin", "feedback"] as const,
+    feedbackColumn: (status: SystemFeedbackStatus) => ["admin", "feedback", "column", status] as const,
   },
 } as const;
