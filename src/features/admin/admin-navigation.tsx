@@ -78,7 +78,7 @@ const navGroups = [
       {
         href: "/admin/media",
         labelKey: "nav.media",
-        fallback: "Thư viện tư liệu",
+        fallback: "Từ điển",
         icon: ImageIcon,
         roles: allStaff,
       },
