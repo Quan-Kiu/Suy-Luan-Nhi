@@ -98,6 +98,13 @@ test("content admin submits an immutable version and reviewer publishes it", asy
   await page.getByRole("button", { name: /Đạt yêu cầu/i }).click();
   await expect(page.getByText("Hãy ghi ít nhất 4 ký tự để người soạn biết cần sửa gì")).toHaveCount(0);
   await expect(page.getByRole("button", { name: /Cho bé xem ngay/i })).toBeVisible();
+
+  await page.goto("/admin/reviews");
+  await expect(page.getByRole("heading", { name: "Đã duyệt, chờ hiển thị" })).toBeVisible();
+  const approvedLink = page.getByRole("link", { name: /Thám tử dấu chân \(Bản sao\)/i });
+  await expect(approvedLink).toContainText("Mở để hiển thị");
+  await approvedLink.click();
+  await expect(page.getByRole("button", { name: /Cho bé xem ngay/i })).toBeVisible();
   await page.getByRole("button", { name: /Cho bé xem ngay/i }).click();
   await expect(page.getByText("Đang hiển thị", { exact: true })).toBeVisible();
 

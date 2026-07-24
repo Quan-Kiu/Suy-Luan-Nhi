@@ -205,18 +205,46 @@ export const adminOperationsContentEntries = defineContent("admin", {
   "missions.status.archived": { value: "Đã lưu trữ", description: "Nhãn trạng thái archived." },
   "reviews.eyebrow": { value: "Kiểm tra nội dung", description: "Nhãn đầu danh sách kiểm tra nội dung." },
   "reviews.title": {
-    value: "Nhiệm vụ đang chờ kiểm tra",
-    description: "Tiêu đề danh sách kiểm tra nội dung.",
+    value: "Duyệt và hiển thị nội dung",
+    description: "Tiêu đề khu vực duyệt và hiển thị nội dung.",
   },
   "reviews.description": {
-    value:
-      "Mở từng nhiệm vụ để xem như bé sẽ thấy, kiểm tra độ an toàn rồi xác nhận đạt yêu cầu hoặc ghi rõ phần cần sửa.",
-    description: "Mô tả danh sách kiểm tra nội dung.",
+    value: "Kiểm tra nội dung mới gửi, sau đó tiếp tục đưa các nhiệm vụ đã đạt yêu cầu đến với bé.",
+    description: "Mô tả khu vực duyệt và hiển thị nội dung.",
   },
+  "reviews.pendingTitle": { value: "Chờ kiểm tra", description: "Tiêu đề nhóm đang chờ kiểm tra." },
+  "reviews.pendingDescription": {
+    value: "Xem nội dung như bé sẽ thấy, kiểm tra độ an toàn rồi xác nhận hoặc ghi rõ phần cần sửa.",
+    description: "Mô tả nhóm đang chờ kiểm tra.",
+  },
+  "reviews.pendingStatus": { value: "Chờ kiểm tra", description: "Trạng thái đang chờ kiểm tra." },
+  "reviews.approvedTitle": {
+    value: "Đã duyệt, chờ hiển thị",
+    description: "Tiêu đề nhóm đã duyệt nhưng chưa hiển thị.",
+  },
+  "reviews.approvedDescription": {
+    value: "Các nhiệm vụ đã đạt yêu cầu nhưng chưa được đưa đến khu vực của bé.",
+    description: "Mô tả nhóm đã duyệt nhưng chưa hiển thị.",
+  },
+  "reviews.approvedStatus": { value: "Đã duyệt", description: "Trạng thái nội dung đã duyệt." },
   "reviews.version": { value: "Lần gửi {number}", description: "Nhãn lần gửi kiểm tra nội dung." },
   "reviews.submittedAt": { value: "Gửi lúc {time}", description: "Thời điểm gửi kiểm tra nội dung." },
+  "reviews.reviewedAt": { value: "Duyệt lúc {time}", description: "Thời điểm nội dung được duyệt." },
+  "reviews.scheduledFor": {
+    value: "Đã hẹn hiển thị lúc {time}",
+    description: "Thời điểm nội dung được hẹn hiển thị.",
+  },
+  "reviews.openReview": { value: "Mở để kiểm tra", description: "Thao tác mở nội dung chờ kiểm tra." },
+  "reviews.openApproved": {
+    value: "Mở để hiển thị",
+    description: "Thao tác mở nội dung đã duyệt để hiển thị.",
+  },
   "reviews.empty": {
     value: "Hiện không có nhiệm vụ nào cần kiểm tra.",
     description: "Danh sách kiểm tra nội dung trống.",
+  },
+  "reviews.approvedEmpty": {
+    value: "Hiện không có nhiệm vụ nào đang chờ hiển thị.",
+    description: "Danh sách nội dung đã duyệt đang trống.",
   },
 });

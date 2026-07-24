@@ -654,7 +654,7 @@ export async function restoreArchivedMission(missionId: string, actorId: string)
   });
 }
 
-export async function getPendingReviews() {
+export async function getReviewWorkspaceItems() {
   return db
     .select({
       version: missionVersions,
@@ -663,11 +663,18 @@ export async function getPendingReviews() {
       slug: missions.slug,
       coverUrl: missions.coverUrl,
       worldTitle: missionWorlds.title,
+      scheduledFor: missions.scheduledFor,
     })
     .from(missionVersions)
     .innerJoin(missions, eq(missionVersions.missionId, missions.id))
     .innerJoin(missionWorlds, eq(missions.worldId, missionWorlds.id))
-    .where(eq(missionVersions.status, "in_review"))
+    .where(
+      and(
+        inArray(missionVersions.status, ["in_review", "approved"]),
+        sql`${missions.status} = ${missionVersions.status}`,
+        sql`${missionVersions.versionNumber} = ${missions.currentDraftVersion}`,
+      ),
+    )
     .orderBy(asc(missionVersions.createdAt));
 }
 
