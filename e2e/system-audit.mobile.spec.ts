@@ -33,6 +33,8 @@ test("parent and child mobile routes pass runtime UX checks", async ({ page }, t
 
   await unlockParentGate(page);
   await auditRoute(page, testInfo, "/parent", "mobile-parent-dashboard");
+  await auditRoute(page, testInfo, "/parent/notifications", "mobile-parent-notifications");
+  await expect(page.getByRole("heading", { name: "Chưa có thông báo mới" })).toBeVisible();
   await auditRoute(page, testInfo, "/parent/settings", "mobile-parent-settings");
 });
 

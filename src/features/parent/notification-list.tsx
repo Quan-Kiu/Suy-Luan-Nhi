@@ -1,8 +1,11 @@
 "use client";
 
 import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { BellRing } from "lucide-react";
 import { parentApi } from "@/api/parent";
 import { FormStatus } from "@/components/form";
+import { Card } from "@/components/ui";
+import { contentText, useContent } from "@/content/client";
 import { usePendingRouter } from "@/hooks/use-pending-router";
 import { queryKeys } from "@/lib/query/keys";
 import { cn } from "@/lib/utils";
@@ -16,6 +19,7 @@ type NotificationItem = {
 };
 
 export function NotificationList({ items }: { items: NotificationItem[] }) {
+  const content = useContent("parent");
   const navigation = usePendingRouter();
   const queryClient = useQueryClient();
   const mutation = useMutation({
@@ -28,6 +32,28 @@ export function NotificationList({ items }: { items: NotificationItem[] }) {
       navigation.refresh();
     },
   });
+
+  if (items.length === 0) {
+    return (
+      <Card className="grid min-h-64 place-items-center p-6 text-center sm:p-8">
+        <div className="max-w-md">
+          <div className="mx-auto grid size-16 place-items-center rounded-full bg-[#edf4df] text-[#50723e]">
+            <BellRing size={30} aria-hidden="true" />
+          </div>
+          <h2 className="type-section-title mt-4">
+            {contentText(content, "notifications.emptyTitle", "Chưa có thông báo mới")}
+          </h2>
+          <p className="type-supporting mt-2 text-[#6f604b]">
+            {contentText(
+              content,
+              "notifications.emptyDescription",
+              "Khi bé hoàn thành nhiệm vụ hoặc có cập nhật quan trọng, thông báo sẽ xuất hiện tại đây.",
+            )}
+          </p>
+        </div>
+      </Card>
+    );
+  }
 
   return (
     <div className="space-y-3">

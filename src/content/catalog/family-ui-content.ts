@@ -186,6 +186,19 @@ export const parentContentEntries = defineContent("parent", {
   "nav.resources": { value: "Hướng dẫn cho ba mẹ", description: "Điều hướng tài nguyên." },
   "nav.settings": { value: "Cài đặt", description: "Điều hướng cài đặt." },
   "nav.notifications": { value: "Thông báo", description: "Nhãn thông báo." },
+  "notifications.title": { value: "Thông báo", description: "Tiêu đề trang thông báo phụ huynh." },
+  "notifications.description": {
+    value: "Những thông tin mới về hoạt động của bé và các thay đổi quan trọng trong ứng dụng.",
+    description: "Mô tả trang thông báo phụ huynh.",
+  },
+  "notifications.emptyTitle": {
+    value: "Chưa có thông báo mới",
+    description: "Tiêu đề trạng thái trống của trang thông báo phụ huynh.",
+  },
+  "notifications.emptyDescription": {
+    value: "Khi bé hoàn thành nhiệm vụ hoặc có cập nhật quan trọng, thông báo sẽ xuất hiện tại đây.",
+    description: "Mô tả trạng thái trống của trang thông báo phụ huynh.",
+  },
   "nav.logout": { value: "Đăng xuất", description: "Nhãn đăng xuất." },
   "nav.openMenu": { value: "Mở menu phụ huynh", description: "Nhãn mở menu khu vực phụ huynh." },
   "nav.closeMenu": { value: "Đóng menu phụ huynh", description: "Nhãn đóng menu khu vực phụ huynh." },
