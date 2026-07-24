@@ -8,6 +8,8 @@ async function readApiSession(request: Request) {
   return auth.api.getSession({ headers: request.headers });
 }
 
+type ApiSession = NonNullable<Awaited<ReturnType<typeof readApiSession>>>;
+
 export async function getApiSession(request: Request) {
   const session = await readApiSession(request);
   return session && !isActiveBan(session.user) ? session : null;
@@ -62,27 +64,37 @@ export async function requireApiRoles(request: Request, roles: readonly AppRole[
   return authResult;
 }
 
-export async function requireApiParentGate(request: Request) {
-  const authResult = await requireApiRoles(request, ["parent", "super_admin"]);
-  if ("error" in authResult) return authResult;
+export async function requireApiParentGateForAuthorizedSession(session: ApiSession) {
   const [{ getOrCreateParentProfile }, { resolveParentWorkspaceAccess }] = await Promise.all([
     import("@/modules/family/family"),
     import("@/modules/parent/access-policy"),
   ]);
-  const parent = await getOrCreateParentProfile(authResult.session.user.id, authResult.session.user.name);
+  const parent = await getOrCreateParentProfile(session.user.id, session.user.name);
   const access = await resolveParentWorkspaceAccess({
-    role: authResult.session.user.role,
+    role: session.user.role,
     parentProfileId: parent.id,
     pinHash: parent.pinHash,
-    sessionToken: authResult.session.session.token,
+    sessionToken: session.session.token,
   });
   if (!access.granted) {
     return {
+      granted: false,
       error: apiJson(
-        { message: "Cần mở Parent Gate trước khi thực hiện thao tác nhạy cảm" },
+        {
+          code: "PARENT_GATE_REQUIRED",
+          message: "Cần mở Parent Gate trước khi thực hiện thao tác nhạy cảm",
+        },
         { status: 403 },
       ),
     } as const;
   }
-  return { ...authResult, parent } as const;
+  return { granted: true, parent } as const;
+}
+
+export async function requireApiParentGate(request: Request) {
+  const authResult = await requireApiRoles(request, ["parent", "super_admin"]);
+  if ("error" in authResult) return authResult;
+  const gateResult = await requireApiParentGateForAuthorizedSession(authResult.session);
+  if (!gateResult.granted) return { error: gateResult.error } as const;
+  return { ...authResult, parent: gateResult.parent } as const;
 }
