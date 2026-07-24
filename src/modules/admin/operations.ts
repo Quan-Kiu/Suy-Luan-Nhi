@@ -1,4 +1,4 @@
-import { and, asc, desc, eq, gte, sql } from "drizzle-orm";
+import { and, asc, desc, eq, gte, lt, sql } from "drizzle-orm";
 import { db } from "@/db/client";
 import { ageGroupCodes, type AgeGroup } from "@/domain/age-groups";
 import { missingWorldAgeGroups } from "@/domain/mission-publication";
@@ -424,17 +424,59 @@ export async function updateAgeGroup(
   return updated;
 }
 
-export async function listAuditLogs(
-  filters: { resourceType?: string; action?: string; limit?: number } = {},
-) {
+export type AuditLogFilters = {
+  resourceType?: string;
+  action?: string;
+  resourceId?: string;
+  from?: Date;
+  to?: Date;
+  page?: number;
+  pageSize?: number;
+};
+
+export async function listAuditLogs(filters: AuditLogFilters = {}) {
+  const requestedPage = Math.max(1, Math.floor(filters.page ?? 1));
+  const pageSize = Math.min(100, Math.max(10, Math.floor(filters.pageSize ?? 25)));
   const conditions = [];
   if (filters.resourceType) conditions.push(eq(auditLogs.resourceType, filters.resourceType));
-  if (filters.action) conditions.push(sql`${auditLogs.action} ilike ${`%${filters.action}%`}`);
-  return db.query.auditLogs.findMany({
-    where: conditions.length ? and(...conditions) : undefined,
-    orderBy: [desc(auditLogs.createdAt)],
-    limit: Math.min(filters.limit ?? 100, 500),
-  });
+  if (filters.action) conditions.push(eq(auditLogs.action, filters.action));
+  if (filters.resourceId) {
+    conditions.push(sql`${auditLogs.resourceId} ilike ${`%${filters.resourceId}%`}`);
+  }
+  if (filters.from) conditions.push(gte(auditLogs.createdAt, filters.from));
+  if (filters.to) conditions.push(lt(auditLogs.createdAt, filters.to));
+  const where = conditions.length ? and(...conditions) : undefined;
+
+  const countRows = await db
+    .select({ count: sql<number>`count(*)::int` })
+    .from(auditLogs)
+    .where(where);
+  const total = countRows[0]?.count ?? 0;
+  const totalPages = Math.max(1, Math.ceil(total / pageSize));
+  const page = Math.min(requestedPage, totalPages);
+
+  const items = await db
+    .select({
+      id: auditLogs.id,
+      actorId: auditLogs.actorId,
+      actorName: user.name,
+      actorEmail: user.email,
+      action: auditLogs.action,
+      resourceType: auditLogs.resourceType,
+      resourceId: auditLogs.resourceId,
+      beforeState: auditLogs.beforeState,
+      afterState: auditLogs.afterState,
+      metadata: auditLogs.metadata,
+      createdAt: auditLogs.createdAt,
+    })
+    .from(auditLogs)
+    .leftJoin(user, eq(auditLogs.actorId, user.id))
+    .where(where)
+    .orderBy(desc(auditLogs.createdAt), desc(auditLogs.id))
+    .limit(pageSize)
+    .offset((page - 1) * pageSize);
+
+  return { items, total, page, pageSize, totalPages };
 }
 
 export async function getSystemSettings() {

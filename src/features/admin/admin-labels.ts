@@ -47,6 +47,7 @@ export const auditActionLabels: Record<string, string> = {
   "member.updated": "Cập nhật thành viên",
   "session.revoked_by_ban": "Thu hồi phiên đăng nhập khi tạm ngưng",
   "content.updated": "Sửa câu chữ trong ứng dụng",
+  "content.reset": "Khôi phục câu chữ mặc định",
   "media.uploaded": "Thêm tệp mới",
   "media.reviewed": "Kiểm tra hình ảnh hoặc âm thanh",
   "media.deleted": "Xóa tệp",
@@ -57,13 +58,23 @@ export const auditActionLabels: Record<string, string> = {
   "child.updated": "Cập nhật hồ sơ bé",
   "child.deleted": "Xóa hồ sơ bé",
   "child.delete_requested": "Phụ huynh yêu cầu xóa hồ sơ bé",
+  "child.deleted_permanently": "Xóa vĩnh viễn hồ sơ bé",
+  "child.restored": "Khôi phục hồ sơ bé",
   "child.progress_reset": "Đặt lại tiến độ của bé",
+  "parent.pin_created": "Tạo mã PIN phụ huynh",
+  "parent.pin_reset_requested": "Yêu cầu đặt lại mã PIN phụ huynh",
+  "parent.pin_reset_completed": "Hoàn tất đặt lại mã PIN phụ huynh",
   "parent.settings_updated": "Cập nhật cài đặt phụ huynh",
+  "parent_resource.created": "Thêm bài viết cho phụ huynh",
+  "parent_resource.updated": "Cập nhật bài viết cho phụ huynh",
+  "parent_resource.archived": "Lưu trữ bài viết cho phụ huynh",
   "mission.scheduled": "Lên lịch hiển thị nhiệm vụ",
   "age_group.updated": "Cập nhật nhóm tuổi",
   "skill.created": "Thêm kỹ năng",
   "skill.updated": "Cập nhật kỹ năng",
   "system_setting.updated": "Cập nhật cài đặt nâng cao",
+  "system_feedback.created": "Gửi góp ý hệ thống",
+  "system_feedback.updated": "Cập nhật trạng thái góp ý",
 };
 export const resourceTypeLabels: Record<string, string> = {
   mission: "Nhiệm vụ",
@@ -79,6 +90,10 @@ export const resourceTypeLabels: Record<string, string> = {
   child_profile: "Hồ sơ bé",
   parent_profile: "Hồ sơ phụ huynh",
   family: "Gia đình",
+  age_group: "Nhóm tuổi",
+  skill: "Kỹ năng",
+  parent_resource: "Bài viết cho phụ huynh",
+  system_feedback: "Góp ý hệ thống",
 };
 
 export const analyticsEventLabels: Record<string, string> = {
