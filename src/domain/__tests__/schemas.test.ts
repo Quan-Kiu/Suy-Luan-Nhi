@@ -48,8 +48,27 @@ describe("Child Profile validation", () => {
     });
   });
 
-  it("rejects an empty nickname and unsupported age group", () => {
-    expect(createChildProfileSchema.safeParse({ displayName: "", ageGroup: "9-11" }).success).toBe(false);
+  it("rejects a nickname shorter than two characters", () => {
+    const result = createChildProfileSchema.safeParse({
+      displayName: "Q",
+      ageGroup: "6-8",
+      avatarAssetId: DEFAULT_CHILD_AVATAR_ASSET_ID,
+    });
+
+    expect(result.success).toBe(false);
+    if (!result.success) {
+      expect(result.error.issues[0]?.message).toBe("Tên hồ sơ của bé cần ít nhất 2 ký tự");
+    }
+  });
+
+  it("rejects an unsupported age group", () => {
+    expect(
+      createChildProfileSchema.safeParse({
+        displayName: "Bống",
+        ageGroup: "9-11",
+        avatarAssetId: DEFAULT_CHILD_AVATAR_ASSET_ID,
+      }).success,
+    ).toBe(false);
   });
 });
 

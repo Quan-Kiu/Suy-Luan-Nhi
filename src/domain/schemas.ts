@@ -4,9 +4,15 @@ import { ageGroupCodes, type AgeGroup } from "@/domain/age-groups";
 export const ageGroupSchema = z.enum(ageGroupCodes);
 export type { AgeGroup };
 
+export const childDisplayNameSchema = z
+  .string()
+  .trim()
+  .min(2, "Tên hồ sơ của bé cần ít nhất 2 ký tự")
+  .max(20, "Tên tối đa 20 ký tự");
+
 export const childProfileSchema = z.object({
   id: z.string().min(1),
-  displayName: z.string().trim().min(1, "Hãy nhập tên thân mật").max(20, "Tên tối đa 20 ký tự"),
+  displayName: childDisplayNameSchema,
   ageGroup: ageGroupSchema,
   avatar: z.string().min(1),
   mascot: z.string().min(1),

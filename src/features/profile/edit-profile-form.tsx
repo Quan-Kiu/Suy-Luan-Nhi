@@ -8,6 +8,7 @@ import { toast } from "sonner";
 import { z } from "zod";
 import { ageGroupCodes } from "@/domain/age-groups";
 import { DEFAULT_CHILD_AVATAR_ASSET_ID } from "@/domain/child-avatar";
+import { childDisplayNameSchema } from "@/domain/schemas";
 import { childrenApi, type ChildProfile } from "@/api/children";
 import { FormStatus, HydrationSafeForm, SelectField, SubmitButton, TextField } from "@/components/form";
 import { Card } from "@/components/ui";
@@ -20,7 +21,7 @@ import { usePendingRouter } from "@/hooks/use-pending-router";
 import { queryKeys } from "@/lib/query/keys";
 
 const schema = z.object({
-  displayName: z.string().trim().min(1, "Hãy nhập tên thân mật").max(20, "Tên tối đa 20 ký tự"),
+  displayName: childDisplayNameSchema,
   ageGroup: z.enum(ageGroupCodes),
   avatarAssetId: z.string().uuid("Hãy chọn avatar cho bé"),
 });
@@ -78,6 +79,8 @@ export function EditProfileForm({ child }: { child: ChildProfile }) {
           label={contentText(content, "edit.nameLabel", "Tên thân mật")}
           placeholder={contentText(content, "edit.namePlaceholder", "Tên thân mật của bé")}
           registration={form.register("displayName")}
+          minLength={2}
+          maxLength={20}
           error={form.formState.errors.displayName?.message}
         />
         <Controller

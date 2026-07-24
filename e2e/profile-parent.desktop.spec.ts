@@ -13,6 +13,11 @@ test("parent moves a child profile to trash, restores it and deletes it permanen
   await page.goto("/profiles");
   await page.getByRole("link", { name: /Tạo thêm hồ sơ bé/i }).click();
   await expect(page).toHaveURL(/\/onboarding$/);
+  await page.getByLabel("Tên thân mật của bé").fill("Q");
+  await page.getByRole("button", { name: /Tạo hồ sơ và bắt đầu/i }).click();
+  await expect(page.getByText("Tên hồ sơ của bé cần ít nhất 2 ký tự")).toBeVisible();
+  await expect(page).toHaveURL(/\/onboarding$/);
+
   await page.getByLabel("Tên thân mật của bé").fill("Mít E2E");
   await page.getByText("6–8 tuổi", { exact: true }).click();
   await page.getByRole("button", { name: /Tạo hồ sơ và bắt đầu/i }).click();
@@ -20,6 +25,11 @@ test("parent moves a child profile to trash, restores it and deletes it permanen
   await expect(page.getByRole("heading", { name: "Mít E2E" })).toBeVisible();
 
   await page.getByLabel("Chỉnh sửa Mít E2E").click();
+  await page.getByLabel("Tên thân mật").fill("Q");
+  await page.getByRole("button", { name: "Lưu thay đổi" }).click();
+  await expect(page.getByText("Tên hồ sơ của bé cần ít nhất 2 ký tự")).toBeVisible();
+  await expect(page).toHaveURL(/\/profiles\/[^/]+\/edit$/);
+
   await page.getByLabel("Tên thân mật").fill("Mít Đã Sửa");
   await page.getByLabel("Nhóm tuổi").selectOption("6-8");
   await page.getByRole("button", { name: "Lưu thay đổi" }).click();

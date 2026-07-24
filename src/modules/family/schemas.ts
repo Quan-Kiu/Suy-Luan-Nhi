@@ -2,12 +2,11 @@ import { z } from "zod";
 import { ageGroupCodes } from "@/domain/age-groups";
 import { DEFAULT_CHILD_AVATAR_ASSET_ID } from "@/domain/child-avatar";
 import { parentPinValueSchema } from "@/domain/parent-pin";
-
-const displayNameSchema = z.string().trim().min(1, "Hãy nhập tên thân mật").max(20, "Tên tối đa 20 ký tự");
+import { childDisplayNameSchema } from "@/domain/schemas";
 const avatarAssetIdSchema = z.string().uuid("Hãy chọn avatar cho bé");
 
 export const createChildSchema = z.object({
-  displayName: displayNameSchema,
+  displayName: childDisplayNameSchema,
   ageGroup: z.enum(ageGroupCodes),
   avatarAssetId: avatarAssetIdSchema.default(DEFAULT_CHILD_AVATAR_ASSET_ID),
   mascotId: z.string().default("bong"),
@@ -15,7 +14,7 @@ export const createChildSchema = z.object({
 
 export const updateChildSchema = z
   .object({
-    displayName: displayNameSchema.optional(),
+    displayName: childDisplayNameSchema.optional(),
     ageGroup: z.enum(ageGroupCodes).optional(),
     avatarAssetId: avatarAssetIdSchema.optional(),
     mascotId: z.string().optional(),

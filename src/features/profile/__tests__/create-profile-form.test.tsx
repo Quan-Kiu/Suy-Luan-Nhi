@@ -40,12 +40,13 @@ function renderForm() {
 }
 
 describe("CreateProfileForm", () => {
-  it("shows a field error before sending an empty nickname", async () => {
+  it("shows a field error before sending a one-character nickname", async () => {
     renderForm();
     const submit = await screen.findByRole("button", { name: /tạo hồ sơ và bắt đầu/i });
     await waitFor(() => expect(submit).toBeEnabled());
+    await userEvent.type(screen.getByLabelText(/tên thân mật của bé/i), "Q");
     await userEvent.click(submit);
-    expect(await screen.findByText("Hãy nhập tên thân mật")).toBeInTheDocument();
+    expect(await screen.findByText("Tên hồ sơ của bé cần ít nhất 2 ký tự")).toBeInTheDocument();
   });
 
   it("lets the parent select an age group", async () => {

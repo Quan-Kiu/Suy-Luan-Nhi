@@ -77,6 +77,8 @@ export function CreateProfileForm() {
           placeholder={contentText(content, "create.namePlaceholder", "Ví dụ: Bống, Mít...")}
           autoComplete="off"
           registration={form.register("displayName")}
+          minLength={2}
+          maxLength={20}
           error={form.formState.errors.displayName?.message}
           className="min-h-14"
         />
