@@ -27,7 +27,7 @@ test.afterAll(async () => {
   await pool.end();
 });
 
-test("member groups and sign-in badges remain clear on mobile", async ({ page }) => {
+test("member tabs and sign-in badges remain clear on mobile", async ({ page }) => {
   await signIn(page, "admin@demo.local", "/admin");
 
   const result = await pool.query<AccountSnapshot>(
@@ -48,25 +48,30 @@ test("member groups and sign-in badges remain clear on mobile", async ({ page })
 
   await page.goto("/admin/members");
 
-  const staffSection = page.getByRole("region", { name: "Ban quản trị" });
-  const parentSection = page.getByRole("region", { name: "Phụ huynh" });
-  await expect(staffSection).toBeVisible();
-  await expect(parentSection).toBeVisible();
+  const staffTab = page.getByRole("tab", { name: /Ban quản trị/ });
+  const parentTab = page.getByRole("tab", { name: /Phụ huynh/ });
+  await expect(staffTab).toBeVisible();
+  await expect(parentTab).toBeVisible();
+  await expect(staffTab).toHaveAttribute("aria-selected", "true");
 
-  const reviewerCard = staffSection.locator("article", { hasText: "reviewer@demo.local" });
+  const staffPanel = page.getByRole("tabpanel", { name: /Ban quản trị/ });
+  const reviewerCard = staffPanel.locator("article", { hasText: "reviewer@demo.local" });
   await expect(reviewerCard).toBeVisible();
   await expect(reviewerCard.getByText("Google", { exact: true })).toBeVisible();
 
-  const parentCard = parentSection.locator("article", { hasText: "parent@demo.local" });
+  await parentTab.click();
+  const parentPanel = page.getByRole("tabpanel", { name: /Phụ huynh/ });
+  const parentCard = parentPanel.locator("article", { hasText: "parent@demo.local" });
   await expect(parentCard).toBeVisible();
   await expect(parentCard.getByText("Email & mật khẩu", { exact: true })).toBeVisible();
+  await expect(page.getByRole("tabpanel", { name: /Ban quản trị/ })).toHaveCount(0);
 
   expect(await page.locator("html").evaluate((element) => element.scrollWidth <= element.clientWidth)).toBe(
     true,
   );
 
   await page.screenshot({
-    path: ".verification/browser/admin-member-sections-mobile.png",
+    path: ".verification/browser/admin-member-tabs-mobile.png",
     fullPage: true,
   });
 });

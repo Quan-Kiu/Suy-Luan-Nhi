@@ -27,7 +27,7 @@ test.afterAll(async () => {
   await pool.end();
 });
 
-test("member management separates staff and parents and identifies Google accounts", async ({ page }) => {
+test("member management uses tabs and identifies Google accounts", async ({ page }) => {
   await signIn(page, "admin@demo.local", "/admin");
 
   const result = await pool.query<AccountSnapshot>(
@@ -48,23 +48,30 @@ test("member management separates staff and parents and identifies Google accoun
 
   await page.goto("/admin/members");
 
-  const staffSection = page.getByRole("region", { name: "Ban quản trị" });
-  const parentSection = page.getByRole("region", { name: "Phụ huynh" });
-  await expect(staffSection).toBeVisible();
-  await expect(parentSection).toBeVisible();
+  const staffTab = page.getByRole("tab", { name: /Ban quản trị/ });
+  const parentTab = page.getByRole("tab", { name: /Phụ huynh/ });
+  await expect(staffTab).toHaveAttribute("aria-selected", "true");
+  await expect(parentTab).toHaveAttribute("aria-selected", "false");
 
-  const reviewerRow = staffSection.locator("tr", { hasText: "reviewer@demo.local" });
+  const staffPanel = page.getByRole("tabpanel", { name: /Ban quản trị/ });
+  const reviewerRow = staffPanel.locator("tr", { hasText: "reviewer@demo.local" });
   await expect(reviewerRow).toBeVisible();
   await expect(reviewerRow.getByText("Google", { exact: true })).toBeVisible();
   await expect(reviewerRow.getByText("Email & mật khẩu", { exact: true })).toHaveCount(0);
+  await expect(page.getByRole("tabpanel", { name: /Phụ huynh/ })).toHaveCount(0);
 
-  const parentRow = parentSection.locator("tr", { hasText: "parent@demo.local" });
+  await parentTab.click();
+  await expect(parentTab).toHaveAttribute("aria-selected", "true");
+  await expect(page.getByRole("tabpanel", { name: /Ban quản trị/ })).toHaveCount(0);
+
+  const parentPanel = page.getByRole("tabpanel", { name: /Phụ huynh/ });
+  const parentRow = parentPanel.locator("tr", { hasText: "parent@demo.local" });
   await expect(parentRow).toBeVisible();
   await expect(parentRow.getByText("Email & mật khẩu", { exact: true })).toBeVisible();
   await expect(parentRow.getByText("Google", { exact: true })).toHaveCount(0);
 
   await page.screenshot({
-    path: ".verification/browser/admin-member-sections.png",
+    path: ".verification/browser/admin-member-tabs.png",
     fullPage: true,
   });
 });
