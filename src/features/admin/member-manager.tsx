@@ -1,9 +1,9 @@
 "use client";
 
-import type { KeyboardEvent } from "react";
-import { useRef, useState } from "react";
+import { useState } from "react";
 import type { LucideIcon } from "lucide-react";
 import { ShieldCheck, UsersRound } from "lucide-react";
+import { AdminTabPanel, AdminTabs } from "@/features/admin/admin-tabs";
 import { MemberCard, MemberRow, type MemberItem } from "@/features/admin/member-row";
 import { partitionMembersByAccess } from "@/features/admin/member-presentation";
 
@@ -54,56 +54,9 @@ type MemberTab = {
   icon: LucideIcon;
 };
 
-function MemberTabButton({
-  tab,
-  selected,
-  buttonRef,
-  onClick,
-  onKeyDown,
-}: {
-  tab: MemberTab;
-  selected: boolean;
-  buttonRef: (element: HTMLButtonElement | null) => void;
-  onClick: () => void;
-  onKeyDown: (event: KeyboardEvent<HTMLButtonElement>) => void;
-}) {
-  const Icon = tab.icon;
-  return (
-    <button
-      ref={buttonRef}
-      id={`member-tab-${tab.key}`}
-      type="button"
-      role="tab"
-      aria-selected={selected}
-      aria-controls={`member-panel-${tab.key}`}
-      aria-label={`${tab.title}, ${tab.items.length} tài khoản`}
-      tabIndex={selected ? 0 : -1}
-      onClick={onClick}
-      onKeyDown={onKeyDown}
-      className={`type-action flex min-h-12 min-w-0 items-center justify-center gap-2 rounded-xl border px-3 py-2.5 transition sm:min-w-52 ${
-        selected
-          ? "border-[#342f28] bg-white text-[#342f28] shadow-sm"
-          : "border-transparent text-[#6f6558] hover:bg-white/70 hover:text-[#342f28]"
-      }`}
-    >
-      <Icon aria-hidden="true" className="shrink-0" size={18} />
-      <span className="truncate">{tab.title}</span>
-      <span
-        aria-hidden="true"
-        className={`type-caption shrink-0 rounded-full border px-2 py-0.5 font-bold ${
-          selected ? "bg-[#f7f3eb] text-[#493f34]" : "bg-white/70 text-[#6f6558]"
-        }`}
-      >
-        {tab.items.length}
-      </span>
-    </button>
-  );
-}
-
 export function MemberManager({ items, currentUserId }: { items: MemberItem[]; currentUserId: string }) {
   const { staff, parents } = partitionMembersByAccess(items);
   const [activeTabKey, setActiveTabKey] = useState<MemberTabKey>("staff");
-  const tabRefs = useRef<Array<HTMLButtonElement | null>>([]);
   const tabs: MemberTab[] = [
     {
       key: "staff",
@@ -125,52 +78,23 @@ export function MemberManager({ items, currentUserId }: { items: MemberItem[]; c
   ];
   const activeTab = tabs.find((tab) => tab.key === activeTabKey) ?? tabs[0]!;
 
-  function selectTab(index: number, focus = false) {
-    const tab = tabs[index];
-    if (!tab) return;
-    setActiveTabKey(tab.key);
-    if (focus) tabRefs.current[index]?.focus();
-  }
-
-  function handleTabKeyDown(event: KeyboardEvent<HTMLButtonElement>, currentIndex: number) {
-    let nextIndex: number | null = null;
-    if (event.key === "ArrowRight") nextIndex = (currentIndex + 1) % tabs.length;
-    if (event.key === "ArrowLeft") nextIndex = (currentIndex - 1 + tabs.length) % tabs.length;
-    if (event.key === "Home") nextIndex = 0;
-    if (event.key === "End") nextIndex = tabs.length - 1;
-    if (nextIndex === null) return;
-    event.preventDefault();
-    selectTab(nextIndex, true);
-  }
-
   return (
     <div className="space-y-4">
-      <div
-        role="tablist"
-        aria-label="Nhóm thành viên"
-        className="grid grid-cols-2 gap-1.5 rounded-2xl border bg-[#f3ecdf] p-1.5 sm:w-fit"
-      >
-        {tabs.map((tab, index) => (
-          <MemberTabButton
-            key={tab.key}
-            tab={tab}
-            selected={tab.key === activeTab.key}
-            buttonRef={(element) => {
-              tabRefs.current[index] = element;
-            }}
-            onClick={() => selectTab(index)}
-            onKeyDown={(event) => handleTabKeyDown(event, index)}
-          />
-        ))}
-      </div>
+      <AdminTabs
+        idPrefix="member"
+        ariaLabel="Nhóm thành viên"
+        value={activeTab.key}
+        onValueChange={setActiveTabKey}
+        items={tabs.map((tab) => ({
+          value: tab.key,
+          label: tab.title,
+          icon: tab.icon,
+          count: tab.items.length,
+          ariaLabel: `${tab.title}, ${tab.items.length} tài khoản`,
+        }))}
+      />
 
-      <section
-        id={`member-panel-${activeTab.key}`}
-        role="tabpanel"
-        aria-labelledby={`member-tab-${activeTab.key}`}
-        tabIndex={0}
-        className="space-y-3 outline-none focus-visible:ring-2 focus-visible:ring-[#c45a16] focus-visible:ring-offset-2"
-      >
+      <AdminTabPanel idPrefix="member" value={activeTab.key} className="space-y-3">
         <div className="rounded-2xl border bg-[#fffdf8] px-4 py-3">
           <p className="type-supporting text-[#6f6558]">{activeTab.description}</p>
         </div>
@@ -181,7 +105,7 @@ export function MemberManager({ items, currentUserId }: { items: MemberItem[]; c
             <p className="type-supporting text-[#6f6558]">{activeTab.emptyMessage}</p>
           </div>
         )}
-      </section>
+      </AdminTabPanel>
     </div>
   );
 }

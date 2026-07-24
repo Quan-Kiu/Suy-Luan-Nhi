@@ -22,6 +22,7 @@ import {
 } from "@/api/admin/missions";
 import { contentTemplate, contentText } from "@/content/resolve";
 import type { ContentDictionary } from "@/content/types";
+import { AdminTabPanel, AdminTabs } from "@/features/admin/admin-tabs";
 import { MissionListActions } from "@/features/admin/mission-list-actions";
 import { MissionStatusBadge } from "@/features/admin/mission-status-badge";
 import { missionStatusLabels } from "@/features/admin/admin-labels";
@@ -158,33 +159,19 @@ export function MissionListWorkspace({ initialData, initialFilters, worlds, canE
 
   return (
     <div className="space-y-5">
-      <nav
-        aria-label="Xem nhanh danh sách nhiệm vụ"
-        className="flex w-fit flex-wrap gap-1 rounded-xl border bg-white p-1"
-      >
-        <button
-          type="button"
-          aria-pressed={!archiveView}
-          onClick={showActiveMissions}
-          className={cn(
-            "type-action inline-flex min-h-10 items-center gap-2 rounded-lg px-3 py-2 font-black transition",
-            !archiveView ? "bg-[#3f392f] text-white" : "text-[#62594e] hover:bg-[#f7f3eb]",
-          )}
-        >
-          <ListChecks size={17} /> Đang quản lý
-        </button>
-        <button
-          type="button"
-          aria-pressed={archiveView}
-          onClick={showArchivedMissions}
-          className={cn(
-            "type-action inline-flex min-h-10 items-center gap-2 rounded-lg px-3 py-2 font-black transition",
-            archiveView ? "bg-[#3f392f] text-white" : "text-[#62594e] hover:bg-[#f7f3eb]",
-          )}
-        >
-          <Archive size={17} /> Kho lưu trữ
-        </button>
-      </nav>
+      <AdminTabs
+        idPrefix="mission-list"
+        ariaLabel="Xem nhanh danh sách nhiệm vụ"
+        value={archiveView ? "archived" : "active"}
+        onValueChange={(value) => {
+          if (value === "archived") showArchivedMissions();
+          else showActiveMissions();
+        }}
+        items={[
+          { value: "active", label: "Đang quản lý", icon: ListChecks },
+          { value: "archived", label: "Kho lưu trữ", icon: Archive },
+        ]}
+      />
 
       <form
         className="grid gap-3 rounded-2xl border bg-white p-4 sm:grid-cols-2 xl:grid-cols-[minmax(260px,1fr)_220px_210px_auto_auto]"
@@ -254,183 +241,185 @@ export function MissionListWorkspace({ initialData, initialFilters, worlds, canE
         )}
       </form>
 
-      <section className="relative" aria-busy={query.isFetching}>
-        {query.isFetching ? (
-          <div className="absolute inset-x-0 -top-1 z-10 h-1 overflow-hidden rounded-full bg-[#f0dfc3]">
-            <div className="h-full w-1/3 animate-[pulse_1s_ease-in-out_infinite] rounded-full bg-[#b9470d]" />
-          </div>
-        ) : null}
-        <div className={cn("space-y-4 transition-opacity", query.isFetching && "opacity-65")}>
-          <div className="flex flex-wrap items-center justify-between gap-3">
-            <p className="type-supporting font-bold text-[#6f6558]">
-              {archiveView
-                ? contentTemplate(
-                    content,
-                    "missions.archiveResultCount",
-                    "{count} nhiệm vụ trong Kho lưu trữ",
-                    { count: data.total },
-                  )
-                : contentTemplate(content, "missions.resultCount", "{count} nhiệm vụ", {
-                    count: data.total,
-                  })}
-            </p>
-            <label className="type-label flex items-center gap-2 font-bold text-[#6f6558]">
-              Hiển thị
-              <select
-                value={filters.pageSize}
-                onChange={(event) => {
-                  const next = { ...filters, page: 1, pageSize: Number(event.target.value) };
-                  setFilters(next);
-                  syncUrl(next);
-                }}
-                className="min-h-10 rounded-xl border bg-white px-3"
-              >
-                {[10, 20, 30].map((size) => (
-                  <option key={size} value={size}>
-                    {size}
-                  </option>
-                ))}
-              </select>
-            </label>
-          </div>
-
-          <div className="grid gap-4 md:hidden">
-            {data.items.map((item, index) => {
-              const archived = item.status === "archived";
-              return (
-                <article
-                  key={item.id}
-                  className={cn(
-                    "overflow-hidden rounded-2xl border bg-white shadow-sm",
-                    archived && "border-stone-300 bg-stone-50",
-                  )}
+      <AdminTabPanel idPrefix="mission-list" value={archiveView ? "archived" : "active"} className="relative">
+        <div aria-busy={query.isFetching}>
+          {query.isFetching ? (
+            <div className="absolute inset-x-0 -top-1 z-10 h-1 overflow-hidden rounded-full bg-[#f0dfc3]">
+              <div className="h-full w-1/3 animate-[pulse_1s_ease-in-out_infinite] rounded-full bg-[#b9470d]" />
+            </div>
+          ) : null}
+          <div className={cn("space-y-4 transition-opacity", query.isFetching && "opacity-65")}>
+            <div className="flex flex-wrap items-center justify-between gap-3">
+              <p className="type-supporting font-bold text-[#6f6558]">
+                {archiveView
+                  ? contentTemplate(
+                      content,
+                      "missions.archiveResultCount",
+                      "{count} nhiệm vụ trong Kho lưu trữ",
+                      { count: data.total },
+                    )
+                  : contentTemplate(content, "missions.resultCount", "{count} nhiệm vụ", {
+                      count: data.total,
+                    })}
+              </p>
+              <label className="type-label flex items-center gap-2 font-bold text-[#6f6558]">
+                Hiển thị
+                <select
+                  value={filters.pageSize}
+                  onChange={(event) => {
+                    const next = { ...filters, page: 1, pageSize: Number(event.target.value) };
+                    setFilters(next);
+                    syncUrl(next);
+                  }}
+                  className="min-h-10 rounded-xl border bg-white px-3"
                 >
-                  <MissionEditTarget
-                    canEdit={canEdit && !archived}
-                    href={`/admin/missions/${item.id}/edit`}
-                    className="block"
-                  >
-                    <div className="relative h-36 w-full overflow-hidden">
-                      <Image
-                        src={item.coverUrl}
-                        fill
-                        sizes="(max-width: 767px) calc(100vw - 2rem), 1px"
-                        priority={index === 0}
-                        alt=""
-                        className={cn("object-cover", archived && "opacity-75 grayscale-[35%]")}
-                      />
-                    </div>
-                    <div className="p-4">
-                      <div className="flex flex-wrap items-start justify-between gap-2">
-                        <div className="min-w-0">
-                          <h2 className="type-card-title">{item.title}</h2>
-                          <p className="type-supporting text-[#6f6558]">{item.worldTitle}</p>
-                        </div>
-                        <MissionStatusBadge status={item.status} />
-                      </div>
-                      <p className="type-supporting mt-3 text-[#6f6558]">
-                        {contentTemplate(
-                          content,
-                          "missions.summary",
-                          "{questions} câu hỏi · khoảng {minutes} phút",
-                          {
-                            questions: item.questionCount,
-                            minutes: item.estimatedMinutes,
-                          },
-                        )}
-                      </p>
-                      <p className="type-caption mt-1 text-[#756b60]">{formatMissionTimeline(item)}</p>
-                    </div>
-                  </MissionEditTarget>
-                  {canEdit ? (
-                    <div className="border-t px-4 py-3">
-                      <MissionListActions missionId={item.id} status={item.status} showLabels />
-                    </div>
-                  ) : null}
-                </article>
-              );
-            })}
-          </div>
+                  {[10, 20, 30].map((size) => (
+                    <option key={size} value={size}>
+                      {size}
+                    </option>
+                  ))}
+                </select>
+              </label>
+            </div>
 
-          <div className="hidden overflow-x-auto rounded-2xl border bg-white md:block">
-            <table className="type-supporting min-w-full">
-              <thead className="bg-[#f7f3eb] text-left">
-                <tr>
-                  <th className="p-3">{t("missions.columnMission", "Nhiệm vụ")}</th>
-                  <th className="p-3">{t("missions.columnWorld", "Thế giới")}</th>
-                  <th className="p-3">{t("missions.columnStatus", "Trạng thái")}</th>
-                  <th className="p-3">{t("missions.columnContent", "Độ dài")}</th>
-                  <th className="p-3">{t("missions.columnTimeline", "Thời gian")}</th>
-                  {canEdit ? <th className="p-3">{t("missions.columnActions", "Thao tác")}</th> : null}
-                </tr>
-              </thead>
-              <tbody>
-                {data.items.map((item) => (
-                  <MissionTableRow key={item.id} item={item} canEdit={canEdit} content={content} />
-                ))}
-              </tbody>
-            </table>
-          </div>
-          {!data.items.length ? (
-            <div className="rounded-2xl border bg-white p-10 text-center">
-              <p className="font-black">
-                {archiveView
-                  ? t("missions.archiveEmpty", "Kho lưu trữ đang trống.")
-                  : t("missions.empty", "Không tìm thấy nhiệm vụ phù hợp.")}
-              </p>
-              <p className="type-supporting mt-2 text-[#6f6558]">
-                {archiveView
-                  ? "Những nhiệm vụ được lưu trữ sẽ xuất hiện ở đây và có thể khôi phục khi cần."
-                  : canEdit
-                    ? "Thử xóa bộ lọc hoặc tạo một nhiệm vụ mới."
-                    : "Thử xóa bộ lọc để xem toàn bộ nhiệm vụ."}
-              </p>
-              {archiveView ? (
+            <div className="grid gap-4 md:hidden">
+              {data.items.map((item, index) => {
+                const archived = item.status === "archived";
+                return (
+                  <article
+                    key={item.id}
+                    className={cn(
+                      "overflow-hidden rounded-2xl border bg-white shadow-sm",
+                      archived && "border-stone-300 bg-stone-50",
+                    )}
+                  >
+                    <MissionEditTarget
+                      canEdit={canEdit && !archived}
+                      href={`/admin/missions/${item.id}/edit`}
+                      className="block"
+                    >
+                      <div className="relative h-36 w-full overflow-hidden">
+                        <Image
+                          src={item.coverUrl}
+                          fill
+                          sizes="(max-width: 767px) calc(100vw - 2rem), 1px"
+                          priority={index === 0}
+                          alt=""
+                          className={cn("object-cover", archived && "opacity-75 grayscale-[35%]")}
+                        />
+                      </div>
+                      <div className="p-4">
+                        <div className="flex flex-wrap items-start justify-between gap-2">
+                          <div className="min-w-0">
+                            <h2 className="type-card-title">{item.title}</h2>
+                            <p className="type-supporting text-[#6f6558]">{item.worldTitle}</p>
+                          </div>
+                          <MissionStatusBadge status={item.status} />
+                        </div>
+                        <p className="type-supporting mt-3 text-[#6f6558]">
+                          {contentTemplate(
+                            content,
+                            "missions.summary",
+                            "{questions} câu hỏi · khoảng {minutes} phút",
+                            {
+                              questions: item.questionCount,
+                              minutes: item.estimatedMinutes,
+                            },
+                          )}
+                        </p>
+                        <p className="type-caption mt-1 text-[#756b60]">{formatMissionTimeline(item)}</p>
+                      </div>
+                    </MissionEditTarget>
+                    {canEdit ? (
+                      <div className="border-t px-4 py-3">
+                        <MissionListActions missionId={item.id} status={item.status} showLabels />
+                      </div>
+                    ) : null}
+                  </article>
+                );
+              })}
+            </div>
+
+            <div className="hidden overflow-x-auto rounded-2xl border bg-white md:block">
+              <table className="type-supporting min-w-full">
+                <thead className="bg-[#f7f3eb] text-left">
+                  <tr>
+                    <th className="p-3">{t("missions.columnMission", "Nhiệm vụ")}</th>
+                    <th className="p-3">{t("missions.columnWorld", "Thế giới")}</th>
+                    <th className="p-3">{t("missions.columnStatus", "Trạng thái")}</th>
+                    <th className="p-3">{t("missions.columnContent", "Độ dài")}</th>
+                    <th className="p-3">{t("missions.columnTimeline", "Thời gian")}</th>
+                    {canEdit ? <th className="p-3">{t("missions.columnActions", "Thao tác")}</th> : null}
+                  </tr>
+                </thead>
+                <tbody>
+                  {data.items.map((item) => (
+                    <MissionTableRow key={item.id} item={item} canEdit={canEdit} content={content} />
+                  ))}
+                </tbody>
+              </table>
+            </div>
+            {!data.items.length ? (
+              <div className="rounded-2xl border bg-white p-10 text-center">
+                <p className="font-black">
+                  {archiveView
+                    ? t("missions.archiveEmpty", "Kho lưu trữ đang trống.")
+                    : t("missions.empty", "Không tìm thấy nhiệm vụ phù hợp.")}
+                </p>
+                <p className="type-supporting mt-2 text-[#6f6558]">
+                  {archiveView
+                    ? "Những nhiệm vụ được lưu trữ sẽ xuất hiện ở đây và có thể khôi phục khi cần."
+                    : canEdit
+                      ? "Thử xóa bộ lọc hoặc tạo một nhiệm vụ mới."
+                      : "Thử xóa bộ lọc để xem toàn bộ nhiệm vụ."}
+                </p>
+                {archiveView ? (
+                  <button
+                    type="button"
+                    onClick={showActiveMissions}
+                    className="mt-4 inline-flex min-h-10 items-center gap-2 rounded-xl border px-4 font-black"
+                  >
+                    <ListChecks size={17} /> Xem nhiệm vụ đang quản lý
+                  </button>
+                ) : null}
+              </div>
+            ) : null}
+
+            {query.isError ? (
+              <div
+                role="alert"
+                className="type-label rounded-2xl border border-red-200 bg-red-50 p-4 font-bold text-red-800"
+              >
+                {query.error.message}
+              </div>
+            ) : null}
+
+            {data.totalPages > 1 ? (
+              <nav aria-label="Phân trang nhiệm vụ" className="flex items-center justify-center gap-3 pt-1">
                 <button
                   type="button"
-                  onClick={showActiveMissions}
-                  className="mt-4 inline-flex min-h-10 items-center gap-2 rounded-xl border px-4 font-black"
+                  disabled={filters.page <= 1 || query.isFetching}
+                  onClick={() => changePage(filters.page - 1)}
+                  className="inline-flex min-h-11 items-center gap-2 rounded-xl border bg-white px-4 font-black disabled:opacity-40"
                 >
-                  <ListChecks size={17} /> Xem nhiệm vụ đang quản lý
+                  <ChevronLeft size={18} /> Trang trước
                 </button>
-              ) : null}
-            </div>
-          ) : null}
-
-          {query.isError ? (
-            <div
-              role="alert"
-              className="type-label rounded-2xl border border-red-200 bg-red-50 p-4 font-bold text-red-800"
-            >
-              {query.error.message}
-            </div>
-          ) : null}
-
-          {data.totalPages > 1 ? (
-            <nav aria-label="Phân trang nhiệm vụ" className="flex items-center justify-center gap-3 pt-1">
-              <button
-                type="button"
-                disabled={filters.page <= 1 || query.isFetching}
-                onClick={() => changePage(filters.page - 1)}
-                className="inline-flex min-h-11 items-center gap-2 rounded-xl border bg-white px-4 font-black disabled:opacity-40"
-              >
-                <ChevronLeft size={18} /> Trang trước
-              </button>
-              <span className="type-label font-black text-[#6f6558]">
-                Trang {data.page}/{data.totalPages}
-              </span>
-              <button
-                type="button"
-                disabled={filters.page >= data.totalPages || query.isFetching}
-                onClick={() => changePage(filters.page + 1)}
-                className="inline-flex min-h-11 items-center gap-2 rounded-xl border bg-white px-4 font-black disabled:opacity-40"
-              >
-                Trang sau <ChevronRight size={18} />
-              </button>
-            </nav>
-          ) : null}
+                <span className="type-label font-black text-[#6f6558]">
+                  Trang {data.page}/{data.totalPages}
+                </span>
+                <button
+                  type="button"
+                  disabled={filters.page >= data.totalPages || query.isFetching}
+                  onClick={() => changePage(filters.page + 1)}
+                  className="inline-flex min-h-11 items-center gap-2 rounded-xl border bg-white px-4 font-black disabled:opacity-40"
+                >
+                  Trang sau <ChevronRight size={18} />
+                </button>
+              </nav>
+            ) : null}
+          </div>
         </div>
-      </section>
+      </AdminTabPanel>
     </div>
   );
 }

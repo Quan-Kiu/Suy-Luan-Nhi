@@ -6,8 +6,8 @@ test.describe.configure({ mode: "serial" });
 test("content admin can archive, find, and safely restore a mission", async ({ page }) => {
   await signIn(page, "content@demo.local", "/admin/missions");
 
-  const activeView = page.getByRole("button", { name: "Đang quản lý", exact: true });
-  await expect(activeView).toHaveAttribute("aria-pressed", "true");
+  const activeView = page.getByRole("tab", { name: "Đang quản lý", exact: true });
+  await expect(activeView).toHaveAttribute("aria-selected", "true");
 
   const activeRow = page.locator("tbody tr").first();
   await expect(activeRow).toBeVisible();
@@ -23,7 +23,9 @@ test("content admin can archive, find, and safely restore a mission", async ({ p
   await expect(page.getByText("Đã chuyển nhiệm vụ vào Kho lưu trữ")).toBeVisible();
   await expect(page.locator("tbody tr").filter({ hasText: missionTitle })).toHaveCount(0);
 
-  await page.getByRole("button", { name: "Kho lưu trữ", exact: true }).click();
+  const archiveView = page.getByRole("tab", { name: "Kho lưu trữ", exact: true });
+  await archiveView.click();
+  await expect(archiveView).toHaveAttribute("aria-selected", "true");
   await expect(page).toHaveURL(/status=archived/);
 
   const archivedRow = page.locator("tbody tr").filter({ hasText: missionTitle });
