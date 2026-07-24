@@ -34,6 +34,7 @@ export function MediaUploadForm({ onUploaded }: { onUploaded: (item: MediaItem) 
     defaultValues: { category: "general", altText: "" },
   });
   const fileInputId = useId();
+  const fileLabelId = `${fileInputId}-label`;
   const fileInputRef = useRef<HTMLInputElement | null>(null);
   const fileRegistration = form.register("file");
   const category = useWatch({ control: form.control, name: "category" });
@@ -93,17 +94,18 @@ export function MediaUploadForm({ onUploaded }: { onUploaded: (item: MediaItem) 
       ) : null}
       <div className="mt-5 grid gap-x-3 gap-y-4 md:grid-cols-2 2xl:grid-cols-[minmax(0,1.25fr)_minmax(180px,0.45fr)_minmax(0,1fr)_minmax(8rem,max-content)] 2xl:items-start">
         <div className="grid content-start gap-2 font-bold md:col-span-2 2xl:col-span-1">
-          <label htmlFor={fileInputId} className="type-label">
+          <span id={fileLabelId} className="type-label">
             Tệp hình ảnh, âm thanh hoặc video
-          </label>
+          </span>
           <input
             id={fileInputId}
             type="file"
             accept="image/png,image/jpeg,image/webp,image/gif,image/avif,audio/mpeg,audio/wav,audio/ogg,video/mp4,video/webm,video/quicktime"
-            className="peer sr-only"
+            hidden
             name={fileRegistration.name}
             onBlur={fileRegistration.onBlur}
             onChange={fileRegistration.onChange}
+            aria-labelledby={fileLabelId}
             aria-invalid={Boolean(fileError)}
             aria-describedby={fileDescriptionIds || undefined}
             ref={(element) => {
@@ -111,17 +113,26 @@ export function MediaUploadForm({ onUploaded }: { onUploaded: (item: MediaItem) 
               fileInputRef.current = element;
             }}
           />
-          <label
-            htmlFor={fileInputId}
-            className="flex min-h-12 cursor-pointer items-stretch overflow-hidden rounded-2xl border-2 border-[#eadfc9] bg-[#fffdf8] transition peer-focus-visible:border-[#e9641a] peer-focus-visible:ring-4 peer-focus-visible:ring-[#f6be78]/45 hover:border-[#d6b783]"
+          <div
+            className="flex min-h-12 items-stretch overflow-hidden rounded-2xl border-2 border-[#eadfc9] bg-[#fffdf8] transition focus-within:border-[#e9641a] focus-within:ring-4 focus-within:ring-[#f6be78]/45"
+            data-testid="media-file-picker"
           >
-            <span className="type-label inline-flex shrink-0 items-center border-r border-[#eadfc9] bg-[#fff7e9] px-4 font-black text-[#5e4b34]">
+            <button
+              type="button"
+              className="type-label inline-flex shrink-0 cursor-pointer items-center border-r border-[#eadfc9] bg-[#fff7e9] px-4 font-black text-[#5e4b34] transition hover:bg-[#ffefd5] focus-visible:outline-none"
+              onClick={() => fileInputRef.current?.click()}
+              aria-label="Chọn tệp hình ảnh, âm thanh hoặc video"
+              aria-describedby={fileDescriptionIds || undefined}
+            >
               Chọn tệp
-            </span>
-            <span className="flex min-w-0 flex-1 items-center truncate px-3 font-normal text-[#6f6558]">
+            </button>
+            <span
+              className="flex min-w-0 flex-1 items-center truncate px-3 font-normal text-[#6f6558]"
+              aria-live="polite"
+            >
               {selectedFileName}
             </span>
-          </label>
+          </div>
           {fileError ? (
             <span id="media-file-error" role="alert" className="type-supporting font-bold text-red-700">
               {fileError}
