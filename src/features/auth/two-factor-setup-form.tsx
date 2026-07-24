@@ -9,7 +9,7 @@ import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { z } from "zod";
 import { authClient } from "@/auth/client";
-import { FormStatus, PasswordField, SubmitButton, TextField } from "@/components/form";
+import { FormStatus, HydrationSafeForm, PasswordField, SubmitButton, TextField } from "@/components/form";
 import { usePendingRouter } from "@/hooks/use-pending-router";
 
 const passwordSchema = z.object({ password: z.string().min(1, "Hãy nhập mật khẩu hiện tại") });
@@ -75,8 +75,9 @@ export function TwoFactorSetupForm({ requiresPassword }: { requiresPassword: boo
       ? authErrorMessage(enableMutation.error, "Không thể bắt đầu thiết lập xác thực hai lớp")
       : undefined;
     return (
-      <form
-        className="space-y-4"
+      <HydrationSafeForm
+        busy={enableMutation.isPending}
+        fieldsetClassName="space-y-4"
         onSubmit={
           requiresPassword
             ? passwordForm.handleSubmit((values) => enableMutation.mutate(values))
@@ -110,7 +111,7 @@ export function TwoFactorSetupForm({ requiresPassword }: { requiresPassword: boo
         <SubmitButton pending={enableMutation.isPending} pendingLabel="Đang tạo mã bảo mật...">
           Bắt đầu thiết lập
         </SubmitButton>
-      </form>
+      </HydrationSafeForm>
     );
   }
   const copySecret = async () => {
@@ -187,8 +188,9 @@ export function TwoFactorSetupForm({ requiresPassword }: { requiresPassword: boo
         </p>
       </section>
 
-      <form
-        className="space-y-4"
+      <HydrationSafeForm
+        busy={verifyMutation.isPending || navigation.isPending}
+        fieldsetClassName="space-y-4"
         onSubmit={codeForm.handleSubmit((values) => verifyMutation.mutate(values))}
         noValidate
       >
@@ -209,7 +211,7 @@ export function TwoFactorSetupForm({ requiresPassword }: { requiresPassword: boo
           <Check size={18} />
           Xác minh và tiếp tục
         </SubmitButton>
-      </form>
+      </HydrationSafeForm>
     </div>
   );
 }

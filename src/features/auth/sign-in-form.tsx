@@ -16,7 +16,14 @@ import {
   PARENT_PIN_SETUP_PATH,
   resolveSafeAuthCallbackPath,
 } from "@/auth/navigation";
-import { CheckboxField, FormStatus, PasswordField, SubmitButton, TextField } from "@/components/form";
+import {
+  CheckboxField,
+  FormStatus,
+  HydrationSafeForm,
+  PasswordField,
+  SubmitButton,
+  TextField,
+} from "@/components/form";
 import { contentText, useContent } from "@/content/client";
 import { EmailVerificationDialog } from "@/features/auth/email-verification-dialog";
 import { getAuthErrorMessage, isAuthError, toAuthFlowError } from "@/features/auth/auth-errors";
@@ -77,8 +84,9 @@ export function SignInForm({
 
   return (
     <>
-      <form
-        className="space-y-4"
+      <HydrationSafeForm
+        busy={mutation.isPending || navigation.isPending}
+        fieldsetClassName="space-y-4"
         onSubmit={form.handleSubmit((values) => mutation.mutate(values))}
         noValidate
       >
@@ -126,7 +134,7 @@ export function SignInForm({
             {contentText(content, "signIn.createAccount", "Tạo tài khoản")}
           </Link>
         </div>
-      </form>
+      </HydrationSafeForm>
       <EmailVerificationDialog
         open={Boolean(verificationEmail)}
         email={verificationEmail ?? ""}

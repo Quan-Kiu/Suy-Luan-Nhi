@@ -5,7 +5,7 @@ import { useMutation } from "@tanstack/react-query";
 import { useForm } from "react-hook-form";
 import type { z } from "zod";
 import { authClient } from "@/auth/client";
-import { FormStatus, SubmitButton, TextField } from "@/components/form";
+import { FormStatus, HydrationSafeForm, SubmitButton, TextField } from "@/components/form";
 import { contentText, useContent } from "@/content/client";
 import { getAuthErrorMessage, toAuthFlowError } from "@/features/auth/auth-errors";
 import { forgotPasswordSchema } from "@/features/auth/schemas";
@@ -45,7 +45,12 @@ export function ForgotPasswordForm() {
     ? getAuthErrorMessage(content, mutation.error, "PASSWORD_RESET_REQUEST_FAILED")
     : undefined;
   return (
-    <form className="space-y-4" onSubmit={form.handleSubmit((values) => mutation.mutate(values))} noValidate>
+    <HydrationSafeForm
+      busy={mutation.isPending}
+      fieldsetClassName="space-y-4"
+      onSubmit={form.handleSubmit((values) => mutation.mutate(values))}
+      noValidate
+    >
       <TextField
         type="email"
         autoComplete="email"
@@ -61,6 +66,6 @@ export function ForgotPasswordForm() {
       >
         {contentText(content, "forgot.submit", "Gửi liên kết đặt lại")}
       </SubmitButton>
-    </form>
+    </HydrationSafeForm>
   );
 }

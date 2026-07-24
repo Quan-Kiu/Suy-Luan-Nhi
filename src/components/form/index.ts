@@ -4,6 +4,7 @@ export { ControlledSelectField } from "@/components/form/controlled-select-field
 export { ControlledTextareaField } from "@/components/form/controlled-textarea-field";
 export { FieldShell } from "@/components/form/field-shell";
 export { FormStatus } from "@/components/form/form-status";
+export { HydrationSafeForm } from "@/components/form/hydration-safe-form";
 export { PasswordField } from "@/components/form/password-field";
 export { SelectField } from "@/components/form/select-field";
 export { SubmitButton } from "@/components/form/submit-button";

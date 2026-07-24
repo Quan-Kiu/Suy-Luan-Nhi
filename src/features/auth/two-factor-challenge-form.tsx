@@ -7,7 +7,7 @@ import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { authClient } from "@/auth/client";
-import { FormStatus, SubmitButton, TextField } from "@/components/form";
+import { FormStatus, HydrationSafeForm, SubmitButton, TextField } from "@/components/form";
 import { usePendingRouter } from "@/hooks/use-pending-router";
 
 const totpSchema = z.object({ code: z.string().regex(/^\d{6}$/, "Mã xác thực gồm 6 chữ số") });
@@ -50,7 +50,12 @@ export function TwoFactorChallengeForm() {
   };
 
   return (
-    <form className="space-y-4" onSubmit={form.handleSubmit((values) => mutation.mutate(values))} noValidate>
+    <HydrationSafeForm
+      busy={mutation.isPending || navigation.isPending}
+      fieldsetClassName="space-y-4"
+      onSubmit={form.handleSubmit((values) => mutation.mutate(values))}
+      noValidate
+    >
       <div className="rounded-2xl bg-blue-50 p-4 text-blue-950">
         <div className="flex items-start gap-3">
           <ShieldCheck className="mt-0.5 shrink-0" size={20} />
@@ -80,6 +85,6 @@ export function TwoFactorChallengeForm() {
       >
         {mode === "totp" ? "Dùng mã dự phòng" : "Dùng mã từ Authenticator"}
       </button>
-    </form>
+    </HydrationSafeForm>
   );
 }

@@ -10,7 +10,7 @@ import type { z } from "zod";
 import { signUp } from "@/auth/client";
 import { buildEmailVerificationCallback } from "@/auth/email-verification";
 import { buildAuthCompletePath, buildParentPinSetupPath } from "@/auth/navigation";
-import { FormStatus, PasswordField, SubmitButton, TextField } from "@/components/form";
+import { FormStatus, HydrationSafeForm, PasswordField, SubmitButton, TextField } from "@/components/form";
 import { contentText, useContent } from "@/content/client";
 import { getAuthErrorMessage, toAuthFlowError } from "@/features/auth/auth-errors";
 import { EmailVerificationStep } from "@/features/auth/email-verification-step";
@@ -72,7 +72,12 @@ export function SignUpForm({
     ? getAuthErrorMessage(content, mutation.error, "SIGN_UP_FAILED")
     : undefined;
   return (
-    <form className="space-y-4" onSubmit={form.handleSubmit((values) => mutation.mutate(values))} noValidate>
+    <HydrationSafeForm
+      busy={mutation.isPending || navigation.isPending}
+      fieldsetClassName="space-y-4"
+      onSubmit={form.handleSubmit((values) => mutation.mutate(values))}
+      noValidate
+    >
       {googleAuthEnabled ? (
         <GoogleAuthButton
           mode="sign-up"
@@ -130,6 +135,6 @@ export function SignUpForm({
           {contentText(content, "signIn.submit", "Đăng nhập")}
         </Link>
       </p>
-    </form>
+    </HydrationSafeForm>
   );
 }

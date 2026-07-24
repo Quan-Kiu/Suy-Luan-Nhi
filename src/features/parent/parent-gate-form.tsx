@@ -7,7 +7,7 @@ import Link from "next/link";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { parentApi } from "@/api/parent";
-import { FormStatus, PasswordField, SubmitButton } from "@/components/form";
+import { FormStatus, HydrationSafeForm, PasswordField, SubmitButton } from "@/components/form";
 import { Card } from "@/components/ui";
 import { contentText, useContent } from "@/content/client";
 import { parentPinUnlockSchema, PARENT_PIN_MAX_LEGACY_LENGTH } from "@/domain/parent-pin";
@@ -45,8 +45,9 @@ export function ParentGateForm() {
           </p>
         </div>
       </div>
-      <form
-        className="mt-5 space-y-3"
+      <HydrationSafeForm
+        busy={mutation.isPending || navigation.isPending}
+        fieldsetClassName="mt-5 space-y-3"
         onSubmit={form.handleSubmit((values) => mutation.mutate(values))}
         noValidate
       >
@@ -78,7 +79,7 @@ export function ParentGateForm() {
         >
           {contentText(content, "gate.submit", "Mở khu vực phụ huynh")}
         </SubmitButton>
-      </form>
+      </HydrationSafeForm>
     </Card>
   );
 }

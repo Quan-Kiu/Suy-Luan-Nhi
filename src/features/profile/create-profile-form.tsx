@@ -7,7 +7,7 @@ import { Controller, useForm, useWatch } from "react-hook-form";
 import { useEffect } from "react";
 import { toast } from "sonner";
 import { childrenApi, type ChildProfile } from "@/api/children";
-import { FormStatus, SubmitButton, TextField } from "@/components/form";
+import { FormStatus, HydrationSafeForm, SubmitButton, TextField } from "@/components/form";
 import { Card } from "@/components/ui";
 import { contentText, useContent } from "@/content/client";
 import { createChildProfileSchema, type CreateChildProfileInput } from "@/domain/schemas";
@@ -64,7 +64,12 @@ export function CreateProfileForm() {
   });
 
   return (
-    <form onSubmit={form.handleSubmit((values) => mutation.mutate(values))} className="space-y-5" noValidate>
+    <HydrationSafeForm
+      busy={mutation.isPending || navigation.isPending}
+      fieldsetClassName="space-y-5"
+      onSubmit={form.handleSubmit((values) => mutation.mutate(values))}
+      noValidate
+    >
       <Card className="p-5">
         <TextField
           label={contentText(content, "create.nameLabel", "Tên thân mật của bé")}
@@ -146,6 +151,6 @@ export function CreateProfileForm() {
       >
         {contentText(content, "create.submit", "Bắt đầu chế độ bé →")}
       </SubmitButton>
-    </form>
+    </HydrationSafeForm>
   );
 }

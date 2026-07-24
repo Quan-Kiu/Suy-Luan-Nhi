@@ -9,7 +9,7 @@ import { z } from "zod";
 import { ageGroupCodes } from "@/domain/age-groups";
 import { DEFAULT_CHILD_AVATAR_ASSET_ID } from "@/domain/child-avatar";
 import { childrenApi, type ChildProfile } from "@/api/children";
-import { FormStatus, SelectField, SubmitButton, TextField } from "@/components/form";
+import { FormStatus, HydrationSafeForm, SelectField, SubmitButton, TextField } from "@/components/form";
 import { Card } from "@/components/ui";
 import { contentText, useContent } from "@/content/client";
 import { useActiveChild, useSetActiveChild } from "@/features/child/active-child-context";
@@ -67,7 +67,12 @@ export function EditProfileForm({ child }: { child: ChildProfile }) {
   });
 
   return (
-    <form className="space-y-4" onSubmit={form.handleSubmit((values) => mutation.mutate(values))} noValidate>
+    <HydrationSafeForm
+      busy={mutation.isPending || navigation.isPending}
+      fieldsetClassName="space-y-4"
+      onSubmit={form.handleSubmit((values) => mutation.mutate(values))}
+      noValidate
+    >
       <Card className="space-y-4 p-5">
         <TextField
           label={contentText(content, "edit.nameLabel", "Tên thân mật")}
@@ -120,6 +125,6 @@ export function EditProfileForm({ child }: { child: ChildProfile }) {
       >
         {contentText(content, "edit.submit", "Lưu thay đổi")}
       </SubmitButton>
-    </form>
+    </HydrationSafeForm>
   );
 }

@@ -6,7 +6,7 @@ import { useSearchParams } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { parentApi } from "@/api/parent";
-import { FormStatus, PasswordField, SubmitButton } from "@/components/form";
+import { FormStatus, HydrationSafeForm, PasswordField, SubmitButton } from "@/components/form";
 import { contentText, useContent } from "@/content/client";
 import { PARENT_PIN_LENGTH, parentPinSetupSchema, type ParentPinSetupInput } from "@/domain/parent-pin";
 import { usePendingRouter } from "@/hooks/use-pending-router";
@@ -47,7 +47,12 @@ export function ResetParentPinForm() {
   }
 
   return (
-    <form className="space-y-4" onSubmit={form.handleSubmit((values) => mutation.mutate(values))} noValidate>
+    <HydrationSafeForm
+      busy={mutation.isPending || navigation.isPending}
+      fieldsetClassName="space-y-4"
+      onSubmit={form.handleSubmit((values) => mutation.mutate(values))}
+      noValidate
+    >
       <PasswordField
         autoComplete="new-password"
         inputMode="numeric"
@@ -78,6 +83,6 @@ export function ResetParentPinForm() {
       >
         {contentText(content, "pinReset.resetSubmit", "Lưu mã PIN mới")}
       </SubmitButton>
-    </form>
+    </HydrationSafeForm>
   );
 }

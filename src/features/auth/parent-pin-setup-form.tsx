@@ -7,7 +7,7 @@ import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { parentApi } from "@/api/parent";
-import { FormStatus, PasswordField, SubmitButton } from "@/components/form";
+import { FormStatus, HydrationSafeForm, PasswordField, SubmitButton } from "@/components/form";
 import { contentText, useContent } from "@/content/client";
 import { PARENT_PIN_LENGTH, parentPinSetupSchema, type ParentPinSetupInput } from "@/domain/parent-pin";
 
@@ -32,7 +32,12 @@ export function ParentPinSetupForm({ nextPath }: { nextPath: string }) {
   });
 
   return (
-    <form className="space-y-4" onSubmit={form.handleSubmit((values) => mutation.mutate(values))} noValidate>
+    <HydrationSafeForm
+      busy={mutation.isPending || navigating}
+      fieldsetClassName="space-y-4"
+      onSubmit={form.handleSubmit((values) => mutation.mutate(values))}
+      noValidate
+    >
       <div className="rounded-2xl bg-[#edf4df] p-4 text-[#526b43]">
         <div className="flex items-start gap-3">
           <ShieldCheck className="mt-0.5 shrink-0" size={22} aria-hidden="true" />
@@ -88,6 +93,6 @@ export function ParentPinSetupForm({ nextPath }: { nextPath: string }) {
       >
         {contentText(content, "pinSetup.submit", "Lưu mã PIN và tiếp tục")}
       </SubmitButton>
-    </form>
+    </HydrationSafeForm>
   );
 }

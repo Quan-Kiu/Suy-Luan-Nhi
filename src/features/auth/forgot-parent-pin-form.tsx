@@ -3,7 +3,7 @@
 import { useMutation } from "@tanstack/react-query";
 import Link from "next/link";
 import { parentApi } from "@/api/parent";
-import { FormStatus, SubmitButton } from "@/components/form";
+import { FormStatus, HydrationSafeForm, SubmitButton } from "@/components/form";
 import { contentTemplate, contentText, useContent } from "@/content/client";
 
 function maskEmail(email: string) {
@@ -37,8 +37,9 @@ export function ForgotParentPinForm({ email }: { email: string }) {
   }
 
   return (
-    <form
-      className="space-y-4"
+    <HydrationSafeForm
+      busy={mutation.isPending}
+      fieldsetClassName="space-y-4"
       onSubmit={(event) => {
         event.preventDefault();
         mutation.mutate();
@@ -59,6 +60,6 @@ export function ForgotParentPinForm({ email }: { email: string }) {
       >
         {contentText(content, "pinReset.requestSubmit", "Gửi liên kết tạo PIN mới")}
       </SubmitButton>
-    </form>
+    </HydrationSafeForm>
   );
 }
