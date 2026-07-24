@@ -65,6 +65,27 @@ test("iOS parent navigation clears the home indicator", async ({ page }) => {
   await expectNoHorizontalOverflow(page);
 });
 
+test("iOS media picker hides the native WebKit control behind the localized picker", async ({ page }) => {
+  await signIn(page, "content@demo.local", "/admin/media");
+
+  const input = page.locator('input[type="file"][name="file"]');
+  await expect(input).toHaveClass(/sr-only/);
+  const inputBox = await input.boundingBox();
+  expect(inputBox).not.toBeNull();
+  expect(inputBox!.width).toBeLessThanOrEqual(1);
+  expect(inputBox!.height).toBeLessThanOrEqual(1);
+
+  await input.setInputFiles({
+    name: "anh-kiem-tra.png",
+    mimeType: "image/png",
+    buffer: Buffer.from("not-submitted"),
+  });
+
+  await expect(page.getByText("anh-kiem-tra.png", { exact: true })).toBeVisible();
+  await expect(page.getByText(/Choose File|no file selected/i)).toHaveCount(0);
+  await expectNoHorizontalOverflow(page);
+});
+
 test("iOS admin shell keeps header and scroll region inside the visual viewport", async ({ page }) => {
   await signIn(page, "content@demo.local", "/admin");
   await simulateIPhoneSafeArea(page);

@@ -2,7 +2,7 @@
 
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation, useQuery } from "@tanstack/react-query";
-import { useRef } from "react";
+import { useId, useRef } from "react";
 import { useForm, useWatch } from "react-hook-form";
 import { toast } from "sonner";
 import { z } from "zod";
@@ -33,6 +33,7 @@ export function MediaUploadForm({ onUploaded }: { onUploaded: (item: MediaItem) 
     resolver: zodResolver(schema),
     defaultValues: { category: "general", altText: "" },
   });
+  const fileInputId = useId();
   const fileInputRef = useRef<HTMLInputElement | null>(null);
   const fileRegistration = form.register("file");
   const category = useWatch({ control: form.control, name: "category" });
@@ -91,36 +92,42 @@ export function MediaUploadForm({ onUploaded }: { onUploaded: (item: MediaItem) 
         </p>
       ) : null}
       <div className="mt-5 grid gap-x-3 gap-y-4 md:grid-cols-2 2xl:grid-cols-[minmax(0,1.25fr)_minmax(180px,0.45fr)_minmax(0,1fr)_minmax(8rem,max-content)] 2xl:items-start">
-        <label className="grid content-start gap-2 font-bold md:col-span-2 2xl:col-span-1">
-          <span className="type-label">Tệp hình ảnh, âm thanh hoặc video</span>
-          <span className="relative flex h-12 items-stretch overflow-hidden rounded-2xl border-2 border-[#eadfc9] bg-[#fffdf8] transition outline-none focus-within:border-[#e9641a]">
+        <div className="grid content-start gap-2 font-bold md:col-span-2 2xl:col-span-1">
+          <label htmlFor={fileInputId} className="type-label">
+            Tệp hình ảnh, âm thanh hoặc video
+          </label>
+          <input
+            id={fileInputId}
+            type="file"
+            accept="image/png,image/jpeg,image/webp,image/gif,image/avif,audio/mpeg,audio/wav,audio/ogg,video/mp4,video/webm,video/quicktime"
+            className="peer sr-only"
+            name={fileRegistration.name}
+            onBlur={fileRegistration.onBlur}
+            onChange={fileRegistration.onChange}
+            aria-invalid={Boolean(fileError)}
+            aria-describedby={fileDescriptionIds || undefined}
+            ref={(element) => {
+              fileRegistration.ref(element);
+              fileInputRef.current = element;
+            }}
+          />
+          <label
+            htmlFor={fileInputId}
+            className="flex min-h-12 cursor-pointer items-stretch overflow-hidden rounded-2xl border-2 border-[#eadfc9] bg-[#fffdf8] transition peer-focus-visible:border-[#e9641a] peer-focus-visible:ring-4 peer-focus-visible:ring-[#f6be78]/45 hover:border-[#d6b783]"
+          >
             <span className="type-label inline-flex shrink-0 items-center border-r border-[#eadfc9] bg-[#fff7e9] px-4 font-black text-[#5e4b34]">
               Chọn tệp
             </span>
             <span className="flex min-w-0 flex-1 items-center truncate px-3 font-normal text-[#6f6558]">
               {selectedFileName}
             </span>
-            <input
-              type="file"
-              accept="image/png,image/jpeg,image/webp,image/gif,image/avif,audio/mpeg,audio/wav,audio/ogg,video/mp4,video/webm,video/quicktime"
-              className="absolute inset-0 cursor-pointer opacity-0"
-              name={fileRegistration.name}
-              onBlur={fileRegistration.onBlur}
-              onChange={fileRegistration.onChange}
-              aria-invalid={Boolean(fileError)}
-              aria-describedby={fileDescriptionIds || undefined}
-              ref={(element) => {
-                fileRegistration.ref(element);
-                fileInputRef.current = element;
-              }}
-            />
-          </span>
+          </label>
           {fileError ? (
             <span id="media-file-error" role="alert" className="type-supporting font-bold text-red-700">
               {fileError}
             </span>
           ) : null}
-        </label>
+        </div>
         <SelectField
           label="Loại nội dung"
           registration={form.register("category")}
