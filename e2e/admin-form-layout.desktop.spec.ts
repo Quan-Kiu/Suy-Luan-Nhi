@@ -58,7 +58,9 @@ test("media upload controls stay aligned before and after validation", async ({ 
   await expect(page.getByRole("heading", { name: "Hình ảnh, âm thanh và video" })).toBeVisible();
 
   const fileInput = page.locator('input[type="file"]').first();
-  const file = fileInput.locator("..");
+  const file = page.getByTestId("media-file-picker");
+  await expect(fileInput).toHaveAttribute("hidden", "");
+  await expect(page.getByRole("button", { name: "Chọn tệp hình ảnh, âm thanh hoặc video" })).toBeVisible();
   const category = page.locator('select[name="category"]');
   const description = page.locator('input[name="altText"]');
   const upload = page.getByRole("button", { name: "Tải lên" });
@@ -99,7 +101,7 @@ test("media upload controls stay balanced on a wide admin viewport", async ({ pa
   await signIn(page, "content@demo.local", "/admin/media");
   await expect(page.getByRole("heading", { name: "Hình ảnh, âm thanh và video" })).toBeVisible();
 
-  const file = page.locator('input[type="file"]').first().locator("..");
+  const file = page.getByTestId("media-file-picker");
   const category = page.locator('select[name="category"]');
   const description = page.locator('input[name="altText"]');
   const upload = page.getByRole("button", { name: "Tải lên" });

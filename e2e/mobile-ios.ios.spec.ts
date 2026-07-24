@@ -128,13 +128,19 @@ test("iOS media picker hides the native WebKit control behind the localized pick
   await signIn(page, "content@demo.local", "/admin/media");
 
   const input = page.locator('input[type="file"][name="file"]');
-  await expect(input).toHaveClass(/sr-only/);
-  const inputBox = await input.boundingBox();
-  expect(inputBox).not.toBeNull();
-  expect(inputBox!.width).toBeLessThanOrEqual(1);
-  expect(inputBox!.height).toBeLessThanOrEqual(1);
+  const picker = page.getByTestId("media-file-picker");
+  const chooseButton = page.getByRole("button", {
+    name: "Chọn tệp hình ảnh, âm thanh hoặc video",
+  });
+  await expect(input).toHaveAttribute("hidden", "");
+  await expect(input).toBeHidden();
+  await expect(picker).toBeVisible();
+  await expect(chooseButton).toBeVisible();
 
-  await input.setInputFiles({
+  const fileChooserPromise = page.waitForEvent("filechooser");
+  await chooseButton.click();
+  const fileChooser = await fileChooserPromise;
+  await fileChooser.setFiles({
     name: "anh-kiem-tra.png",
     mimeType: "image/png",
     buffer: Buffer.from("not-submitted"),
