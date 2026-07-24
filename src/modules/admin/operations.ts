@@ -112,21 +112,36 @@ export async function getAdminReports() {
 }
 
 export async function listMembers() {
-  return db
-    .select({
-      id: user.id,
-      name: user.name,
-      email: user.email,
-      role: user.role,
-      banned: user.banned,
-      twoFactorEnabled: user.twoFactorEnabled,
-      emailVerified: user.emailVerified,
-      createdAt: user.createdAt,
-      parentProfileId: parentProfiles.id,
-    })
-    .from(user)
-    .leftJoin(parentProfiles, eq(parentProfiles.userId, user.id))
-    .orderBy(desc(user.createdAt));
+  const [members, accountProviders] = await Promise.all([
+    db
+      .select({
+        id: user.id,
+        name: user.name,
+        email: user.email,
+        role: user.role,
+        banned: user.banned,
+        twoFactorEnabled: user.twoFactorEnabled,
+        emailVerified: user.emailVerified,
+        createdAt: user.createdAt,
+        parentProfileId: parentProfiles.id,
+      })
+      .from(user)
+      .leftJoin(parentProfiles, eq(parentProfiles.userId, user.id))
+      .orderBy(desc(user.createdAt)),
+    db.select({ userId: account.userId, providerId: account.providerId }).from(account),
+  ]);
+
+  const providersByUser = new Map<string, Set<string>>();
+  for (const provider of accountProviders) {
+    const providerIds = providersByUser.get(provider.userId) ?? new Set<string>();
+    providerIds.add(provider.providerId);
+    providersByUser.set(provider.userId, providerIds);
+  }
+
+  return members.map((member) => ({
+    ...member,
+    accountProviders: [...(providersByUser.get(member.id) ?? [])],
+  }));
 }
 
 export async function updateMember(
