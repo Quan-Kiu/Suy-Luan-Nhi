@@ -2,11 +2,24 @@ import axios, { AxiosError, type AxiosRequestConfig } from "axios";
 import { ApiRequestError } from "@/lib/api/error";
 import { isApiEnvelope, unwrapApiEnvelope } from "@/lib/api/envelope";
 import { redirectToSignInAfterUnauthorized } from "@/lib/api/unauthorized-redirect";
+import { addErrorBreadcrumb, reportApiFailure } from "@/lib/monitoring/client-error-reporter";
+import { sanitizeRoutePath } from "@/domain/error-reporting";
 
 export const apiClient = axios.create({
   headers: { Accept: "application/json" },
   timeout: 20_000,
   withCredentials: true,
+});
+
+apiClient.interceptors.request.use((config) => {
+  const path = sanitizeRoutePath(config.url ?? "/");
+  if (path !== "/api/error-reports") {
+    addErrorBreadcrumb("request", "api.request", {
+      method: (config.method || "get").toUpperCase(),
+      path,
+    });
+  }
+  return config;
 });
 
 apiClient.interceptors.response.use(
@@ -16,6 +29,15 @@ apiClient.interceptors.response.use(
 
     const status = error.response?.status;
     const body = error.response?.data;
+    const requestId =
+      isApiEnvelope(body) && !body.success ? body.meta.requestId : error.response?.headers?.["x-request-id"];
+    reportApiFailure({
+      method: error.config?.method,
+      url: error.config?.url,
+      status,
+      code: error.code,
+      requestId,
+    });
     redirectToSignInAfterUnauthorized(status);
     if (isApiEnvelope(body) && !body.success) {
       return Promise.reject(

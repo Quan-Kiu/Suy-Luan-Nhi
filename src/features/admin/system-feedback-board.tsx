@@ -15,6 +15,7 @@ import {
 } from "@dnd-kit/core";
 import { CSS } from "@dnd-kit/utilities";
 import {
+  Bug,
   CalendarClock,
   ChevronRight,
   GripVertical,
@@ -117,6 +118,11 @@ function FeedbackCardContent({
         {!overlay ? <FeedbackDragHandle item={item} disabled={dragDisabled || moving} /> : null}
         <div className="min-w-0 flex-1">
           <div className="type-caption flex flex-wrap items-center gap-x-2 gap-y-1 font-bold text-[#786d60]">
+            {item.context.reportKind === "automatic_error" ? (
+              <span className="inline-flex items-center gap-1 rounded-full border border-rose-200 bg-rose-50 px-2 py-0.5 text-rose-800">
+                <Bug size={12} aria-hidden="true" /> Lỗi tự động
+              </span>
+            ) : null}
             <span className="inline-flex items-center gap-1">
               <CalendarClock size={13} aria-hidden="true" />
               {formatFeedbackTime(item.createdAt)}

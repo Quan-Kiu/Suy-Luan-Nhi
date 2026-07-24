@@ -18,6 +18,7 @@ import { SettingsSection } from "@/features/parent/settings-section";
 import { useHydrated } from "@/hooks/use-hydrated";
 import { usePendingRouter } from "@/hooks/use-pending-router";
 import { queryKeys } from "@/lib/query/keys";
+import { setClientErrorReportingConsent } from "@/lib/monitoring/client-error-reporter";
 
 type Settings = {
   soundEnabled: boolean;
@@ -35,7 +36,10 @@ function normalizeSettings(initial: Settings): ParentSettingsFormValues {
       suggestions: initial.notificationSettings.suggestions ?? false,
       weeklySummary: initial.notificationSettings.weeklySummary ?? false,
     },
-    privacySettings: { analytics: initial.privacySettings.analytics ?? true },
+    privacySettings: {
+      analytics: initial.privacySettings.analytics ?? true,
+      errorReporting: initial.privacySettings.errorReporting ?? false,
+    },
     pin: "",
   };
 }
@@ -53,7 +57,8 @@ export function SettingsForm({ initial, childId }: { initial: Settings; childId:
   const saveMutation = useMutation({
     mutationFn: ({ pin, ...values }: ParentSettingsFormValues) =>
       parentApi.updateSettings({ ...values, pin: pin || undefined }),
-    onSuccess: async () => {
+    onSuccess: async (_data, variables) => {
+      setClientErrorReportingConsent(variables.privacySettings.errorReporting);
       form.setValue("pin", "");
       await queryClient.invalidateQueries({ queryKey: queryKeys.parent.settings });
       navigation.refresh();
@@ -128,12 +133,12 @@ export function SettingsForm({ initial, childId }: { initial: Settings; childId:
         <SettingsSection title={contentText(content, "settings.privacyTitle", "Quyền riêng tư")}>
           <ControlledCheckboxField
             control={form.control}
-            name="privacySettings.analytics"
-            label={contentText(content, "settings.analyticsTitle", "Dữ liệu giúp cải thiện ứng dụng")}
+            name="privacySettings.errorReporting"
+            label={contentText(content, "settings.errorReportingTitle", "Tự động gửi báo cáo lỗi")}
             description={contentText(
               content,
-              "settings.analyticsDescription",
-              "Không dùng quảng cáo hoặc định vị.",
+              "settings.errorReportingDescription",
+              "Gửi thông tin kỹ thuật và các bước thao tác gần nhất khi có lỗi. Không gửi nội dung nhập, mã PIN, ảnh hoặc thông tin riêng của bé.",
             )}
           />
         </SettingsSection>

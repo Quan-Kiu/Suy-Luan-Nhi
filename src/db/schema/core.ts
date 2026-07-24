@@ -94,7 +94,7 @@ export const parentProfiles = pgTable("parent_profiles", {
     .notNull(),
   privacySettings: jsonb("privacy_settings")
     .$type<Record<string, boolean>>()
-    .default({ analytics: true })
+    .default({ analytics: true, errorReporting: false })
     .notNull(),
   createdAt: timestamp("created_at", { withTimezone: true }).defaultNow().notNull(),
   updatedAt: timestamp("updated_at", { withTimezone: true }).defaultNow().notNull(),

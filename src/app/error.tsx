@@ -6,6 +6,7 @@ import { usePathname } from "next/navigation";
 import { useEffect } from "react";
 import { Button } from "@/components/ui";
 import { getLayoutHome } from "@/lib/navigation/layout-home";
+import { reportClientError } from "@/lib/monitoring/client-error-reporter";
 
 export default function ErrorPage({
   error,
@@ -20,7 +21,8 @@ export default function ErrorPage({
 
   useEffect(() => {
     console.error("Application error", { message: error.message, digest: error.digest });
-  }, [error]);
+    reportClientError(error, { source: "error_boundary", digest: error.digest, pagePath: pathname });
+  }, [error, pathname]);
 
   return (
     <main

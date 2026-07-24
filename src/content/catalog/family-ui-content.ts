@@ -296,6 +296,15 @@ export const parentContentEntries = defineContent("parent", {
   "settings.suggestions": { value: "Khi có gợi ý trò chuyện mới", description: "Nhãn thông báo gợi ý." },
   "settings.weeklySummary": { value: "Tóm tắt tuần", description: "Nhãn thông báo tóm tắt tuần." },
   "settings.privacyTitle": { value: "Quyền riêng tư", description: "Tiêu đề nhóm quyền riêng tư." },
+  "settings.errorReportingTitle": {
+    value: "Tự động gửi báo cáo lỗi",
+    description: "Nhãn cho phép tự động gửi lỗi kỹ thuật.",
+  },
+  "settings.errorReportingDescription": {
+    value:
+      "Khi có sự cố, hệ thống gửi thông tin kỹ thuật và các bước thao tác gần nhất để đội ngũ phát triển sửa lỗi nhanh hơn. Không gửi nội dung nhập, mã PIN, ảnh hoặc thông tin riêng của bé.",
+    description: "Mô tả phạm vi dữ liệu của báo cáo lỗi tự động.",
+  },
   "settings.analyticsTitle": {
     value: "Dữ liệu giúp cải thiện ứng dụng",
     description: "Nhãn phân tích tối giản.",

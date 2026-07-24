@@ -184,4 +184,48 @@ describe("SystemFeedbackManager", () => {
     await waitFor(() => expect(list).toHaveBeenCalled());
     expect(list.mock.calls.every(([input]) => input.status === "resolved")).toBe(true);
   });
+
+  it("shows privacy-filtered technical details for automatic error reports", async () => {
+    const user = userEvent.setup();
+    const automaticItem: SystemFeedbackItem = {
+      ...feedbackItem,
+      id: "feedback-auto",
+      content: "[Báo cáo lỗi tự động] Error: API POST /api/children thất bại",
+      pageTitle: "Báo cáo lỗi tự động",
+      attachments: [],
+      context: {
+        reportKind: "automatic_error",
+        source: "api_failure",
+        error: {
+          name: "Error",
+          message: "API POST /api/children thất bại",
+          stack: "Error: API failure\n    at submitChild",
+          details: { status: 500, requestId: "req-123" },
+        },
+        breadcrumbs: [
+          {
+            timestamp: "2026-07-21T09:59:59.000Z",
+            category: "interaction",
+            action: "form.submit",
+            data: { method: "POST", action: "/api/children" },
+          },
+        ],
+        viewportWidth: 390,
+        viewportHeight: 844,
+        devicePixelRatio: 3,
+        userAgent: "Mobile Safari",
+      },
+    };
+    renderManager({ ...initialData, new: page([automaticItem]) });
+
+    expect(screen.getByText("Lỗi tự động")).toBeVisible();
+    await user.click(screen.getByRole("button", { name: "Chi tiết" }));
+
+    const dialog = screen.getByRole("dialog", { name: "Báo cáo lỗi tự động" });
+    expect(within(dialog).getByText("Yêu cầu API thất bại")).toBeInTheDocument();
+    expect(within(dialog).getByText("req-123")).toBeInTheDocument();
+    expect(within(dialog).getByText("Các bước gần nhất (1)")).toBeInTheDocument();
+    expect(within(dialog).getByText(/form.submit/)).toBeInTheDocument();
+    expect(within(dialog).getByText("Mobile Safari")).toBeInTheDocument();
+  });
 });

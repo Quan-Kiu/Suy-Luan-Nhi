@@ -9,7 +9,10 @@ export const parentSettingsSchema = z.object({
     suggestions: z.boolean(),
     weeklySummary: z.boolean(),
   }),
-  privacySettings: z.object({ analytics: z.boolean() }),
+  privacySettings: z.object({
+    analytics: z.boolean(),
+    errorReporting: z.boolean(),
+  }),
   pin: z.union([z.literal(""), parentPinValueSchema]),
 });
 
