@@ -1,28 +1,43 @@
 "use client";
 
 import { AnimatePresence, motion } from "motion/react";
-import { Bell, LayoutDashboard, LoaderCircle, LogOut, Menu, Play, UserRound, X } from "lucide-react";
+import {
+  Bell,
+  LayoutDashboard,
+  LoaderCircle,
+  LogOut,
+  Menu,
+  Play,
+  Sparkles,
+  UserRound,
+  X,
+} from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { contentTemplate, contentText } from "@/content/resolve";
 import type { ContentDictionary } from "@/content/types";
 import { useSignOutNavigation } from "@/features/auth/use-sign-out-navigation";
+import { useHasUnseenReleaseNotes } from "@/features/parent/release-notes-seen";
 
 export function ParentHeader({
   childName,
   unread,
   content,
   canAccessAdmin = false,
+  latestReleaseVersion = null,
 }: {
   childName: string;
   unread: number;
   content: ContentDictionary;
   canAccessAdmin?: boolean;
+  latestReleaseVersion?: string | null;
 }) {
   const signOutFlow = useSignOutNavigation("/");
   const [open, setOpen] = useState(false);
+  const hasUnseenReleaseNotes = useHasUnseenReleaseNotes(latestReleaseVersion);
   const adminAreaLabel = contentText(content, "shell.adminArea", "Trang quản trị");
+  const whatsNewLabel = contentText(content, "nav.whatsNew", "Có gì mới");
 
   useEffect(() => {
     if (!open) return;
@@ -67,6 +82,22 @@ export function ParentHeader({
               {adminAreaLabel}
             </Link>
           ) : null}
+          <Link
+            href="/parent/whats-new"
+            aria-label={whatsNewLabel}
+            className="type-action relative inline-flex min-h-10 items-center gap-2 rounded-full border border-[#eadfc9] px-3 whitespace-nowrap transition hover:bg-[#fff0df]"
+          >
+            <Sparkles size={17} aria-hidden="true" />
+            <span className="hidden lg:inline">{whatsNewLabel}</span>
+            {hasUnseenReleaseNotes ? (
+              <span className="size-2 rounded-full bg-[#b9470d] xl:hidden" aria-label="Có cập nhật mới" />
+            ) : null}
+            {hasUnseenReleaseNotes ? (
+              <span className="type-caption hidden rounded-full bg-[#b9470d] px-2 py-0.5 text-white xl:inline">
+                Mới
+              </span>
+            ) : null}
+          </Link>
           <Link
             href="/missions"
             prefetch={false}
@@ -125,6 +156,19 @@ export function ParentHeader({
               >
                 <UserRound size={19} />
                 {contentText(content, "shell.changeChild", "Đổi bé")}
+              </Link>
+              <Link
+                href="/parent/whats-new"
+                onClick={() => setOpen(false)}
+                className="type-action flex min-h-12 items-center gap-3 rounded-2xl px-4 hover:bg-[#fff0df]"
+              >
+                <Sparkles size={19} aria-hidden="true" />
+                {whatsNewLabel}
+                {hasUnseenReleaseNotes ? (
+                  <span className="type-caption ml-auto rounded-full bg-[#b9470d] px-2 py-0.5 text-white">
+                    Mới
+                  </span>
+                ) : null}
               </Link>
               {canAccessAdmin ? (
                 <Link

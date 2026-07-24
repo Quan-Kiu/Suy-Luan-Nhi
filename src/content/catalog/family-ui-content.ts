@@ -185,6 +185,7 @@ export const parentContentEntries = defineContent("parent", {
   "nav.suggestions": { value: "Gợi ý", description: "Điều hướng gợi ý." },
   "nav.resources": { value: "Hướng dẫn cho ba mẹ", description: "Điều hướng tài nguyên." },
   "nav.settings": { value: "Cài đặt", description: "Điều hướng cài đặt." },
+  "nav.whatsNew": { value: "Có gì mới", description: "Điều hướng các cập nhật dành cho gia đình." },
   "nav.notifications": { value: "Thông báo", description: "Nhãn thông báo." },
   "notifications.title": { value: "Thông báo", description: "Tiêu đề trang thông báo phụ huynh." },
   "notifications.description": {
