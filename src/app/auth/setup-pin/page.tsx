@@ -42,7 +42,7 @@ export default async function Page({
           2 · Mã PIN
         </div>
         <span aria-hidden="true" className="h-px w-3 bg-[#dcc8a7]" />
-        <div className="type-caption rounded-2xl border border-[#e8dcc8] bg-[#faf7f1] px-2 py-2 text-center font-bold text-[#88755d]">
+        <div className="type-caption rounded-2xl border border-[#e8dcc8] bg-[#faf7f1] px-2 py-2 text-center font-bold text-[#806d54]">
           3 · Hồ sơ bé
         </div>
       </div>

@@ -120,7 +120,7 @@ export default async function HomePage() {
       <section id="how" aria-labelledby="how-title" className="scroll-mt-6 bg-[#edf4df] px-5 py-16 lg:py-20">
         <div className="mx-auto max-w-7xl">
           <div className="mx-auto max-w-3xl text-center">
-            <p className="type-overline font-black tracking-[0.16em] text-[#6d844f] uppercase">
+            <p className="type-overline font-black tracking-[0.16em] text-[#567044] uppercase">
               {t("how.eyebrow", "Bắt đầu rất đơn giản")}
             </p>
             <h2 id="how-title" className="type-marketing-title mt-3">
