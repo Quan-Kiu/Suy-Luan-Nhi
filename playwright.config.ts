@@ -62,5 +62,10 @@ export default defineConfig({
       testMatch: /.*\.mobile\.spec\.ts/,
       use: { ...devices["Pixel 7"] },
     },
+    {
+      name: "mobile-webkit-ios",
+      testMatch: /.*\.ios\.spec\.ts/,
+      use: { ...devices["iPhone 13"] },
+    },
   ],
 });

@@ -8,7 +8,9 @@ export async function signIn(page: Page, email: string, callbackUrl = "/profiles
   await page.getByLabel("Email").fill(email);
   await page.locator('input[name="password"]').fill(demoPassword);
   await page.getByRole("button", { name: "Đăng nhập", exact: true }).click();
-  await page.waitForURL((url) => !url.pathname.startsWith("/auth/sign-in"));
+  await page.waitForURL(
+    (url) => !url.pathname.startsWith("/auth/sign-in") && !url.pathname.startsWith("/auth/setup-pin"),
+  );
 }
 
 export async function apiData<T>(response: APIResponse): Promise<T> {
