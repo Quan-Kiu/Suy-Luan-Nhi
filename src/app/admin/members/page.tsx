@@ -6,7 +6,7 @@ import { MemberManager } from "@/features/admin/member-manager";
 import { listMembers } from "@/modules/admin/operations";
 
 export const metadata: Metadata = {
-  title: "Tài khoản quản trị",
+  title: "Thành viên & quyền",
 };
 
 export default async function Page() {
@@ -16,8 +16,8 @@ export default async function Page() {
     <div className="space-y-6">
       <AdminPageHeader
         eyebrow="Quản lý quyền truy cập"
-        title="Tài khoản quản trị"
-        description="Xem tài khoản quản trị, giao đúng vai trò và tạm ngưng quyền truy cập khi cần. Mọi thay đổi đều được ghi lại."
+        title="Thành viên & quyền"
+        description="Tách riêng tài khoản phụ huynh và ban quản trị, theo dõi vai trò, trạng thái và hình thức đăng nhập của từng người."
         icon={Users}
       />
       <MemberManager items={items} currentUserId={session.user.id} />

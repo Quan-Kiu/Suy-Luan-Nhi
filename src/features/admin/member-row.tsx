@@ -4,6 +4,7 @@ import { useMutation } from "@tanstack/react-query";
 import { ShieldCheck, ShieldOff } from "lucide-react";
 import { toast } from "sonner";
 import { membersApi } from "@/api/admin/members";
+import { getAccountMethods } from "@/features/admin/member-presentation";
 import { usePendingRouter } from "@/hooks/use-pending-router";
 
 export type MemberItem = {
@@ -15,6 +16,7 @@ export type MemberItem = {
   twoFactorEnabled: boolean;
   emailVerified: boolean;
   createdAt: Date;
+  accountProviders: string[];
 };
 
 type UpdateInput = { payload: Record<string, unknown>; successMessage: string };
@@ -63,8 +65,30 @@ function RoleSelect({
   );
 }
 
+function AccountMethods({ providerIds }: { providerIds: string[] }) {
+  const methods = getAccountMethods(providerIds);
+  return (
+    <div aria-label="Hình thức đăng nhập" className="flex flex-wrap gap-1.5">
+      {methods.map((method) => (
+        <span
+          key={method.providerId}
+          className={`type-caption inline-flex min-h-7 items-center rounded-full border px-2.5 py-1 font-bold ${
+            method.providerId === "google"
+              ? "border-blue-200 bg-blue-50 text-blue-800"
+              : method.providerId === "credential"
+                ? "border-stone-200 bg-stone-50 text-stone-700"
+                : "border-slate-200 bg-slate-50 text-slate-600"
+          }`}
+        >
+          {method.label}
+        </span>
+      ))}
+    </div>
+  );
+}
+
 function MemberStatus({ item }: { item: MemberItem }) {
-  const staff = ["content_admin", "reviewer", "super_admin"].includes(item.role);
+  const staff = item.role !== "parent";
   return (
     <div>
       <span className={item.banned ? "type-label block text-red-700" : "type-label block text-green-700"}>
@@ -104,7 +128,7 @@ function AccessButton({
           successMessage: item.banned ? "Đã mở lại tài khoản" : "Đã tạm ngưng tài khoản",
         })
       }
-      className={`type-action inline-flex min-h-10 items-center gap-2 rounded-xl border px-3 py-2 disabled:opacity-30 ${
+      className={`type-action inline-flex min-h-10 items-center gap-2 rounded-xl border px-3 py-2 whitespace-nowrap disabled:opacity-30 ${
         item.banned ? "text-green-700" : "text-red-700"
       } ${className}`}
     >
@@ -124,17 +148,20 @@ function MutationError({ actions }: { actions: Actions }) {
 export function MemberRow({ item, currentUserId }: { item: MemberItem; currentUserId: string }) {
   const actions = useMemberActions(item, currentUserId);
   return (
-    <tr className="border-t">
+    <tr className="border-t align-top">
       <td className="p-3">
         <strong className="type-label block">{item.name}</strong>
         <span className="type-caption">Tạo ngày {new Date(item.createdAt).toLocaleDateString("vi-VN")}</span>
       </td>
       <td className="p-3">
-        <RoleSelect item={item} actions={actions} />
+        <RoleSelect item={item} actions={actions} className="w-full" />
       </td>
       <td className="p-3">
-        <span className="block">{item.email}</span>
+        <span className="block break-all">{item.email}</span>
         <span className="type-caption">{item.emailVerified ? "Đã xác minh" : "Chưa xác minh"}</span>
+        <div className="mt-2">
+          <AccountMethods providerIds={item.accountProviders} />
+        </div>
       </td>
       <td className="p-3">
         <MemberStatus item={item} />
@@ -153,7 +180,7 @@ export function MemberCard({ item, currentUserId }: { item: MemberItem; currentU
     <article className="rounded-2xl border bg-white p-4 shadow-sm">
       <div className="flex items-start justify-between gap-3">
         <div className="min-w-0">
-          <h2 className="type-card-title truncate">{item.name}</h2>
+          <h3 className="type-card-title truncate">{item.name}</h3>
           <p className="type-supporting mt-1 break-all text-[#6f6558]">{item.email}</p>
         </div>
         <MemberStatus item={item} />
@@ -164,8 +191,11 @@ export function MemberCard({ item, currentUserId }: { item: MemberItem; currentU
           <RoleSelect item={item} actions={actions} className="mt-1 w-full" />
         </label>
         <div className="rounded-xl bg-[#f7f3eb] p-3">
-          <p className="type-caption font-black text-[#6f6558]">Tài khoản</p>
-          <p className="type-supporting mt-1 font-bold">
+          <p className="type-caption font-black text-[#6f6558]">Hình thức đăng nhập</p>
+          <div className="mt-2">
+            <AccountMethods providerIds={item.accountProviders} />
+          </div>
+          <p className="type-caption mt-2 font-bold text-[#493f34]">
             {item.emailVerified ? "Email đã xác minh" : "Email chưa xác minh"}
           </p>
           <p className="type-caption mt-1 text-[#6f6558]">
