@@ -24,6 +24,8 @@ export default async function Page({ params }: { params: Promise<{ missionId: st
       templateVariables={templateVariables}
       missionId={missionId}
       status={mission.mission.status}
+      updatedAt={mission.mission.updatedAt.toISOString()}
+      draftVersion={mission.mission.currentDraftVersion}
       versions={mission.versions.map((version) => ({
         id: version.id,
         versionNumber: version.versionNumber,

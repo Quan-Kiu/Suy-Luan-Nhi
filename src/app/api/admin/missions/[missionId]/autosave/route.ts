@@ -1,28 +1,16 @@
 import { apiJson } from "@/lib/api-response";
-import { invalidateAdminMissionViews } from "@/lib/cache/invalidation";
 import { requireApiRoles } from "@/auth/api";
-import { adminMissionDraftSchema } from "@/modules/admin/schemas";
+import { autosaveAdminMission, MissionDraftConflictError } from "@/modules/admin/mission-admin";
 import {
   missionTemplateIssueMessage,
   validateMissionTemplateVariables,
 } from "@/modules/admin/mission-template-variables";
-import {
-  getAdminMission,
-  MissionDraftConflictError,
-  updateAdminMission,
-} from "@/modules/admin/mission-admin";
-
-export async function GET(request: Request, { params }: { params: Promise<{ missionId: string }> }) {
-  const authResult = await requireApiRoles(request, ["content_admin", "reviewer", "super_admin"]);
-  if ("error" in authResult) return authResult.error;
-  const { missionId } = await params;
-  const mission = await getAdminMission(missionId);
-  return mission ? apiJson(mission) : apiJson({ message: "Không tìm thấy nhiệm vụ" }, { status: 404 });
-}
+import { adminMissionDraftSchema } from "@/modules/admin/schemas";
 
 export async function PATCH(request: Request, { params }: { params: Promise<{ missionId: string }> }) {
   const authResult = await requireApiRoles(request, ["content_admin", "super_admin"]);
   if ("error" in authResult) return authResult.error;
+
   const input = adminMissionDraftSchema.safeParse(await request.json().catch(() => null));
   if (!input.success) {
     return apiJson(
@@ -30,7 +18,7 @@ export async function PATCH(request: Request, { params }: { params: Promise<{ mi
       { status: 400 },
     );
   }
-  const { missionId } = await params;
+
   const templateValidation = await validateMissionTemplateVariables(input.data);
   if (templateValidation.issues.length) {
     return apiJson(
@@ -41,15 +29,24 @@ export async function PATCH(request: Request, { params }: { params: Promise<{ mi
       { status: 422 },
     );
   }
+
+  const { missionId } = await params;
   try {
-    const mission = await updateAdminMission(missionId, input.data, authResult.session.user.id, {
-      expectedDraftVersion: request.headers.has("x-mission-draft-version")
+    const mission = await autosaveAdminMission(
+      missionId,
+      input.data,
+      authResult.session.user.id,
+      request.headers.has("x-mission-draft-version")
         ? Number(request.headers.get("x-mission-draft-version"))
         : undefined,
-    });
+    );
     if (!mission) return apiJson({ message: "Không tìm thấy nhiệm vụ" }, { status: 404 });
-    invalidateAdminMissionViews(missionId);
-    return apiJson(mission);
+    return apiJson({
+      id: mission.id,
+      status: mission.status,
+      currentDraftVersion: mission.currentDraftVersion,
+      updatedAt: mission.updatedAt.toISOString(),
+    });
   } catch (error) {
     if (error instanceof MissionDraftConflictError) {
       return apiJson(

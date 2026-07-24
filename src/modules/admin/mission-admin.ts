@@ -308,10 +308,25 @@ export async function createAdminMission(input: AdminMissionDraft, actorId: stri
   });
 }
 
+export class MissionDraftConflictError extends Error {
+  readonly currentDraftVersion: number;
+  readonly currentUpdatedAt: Date;
+
+  constructor(currentDraftVersion: number, currentUpdatedAt: Date) {
+    super("Mission draft was updated by another editor");
+    this.name = "MissionDraftConflictError";
+    this.currentDraftVersion = currentDraftVersion;
+    this.currentUpdatedAt = currentUpdatedAt;
+  }
+}
+
 type UpdateMissionOptions = {
   historyComment?: string;
   auditAction?: string;
   auditMetadata?: Record<string, unknown>;
+  expectedDraftVersion?: number;
+  recordHistory?: boolean;
+  recordAudit?: boolean;
 };
 
 export async function updateAdminMission(
@@ -322,7 +337,20 @@ export async function updateAdminMission(
 ) {
   const current = await getAdminMission(missionId);
   if (!current) return null;
+  const expectedDraftVersion = options.expectedDraftVersion;
+  if (expectedDraftVersion !== undefined && !Number.isInteger(expectedDraftVersion)) {
+    throw new MissionDraftConflictError(current.mission.currentDraftVersion, current.mission.updatedAt);
+  }
+  if (JSON.stringify(current.draft) === JSON.stringify(input)) {
+    return current.mission;
+  }
+
   return db.transaction(async (tx) => {
+    const updatedAt = new Date();
+    const updateCondition =
+      expectedDraftVersion !== undefined
+        ? and(eq(missions.id, missionId), eq(missions.currentDraftVersion, expectedDraftVersion))
+        : eq(missions.id, missionId);
     const [updated] = await tx
       .update(missions)
       .set({
@@ -345,30 +373,63 @@ export async function updateAdminMission(
         difficulty: input.difficulty,
         allowReplay: input.allowReplay,
         randomizeAnswers: input.randomizeAnswers,
+        currentDraftVersion: sql`${missions.currentDraftVersion} + 1`,
         updatedBy: actorId,
-        updatedAt: new Date(),
+        updatedAt,
       })
-      .where(eq(missions.id, missionId))
+      .where(updateCondition)
       .returning();
+    if (!updated) {
+      const [latest] = await tx
+        .select({
+          currentDraftVersion: missions.currentDraftVersion,
+          updatedAt: missions.updatedAt,
+        })
+        .from(missions)
+        .where(eq(missions.id, missionId))
+        .limit(1);
+      throw new MissionDraftConflictError(
+        latest?.currentDraftVersion ?? current.mission.currentDraftVersion,
+        latest?.updatedAt ?? current.mission.updatedAt,
+      );
+    }
+
     await replaceMissionContent(tx, missionId, input, actorId);
-    await tx.insert(reviewHistories).values({
-      missionId,
-      action: "updated",
-      actorId,
-      comment: options.historyComment,
-      beforeState: current.draft,
-      afterState: input,
-    });
-    await tx.insert(auditLogs).values({
-      actorId,
-      action: options.auditAction ?? "mission.updated",
-      resourceType: "mission",
-      resourceId: missionId,
-      beforeState: current.draft,
-      afterState: input,
-      metadata: options.auditMetadata ?? {},
-    });
+    if (options.recordHistory !== false) {
+      await tx.insert(reviewHistories).values({
+        missionId,
+        action: "updated",
+        actorId,
+        comment: options.historyComment,
+        beforeState: current.draft,
+        afterState: input,
+      });
+    }
+    if (options.recordAudit !== false) {
+      await tx.insert(auditLogs).values({
+        actorId,
+        action: options.auditAction ?? "mission.updated",
+        resourceType: "mission",
+        resourceId: missionId,
+        beforeState: current.draft,
+        afterState: input,
+        metadata: options.auditMetadata ?? {},
+      });
+    }
     return updated;
+  });
+}
+
+export async function autosaveAdminMission(
+  missionId: string,
+  input: AdminMissionDraft,
+  actorId: string,
+  expectedDraftVersion?: number,
+) {
+  return updateAdminMission(missionId, input, actorId, {
+    expectedDraftVersion,
+    recordHistory: false,
+    recordAudit: false,
   });
 }
 

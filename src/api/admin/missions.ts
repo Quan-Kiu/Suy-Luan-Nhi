@@ -46,6 +46,13 @@ export type AdminMissionVersionSummary = {
   publishedAt: string | null;
 };
 
+export type AdminMissionSaveResult = {
+  id: string;
+  status: AdminMissionListItem["status"];
+  currentDraftVersion: number;
+  updatedAt: string;
+};
+
 function missionListQuery(filters: AdminMissionListFilters) {
   const params = new URLSearchParams();
   if (filters.status) params.set("status", filters.status);
@@ -61,11 +68,20 @@ export const adminMissionsApi = {
   list(filters: AdminMissionListFilters = {}) {
     return apiRequest<AdminMissionPage>({ url: missionListQuery(filters), method: "GET" });
   },
-  saveDraft(missionId: string | undefined, input: AdminMissionDraft) {
-    return apiRequest<{ id: string }>({
+  saveDraft(missionId: string | undefined, input: AdminMissionDraft, draftVersion?: number) {
+    return apiRequest<AdminMissionSaveResult>({
       url: missionId ? `/api/admin/missions/${missionId}` : "/api/admin/missions",
       method: missionId ? "PATCH" : "POST",
       data: input,
+      headers: draftVersion !== undefined ? { "x-mission-draft-version": String(draftVersion) } : undefined,
+    });
+  },
+  autosaveDraft(missionId: string, input: AdminMissionDraft, draftVersion?: number) {
+    return apiRequest<AdminMissionSaveResult>({
+      url: `/api/admin/missions/${missionId}/autosave`,
+      method: "PATCH",
+      data: input,
+      headers: draftVersion !== undefined ? { "x-mission-draft-version": String(draftVersion) } : undefined,
     });
   },
   submit(missionId: string) {

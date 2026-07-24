@@ -19,6 +19,38 @@ export const missionEditorContentEntries = defineContent("admin", {
   "missionEditor.submit": { value: "Gửi để kiểm tra", description: "Nhãn gửi kiểm tra nội dung." },
   "missionEditor.submitting": { value: "Đang gửi...", description: "Nhãn khi gửi kiểm tra nội dung." },
   "missionEditor.saved": { value: "Đã lưu bản nháp", description: "Thông báo lưu bản nháp." },
+  "missionEditor.autosave.idle": {
+    value: "Tự động lưu đang bật",
+    description: "Trạng thái tự động lưu sẵn sàng.",
+  },
+  "missionEditor.autosave.unsaved": {
+    value: "Có thay đổi chưa lưu",
+    description: "Trạng thái đang chờ tự động lưu.",
+  },
+  "missionEditor.autosave.saving": {
+    value: "Đang tự động lưu...",
+    description: "Trạng thái tự động lưu đang chạy.",
+  },
+  "missionEditor.autosave.savedAt": {
+    value: "Đã tự động lưu lúc {time}",
+    description: "Trạng thái tự động lưu thành công.",
+  },
+  "missionEditor.autosave.invalid": {
+    value: "Chưa tự lưu vì còn mục chưa hợp lệ",
+    description: "Trạng thái bản nháp chưa đủ hợp lệ để lưu lên máy chủ.",
+  },
+  "missionEditor.autosave.error": {
+    value: "Tự động lưu thất bại — thay đổi vẫn còn trên màn hình",
+    description: "Trạng thái tự động lưu gặp lỗi.",
+  },
+  "missionEditor.autosave.conflict": {
+    value: "Bản nháp có thay đổi mới hơn ở nơi khác — hãy tải lại trang",
+    description: "Trạng thái xung đột nhiều phiên chỉnh sửa.",
+  },
+  "missionEditor.autosave.leaveWarning": {
+    value: "Một số thay đổi chưa được lưu. Bạn có chắc muốn rời khỏi trang?",
+    description: "Cảnh báo khi rời editor trong lúc còn thay đổi chưa lưu.",
+  },
   "missionEditor.submitted": {
     value: "Đã gửi nhiệm vụ để kiểm tra",
     description: "Thông báo gửi kiểm tra nội dung.",
