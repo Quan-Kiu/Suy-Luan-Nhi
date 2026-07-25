@@ -5,6 +5,7 @@ import { resolveParentPinSetupNextPath } from "@/auth/navigation";
 import { contentText } from "@/content/resolve";
 import { AuthShell } from "@/features/auth/auth-shell";
 import { ParentPinSetupForm } from "@/features/auth/parent-pin-setup-form";
+import { SwitchAccountButton } from "@/features/auth/switch-account-button";
 import { getContentNamespace } from "@/modules/content/content";
 import { getOrCreateParentProfile } from "@/modules/family/family";
 
@@ -52,6 +53,13 @@ export default async function Page({
         </div>
       </div>
       <ParentPinSetupForm nextPath={nextPath} />
+      <div className="mt-5 border-t border-[#eadfc9] pt-5">
+        <SwitchAccountButton
+          callbackUrl={nextPath}
+          label="Đăng xuất và dùng tài khoản khác"
+          pendingLabel="Đang đăng xuất..."
+        />
+      </div>
     </AuthShell>
   );
 }

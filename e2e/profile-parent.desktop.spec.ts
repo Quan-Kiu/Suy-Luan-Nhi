@@ -3,6 +3,20 @@ import { apiData, demoParentPin, getDemoChild, selectChild, signIn, unlockParent
 
 test.describe.configure({ mode: "serial" });
 
+test("locked parent gate always allows signing out to another account", async ({ page }) => {
+  await signIn(page, "parent@demo.local");
+  const demoChild = await getDemoChild(page);
+  await selectChild(page, demoChild.id);
+
+  await page.goto("/parent");
+  const switchAccount = page.getByRole("button", { name: "Đăng xuất và dùng tài khoản khác" });
+  await expect(switchAccount).toBeVisible();
+  await switchAccount.click();
+
+  await expect(page).toHaveURL(/\/auth\/sign-in\?callbackUrl=%2Fparent$/);
+  await expect(page.getByRole("button", { name: "Đăng nhập", exact: true })).toBeVisible();
+});
+
 test("parent moves a child profile to trash, restores it and deletes it permanently", async ({ page }) => {
   await signIn(page, "parent@demo.local");
   const demoChild = await getDemoChild(page);

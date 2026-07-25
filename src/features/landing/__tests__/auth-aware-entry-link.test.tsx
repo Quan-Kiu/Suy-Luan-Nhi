@@ -13,6 +13,9 @@ const mocks = vi.hoisted(() => ({
 vi.mock("@/auth/client", () => ({
   useSession: () => mocks.session,
 }));
+vi.mock("@/features/auth/use-sign-out-navigation", () => ({
+  useSignOutNavigation: () => ({ pending: false, signOutAndNavigate: vi.fn() }),
+}));
 
 beforeEach(() => {
   mocks.session.isPending = false;
@@ -51,6 +54,21 @@ describe("AuthAwareEntryLink", () => {
     render(<AuthAwareEntryLink content={{}} compact />);
 
     expect(screen.getByRole("link", { name: "Khu vực phụ huynh" })).toHaveAttribute("href", "/parent");
+  });
+
+  it("exposes logout next to an authenticated landing entry", () => {
+    mocks.session.data = { user: { role: "parent" } };
+    render(<AuthAwareEntryLink content={{}} compact showSessionExit />);
+
+    expect(screen.getByRole("link", { name: "Khu vực phụ huynh" })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Đăng xuất" })).toBeInTheDocument();
+  });
+
+  it("does not expose logout for a guest landing entry", () => {
+    render(<AuthAwareEntryLink content={{}} compact showSessionExit />);
+
+    expect(screen.getByRole("link", { name: "Đăng nhập" })).toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: "Đăng xuất" })).not.toBeInTheDocument();
   });
 
   it("keeps the parent destination direct after sign-in", () => {
