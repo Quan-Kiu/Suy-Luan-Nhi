@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useSession } from "@/auth/client";
 import { contentText } from "@/content/resolve";
 import type { ContentDictionary } from "@/content/types";
+import { SwitchAccountButton } from "@/features/auth/switch-account-button";
 import { resolveLandingEntryState } from "@/features/landing/landing-entry-state";
 import { useHydrated } from "@/hooks/use-hydrated";
 import { cn } from "@/lib/utils";
@@ -13,12 +14,14 @@ export function AuthAwareEntryLink({
   content,
   compact = false,
   hideForStaff = false,
+  showSessionExit = false,
   onNavigate,
   className,
 }: {
   content: ContentDictionary;
   compact?: boolean;
   hideForStaff?: boolean;
+  showSessionExit?: boolean;
   onNavigate?: () => void;
   className?: string;
 }) {
@@ -74,7 +77,7 @@ export function AuthAwareEntryLink({
             staff ? "Mở trang quản trị" : parent ? "Vào khu vực phụ huynh" : "Bắt đầu cho bé",
           );
 
-  return (
+  const entryLink = (
     <Link
       href={href}
       onClick={onNavigate}
@@ -97,5 +100,22 @@ export function AuthAwareEntryLink({
       )}
       {!compact ? <ArrowRight size={20} className="shrink-0" /> : null}
     </Link>
+  );
+
+  if (!showSessionExit || guest) return entryLink;
+
+  return (
+    <div className={cn("flex items-center gap-2", compact && "max-md:grid")}>
+      {entryLink}
+      <SwitchAccountButton
+        callbackUrl={staff ? "/admin" : parent ? "/parent" : "/"}
+        label="Đăng xuất"
+        pendingLabel="Đang đăng xuất..."
+        className={cn(
+          "min-h-10 rounded-full border border-[#e4d5ba] bg-white px-4 py-2 text-[#b9470d] shadow-none",
+          "hover:bg-[#fff0df] hover:brightness-100 active:translate-y-0",
+        )}
+      />
+    </div>
   );
 }
