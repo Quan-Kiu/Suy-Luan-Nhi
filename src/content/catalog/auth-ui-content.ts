@@ -20,6 +20,10 @@ export const authContentEntries = defineContent("auth", {
   "signIn.submitting": { value: "Đang đăng nhập...", description: "Nhãn khi đang đăng nhập." },
   "signIn.forgot": { value: "Quên mật khẩu?", description: "Liên kết quên mật khẩu." },
   "signIn.createAccount": { value: "Tạo tài khoản", description: "Liên kết tạo tài khoản." },
+  "mfaSetup.forgotPassword": {
+    value: "Quên mật khẩu?",
+    description: "Liên kết khôi phục mật khẩu tại bước thiết lập xác thực hai lớp.",
+  },
   "social.googleSignIn": { value: "Đăng nhập bằng Google", description: "Nhãn nút đăng nhập Google." },
   "social.googleSignUp": { value: "Đăng ký bằng Google", description: "Nhãn nút đăng ký Google." },
   "social.googlePending": { value: "Đang kết nối Google...", description: "Trạng thái kết nối Google." },
