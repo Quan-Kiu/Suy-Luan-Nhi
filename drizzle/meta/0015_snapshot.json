@@ -4005,14 +4005,7 @@
     "public.content_status": {
       "name": "content_status",
       "schema": "public",
-      "values": [
-        "draft",
-        "in_review",
-        "rejected",
-        "approved",
-        "published",
-        "archived"
-      ]
+      "values": ["draft", "in_review", "rejected", "approved", "published", "archived"]
     },
     "public.content_value_type": {
       "name": "content_value_type",
@@ -4042,12 +4035,7 @@
     "public.notification_type": {
       "name": "notification_type",
       "schema": "public",
-      "values": [
-        "mission_completed",
-        "suggestion_available",
-        "thinking_habit",
-        "system"
-      ]
+      "values": ["mission_completed", "suggestion_available", "thinking_habit", "system"]
     },
     "public.parent_resource_type": {
       "name": "parent_resource_type",
@@ -4057,13 +4045,7 @@
     "public.question_type": {
       "name": "question_type",
       "schema": "public",
-      "values": [
-        "single_choice",
-        "pattern_sequence",
-        "drag_drop",
-        "fill_answer",
-        "sorting"
-      ]
+      "values": ["single_choice", "pattern_sequence", "drag_drop", "fill_answer", "sorting"]
     },
     "public.request_status": {
       "name": "request_status",
