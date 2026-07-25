@@ -11,6 +11,7 @@ import { FormStatus, HydrationSafeForm, PasswordField, SubmitButton } from "@/co
 import { Card } from "@/components/ui";
 import { contentText, useContent } from "@/content/client";
 import { parentPinUnlockSchema, PARENT_PIN_MAX_LEGACY_LENGTH } from "@/domain/parent-pin";
+import { SwitchAccountButton } from "@/features/auth/switch-account-button";
 import { usePendingRouter } from "@/hooks/use-pending-router";
 
 const schema = z.object({ pin: parentPinUnlockSchema });
@@ -83,6 +84,14 @@ export function ParentGateForm() {
           {contentText(content, "gate.submit", "Mở khu vực phụ huynh")}
         </SubmitButton>
       </HydrationSafeForm>
+      <div className="mt-4 border-t border-[#eadfc9] pt-4">
+        <SwitchAccountButton
+          callbackUrl="/parent"
+          label="Đăng xuất và dùng tài khoản khác"
+          pendingLabel="Đang đăng xuất..."
+          className="w-full border border-[#e4d5ba] bg-white text-[#b9470d] shadow-none hover:bg-[#fff0df] hover:brightness-100"
+        />
+      </div>
     </Card>
   );
 }
