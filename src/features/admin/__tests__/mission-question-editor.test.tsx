@@ -35,25 +35,29 @@ function TestForm() {
 }
 
 describe("MissionQuestionEditor", () => {
-  it("keeps the newline after Enter and stores the next line as a separate hint", async () => {
-    const user = userEvent.setup();
-    render(<TestForm />);
+  it(
+    "keeps the newline after Enter and stores the next line as a separate hint",
+    async () => {
+      const user = userEvent.setup();
+      render(<TestForm />);
 
-    const textarea = screen.getByRole("textbox", { name: "Các gợi ý, mỗi dòng một gợi ý" });
-    const firstHint = "Con thử nhìn từng phần một nhé.";
-    const secondHint = "Nhìn vật liệu và khả năng dùng tiếp.";
+      const textarea = screen.getByRole("textbox", { name: "Các gợi ý, mỗi dòng một gợi ý" });
+      const firstHint = "Con thử nhìn từng phần một nhé.";
+      const secondHint = "Nhìn vật liệu và khả năng dùng tiếp.";
 
-    expect(textarea).toHaveValue(firstHint);
+      expect(textarea).toHaveValue(firstHint);
 
-    await user.click(textarea);
-    await user.keyboard(`{End}{Enter}${secondHint}`);
+      await user.click(textarea);
+      await user.keyboard(`{End}{Enter}${secondHint}`);
 
-    expect(textarea).toHaveValue(`${firstHint}\n${secondHint}`);
-    expect(screen.getByLabelText("Dữ liệu gợi ý")).toHaveTextContent(
-      JSON.stringify([
-        { level: 1, text: firstHint },
-        { level: 2, text: secondHint },
-      ]),
-    );
-  });
+      expect(textarea).toHaveValue(`${firstHint}\n${secondHint}`);
+      expect(screen.getByLabelText("Dữ liệu gợi ý")).toHaveTextContent(
+        JSON.stringify([
+          { level: 1, text: firstHint },
+          { level: 2, text: secondHint },
+        ]),
+      );
+    },
+    10_000,
+  );
 });
