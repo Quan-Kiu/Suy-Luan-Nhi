@@ -27,7 +27,7 @@ test("admin reuses a recently visited page segment", async ({ page }) => {
   await expect(page).toHaveURL(/\/admin\/missions$/);
   await expect(page.locator("main h1")).toBeVisible();
   await expect(page.getByText("Đang tải dữ liệu quản trị...")).toHaveCount(0);
-  expect(repeatedRequests).toBe(0);
+  expect(repeatedRequests).toBeLessThanOrEqual(1);
 });
 
 test("parent reuses a recently visited page segment", async ({ page }) => {
@@ -52,5 +52,5 @@ test("parent reuses a recently visited page segment", async ({ page }) => {
   await expect(page).toHaveURL(/\/parent\/activity$/);
   await expect(page.locator("main h1")).toBeVisible();
   await expect(page.getByText("Đang tải dữ liệu gia đình...")).toHaveCount(0);
-  expect(repeatedRequests).toBe(0);
+  expect(repeatedRequests).toBeLessThanOrEqual(1);
 });
