@@ -31,6 +31,7 @@ function NavigationLinks({
       <AuthAwareEntryLink
         content={content}
         compact
+        showSessionExit
         onNavigate={onNavigate}
         className={mobile ? "rounded-xl px-4 py-3" : undefined}
       />
