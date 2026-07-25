@@ -12,8 +12,12 @@ test("super admin manages content tags from a dedicated dashboard", async ({ pag
   await expect(page.getByText("{{name}}", { exact: true }).first()).toBeVisible();
   await expect(page.getByPlaceholder("name").first()).toBeDisabled();
   await page.getByRole("button", { name: "Thêm tag mới" }).click();
-  await expect(page.getByRole("button", { name: "Bỏ tag mới" })).toBeVisible();
-  await page.getByRole("button", { name: "Bỏ tag mới" }).click();
+  const newTag = page.locator("details").filter({
+    has: page.getByText("{{tag_moi}}", { exact: true }),
+  });
+  await newTag.locator("summary").click();
+  await expect(newTag.getByRole("button", { name: "Bỏ tag mới" })).toBeVisible();
+  await newTag.getByRole("button", { name: "Bỏ tag mới" }).click();
 
   await page.getByLabel("Nội dung thử").fill("Yêu cầu {{name}} quan sát thật kỹ.");
   await expect(page.getByText("Yêu cầu Bống quan sát thật kỹ.", { exact: true })).toBeVisible();
@@ -59,7 +63,7 @@ test("mission author gets tag suggestions while writing", async ({ page }) => {
   await expect(prompt).toHaveValue("Yêu cầu {{name}}");
   await expect(page.getByRole("heading", { name: "Yêu cầu Bống" })).toBeVisible();
 
-  const firstOption = page.getByRole("textbox", { name: "Các lựa chọn 1" });
+  const firstOption = page.getByRole("group", { name: "Các lựa chọn" }).getByLabel("Nội dung").first();
   await firstOption.fill("{{");
   await page.getByRole("button", { name: /Tên bé/ }).click();
   await expect(firstOption).toHaveValue("{{name}}");
