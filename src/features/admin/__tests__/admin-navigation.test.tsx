@@ -12,6 +12,14 @@ describe("AdminNavigation", () => {
     );
   });
 
+  it("distinguishes the media library from the content dictionary", () => {
+    render(<AdminNavigation pathname="/admin" role="super_admin" content={{}} />);
+
+    expect(screen.getByRole("link", { name: "Thư viện" })).toHaveAttribute("href", "/admin/media");
+    expect(screen.getByRole("link", { name: "Từ điển" })).toHaveAttribute("href", "/admin/content-variables");
+    expect(screen.queryByRole("link", { name: "Thông tin từ điển" })).not.toBeInTheDocument();
+  });
+
   it("shows system feedback for every staff role", () => {
     render(<AdminNavigation pathname="/admin" role="reviewer" content={{}} />);
 
