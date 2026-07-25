@@ -3,6 +3,7 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation } from "@tanstack/react-query";
 import { Check, Copy, Download, KeyRound } from "lucide-react";
+import Link from "next/link";
 import { QRCodeSVG } from "qrcode.react";
 import { useMemo, useState } from "react";
 import { useForm } from "react-hook-form";
@@ -10,6 +11,7 @@ import { toast } from "sonner";
 import { z } from "zod";
 import { authClient } from "@/auth/client";
 import { FormStatus, HydrationSafeForm, PasswordField, SubmitButton, TextField } from "@/components/form";
+import { contentText, useContent } from "@/content/client";
 import { usePendingRouter } from "@/hooks/use-pending-router";
 
 const passwordSchema = z.object({ password: z.string().min(1, "Hãy nhập mật khẩu hiện tại") });
@@ -23,6 +25,7 @@ function authErrorMessage(error: unknown, fallback: string) {
   return fallback;
 }
 export function TwoFactorSetupForm({ requiresPassword }: { requiresPassword: boolean }) {
+  const content = useContent("auth");
   const navigation = usePendingRouter();
   const [setup, setSetup] = useState<SetupData | null>(null);
   const passwordForm = useForm<z.infer<typeof passwordSchema>>({
@@ -99,13 +102,23 @@ export function TwoFactorSetupForm({ requiresPassword }: { requiresPassword: boo
           </div>
         </div>
         {requiresPassword ? (
-          <PasswordField
-            autoComplete="current-password"
-            label="Mật khẩu hiện tại"
-            placeholder="Nhập mật khẩu của bạn"
-            registration={passwordForm.register("password")}
-            error={passwordForm.formState.errors.password?.message}
-          />
+          <div className="space-y-1">
+            <PasswordField
+              autoComplete="current-password"
+              label="Mật khẩu hiện tại"
+              placeholder="Nhập mật khẩu của bạn"
+              registration={passwordForm.register("password")}
+              error={passwordForm.formState.errors.password?.message}
+            />
+            <div className="flex justify-end">
+              <Link
+                href="/auth/forgot-password"
+                className="type-supporting inline-flex min-h-11 items-center font-bold text-[#c55312] underline"
+              >
+                {contentText(content, "mfaSetup.forgotPassword", "Quên mật khẩu?")}
+              </Link>
+            </div>
+          </div>
         ) : null}
         <FormStatus status={message ? "error" : "idle"} message={message} />
         <SubmitButton pending={enableMutation.isPending} pendingLabel="Đang tạo mã bảo mật...">

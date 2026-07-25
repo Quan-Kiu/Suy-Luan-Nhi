@@ -59,6 +59,7 @@ describe("two-factor setup account capability", () => {
     renderForm(false);
 
     expect(screen.queryByLabelText("Mật khẩu hiện tại")).not.toBeInTheDocument();
+    expect(screen.queryByRole("link", { name: "Quên mật khẩu?" })).not.toBeInTheDocument();
     expect(screen.getByText(/đăng nhập bằng Google và không có mật khẩu riêng/)).toBeInTheDocument();
 
     await userEvent.click(screen.getByRole("button", { name: "Bắt đầu thiết lập" }));
@@ -78,6 +79,10 @@ describe("two-factor setup account capability", () => {
     renderForm(true);
 
     const password = screen.getByLabelText("Mật khẩu hiện tại");
+    expect(screen.getByRole("link", { name: "Quên mật khẩu?" })).toHaveAttribute(
+      "href",
+      "/auth/forgot-password",
+    );
     await userEvent.type(password, "StrongPass123!");
     await userEvent.click(screen.getByRole("button", { name: "Bắt đầu thiết lập" }));
 
