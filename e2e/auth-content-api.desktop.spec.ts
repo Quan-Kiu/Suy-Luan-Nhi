@@ -5,7 +5,7 @@ const password = "LocalDemo-2026!";
 async function signIn(page: Page, email: string, callbackUrl = "/profiles") {
   await page.goto(`/auth/sign-in?callbackUrl=${encodeURIComponent(callbackUrl)}`);
   await page.getByLabel("Email").fill(email);
-  await page.getByLabel("Mật khẩu").fill(password);
+  await page.locator('input[name="password"]').fill(password);
   await page.getByRole("button", { name: "Đăng nhập", exact: true }).click();
   await page.waitForURL((url) => !url.pathname.startsWith("/auth/sign-in"));
 }
@@ -15,7 +15,7 @@ test.describe.configure({ mode: "serial" });
 test("login accepts the browser origin and custom APIs use one envelope", async ({ page }) => {
   await page.goto("/auth/sign-in");
   await expect(page.getByLabel("Email")).toHaveAttribute("placeholder", "ba.me@example.com");
-  await expect(page.getByLabel("Mật khẩu")).toHaveAttribute("placeholder", "Nhập mật khẩu");
+  await expect(page.locator('input[name="password"]')).toHaveAttribute("placeholder", "Nhập mật khẩu");
 
   await signIn(page, "parent@demo.local");
   await expect(page).toHaveURL(/\/profiles$/);
