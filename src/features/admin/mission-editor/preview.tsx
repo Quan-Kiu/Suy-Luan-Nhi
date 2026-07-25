@@ -34,8 +34,13 @@ export function MissionEditorPreview({
     : null;
 
   return (
-    <aside className="min-w-0">
-      <div className="sticky top-20 space-y-4">
+    <aside
+      data-testid="mission-editor-preview-scroll-region"
+      aria-label={contentText(content, "missionEditor.previewRegion", "Bản xem trước nhiệm vụ")}
+      tabIndex={0}
+      className="min-w-0 outline-none focus-visible:ring-2 focus-visible:ring-[#d86a24] focus-visible:ring-inset xl:min-h-0 xl:scrollbar-thin xl:overflow-y-auto xl:overscroll-contain xl:pr-2 xl:pb-2"
+    >
+      <div className="space-y-4">
         <Card className="overflow-hidden rounded-[30px] p-3 shadow-xl">
           <div className="relative mb-3 h-32 overflow-hidden rounded-[22px]">
             <Image

@@ -158,7 +158,7 @@ export function AdminShell({
           aria-label={contentText(content, "shell.mainContent", "Nội dung quản trị")}
           className="min-h-0 min-w-0 scrollbar-thin overflow-x-hidden overflow-y-auto overscroll-contain p-4 pb-[max(1rem,var(--safe-area-bottom))] outline-none focus-visible:ring-2 focus-visible:ring-[#d86a24] focus-visible:ring-inset sm:p-5 lg:p-6"
         >
-          <div className="mx-auto w-full max-w-[1680px]">{children}</div>
+          <div className="mx-auto h-full min-h-0 w-full max-w-[1680px]">{children}</div>
         </main>
       </div>
     </div>

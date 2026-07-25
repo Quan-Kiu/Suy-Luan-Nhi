@@ -265,9 +265,12 @@ export function ProductionMissionEditor({
 
   return (
     <FormProvider {...form}>
-      <div className="grid gap-6 xl:grid-cols-[minmax(0,1fr)_370px]">
+      <div className="grid gap-6 xl:h-full xl:min-h-0 xl:grid-cols-[minmax(0,1fr)_370px]">
         <form
-          className="min-w-0 space-y-5"
+          data-testid="mission-editor-fields-scroll-region"
+          aria-label={contentText(content, "missionEditor.editRegion", "Thông tin nhiệm vụ")}
+          tabIndex={0}
+          className="min-w-0 space-y-5 outline-none focus-visible:ring-2 focus-visible:ring-[#d86a24] focus-visible:ring-inset xl:min-h-0 xl:scrollbar-thin xl:overflow-y-auto xl:overscroll-contain xl:pr-2 xl:pb-2"
           onSubmit={(event) => {
             void form.handleSubmit(runManualSave, handleInvalid)(event);
           }}
