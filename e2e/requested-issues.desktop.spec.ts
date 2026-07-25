@@ -11,7 +11,7 @@ test.describe("requested issue regressions", () => {
     expect(mission).toBeTruthy();
     const reportedMissionId = mission!.id;
     await page.goto(`/admin/missions/${reportedMissionId}/edit`);
-    await page.getByText("Thiết lập nâng cao", { exact: true }).click();
+    await page.locator("summary").filter({ hasText: "Thiết lập nâng cao" }).first().click();
     const randomize = page.getByLabel("Đổi thứ tự đáp án khi chơi");
     await expect(randomize).toBeVisible();
     const before = await randomize.isChecked();
@@ -21,26 +21,29 @@ test.describe("requested issue regressions", () => {
         response.request().method() === "PATCH" &&
         response.url().includes(`/api/admin/missions/${reportedMissionId}`),
     );
-    await page.getByRole("button", { name: "Lưu để tiếp tục sau" }).first().click();
+    await page.getByRole("button", { name: "Lưu và làm tiếp sau" }).first().click();
     const response = await responsePromise;
     expect(response.status()).toBe(200);
     await expect(page.getByText("Đã lưu bản nháp")).toBeVisible();
     const publishedResponse = await page.request.get(`/api/missions/${reportedMissionId}`);
     expect(publishedResponse.status()).toBe(200);
   });
+
   test("mission filters keep the admin shell visible and use local loading", async ({ page }) => {
     await signIn(page, "content@demo.local", "/admin/missions");
     await page.goto("/admin/missions");
+    const applyButton = page.getByRole("button", { name: "Lọc", exact: true });
+    await expect(applyButton).toBeVisible();
     await page.route("**/api/admin/missions?**", async (route) => {
       await new Promise((resolve) => setTimeout(resolve, 700));
       await route.continue();
     });
-    await page.getByPlaceholder("Tìm theo tên nhiệm vụ").fill("thám");
-    await page.getByRole("button", { name: "Áp dụng" }).click();
-    await expect(page.getByRole("heading", { name: "Quản lý nhiệm vụ" })).toBeVisible();
+    await page.getByRole("textbox", { name: "Tìm nhiệm vụ" }).fill("thám");
+    await applyButton.click();
+    await expect(page.locator("main h1")).toBeVisible();
     await expect(page.getByRole("button", { name: "Đang lọc..." })).toBeVisible();
     await expect(page.getByText("Đang tải dữ liệu quản trị...")).toHaveCount(0);
-    await expect(page.getByRole("button", { name: "Áp dụng" })).toBeVisible();
+    await expect(page.getByRole("button", { name: "Lọc", exact: true })).toBeVisible();
   });
 
   test("archive uses the custom confirmation modal", async ({ page }) => {
@@ -49,10 +52,11 @@ test.describe("requested issue regressions", () => {
     await page.getByRole("button", { name: "Lưu trữ nhiệm vụ" }).first().click();
     const dialog = page.getByRole("alertdialog");
     await expect(dialog).toBeVisible();
-    await expect(dialog.getByRole("heading", { name: "Lưu trữ nhiệm vụ?" })).toBeVisible();
+    await expect(dialog.getByRole("heading", { name: "Chuyển nhiệm vụ vào Kho lưu trữ?" })).toBeVisible();
     await dialog.getByRole("button", { name: "Hủy" }).click();
     await expect(dialog).toBeHidden();
   });
+
   test("parent gate uses PIN and locks again after leaving parent area", async ({ page }) => {
     await signIn(page, "parent@demo.local", "/profiles");
     const child = await getDemoChild(page);
@@ -69,10 +73,10 @@ test.describe("requested issue regressions", () => {
   test("resource management is available in admin", async ({ page }) => {
     await signIn(page, "content@demo.local", "/admin/resources");
     await page.goto("/admin/resources");
-    await expect(page.getByRole("heading", { name: "Gợi ý cho phụ huynh" })).toBeVisible();
-    await expect(page.getByRole("link", { name: "Viết nội dung mới" })).toBeVisible();
+    await expect(page.getByRole("heading", { name: "Bài viết cho phụ huynh" })).toBeVisible();
+    await expect(page.getByRole("link", { name: "Viết bài mới" })).toBeVisible();
     await expect(page.getByText(/^\d+ tài nguyên$/)).toBeVisible();
-    await page.getByRole("link", { name: "Viết nội dung mới" }).click();
+    await page.getByRole("link", { name: "Viết bài mới" }).click();
     const select = page.getByLabel("Loại tài nguyên");
     const style = await select.evaluate((element) => {
       const computed = getComputedStyle(element);
