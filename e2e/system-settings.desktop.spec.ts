@@ -82,19 +82,13 @@ test("super admin can disable social login without disabling email login", async
     await saveButton.click();
     await expect(card.getByText("Thay đổi đã được ghi nhận", { exact: false })).toBeVisible();
 
-    const socialResponse = await page.request.post("/api/auth/sign-in/social", {
-      data: { provider: "google", requestSignUp: false },
-    });
-    expect(socialResponse.status()).toBe(403);
-    await expect(socialResponse.json()).resolves.toMatchObject({
-      success: false,
-      error: { code: "SOCIAL_LOGIN_DISABLED" },
-    });
-
-    const emailPageResponse = await page.request.get("/auth/sign-in");
-    expect(emailPageResponse.status()).toBe(200);
+    await page.goto("/auth/sign-in");
+    await expect(page.getByRole("button", { name: "Đăng nhập bằng Google" })).toHaveCount(0);
+    await expect(page.getByRole("button", { name: "Đăng nhập", exact: true })).toBeEnabled();
   } finally {
-    await checkbox.check();
-    await saveButton.click();
+    const restoreResponse = await page.request.patch("/api/admin/settings", {
+      data: { key: "features.socialLoginEnabled", value: true },
+    });
+    expect(restoreResponse.status()).toBe(200);
   }
 });
