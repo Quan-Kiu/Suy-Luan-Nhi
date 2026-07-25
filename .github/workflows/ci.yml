@@ -8,7 +8,7 @@ on:
 jobs:
   verify:
     runs-on: ubuntu-latest
-    timeout-minutes: 30
+    timeout-minutes: 120
     services:
       postgres:
         image: postgres:17-alpine
@@ -56,6 +56,6 @@ jobs:
           AUTH_REQUIRE_EMAIL_VERIFICATION: "true"
           BETTER_AUTH_SECRET: ci-production-like-secret-with-at-least-thirty-two-characters
         run: npm run build
-      - run: npx playwright install --with-deps chromium
-      - run: npm run test:e2e
+      - run: npx playwright install --with-deps chromium webkit
+      - run: npm run test:e2e:isolated
       - run: npm audit --audit-level=high
