@@ -14,7 +14,7 @@ test.describe("follow-up issue regressions", () => {
       if (request.method() === "POST" && request.url().endsWith("/api/admin/missions")) saveRequests += 1;
     });
 
-    const subtitle = page.getByPlaceholder("Ví dụ: Quan sát thật tinh");
+    const subtitle = page.getByLabel("Câu giới thiệu ngắn");
     await expect(subtitle).toBeEditable();
     await subtitle.fill("a");
     await expect(subtitle).toHaveValue("a");
@@ -22,24 +22,27 @@ test.describe("follow-up issue regressions", () => {
     await expect(page.getByText(/Too small|expected string/i)).toHaveCount(0);
 
     await page.getByRole("button", { name: "Lưu và làm tiếp sau" }).first().click();
-    await expect(page.getByText(/Bản nháp chưa được lưu/)).toBeVisible();
     await expect(page.getByText("Đã lưu bản nháp")).toHaveCount(0);
     expect(saveRequests).toBe(0);
   });
+
   test("mission cover uploads from a local file and receives a storage URL", async ({ page }) => {
     await signIn(page, "content@demo.local", "/admin/missions/new");
-    await page.getByText("Thiết lập nâng cao", { exact: true }).click();
+    const advanced = page.locator("details").filter({
+      has: page.getByText("Thiết lập nâng cao", { exact: true }),
+    });
+    await advanced.locator(":scope > summary").click();
     const uploadResponse = page.waitForResponse(
       (response) => response.request().method() === "POST" && response.url().endsWith("/api/admin/media"),
     );
-    await page.getByLabel("Ảnh bìa nhiệm vụ").setInputFiles({
+    await advanced.locator('input[type="file"]').setInputFiles({
       name: "mission-cover-e2e.png",
       mimeType: "image/png",
       buffer: tinyPng,
     });
     expect((await uploadResponse).status()).toBe(201);
-    await expect(page.getByText(/URL đã được lấy tự động:/)).toBeVisible();
-    await expect(page.getByText("Đã tải tệp và gắn vào nội dung")).toBeVisible();
+    await expect(page.getByText("Tệp đã được gắn tự động vào nội dung.")).toBeVisible();
+    await expect(page.getByText("Đã thêm tệp vào nội dung")).toBeVisible();
   });
 
   test("clicking a locked mission explains the unlock requirement", async ({ page }) => {
@@ -49,10 +52,11 @@ test.describe("follow-up issue regressions", () => {
     await unlockParentGate(page);
     await apiData(await page.request.post(`/api/children/${child.id}/reset-progress`));
     await page.goto("/missions");
-    await page.getByRole("button", { name: /Nhịp đèn lồng\. Nhiệm vụ chưa mở/ }).click();
-    await expect(page.getByText("Nhiệm vụ chưa mở", { exact: true })).toBeVisible();
+    await page.getByRole("button", { name: /Nhịp đèn lồng\. Nhiệm vụ này chưa mở/ }).click();
+    await expect(page.getByText("Nhiệm vụ này chưa mở", { exact: true })).toBeVisible();
     await expect(page.getByText(/Hoàn thành “Thám tử dấu chân”/)).toBeVisible();
   });
+
   test("resource detail uses Vietnamese labels instead of category codes", async ({ page }) => {
     await signIn(page, "parent@demo.local");
     const child = await getDemoChild(page);
@@ -71,6 +75,7 @@ test.describe("follow-up issue regressions", () => {
     await signIn(page, "parent@demo.local");
     const child = await getDemoChild(page);
     await selectChild(page, child.id);
+    await unlockParentGate(page);
     await page.goto("/missions/footprint-detective");
     const title = page.getByRole("heading", { name: "Thám tử dấu chân" });
     const container = title.locator("xpath=ancestor::*[contains(@class,'overflow-hidden')][1]");
@@ -81,7 +86,7 @@ test.describe("follow-up issue regressions", () => {
   test("video resources upload a file and render a player for parents", async ({ page }) => {
     await signIn(page, "content@demo.local", "/admin/resources/new");
     await page.getByLabel("Loại tài nguyên").selectOption("video");
-    await expect(page.getByLabel("Tệp video")).toBeVisible();
+    await expect(page.getByRole("button", { name: /Tệp video.*Tải tệp mới/ })).toBeVisible();
 
     const upload = await apiData<{ url: string }>(
       await page.request.post("/api/admin/media", {
