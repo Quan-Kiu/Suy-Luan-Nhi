@@ -22,64 +22,43 @@ test.describe("interaction state regressions", () => {
   test("keeps sign-in pending until a slow destination route commits", async ({ page }) => {
     await page.goto("/auth/sign-in?callbackUrl=%2Fprofiles");
     await page.getByLabel("Email").fill("parent@demo.local");
-    await page.getByLabel("Mật khẩu").fill(demoPassword);
-
-    const snapshots: Array<{
-      at: number;
-      disabled: boolean;
-      busy: string | null;
-      text: string;
-      cursor: string;
-    }> = [];
-    await page.exposeFunction("captureSignInState", (snapshot: Omit<(typeof snapshots)[number], "at">) =>
-      snapshots.push({ ...snapshot, at: Date.now() }),
-    );
-    await page.evaluate(() => {
-      const button = document.querySelector<HTMLButtonElement>('button[type="submit"]');
-      const capture = (
-        window as typeof window & {
-          captureSignInState: (snapshot: {
-            disabled: boolean;
-            busy: string | null;
-            text: string;
-            cursor: string;
-          }) => Promise<void>;
-        }
-      ).captureSignInState;
-      window.setInterval(() => {
-        if (!button?.isConnected) return;
-        void capture({
-          disabled: button.disabled,
-          busy: button.getAttribute("aria-busy"),
-          text: button.textContent ?? "",
-          cursor: getComputedStyle(button).cursor,
-        });
-      }, 40);
-    });
+    await page.locator('input[name="password"]').fill(demoPassword);
 
     let routeStartedAt = 0;
-    await page.route("**/profiles**", async (route) => {
-      const url = new URL(route.request().url());
-      if (url.pathname === "/profiles") {
-        routeStartedAt = Date.now();
-        await new Promise((resolve) => setTimeout(resolve, 1_200));
-      }
-      await route.continue();
+    let releaseRoute: (() => void) | undefined;
+    const routeStarted = new Promise<void>((resolveStarted) => {
+      void page.route("**/auth/setup-pin**", async (route) => {
+        const url = new URL(route.request().url());
+        if (url.pathname === "/auth/setup-pin") {
+          routeStartedAt = Date.now();
+          resolveStarted();
+          await new Promise<void>((resolveRelease) => {
+            releaseRoute = resolveRelease;
+          });
+        }
+        await route.continue();
+      });
     });
 
-    await page.getByRole("button", { name: "Đăng nhập", exact: true }).click();
-    await page.waitForURL(/\/profiles$/);
+    const submit = page.locator('button[type="submit"]');
+    await submit.click();
+    await routeStarted;
 
     expect(routeStartedAt).toBeGreaterThan(0);
-    expect(
-      snapshots.some(
-        (snapshot) =>
-          snapshot.at >= routeStartedAt &&
-          snapshot.disabled &&
-          snapshot.busy === "true" &&
-          snapshot.text.includes("Đang đăng nhập") &&
-          snapshot.cursor === "progress",
-      ),
-    ).toBe(true);
+    const pendingState = await submit.evaluate((button) => ({
+      disabled: button.disabled,
+      busy: button.getAttribute("aria-busy"),
+      text: button.textContent ?? "",
+      cursor: getComputedStyle(button).cursor,
+    }));
+    expect(pendingState).toMatchObject({
+      disabled: true,
+      busy: "true",
+      cursor: "progress",
+    });
+    expect(pendingState.text).toContain("Đang đăng nhập");
+
+    releaseRoute?.();
+    await page.waitForURL(/\/auth\/setup-pin/);
   });
 });
