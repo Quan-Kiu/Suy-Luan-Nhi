@@ -63,6 +63,10 @@ export function SignInForm({
     },
     onSuccess: (data) => {
       if (data && "twoFactorRedirect" in data && data.twoFactorRedirect) return;
+      if (data?.user.mustChangePassword) {
+        navigation.push("/auth/change-temporary-password");
+        return;
+      }
       const destination = requestedCallback ?? getAuthenticatedHome(data?.user.role);
       const needsParentPinSetup = data?.user.role === "parent" || isParentExperiencePath(destination);
       const target = destination.startsWith(PARENT_PIN_SETUP_PATH)

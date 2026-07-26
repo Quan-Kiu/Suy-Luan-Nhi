@@ -121,6 +121,7 @@ export async function listMembers() {
         role: user.role,
         banned: user.banned,
         twoFactorEnabled: user.twoFactorEnabled,
+        mustChangePassword: user.mustChangePassword,
         emailVerified: user.emailVerified,
         createdAt: user.createdAt,
         parentProfileId: parentProfiles.id,

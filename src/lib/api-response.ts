@@ -43,7 +43,7 @@ function withRequestId(init: ResponseInit | undefined, requestId: string): Respo
 }
 export function apiJson<T>(body: T, init?: ResponseInit): Response {
   const status = init?.status ?? 200;
-  const requestId = crypto.randomUUID();
+  const requestId = new Headers(init?.headers).get("x-request-id") ?? crypto.randomUUID();
   if (status >= 400) {
     const source = typeof body === "object" && body !== null ? (body as Record<string, unknown>) : {};
     const message = typeof source.message === "string" ? source.message : "Có lỗi xảy ra";

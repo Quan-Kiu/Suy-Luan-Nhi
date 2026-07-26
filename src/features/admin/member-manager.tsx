@@ -16,13 +16,13 @@ function MemberTable({ items, currentUserId }: { items: MemberItem[]; currentUse
         ))}
       </div>
       <div className="hidden overflow-x-auto rounded-2xl border bg-white md:block">
-        <table className="type-supporting w-full min-w-[960px] table-fixed">
+        <table className="type-supporting w-full min-w-[1080px] table-fixed">
           <colgroup>
-            <col className="w-[17%]" />
-            <col className="w-[26%]" />
-            <col className="w-[27%]" />
+            <col className="w-[16%]" />
+            <col className="w-[22%]" />
+            <col className="w-[25%]" />
             <col className="w-[15%]" />
-            <col className="w-[15%]" />
+            <col className="w-[22%]" />
           </colgroup>
           <thead className="bg-[#f7f3eb] text-left">
             <tr>

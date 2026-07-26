@@ -58,12 +58,20 @@ test("member tabs and sign-in badges remain clear on mobile", async ({ page }) =
   const reviewerCard = staffPanel.locator("article", { hasText: "reviewer@demo.local" });
   await expect(reviewerCard).toBeVisible();
   await expect(reviewerCard.getByText("Google", { exact: true })).toBeVisible();
+  await reviewerCard.getByText("Thao tác tài khoản", { exact: true }).click();
+  await expect(reviewerCard.getByRole("button", { name: "Đặt lại mật khẩu" })).toBeDisabled();
+  await expect(reviewerCard.getByText(/Google-only quản lý mật khẩu/)).toBeVisible();
 
   await parentTab.click();
   const parentPanel = page.getByRole("tabpanel", { name: /Phụ huynh/ });
   const parentCard = parentPanel.locator("article", { hasText: "parent@demo.local" });
   await expect(parentCard).toBeVisible();
   await expect(parentCard.getByText("Email & mật khẩu", { exact: true })).toBeVisible();
+  await parentCard.getByText("Thao tác tài khoản", { exact: true }).click();
+  await parentCard.getByRole("button", { name: "Đặt lại mã PIN" }).click();
+  await expect(page.getByRole("dialog", { name: /Đặt lại mã PIN/ })).toBeVisible();
+  await expect(page.getByText("Xóa mã PIN hiện tại", { exact: true })).toBeVisible();
+  await page.getByRole("button", { name: "Đóng hộp thoại" }).click();
   await expect(page.getByRole("tabpanel", { name: /Ban quản trị/ })).toHaveCount(0);
 
   expect(await page.locator("html").evaluate((element) => element.scrollWidth <= element.clientWidth)).toBe(

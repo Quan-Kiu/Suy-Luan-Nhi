@@ -7,6 +7,18 @@ const invalidationPattern = /\b(?:revalidatePath|revalidateTag|updateTag|invalid
 
 const intentionallyLocalMutations = new Map<string, string>([
   [
+    "account/complete-temporary-password/route.ts",
+    "Completes the active authentication flow, updates the current session-backed user state, and redirects without a cached read model.",
+  ],
+  [
+    "admin/members/[userId]/password-reset/route.ts",
+    "Member credentials are read dynamically; the admin workspace refreshes after temporary-password changes and email requests do not mutate a cached list.",
+  ],
+  [
+    "admin/members/[userId]/pin-reset/route.ts",
+    "Parent PIN state is read directly; changing the hash invalidates signed Parent Gate access and the admin workspace refreshes locally.",
+  ],
+  [
     "admin/data-requests/[requestId]/process/route.ts",
     "Processes a request and returns the updated row to the current admin workspace; no server-cached reader owns it.",
   ],
@@ -29,6 +41,10 @@ const intentionallyLocalMutations = new Map<string, string>([
   [
     "children/[childId]/select/route.ts",
     "Selection changes a cookie and the active-child provider is updated from the mutation result.",
+  ],
+  [
+    "error-reports/route.ts",
+    "Automatic error reports are append-only telemetry submissions and do not affect a server-cached application read model.",
   ],
   [
     "feedback/route.ts",

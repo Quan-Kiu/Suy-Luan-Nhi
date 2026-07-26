@@ -1,3 +1,4 @@
+export { ChangeTemporaryPasswordForm } from "@/features/auth/change-temporary-password-form";
 export { ForgotParentPinForm } from "@/features/auth/forgot-parent-pin-form";
 export { ForgotPasswordForm } from "@/features/auth/forgot-password-form";
 export { ResetParentPinForm } from "@/features/auth/reset-parent-pin-form";

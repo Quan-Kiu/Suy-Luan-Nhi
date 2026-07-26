@@ -138,8 +138,8 @@ describe("SystemFeedbackManager", () => {
 
     await user.click(screen.getByRole("button", { name: "Chi tiết" }));
 
-    const dialog = screen.getByRole("dialog", { name: "Nhiệm vụ demo" });
-    expect(dialog).toBeVisible();
+    const dialog = await screen.findByRole("dialog", { name: "Nhiệm vụ demo" });
+    await waitFor(() => expect(dialog).toBeVisible());
     expect(within(dialog).getByText("Nút tiếp tục bị che trên điện thoại.")).toBeVisible();
     expect(within(dialog).getByText("Màn hình: 390 × 844px")).toBeVisible();
     expect(within(dialog).getByRole("img", { name: "Ảnh trang hiện tại" })).toBeVisible();
