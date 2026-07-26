@@ -57,5 +57,8 @@ jobs:
           BETTER_AUTH_SECRET: ci-production-like-secret-with-at-least-thirty-two-characters
         run: npm run build
       - run: npx playwright install --with-deps chromium
-      - run: npm run test:e2e
+      - name: Run end-to-end tests
+        env:
+          E2E_SERVER_MODE: production
+        run: npm run test:e2e
       - run: npm audit --audit-level=high
