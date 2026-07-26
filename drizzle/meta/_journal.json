@@ -155,6 +155,13 @@
       "when": 1784887383361,
       "tag": "0021_automatic_error_reporting_consent",
       "breakpoints": true
+    },
+    {
+      "idx": 22,
+      "version": "7",
+      "when": 1784962542902,
+      "tag": "0022_admin_account_reset",
+      "breakpoints": true
     }
   ]
 }

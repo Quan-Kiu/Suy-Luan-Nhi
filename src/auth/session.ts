@@ -19,6 +19,7 @@ export async function requireSession() {
   }
   if (!session) redirect("/auth/sign-in");
   if (isActiveBan(session.user)) redirect("/auth/error?reason=banned");
+  if (session.user.mustChangePassword) redirect("/auth/change-temporary-password");
   return session;
 }
 

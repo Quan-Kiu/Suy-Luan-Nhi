@@ -26,6 +26,14 @@ export async function requireApiSession(request: Request) {
       ),
     } as const;
   }
+  if (session.user.mustChangePassword) {
+    return {
+      error: apiJson(
+        { code: "PASSWORD_CHANGE_REQUIRED", message: "Cần đổi mật khẩu tạm thời trước khi tiếp tục." },
+        { status: 403 },
+      ),
+    } as const;
+  }
   return { session } as const;
 }
 

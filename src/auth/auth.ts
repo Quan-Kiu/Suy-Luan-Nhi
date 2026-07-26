@@ -73,6 +73,13 @@ export const auth = betterAuth({
     enabled: true,
     minPasswordLength: 10,
     requireEmailVerification: env.AUTH_REQUIRE_EMAIL_VERIFICATION,
+    revokeSessionsOnPasswordReset: true,
+    onPasswordReset: async ({ user }) => {
+      await db
+        .update(userTable)
+        .set({ mustChangePassword: false, updatedAt: new Date() })
+        .where(eq(userTable.id, user.id));
+    },
     sendResetPassword: async ({ user, url }) => {
       await sendTransactionalEmail({
         to: user.email,
@@ -106,6 +113,7 @@ export const auth = betterAuth({
       banned: { type: "boolean", required: false, defaultValue: false, input: false },
       banReason: { type: "string", required: false, input: false },
       banExpires: { type: "date", required: false, input: false },
+      mustChangePassword: { type: "boolean", required: false, defaultValue: false, input: false },
     },
   },
   session: {
