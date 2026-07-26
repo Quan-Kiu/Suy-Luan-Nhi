@@ -1,53 +1,138 @@
 import { expect, test } from "@playwright/test";
 import { signIn } from "./helpers";
 
-test("mission editor stays inside the admin viewport without a trailing page gap", async ({ page }) => {
-  await page.setViewportSize({ width: 1912, height: 1080 });
+test("mission editor keeps editing and preview in independent desktop scroll regions", async ({ page }) => {
+  await page.setViewportSize({ width: 1600, height: 600 });
   await signIn(page, "content@demo.local", "/admin/missions/new");
   await expect(page.getByRole("heading", { name: "Nhiệm vụ chưa đặt tên" })).toBeVisible();
 
-  const main = page.locator("#admin-main-content");
-  await main.evaluate((element) => {
+  const shell = page.locator("[data-admin-shell]");
+  const fields = page.getByTestId("mission-editor-fields-scroll-region");
+  const preview = page.getByTestId("mission-editor-preview-scroll-region");
+
+  await expect(fields).toBeVisible();
+  await expect(preview).toBeVisible();
+  await expect(fields).toHaveAttribute("tabindex", "0");
+  await expect(preview).toHaveAttribute("tabindex", "0");
+
+  const initialLayout = await page.evaluate(() => {
+    const shellElement = document.querySelector<HTMLElement>("[data-admin-shell]")!;
+    const mainElement = document.querySelector<HTMLElement>("#admin-main-content")!;
+    const fieldsElement = document.querySelector<HTMLElement>(
+      '[data-testid="mission-editor-fields-scroll-region"]',
+    )!;
+    const previewElement = document.querySelector<HTMLElement>(
+      '[data-testid="mission-editor-preview-scroll-region"]',
+    )!;
+
+    return {
+      rootOverflow: getComputedStyle(document.documentElement).overflow,
+      bodyOverflow: getComputedStyle(document.body).overflow,
+      shellBottom: shellElement.getBoundingClientRect().bottom,
+      viewportHeight: window.innerHeight,
+      mainOverflowY: getComputedStyle(mainElement).overflowY,
+      fieldsOverflowY: getComputedStyle(fieldsElement).overflowY,
+      previewOverflowY: getComputedStyle(previewElement).overflowY,
+      mainScrollTop: mainElement.scrollTop,
+      fieldsClientHeight: fieldsElement.clientHeight,
+      fieldsScrollHeight: fieldsElement.scrollHeight,
+      previewClientHeight: previewElement.clientHeight,
+      previewScrollHeight: previewElement.scrollHeight,
+      previewScrollTop: previewElement.scrollTop,
+    };
+  });
+
+  expect(initialLayout.rootOverflow).toBe("hidden");
+  expect(initialLayout.bodyOverflow).toBe("hidden");
+  expect(initialLayout.shellBottom).toBe(initialLayout.viewportHeight);
+  expect(initialLayout.mainOverflowY).toBe("auto");
+  expect(initialLayout.fieldsOverflowY).toBe("auto");
+  expect(initialLayout.previewOverflowY).toBe("auto");
+  expect(initialLayout.fieldsScrollHeight).toBeGreaterThan(initialLayout.fieldsClientHeight);
+  expect(initialLayout.previewScrollHeight).toBeGreaterThan(initialLayout.previewClientHeight);
+
+  await fields.evaluate((element) => {
     element.scrollTop = element.scrollHeight;
   });
   await expect(page.getByRole("button", { name: "Gửi để kiểm tra" })).toBeInViewport();
 
-  const layout = await page.evaluate(() => {
-    const shell = document.querySelector<HTMLElement>("[data-admin-shell]")!;
+  const afterFieldsScroll = await page.evaluate(() => {
     const mainElement = document.querySelector<HTMLElement>("#admin-main-content")!;
-    const content = mainElement.firstElementChild as HTMLElement;
-    const shellRect = shell.getBoundingClientRect();
-    const mainRect = mainElement.getBoundingClientRect();
-    const contentRect = content.getBoundingClientRect();
+    const fieldsElement = document.querySelector<HTMLElement>(
+      '[data-testid="mission-editor-fields-scroll-region"]',
+    )!;
+    const previewElement = document.querySelector<HTMLElement>(
+      '[data-testid="mission-editor-preview-scroll-region"]',
+    )!;
 
     return {
-      rootOverflow: getComputedStyle(document.documentElement).overflow,
-      rootOverscroll: getComputedStyle(document.documentElement).overscrollBehavior,
-      bodyOverflow: getComputedStyle(document.body).overflow,
-      bodyOverscroll: getComputedStyle(document.body).overscrollBehavior,
-      viewportHeight: window.innerHeight,
-      shellTop: shellRect.top,
-      shellBottom: shellRect.bottom,
-      trailingGap: mainRect.bottom - contentRect.bottom,
+      mainScrollTop: mainElement.scrollTop,
+      fieldsScrollTop: fieldsElement.scrollTop,
+      previewScrollTop: previewElement.scrollTop,
       horizontalOverflow: document.documentElement.scrollWidth - document.documentElement.clientWidth,
     };
   });
 
-  await page.getByTestId("admin-header").hover();
-  await page.mouse.wheel(400, 400);
-  await page.waitForTimeout(100);
-  const documentScroll = await page.evaluate(() => ({ x: window.scrollX, y: window.scrollY }));
+  expect(afterFieldsScroll.mainScrollTop).toBe(initialLayout.mainScrollTop);
+  expect(afterFieldsScroll.fieldsScrollTop).toBeGreaterThan(0);
+  expect(afterFieldsScroll.previewScrollTop).toBe(initialLayout.previewScrollTop);
+  expect(afterFieldsScroll.horizontalOverflow).toBeLessThanOrEqual(1);
 
-  expect(layout.rootOverflow).toBe("hidden");
-  expect(layout.rootOverscroll).toBe("none");
-  expect(layout.bodyOverflow).toBe("hidden");
-  expect(layout.bodyOverscroll).toBe("none");
-  expect(documentScroll.x).toBe(0);
-  expect(documentScroll.y).toBe(0);
-  expect(layout.shellTop).toBe(0);
-  expect(layout.shellBottom).toBe(layout.viewportHeight);
-  expect(layout.trailingGap).toBeLessThanOrEqual(25);
-  expect(layout.horizontalOverflow).toBeLessThanOrEqual(1);
+  await preview.evaluate((element) => {
+    element.scrollTop = element.scrollHeight;
+  });
 
-  await page.screenshot({ path: ".verification/browser/admin-bottom-gap-fixed.png" });
+  const afterPreviewScroll = await page.evaluate(() => {
+    const mainElement = document.querySelector<HTMLElement>("#admin-main-content")!;
+    const fieldsElement = document.querySelector<HTMLElement>(
+      '[data-testid="mission-editor-fields-scroll-region"]',
+    )!;
+    const previewElement = document.querySelector<HTMLElement>(
+      '[data-testid="mission-editor-preview-scroll-region"]',
+    )!;
+
+    return {
+      mainScrollTop: mainElement.scrollTop,
+      fieldsScrollTop: fieldsElement.scrollTop,
+      previewScrollTop: previewElement.scrollTop,
+    };
+  });
+
+  expect(afterPreviewScroll.mainScrollTop).toBe(initialLayout.mainScrollTop);
+  expect(afterPreviewScroll.fieldsScrollTop).toBe(afterFieldsScroll.fieldsScrollTop);
+  expect(afterPreviewScroll.previewScrollTop).toBeGreaterThan(initialLayout.previewScrollTop);
+
+  await shell.screenshot({ path: ".verification/browser/mission-editor-independent-scroll.png" });
+});
+
+test("mission editor keeps the existing page scroll below the desktop breakpoint", async ({ page }) => {
+  await page.setViewportSize({ width: 1024, height: 700 });
+  await signIn(page, "content@demo.local", "/admin/missions/new");
+  await expect(page.getByRole("heading", { name: "Nhiệm vụ chưa đặt tên" })).toBeVisible();
+
+  const main = page.locator("#admin-main-content");
+  const overflow = await page.evaluate(() => {
+    const mainElement = document.querySelector<HTMLElement>("#admin-main-content")!;
+    const fieldsElement = document.querySelector<HTMLElement>(
+      '[data-testid="mission-editor-fields-scroll-region"]',
+    )!;
+    const previewElement = document.querySelector<HTMLElement>(
+      '[data-testid="mission-editor-preview-scroll-region"]',
+    )!;
+
+    return {
+      main: getComputedStyle(mainElement).overflowY,
+      fields: getComputedStyle(fieldsElement).overflowY,
+      preview: getComputedStyle(previewElement).overflowY,
+    };
+  });
+
+  expect(overflow.main).toBe("auto");
+  expect(overflow.fields).toBe("visible");
+  expect(overflow.preview).toBe("visible");
+
+  await main.evaluate((element) => {
+    element.scrollTop = element.scrollHeight;
+  });
+  await expect(page.getByRole("button", { name: "Gửi để kiểm tra" })).toBeInViewport();
 });
