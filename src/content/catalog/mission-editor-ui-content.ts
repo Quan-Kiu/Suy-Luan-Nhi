@@ -14,6 +14,14 @@ export const missionEditorContentEntries = defineContent("admin", {
     description: "Tiêu đề kiểm tra an toàn.",
   },
   "missionEditor.previewRules": { value: "Các bước tiếp theo", description: "Tiêu đề quy trình." },
+  "missionEditor.editRegion": {
+    value: "Thông tin nhiệm vụ",
+    description: "Nhãn hỗ trợ truy cập cho khu vực chỉnh sửa nhiệm vụ.",
+  },
+  "missionEditor.previewRegion": {
+    value: "Bản xem trước nhiệm vụ",
+    description: "Nhãn hỗ trợ truy cập cho khu vực xem trước nhiệm vụ.",
+  },
   "missionEditor.saveDraft": { value: "Lưu và làm tiếp sau", description: "Nhãn lưu bản nháp." },
   "missionEditor.saving": { value: "Đang lưu...", description: "Nhãn khi lưu nhiệm vụ." },
   "missionEditor.submit": { value: "Gửi để kiểm tra", description: "Nhãn gửi kiểm tra nội dung." },
