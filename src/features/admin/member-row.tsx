@@ -4,6 +4,7 @@ import { useMutation } from "@tanstack/react-query";
 import { ShieldCheck, ShieldOff } from "lucide-react";
 import { toast } from "sonner";
 import { membersApi } from "@/api/admin/members";
+import { MemberAccountActions } from "@/features/admin/member-account-actions";
 import { getAccountMethods } from "@/features/admin/member-presentation";
 import { usePendingRouter } from "@/hooks/use-pending-router";
 
@@ -17,6 +18,8 @@ export type MemberItem = {
   emailVerified: boolean;
   createdAt: Date;
   accountProviders: string[];
+  parentProfileId: string | null;
+  mustChangePassword: boolean;
 };
 
 type UpdateInput = { payload: Record<string, unknown>; successMessage: string };
@@ -94,6 +97,9 @@ function MemberStatus({ item }: { item: MemberItem }) {
       <span className={item.banned ? "type-label block text-red-700" : "type-label block text-green-700"}>
         {item.banned ? "Tạm ngưng" : "Hoạt động"}
       </span>
+      {item.mustChangePassword ? (
+        <span className="type-caption mt-1 block font-bold text-amber-700">Cần đổi mật khẩu tạm thời</span>
+      ) : null}
       {staff ? (
         <span
           className={`type-caption mt-1 block ${item.twoFactorEnabled ? "text-green-700" : "text-amber-700"}`}
@@ -168,7 +174,10 @@ export function MemberRow({ item, currentUserId }: { item: MemberItem; currentUs
         <MutationError actions={actions} />
       </td>
       <td className="p-3">
-        <AccessButton item={item} actions={actions} />
+        <div className="grid gap-2">
+          <AccessButton item={item} actions={actions} className="w-full justify-center" />
+          <MemberAccountActions item={item} currentUserId={currentUserId} />
+        </div>
       </td>
     </tr>
   );
@@ -205,10 +214,14 @@ export function MemberCard({ item, currentUserId }: { item: MemberItem; currentU
       </div>
       {actions.isCurrentUser ? (
         <p className="type-caption mt-3 rounded-xl bg-blue-50 px-3 py-2 font-bold text-blue-800">
-          Đây là tài khoản bạn đang sử dụng nên không thể tự đổi quyền hoặc tạm ngưng.
+          Đây là tài khoản bạn đang sử dụng nên không thể tự đổi quyền, tạm ngưng hoặc đặt lại thông tin đăng
+          nhập tại đây.
         </p>
       ) : null}
-      <AccessButton item={item} actions={actions} className="mt-4 w-full justify-center" />
+      <div className="mt-4 grid gap-2 sm:grid-cols-2">
+        <AccessButton item={item} actions={actions} className="w-full justify-center" />
+        <MemberAccountActions item={item} currentUserId={currentUserId} />
+      </div>
       <MutationError actions={actions} />
     </article>
   );

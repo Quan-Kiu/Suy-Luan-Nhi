@@ -21,7 +21,12 @@ const baseMember = {
   twoFactorEnabled: false,
   emailVerified: true,
   createdAt: new Date("2026-07-23T00:00:00.000Z"),
-} satisfies Pick<MemberItem, "banned" | "twoFactorEnabled" | "emailVerified" | "createdAt">;
+  parentProfileId: null,
+  mustChangePassword: false,
+} satisfies Pick<
+  MemberItem,
+  "banned" | "twoFactorEnabled" | "emailVerified" | "createdAt" | "parentProfileId" | "mustChangePassword"
+>;
 
 const members: MemberItem[] = [
   {
@@ -31,6 +36,7 @@ const members: MemberItem[] = [
     email: "parent@example.com",
     role: "parent",
     accountProviders: ["credential"],
+    parentProfileId: "parent-profile-credential",
   },
   {
     ...baseMember,
@@ -48,6 +54,7 @@ const members: MemberItem[] = [
     email: "linked@example.com",
     role: "parent",
     accountProviders: ["credential", "google"],
+    parentProfileId: "parent-profile-linked",
   },
 ];
 
