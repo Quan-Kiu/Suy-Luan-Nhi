@@ -45,7 +45,7 @@ export async function POST(
           {
             code: "MISSION_MEDIA_REVIEW_REQUIRED",
             message:
-              "Nhiệm vụ đang dùng tư liệu chưa được kiểm tra. Hãy nhờ người kiểm duyệt đánh dấu phù hợp trong mục Từ điển rồi gửi lại.",
+              "Nhiệm vụ đang dùng tư liệu chưa được kiểm tra. Hãy nhờ người kiểm duyệt đánh dấu phù hợp trong mục Thư viện rồi gửi lại.",
             media: result.media,
           },
           { status: 422 },

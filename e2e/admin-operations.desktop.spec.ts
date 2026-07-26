@@ -12,9 +12,9 @@ test("admin uses plain-language navigation and a structured mission editor", asy
   await signIn(page, "content@demo.local", "/admin");
   await expect(page.getByRole("heading", { name: "Hôm nay cần làm gì?" })).toBeVisible();
   await expect(page.getByText("Biên tập nội dung", { exact: true })).toBeVisible();
-  await expect(page.getByRole("link", { name: "Từ điển" })).toBeVisible();
+  await expect(page.getByRole("link", { name: "Thư viện" })).toBeVisible();
   await expect(page.getByRole("link", { name: "Nội dung hiển thị" })).toBeVisible();
-  await expect(page.getByRole("link", { name: "Thư viện tư liệu" })).toHaveCount(0);
+  await expect(page.getByRole("link", { name: "Từ điển" })).toHaveCount(0);
   await expect(page.getByRole("link", { name: "Câu chữ hiển thị" })).toHaveCount(0);
   await expect(page.getByRole("link", { name: "Tài khoản quản trị" })).toHaveCount(0);
   await expect(page.getByRole("link", { name: "Cài đặt nâng cao" })).toHaveCount(0);

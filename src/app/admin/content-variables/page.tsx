@@ -6,7 +6,7 @@ import { ContentVariableManager } from "@/features/admin/content-variable-manage
 import { getContentVariableDefinitions } from "@/modules/content/content-variables";
 
 export const metadata: Metadata = {
-  title: "Thông tin tự điền",
+  title: "Từ điển",
 };
 
 export default async function Page() {
@@ -16,7 +16,7 @@ export default async function Page() {
     <div className="space-y-6">
       <AdminPageHeader
         eyebrow="Chỉ dành cho Super Admin"
-        title="Thông tin tự điền"
+        title="Từ điển"
         description="Quản lý những thông tin hệ thống có thể tự điền vào nội dung, chẳng hạn tên bé. Ví dụ: {{name}} sẽ được thay bằng tên của bé đang sử dụng."
         icon={Braces}
       />

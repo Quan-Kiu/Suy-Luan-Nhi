@@ -28,14 +28,14 @@ export const adminOperationsContentEntries = defineContent("admin", {
   },
   "nav.missions": { value: "Nhiệm vụ", description: "Điều hướng nhiệm vụ." },
   "nav.reviews": { value: "Nội dung chờ kiểm tra", description: "Điều hướng kiểm tra nội dung." },
-  "nav.media": { value: "Từ điển", description: "Điều hướng đến từ điển hình ảnh và âm thanh." },
+  "nav.media": { value: "Thư viện", description: "Điều hướng đến thư viện hình ảnh, âm thanh và video." },
   "nav.content": {
     value: "Nội dung hiển thị",
     description: "Điều hướng đến phần quản lý nội dung hiển thị trong ứng dụng.",
   },
   "nav.contentVariables": {
-    value: "Thông tin tự điền",
-    description: "Điều hướng đến phần quản lý thông tin được tự điền vào nội dung dành cho Super Admin.",
+    value: "Từ điển",
+    description: "Điều hướng đến từ điển tag dùng để tự điền thông tin vào nội dung dành cho Super Admin.",
   },
   "nav.worlds": { value: "Các chủ đề", description: "Điều hướng thế giới nhiệm vụ." },
   "nav.badges": { value: "Huy hiệu", description: "Điều hướng quản lý huy hiệu phần thưởng." },

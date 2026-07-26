@@ -33,7 +33,7 @@ test.describe.configure({ mode: "serial" });
 test("content variable fields keep a stable two-column baseline", async ({ page }) => {
   await page.setViewportSize({ width: 1600, height: 900 });
   await signIn(page, "admin@demo.local", "/admin/content-variables");
-  await expect(page.getByRole("heading", { name: "Thông tin tự điền", exact: true })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Từ điển", exact: true })).toBeVisible();
 
   await expectAligned(page.getByLabel("Tên tag").first(), page.getByLabel("Tên dễ hiểu").first());
   await expectAligned(

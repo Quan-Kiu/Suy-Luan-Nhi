@@ -3,12 +3,28 @@ import { clearAuth, signIn } from "./helpers";
 
 test.describe.configure({ mode: "serial" });
 
+test("super admin sees the renamed library and dictionary navigation", async ({ page }) => {
+  await signIn(page, "admin@demo.local", "/admin/content-variables");
+
+  await expect(page.getByRole("heading", { name: "Từ điển", exact: true })).toBeVisible();
+  await expect(page.getByRole("link", { name: "Thư viện", exact: true })).toHaveAttribute(
+    "href",
+    "/admin/media",
+  );
+  await expect(page.getByRole("link", { name: "Từ điển", exact: true })).toHaveAttribute(
+    "href",
+    "/admin/content-variables",
+  );
+  await expect(page.getByRole("link", { name: "Thông tin từ điển", exact: true })).toHaveCount(0);
+  await expect(page.getByRole("link", { name: "Thông tin tự điền", exact: true })).toHaveCount(0);
+});
+
 test("super admin manages content tags from a dedicated dashboard", async ({ page }) => {
   await signIn(page, "admin@demo.local", "/admin/content-variables");
 
-  await expect(page.getByRole("heading", { name: "Thông tin tự điền", exact: true })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Từ điển", exact: true })).toBeVisible();
   await expect(page.getByText("Chỉ dành cho Super Admin", { exact: true })).toBeVisible();
-  await expect(page.getByRole("link", { name: "Thông tin tự điền" })).toBeVisible();
+  await expect(page.getByRole("link", { name: "Từ điển" })).toBeVisible();
   await expect(page.getByText("{{name}}", { exact: true }).first()).toBeVisible();
   await expect(page.getByPlaceholder("name").first()).toBeDisabled();
   await page.getByRole("button", { name: "Thêm tag mới" }).click();
@@ -48,7 +64,7 @@ test("mission author gets tag suggestions while writing", async ({ page }) => {
   await clearAuth(page);
   await signIn(page, "content@demo.local", "/admin/missions/new");
 
-  await expect(page.getByRole("link", { name: "Thông tin tự điền" })).toHaveCount(0);
+  await expect(page.getByRole("link", { name: "Từ điển" })).toHaveCount(0);
   const prompt = page.getByLabel("Câu hỏi dành cho bé");
   await prompt.fill("Yêu cầu {{");
 
