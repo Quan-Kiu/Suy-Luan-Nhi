@@ -23,6 +23,11 @@ jobs:
           --health-interval 5s
           --health-timeout 5s
           --health-retries 20
+      mailpit:
+        image: axllent/mailpit:v1.30.0
+        ports:
+          - 1025:1025
+          - 8025:8025
 
     env:
       DATABASE_URL: postgresql://sln@127.0.0.1:5432/sln
@@ -58,11 +63,12 @@ jobs:
         run: npm run build
       - run: npx playwright install --with-deps chromium webkit
       - name: Run desktop end-to-end tests
+        id: desktop_e2e
         env:
           E2E_SERVER_MODE: production
         run: npx playwright test --project=desktop-chromium --workers=1
       - name: Upload desktop E2E failure artifacts
-        if: failure()
+        if: steps.desktop_e2e.outcome == 'failure'
         uses: actions/upload-artifact@v4
         with:
           name: desktop-e2e-failure
@@ -71,11 +77,12 @@ jobs:
             playwright-report
           if-no-files-found: ignore
       - name: Run mobile Chromium end-to-end tests
+        id: mobile_chromium_e2e
         env:
           E2E_SERVER_MODE: production
         run: npx playwright test --project=mobile-chromium --workers=1
       - name: Upload mobile Chromium E2E failure artifacts
-        if: failure()
+        if: steps.mobile_chromium_e2e.outcome == 'failure'
         uses: actions/upload-artifact@v4
         with:
           name: mobile-chromium-e2e-failure
@@ -84,11 +91,12 @@ jobs:
             playwright-report
           if-no-files-found: ignore
       - name: Run iOS WebKit end-to-end tests
+        id: ios_webkit_e2e
         env:
           E2E_SERVER_MODE: production
         run: npx playwright test --project=mobile-webkit-ios --workers=1
       - name: Upload iOS WebKit E2E failure artifacts
-        if: failure()
+        if: steps.ios_webkit_e2e.outcome == 'failure'
         uses: actions/upload-artifact@v4
         with:
           name: ios-webkit-e2e-failure
