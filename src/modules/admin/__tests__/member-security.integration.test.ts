@@ -6,7 +6,7 @@ import { afterAll, beforeAll, describe, expect, it } from "vitest";
 import { auth } from "@/auth/auth";
 import { db, pool } from "@/db/client";
 import { auditLogs, session, user } from "@/db/schema";
-import { updateMember } from "@/modules/admin/operations";
+import { restoreMember, trashMember, updateMember } from "@/modules/admin/operations";
 
 const suite = process.env.RUN_DB_TESTS === "true" ? describe : describe.skip;
 
@@ -68,6 +68,35 @@ suite("member ban security PostgreSQL integration", () => {
       where: and(eq(auditLogs.resourceId, targetId), eq(auditLogs.action, "session.revoked_by_ban")),
     });
     expect(revokeAudit?.metadata).toMatchObject({ revokedSessionCount: 2 });
+  });
+
+  it("preserves a temporary ban expiry across trash and restore", async () => {
+    const temporaryBanUserId = randomUUID();
+    const banExpires = new Date(Date.now() + 60 * 60 * 1000);
+    try {
+      await db.insert(user).values({
+        id: temporaryBanUserId,
+        name: "Temporary Ban Target",
+        email: `temporary-ban-${temporaryBanUserId}@test.local`,
+        emailVerified: true,
+        role: "parent",
+        banned: true,
+        banReason: "Temporary integration ban",
+        banExpires,
+      });
+
+      await trashMember(actorId, temporaryBanUserId, "Temporary trash test");
+      const restored = await restoreMember(actorId, temporaryBanUserId);
+
+      expect(restored).toMatchObject({
+        banned: true,
+        banReason: "Temporary integration ban",
+      });
+      expect(restored?.banExpires?.getTime()).toBe(banExpires.getTime());
+    } finally {
+      await db.delete(auditLogs).where(eq(auditLogs.resourceId, temporaryBanUserId));
+      await db.delete(user).where(eq(user.id, temporaryBanUserId));
+    }
   });
 
   it("blocks credential sign-in for a banned account", async () => {

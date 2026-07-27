@@ -20,6 +20,7 @@ export const user = pgTable("user", {
   deletionReason: text("deletion_reason"),
   deletedPreviousBanned: boolean("deleted_previous_banned"),
   deletedPreviousBanReason: text("deleted_previous_ban_reason"),
+  deletedPreviousBanExpires: timestamp("deleted_previous_ban_expires", { withTimezone: true }),
 });
 
 export const session = pgTable(

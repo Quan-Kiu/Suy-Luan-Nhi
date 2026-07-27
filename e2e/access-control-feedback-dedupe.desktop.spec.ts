@@ -17,6 +17,7 @@ async function restoreTargetParent() {
         "deletion_reason" = null,
         "deleted_previous_banned" = null,
         "deleted_previous_ban_reason" = null,
+        "deleted_previous_ban_expires" = null,
         "banned" = false,
         "ban_reason" = null,
         "ban_expires" = null,

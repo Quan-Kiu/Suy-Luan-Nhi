@@ -183,6 +183,13 @@
       "when": 1785151343939,
       "tag": "0025_automatic_feedback_deduplication",
       "breakpoints": true
+    },
+    {
+      "idx": 26,
+      "version": "7",
+      "when": 1785151841362,
+      "tag": "0026_preserve_member_ban_expiry",
+      "breakpoints": true
     }
   ]
 }

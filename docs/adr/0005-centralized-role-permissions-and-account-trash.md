@@ -14,7 +14,7 @@ Define one permission registry in `src/auth/permissions.ts`. Each permission own
 
 Expose `/admin/access-control` as the role and member workspace. It documents the effective capability and route matrix, supports role assignment, and separates staff, parent, and trash views. Keep `/admin/members` as a compatibility redirect.
 
-Implement account trash as soft deletion on the user record. Moving an account to trash revokes all sessions, blocks future authentication, preserves the previous ban state, and writes an audit event. Restore reinstates the previous ban state. Permanent deletion is allowed only from trash and follows existing database cascade and set-null relationships.
+Implement account trash as soft deletion on the user record. Moving an account to trash revokes all sessions, blocks future authentication, preserves the previous ban state, and writes an audit event. Restore reinstates the previous ban state, reason, and temporary-ban expiry. Permanent deletion is allowed only from trash and follows existing database cascade and set-null relationships.
 
 Protect the current account and the final active super admin from demotion, ban, trash, or permanent deletion.
 
@@ -22,4 +22,4 @@ Protect the current account and the final active super admin from demotion, ban,
 
 Adding a protected admin capability now requires a permission definition and mapping rather than another role condition. Route documentation remains near the executable policy and can be rendered directly in the admin workspace. Authorization remains server-side even when navigation or controls are hidden.
 
-Account removal becomes reversible by default. Permanent deletion remains explicit and may cascade through family data, so the UI must present a destructive confirmation. Deployments must apply migration `0024_access_control_member_trash.sql` before application code that reads the new user columns.
+Account removal becomes reversible by default. Permanent deletion remains explicit and may cascade through family data, so the UI must present a destructive confirmation. Deployments must apply migrations `0024_access_control_member_trash.sql` and `0026_preserve_member_ban_expiry.sql` before application code that reads the new user columns.

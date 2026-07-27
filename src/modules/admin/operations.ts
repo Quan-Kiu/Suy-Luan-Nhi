@@ -315,6 +315,7 @@ export async function trashMember(actorId: string, userId: string, reason?: stri
         deletionReason: reason?.trim() || "Đưa vào thùng rác bởi quản trị viên",
         deletedPreviousBanned: current.banned,
         deletedPreviousBanReason: current.banReason,
+        deletedPreviousBanExpires: current.banExpires,
         banned: true,
         banReason: "Tài khoản đang ở trong thùng rác",
         banExpires: null,
@@ -351,8 +352,10 @@ export async function restoreMember(actorId: string, userId: string) {
         deletionReason: null,
         deletedPreviousBanned: null,
         deletedPreviousBanReason: null,
+        deletedPreviousBanExpires: null,
         banned: restoredBanned,
         banReason: restoredBanned ? current.deletedPreviousBanReason : null,
+        banExpires: restoredBanned ? current.deletedPreviousBanExpires : null,
         updatedAt: new Date(),
       })
       .where(eq(user.id, userId))
