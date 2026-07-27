@@ -64,6 +64,7 @@ jobs:
       - run: npx playwright install --with-deps chromium webkit
       - name: Run desktop end-to-end tests
         id: desktop_e2e
+        continue-on-error: true
         env:
           E2E_SERVER_MODE: production
         run: npx playwright test --project=desktop-chromium --workers=1
@@ -76,8 +77,12 @@ jobs:
             test-results
             playwright-report
           if-no-files-found: ignore
+      - name: Fail after desktop E2E artifact upload
+        if: steps.desktop_e2e.outcome == 'failure'
+        run: exit 1
       - name: Run mobile Chromium end-to-end tests
         id: mobile_chromium_e2e
+        continue-on-error: true
         env:
           E2E_SERVER_MODE: production
         run: npx playwright test --project=mobile-chromium --workers=1
@@ -90,8 +95,12 @@ jobs:
             test-results
             playwright-report
           if-no-files-found: ignore
+      - name: Fail after mobile Chromium E2E artifact upload
+        if: steps.mobile_chromium_e2e.outcome == 'failure'
+        run: exit 1
       - name: Run iOS WebKit end-to-end tests
         id: ios_webkit_e2e
+        continue-on-error: true
         env:
           E2E_SERVER_MODE: production
         run: npx playwright test --project=mobile-webkit-ios --workers=1
@@ -104,6 +113,9 @@ jobs:
             test-results
             playwright-report
           if-no-files-found: ignore
+      - name: Fail after iOS WebKit E2E artifact upload
+        if: steps.ios_webkit_e2e.outcome == 'failure'
+        run: exit 1
       - name: Run staff MFA end-to-end test
         env:
           E2E_SERVER_MODE: production
