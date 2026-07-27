@@ -115,6 +115,7 @@ export const auth = betterAuth({
   user: {
     additionalFields: {
       role: { type: "string", required: false, defaultValue: "parent", input: false },
+      accessRoleKey: { type: "string", required: false, input: false },
       banned: { type: "boolean", required: false, defaultValue: false, input: false },
       banReason: { type: "string", required: false, input: false },
       banExpires: { type: "date", required: false, input: false },

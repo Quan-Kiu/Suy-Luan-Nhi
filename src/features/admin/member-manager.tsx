@@ -7,13 +7,65 @@ import { AdminTabPanel, AdminTabs } from "@/features/admin/admin-tabs";
 import { MemberCard, MemberRow, type MemberItem } from "@/features/admin/member-row";
 import { partitionMembersByAccess } from "@/features/admin/member-presentation";
 import { MemberTrashList } from "@/features/admin/member-trash-list";
+import type { AccessRoleItem } from "@/modules/admin/access-roles";
 
-function MemberTable({ items, currentUserId }: { items: MemberItem[]; currentUserId: string }) {
+const defaultRoleOptions: AccessRoleItem[] = [
+  {
+    key: "parent",
+    name: "Phụ huynh",
+    description: "",
+    permissions: [],
+    system: true,
+    memberCount: 0,
+    createdAt: null,
+    updatedAt: null,
+  },
+  {
+    key: "content_admin",
+    name: "Biên tập nội dung",
+    description: "",
+    permissions: [],
+    system: true,
+    memberCount: 0,
+    createdAt: null,
+    updatedAt: null,
+  },
+  {
+    key: "reviewer",
+    name: "Người kiểm tra nội dung",
+    description: "",
+    permissions: [],
+    system: true,
+    memberCount: 0,
+    createdAt: null,
+    updatedAt: null,
+  },
+  {
+    key: "super_admin",
+    name: "Quản trị viên",
+    description: "",
+    permissions: [],
+    system: true,
+    memberCount: 0,
+    createdAt: null,
+    updatedAt: null,
+  },
+];
+
+function MemberTable({
+  items,
+  currentUserId,
+  roles,
+}: {
+  items: MemberItem[];
+  currentUserId: string;
+  roles: AccessRoleItem[];
+}) {
   return (
     <>
       <div className="grid gap-3 md:hidden">
         {items.map((item) => (
-          <MemberCard key={item.id} item={item} currentUserId={currentUserId} />
+          <MemberCard key={item.id} item={item} currentUserId={currentUserId} roles={roles} />
         ))}
       </div>
       <div className="hidden overflow-x-auto rounded-2xl border bg-white md:block">
@@ -36,7 +88,7 @@ function MemberTable({ items, currentUserId }: { items: MemberItem[]; currentUse
           </thead>
           <tbody>
             {items.map((item) => (
-              <MemberRow key={item.id} item={item} currentUserId={currentUserId} />
+              <MemberRow key={item.id} item={item} currentUserId={currentUserId} roles={roles} />
             ))}
           </tbody>
         </table>
@@ -59,11 +111,14 @@ export function MemberManager({
   items,
   trashedItems,
   currentUserId,
+  roles,
 }: {
   items: MemberItem[];
   trashedItems: MemberItem[];
   currentUserId: string;
+  roles?: AccessRoleItem[];
 }) {
+  const resolvedRoles = roles ?? defaultRoleOptions;
   const { staff, parents } = partitionMembersByAccess(items);
   const [activeTabKey, setActiveTabKey] = useState<MemberTabKey>("staff");
   const tabs: MemberTab[] = [
@@ -118,7 +173,7 @@ export function MemberManager({
         {activeTab.key === "trash" ? (
           <MemberTrashList items={activeTab.items} currentUserId={currentUserId} />
         ) : activeTab.items.length ? (
-          <MemberTable items={activeTab.items} currentUserId={currentUserId} />
+          <MemberTable items={activeTab.items} currentUserId={currentUserId} roles={resolvedRoles} />
         ) : (
           <div className="rounded-2xl border border-dashed bg-white px-4 py-8 text-center">
             <p className="type-supporting text-[#6f6558]">{activeTab.emptyMessage}</p>

@@ -38,6 +38,20 @@ describe("AdminNavigation", () => {
     expect(screen.queryByRole("link", { name: "Huy hiệu" })).not.toBeInTheDocument();
   });
 
+  it("uses resolved permissions for a custom role", () => {
+    render(
+      <AdminNavigation
+        pathname="/admin/feedback"
+        permissions={["admin.dashboard.view", "feedback.view"]}
+        content={{}}
+      />,
+    );
+
+    expect(screen.getByRole("link", { name: "Tổng quan" })).toBeInTheDocument();
+    expect(screen.getByRole("link", { name: "Góp ý hệ thống" })).toBeInTheDocument();
+    expect(screen.queryByRole("link", { name: "Nhiệm vụ" })).not.toBeInTheDocument();
+  });
+
   it("keeps the parent-area shortcut hidden from other staff roles", () => {
     render(<AdminNavigation pathname="/admin" role="content_admin" content={{}} />);
 

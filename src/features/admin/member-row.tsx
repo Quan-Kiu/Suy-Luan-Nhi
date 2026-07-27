@@ -8,12 +8,16 @@ import { MemberAccountActions } from "@/features/admin/member-account-actions";
 import { MemberTrashActions } from "@/features/admin/member-trash-actions";
 import { getAccountMethods } from "@/features/admin/member-presentation";
 import { usePendingRouter } from "@/hooks/use-pending-router";
+import type { AccessRoleItem } from "@/modules/admin/access-roles";
 
 export type MemberItem = {
   id: string;
   name: string;
   email: string;
   role: string;
+  accessRoleKey?: string | null;
+  roleKey?: string;
+  roleLabel?: string;
   banned: boolean;
   twoFactorEnabled: boolean;
   emailVerified: boolean;
@@ -45,29 +49,32 @@ function RoleSelect({
   item,
   actions,
   className = "",
+  roles,
 }: {
   item: MemberItem;
   actions: Actions;
   className?: string;
+  roles: AccessRoleItem[];
 }) {
   const disabled = actions.isCurrentUser || actions.mutation.isPending || actions.navigation.isPending;
   return (
     <select
       aria-label={`Vai trò của ${item.name}`}
       disabled={disabled}
-      defaultValue={item.role}
+      defaultValue={item.roleKey ?? item.role}
       onChange={(event) =>
         actions.mutation.mutate({
-          payload: { role: event.target.value },
+          payload: { roleKey: event.target.value },
           successMessage: "Đã cập nhật vai trò",
         })
       }
       className={`type-body min-h-10 rounded-xl border bg-white px-3 disabled:opacity-50 ${className}`}
     >
-      <option value="parent">Phụ huynh</option>
-      <option value="content_admin">Biên tập nội dung</option>
-      <option value="reviewer">Người kiểm tra nội dung</option>
-      <option value="super_admin">Quản trị viên</option>
+      {roles.map((role) => (
+        <option key={role.key} value={role.key}>
+          {role.name}
+        </option>
+      ))}
     </select>
   );
 }
@@ -95,7 +102,7 @@ function AccountMethods({ providerIds }: { providerIds: string[] }) {
 }
 
 function MemberStatus({ item }: { item: MemberItem }) {
-  const staff = item.role !== "parent";
+  const staff = (item.roleKey ?? item.role) !== "parent";
   return (
     <div>
       <span className={item.banned ? "type-label block text-red-700" : "type-label block text-green-700"}>
@@ -155,7 +162,15 @@ function MutationError({ actions }: { actions: Actions }) {
     </p>
   ) : null;
 }
-export function MemberRow({ item, currentUserId }: { item: MemberItem; currentUserId: string }) {
+export function MemberRow({
+  item,
+  currentUserId,
+  roles,
+}: {
+  item: MemberItem;
+  currentUserId: string;
+  roles: AccessRoleItem[];
+}) {
   const actions = useMemberActions(item, currentUserId);
   return (
     <tr className="border-t align-top">
@@ -164,7 +179,7 @@ export function MemberRow({ item, currentUserId }: { item: MemberItem; currentUs
         <span className="type-caption">Tạo ngày {new Date(item.createdAt).toLocaleDateString("vi-VN")}</span>
       </td>
       <td className="p-3">
-        <RoleSelect item={item} actions={actions} className="w-full" />
+        <RoleSelect item={item} actions={actions} roles={roles} className="w-full" />
       </td>
       <td className="p-3">
         <span className="block break-all">{item.email}</span>
@@ -188,7 +203,15 @@ export function MemberRow({ item, currentUserId }: { item: MemberItem; currentUs
   );
 }
 
-export function MemberCard({ item, currentUserId }: { item: MemberItem; currentUserId: string }) {
+export function MemberCard({
+  item,
+  currentUserId,
+  roles,
+}: {
+  item: MemberItem;
+  currentUserId: string;
+  roles: AccessRoleItem[];
+}) {
   const actions = useMemberActions(item, currentUserId);
   return (
     <article className="rounded-2xl border bg-white p-4 shadow-sm">
@@ -202,7 +225,7 @@ export function MemberCard({ item, currentUserId }: { item: MemberItem; currentU
       <div className="mt-4 grid gap-3 sm:grid-cols-2">
         <label className="type-label block">
           Vai trò
-          <RoleSelect item={item} actions={actions} className="mt-1 w-full" />
+          <RoleSelect item={item} actions={actions} roles={roles} className="mt-1 w-full" />
         </label>
         <div className="rounded-xl bg-[#f7f3eb] p-3">
           <p className="type-caption font-black text-[#6f6558]">Hình thức đăng nhập</p>

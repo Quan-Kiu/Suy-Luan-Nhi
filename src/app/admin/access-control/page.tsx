@@ -1,37 +1,45 @@
 import type { Metadata } from "next";
 import { ShieldCheck } from "lucide-react";
+import { resolveEffectiveAccess } from "@/auth/effective-access";
 import { requirePermission } from "@/auth/session";
+import { AccessControlWorkspace } from "@/features/admin/access-control-workspace";
 import { AdminPageHeader } from "@/features/admin/admin-page-header";
-import { MemberManager } from "@/features/admin/member-manager";
-import { RoleAccessOverview } from "@/features/admin/role-access-overview";
+import { listAccessRoles } from "@/modules/admin/access-roles";
 import { listMembers, listTrashedMembers } from "@/modules/admin/operations";
 
 export const metadata: Metadata = { title: "Vai trò & thành viên" };
 
-export default async function Page() {
+type SearchParams = Promise<{ tab?: string | string[] }>;
+
+export default async function Page({ searchParams }: { searchParams: SearchParams }) {
   const session = await requirePermission("access_control.view");
-  const [items, trashedItems] = await Promise.all([listMembers(), listTrashedMembers()]);
+  const params = await searchParams;
+  const requestedTab = Array.isArray(params.tab) ? params.tab[0] : params.tab;
+  const initialTab = requestedTab === "members" ? "members" : "roles";
+  const access = await resolveEffectiveAccess(session.user);
+  const canManageMembers = access.permissions.includes("members.manage");
+  const [roles, items, trashedItems] = await Promise.all([
+    listAccessRoles(),
+    canManageMembers ? listMembers() : Promise.resolve([]),
+    canManageMembers ? listTrashedMembers() : Promise.resolve([]),
+  ]);
   return (
-    <div className="space-y-8">
+    <div className="space-y-6">
       <AdminPageHeader
         eyebrow="Kiểm soát truy cập"
         title="Vai trò & thành viên"
-        description="Kiểm chứng quyền của từng vai trò, gán vai trò cho tài khoản và quản lý vòng đời thành viên trong một khu vực."
+        description="Tách riêng việc thiết kế role và quản lý tài khoản để dễ kiểm tra quyền, gán role và xử lý vòng đời thành viên."
         icon={ShieldCheck}
       />
-      <RoleAccessOverview />
-      <section id="members" aria-labelledby="members-title" className="scroll-mt-6 space-y-4">
-        <div className="rounded-2xl border border-[#e4d8c5] bg-white p-4 sm:p-5">
-          <h2 id="members-title" className="type-section-title">
-            Thành viên và phân vai trò
-          </h2>
-          <p className="type-supporting mt-1 text-[#6f6558]">
-            Phụ huynh và nhân sự đều có thể được đưa vào thùng rác. Tài khoản trong thùng rác bị thu hồi phiên
-            đăng nhập nhưng vẫn có thể khôi phục trước khi xóa vĩnh viễn.
-          </p>
-        </div>
-        <MemberManager items={items} trashedItems={trashedItems} currentUserId={session.user.id} />
-      </section>
+      <AccessControlWorkspace
+        initialTab={initialTab}
+        roles={roles}
+        members={items}
+        trashedMembers={trashedItems}
+        currentUserId={session.user.id}
+        canManageRoles={access.permissions.includes("roles.manage")}
+        canManageMembers={canManageMembers}
+      />
     </div>
   );
 }

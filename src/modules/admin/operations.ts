@@ -1,4 +1,6 @@
 import { and, asc, desc, eq, gte, inArray, isNotNull, isNull, lt, sql } from "drizzle-orm";
+import { roleDefinitions } from "@/auth/permissions";
+import { systemRoleSchema } from "@/auth/roles";
 import { db } from "@/db/client";
 import { ageGroupCodes, type AgeGroup } from "@/domain/age-groups";
 import { missingWorldAgeGroups } from "@/domain/mission-publication";
@@ -10,7 +12,9 @@ import {
   assertMemberUpdatePolicy,
 } from "@/modules/admin/member-policy";
 import { clearOperationalSystemSettingsCache } from "@/modules/system-settings/runtime";
+import { AccessRoleError } from "@/modules/admin/access-roles";
 import {
+  accessRoles,
   ageGroups,
   account,
   analyticsEvents,
@@ -124,6 +128,7 @@ type MemberListRow = {
   name: string;
   email: string;
   role: string;
+  accessRoleKey: string | null;
   banned: boolean;
   twoFactorEnabled: boolean;
   mustChangePassword: boolean;
@@ -136,27 +141,49 @@ type MemberListRow = {
 };
 
 async function attachAccountProviders(members: MemberListRow[]) {
-  const accountProviders = members.length
-    ? await db
-        .select({ userId: account.userId, providerId: account.providerId })
-        .from(account)
-        .where(
-          inArray(
-            account.userId,
-            members.map((member) => member.id),
-          ),
-        )
-    : [];
+  const [accountProviders, customRoles] = await Promise.all([
+    members.length
+      ? db
+          .select({ userId: account.userId, providerId: account.providerId })
+          .from(account)
+          .where(
+            inArray(
+              account.userId,
+              members.map((member) => member.id),
+            ),
+          )
+      : [],
+    members.some((member) => member.accessRoleKey)
+      ? db
+          .select({ key: accessRoles.key, name: accessRoles.name })
+          .from(accessRoles)
+          .where(
+            inArray(
+              accessRoles.key,
+              members.flatMap((member) => (member.accessRoleKey ? [member.accessRoleKey] : [])),
+            ),
+          )
+      : [],
+  ]);
   const providersByUser = new Map<string, Set<string>>();
   for (const provider of accountProviders) {
     const providerIds = providersByUser.get(provider.userId) ?? new Set<string>();
     providerIds.add(provider.providerId);
     providersByUser.set(provider.userId, providerIds);
   }
-  return members.map((member) => ({
-    ...member,
-    accountProviders: [...(providersByUser.get(member.id) ?? [])],
-  }));
+  const customRoleNames = new Map(customRoles.map((role) => [role.key, role.name]));
+  return members.map((member) => {
+    const roleKey = member.accessRoleKey ?? member.role;
+    const systemRole = systemRoleSchema.safeParse(roleKey);
+    return {
+      ...member,
+      roleKey,
+      roleLabel: systemRole.success
+        ? roleDefinitions[systemRole.data].label
+        : (customRoleNames.get(roleKey) ?? roleKey),
+      accountProviders: [...(providersByUser.get(member.id) ?? [])],
+    };
+  });
 }
 
 const memberSelection = {
@@ -164,6 +191,7 @@ const memberSelection = {
   name: user.name,
   email: user.email,
   role: user.role,
+  accessRoleKey: user.accessRoleKey,
   banned: user.banned,
   twoFactorEnabled: user.twoFactorEnabled,
   mustChangePassword: user.mustChangePassword,
@@ -206,7 +234,7 @@ async function countActiveSuperAdmins(tx: Parameters<Parameters<typeof db.transa
 export async function updateMember(
   actorId: string,
   userId: string,
-  input: { role?: string; banned?: boolean; banReason?: string | null },
+  input: { roleKey?: string; banned?: boolean; banReason?: string | null },
 ) {
   return db.transaction(async (tx) => {
     await tx.execute(sql`select pg_advisory_xact_lock(hashtext('sln:member-policy'))`);
@@ -215,17 +243,42 @@ export async function updateMember(
     const current = await tx.query.user.findFirst({ where: eq(user.id, userId) });
     if (!current) return null;
 
-    const nextRole = input.role ?? current.role;
+    let nextRole = current.role;
+    let nextAccessRoleKey = current.accessRoleKey;
+    const roleKeysToLock = new Set<string>();
+    if (current.accessRoleKey) roleKeysToLock.add(current.accessRoleKey);
+    if (input.roleKey !== undefined && !systemRoleSchema.safeParse(input.roleKey).success) {
+      roleKeysToLock.add(input.roleKey);
+    }
+    for (const roleKey of [...roleKeysToLock].sort()) {
+      await tx.execute(sql`select pg_advisory_xact_lock(hashtext(${`sln:access-role:${roleKey}`}))`);
+    }
+    if (input.roleKey !== undefined) {
+      const systemRole = systemRoleSchema.safeParse(input.roleKey);
+      if (systemRole.success) {
+        nextRole = systemRole.data;
+        nextAccessRoleKey = null;
+      } else {
+        const customRole = await tx.query.accessRoles.findFirst({
+          where: eq(accessRoles.key, input.roleKey),
+        });
+        if (!customRole) throw new AccessRoleError("ROLE_NOT_FOUND", { key: input.roleKey });
+        nextRole = "custom_staff";
+        nextAccessRoleKey = customRole.key;
+      }
+    }
     const nextBanned = input.banned ?? current.banned;
     const policyInput = {
       actorId,
       userId,
       currentRole: current.role,
+      currentRoleKey: current.accessRoleKey ?? current.role,
       currentBanned: current.banned,
       currentDeletedAt: current.deletedAt,
       nextRole,
+      nextRoleKey: nextAccessRoleKey ?? nextRole,
       nextBanned,
-      roleWasProvided: input.role !== undefined,
+      roleWasProvided: input.roleKey !== undefined,
       banWasRequested: input.banned === true,
     };
     assertMemberUpdatePolicy(policyInput);
@@ -249,6 +302,7 @@ export async function updateMember(
       .update(user)
       .set({
         role: nextRole,
+        accessRoleKey: nextAccessRoleKey,
         banned: nextBanned,
         banReason: nextBanned
           ? (input.banReason ?? current.banReason ?? "Tạm ngưng bởi quản trị viên")

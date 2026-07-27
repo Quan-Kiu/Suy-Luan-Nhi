@@ -1,4 +1,6 @@
 import { z } from "zod";
+import { accessRoleKeySchema } from "@/domain/access-roles";
+import { AccessRoleError } from "@/modules/admin/access-roles";
 import { requireApiPermission } from "@/auth/api";
 import { apiJson } from "@/lib/api-response";
 import { invalidateAdminMemberViews } from "@/lib/cache/invalidation";
@@ -6,7 +8,7 @@ import { MemberPolicyError } from "@/modules/admin/member-policy";
 import { trashMember, updateMember } from "@/modules/admin/operations";
 
 const updateSchema = z.object({
-  role: z.enum(["parent", "content_admin", "reviewer", "super_admin"]).optional(),
+  roleKey: accessRoleKeySchema.optional(),
   banned: z.boolean().optional(),
   banReason: z.string().max(500).nullable().optional(),
 });
@@ -14,7 +16,7 @@ const updateSchema = z.object({
 const trashSchema = z.object({ reason: z.string().trim().max(500).optional() });
 
 function memberPolicyResponse(error: unknown) {
-  if (error instanceof MemberPolicyError) {
+  if (error instanceof MemberPolicyError || error instanceof AccessRoleError) {
     return apiJson({ code: error.code, message: error.message }, { status: 409 });
   }
   throw error;

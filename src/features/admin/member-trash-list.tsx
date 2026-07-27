@@ -3,13 +3,6 @@
 import { getAccountMethods } from "@/features/admin/member-presentation";
 import type { MemberItem } from "@/features/admin/member-row";
 import { MemberTrashActions } from "@/features/admin/member-trash-actions";
-import { roleDefinitions } from "@/auth/permissions";
-import { appRoleSchema } from "@/auth/roles";
-
-function roleLabel(role: string) {
-  const parsed = appRoleSchema.safeParse(role);
-  return parsed.success ? roleDefinitions[parsed.data].label : role;
-}
 
 function TrashItem({ item, currentUserId }: { item: MemberItem; currentUserId: string }) {
   const methods = getAccountMethods(item.accountProviders);
@@ -20,7 +13,9 @@ function TrashItem({ item, currentUserId }: { item: MemberItem; currentUserId: s
           <h3 className="type-card-title text-[#342f28]">{item.name}</h3>
           <p className="type-supporting mt-1 break-all text-[#6f6558]">{item.email}</p>
           <div className="type-caption mt-2 flex flex-wrap gap-2 font-bold text-[#6f6558]">
-            <span className="rounded-full bg-[#f7f3eb] px-2.5 py-1">{roleLabel(item.role)}</span>
+            <span className="rounded-full bg-[#f7f3eb] px-2.5 py-1">
+              {item.roleLabel ?? item.roleKey ?? item.role}
+            </span>
             {methods.map((method) => (
               <span key={method.providerId} className="rounded-full bg-[#f7f3eb] px-2.5 py-1">
                 {method.label}

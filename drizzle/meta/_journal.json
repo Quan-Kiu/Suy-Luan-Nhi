@@ -190,6 +190,13 @@
       "when": 1785151841362,
       "tag": "0026_preserve_member_ban_expiry",
       "breakpoints": true
+    },
+    {
+      "idx": 27,
+      "version": "7",
+      "when": 1785162942758,
+      "tag": "0027_access_role_crud",
+      "breakpoints": true
     }
   ]
 }

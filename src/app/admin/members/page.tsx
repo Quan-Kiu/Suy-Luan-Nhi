@@ -1,5 +1,5 @@
 import { redirect } from "next/navigation";
 
 export default function Page() {
-  redirect("/admin/access-control#members");
+  redirect("/admin/access-control?tab=members");
 }

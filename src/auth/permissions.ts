@@ -1,4 +1,4 @@
-import { parseRoles, type AppRole } from "@/auth/roles";
+import { parseRoles, type AppRole, type SystemRole } from "@/auth/roles";
 
 export const permissionKeys = [
   "family.access",
@@ -26,6 +26,7 @@ export const permissionKeys = [
   "reports.view",
   "audit.view",
   "access_control.view",
+  "roles.manage",
   "members.manage",
   "data_requests.manage",
   "settings.manage",
@@ -224,6 +225,13 @@ export const permissionDefinitions: readonly PermissionDefinition[] = [
     routes: ["/admin/access-control"],
   },
   {
+    key: "roles.manage",
+    label: "Quản lý vai trò",
+    description: "Tạo, sửa và xóa vai trò tùy chỉnh cùng tập quyền được cấp.",
+    group: "security",
+    routes: ["/admin/access-control?tab=roles", "/api/admin/roles/**"],
+  },
+  {
     key: "members.manage",
     label: "Quản lý thành viên",
     description: "Gán vai trò, tạm ngưng, đặt lại thông tin đăng nhập và quản lý thùng rác tài khoản.",
@@ -291,10 +299,11 @@ export const rolePermissionMap: Record<AppRole, readonly PermissionKey[]> = {
   content_admin: editorPermissions,
   reviewer: reviewerPermissions,
   super_admin: permissionKeys,
+  custom_staff: [],
 };
 
 export const roleDefinitions: Record<
-  AppRole,
+  SystemRole,
   { label: string; description: string; audience: "family" | "staff" }
 > = {
   parent: {
@@ -318,6 +327,36 @@ export const roleDefinitions: Record<
     audience: "staff",
   },
 };
+
+export const permissionDependencies: Partial<Record<PermissionKey, readonly PermissionKey[]>> = {
+  "missions.manage": ["missions.view"],
+  "missions.review": ["missions.view"],
+  "resources.manage": ["resources.view"],
+  "media.manage": ["media.view"],
+  "media.review": ["media.view"],
+  "content.manage": ["content.view"],
+  "badges.manage": ["badges.view"],
+  "feedback.manage": ["feedback.view"],
+  "roles.manage": ["access_control.view"],
+  "members.manage": ["access_control.view"],
+};
+
+export function expandPermissions(values: readonly PermissionKey[]) {
+  const expanded = new Set<PermissionKey>(values);
+  let changed = true;
+  while (changed) {
+    changed = false;
+    for (const permission of [...expanded]) {
+      for (const dependency of permissionDependencies[permission] ?? []) {
+        if (!expanded.has(dependency)) {
+          expanded.add(dependency);
+          changed = true;
+        }
+      }
+    }
+  }
+  return permissionKeys.filter((permission) => expanded.has(permission));
+}
 
 export function hasPermission(value: unknown, permission: PermissionKey) {
   return parseRoles(value).some((role) => rolePermissionMap[role].includes(permission));
