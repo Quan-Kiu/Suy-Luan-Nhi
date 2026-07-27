@@ -3,6 +3,7 @@ import { db } from "@/db/client";
 import { auditLogs, mediaAssets, systemFeedback, systemFeedbackAttachments, user } from "@/db/schema";
 import type { SystemFeedbackStatus } from "@/domain/system-feedback";
 import { MediaValidationError } from "@/modules/media/storage/errors";
+import { automaticFeedbackReopenWindowMs } from "@/modules/system-feedback/automatic-feedback";
 import { deleteMedia, uploadMedia } from "@/modules/media/media";
 
 export type SystemFeedbackListFilters = {
@@ -45,7 +46,7 @@ export async function listSystemFeedback(filters: SystemFeedbackListFilters = {}
       .from(systemFeedback)
       .leftJoin(user, eq(systemFeedback.userId, user.id))
       .where(where)
-      .orderBy(desc(systemFeedback.createdAt))
+      .orderBy(desc(systemFeedback.lastSeenAt), desc(systemFeedback.createdAt))
       .limit(pageSize)
       .offset((page - 1) * pageSize),
     db
@@ -136,9 +137,9 @@ export async function createOrAggregateAutomaticFeedback(input: {
       return { id: created.id, duplicate: false, reopened: false };
     }
 
-    const reopenAfterMs = 30 * 60 * 1000;
     const finalStatus = current.status === "resolved" || current.status === "dismissed";
-    const reopened = finalStatus && now.getTime() - current.lastSeenAt.getTime() >= reopenAfterMs;
+    const reopened =
+      finalStatus && now.getTime() - current.lastSeenAt.getTime() >= automaticFeedbackReopenWindowMs;
     const [updated] = await tx
       .update(systemFeedback)
       .set({
@@ -156,17 +157,18 @@ export async function createOrAggregateAutomaticFeedback(input: {
       })
       .where(eq(systemFeedback.id, current.id))
       .returning({ id: systemFeedback.id, occurrenceCount: systemFeedback.occurrenceCount });
-    await tx.insert(auditLogs).values({
-      actorId: input.userId,
-      action: "system_feedback.automatic_aggregated",
-      resourceType: "system_feedback",
-      resourceId: current.id,
-      metadata: {
-        fingerprint: input.fingerprint.slice(0, 12),
-        occurrenceCount: updated.occurrenceCount,
-        reopened,
-      },
-    });
+    if (reopened) {
+      await tx.insert(auditLogs).values({
+        actorId: input.userId,
+        action: "system_feedback.automatic_reopened",
+        resourceType: "system_feedback",
+        resourceId: current.id,
+        metadata: {
+          fingerprint: input.fingerprint.slice(0, 12),
+          occurrenceCount: updated.occurrenceCount,
+        },
+      });
+    }
     return { id: current.id, duplicate: true, reopened };
   });
 

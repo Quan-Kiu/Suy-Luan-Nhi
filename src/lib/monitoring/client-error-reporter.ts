@@ -96,6 +96,11 @@ export function wasClientErrorReported(error: unknown) {
     : false;
 }
 
+function normalizedFingerprintValue(value: unknown) {
+  if (value === undefined || value === null) return "";
+  return String(value).trim().replaceAll(/\s+/g, " ").toLowerCase();
+}
+
 function reportFingerprint(report: AutomaticErrorReportInput) {
   const details = report.error.details;
   return [
@@ -108,9 +113,8 @@ function reportFingerprint(report: AutomaticErrorReportInput) {
     details.status,
     details.code,
   ]
-    .filter((value) => value !== undefined && value !== null && value !== "")
-    .join("|")
-    .toLowerCase();
+    .map(normalizedFingerprintValue)
+    .join("\u001f");
 }
 
 function fingerprintHash(value: string) {
