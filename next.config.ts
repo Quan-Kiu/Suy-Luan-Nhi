@@ -37,6 +37,7 @@ const nextConfig: NextConfig = {
   images: { remotePatterns },
   experimental: {
     serverActions: { bodySizeLimit: "2mb" },
+    staleTimes: { dynamic: 60 },
   },
   async headers() {
     return [{ source: "/(.*)", headers: securityHeaders }];
