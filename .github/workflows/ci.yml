@@ -57,10 +57,18 @@ jobs:
           BETTER_AUTH_SECRET: ci-production-like-secret-with-at-least-thirty-two-characters
         run: npm run build
       - run: npx playwright install --with-deps chromium webkit
-      - name: Run end-to-end tests
+      - name: Run desktop end-to-end tests
         env:
           E2E_SERVER_MODE: production
-        run: npm run test:e2e
+        run: npx playwright test --project=desktop-chromium --workers=1
+      - name: Run mobile Chromium end-to-end tests
+        env:
+          E2E_SERVER_MODE: production
+        run: npx playwright test --project=mobile-chromium --workers=1
+      - name: Run iOS WebKit end-to-end tests
+        env:
+          E2E_SERVER_MODE: production
+        run: npx playwright test --project=mobile-webkit-ios --workers=1
       - name: Run staff MFA end-to-end test
         env:
           E2E_SERVER_MODE: production
