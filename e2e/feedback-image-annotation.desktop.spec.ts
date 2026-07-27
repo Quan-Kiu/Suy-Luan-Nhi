@@ -14,7 +14,7 @@ async function createTestImage(label: string) {
 
 test("feedback images can be added in separate selections and annotated", async ({ page }) => {
   await page.setViewportSize({ width: 900, height: 820 });
-  await page.goto("/");
+  await page.goto("/", { waitUntil: "domcontentloaded", timeout: 30_000 });
   await page.getByRole("button", { name: "Gửi góp ý về trang này" }).click();
 
   const input = page.getByLabel("Thêm ảnh từ máy");

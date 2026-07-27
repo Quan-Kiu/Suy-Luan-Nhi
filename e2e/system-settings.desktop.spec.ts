@@ -1,4 +1,4 @@
-import { expect, test } from "@playwright/test";
+import { expect, test, type APIRequestContext } from "@playwright/test";
 import { signIn } from "./helpers";
 
 const settingLabels = [
@@ -16,15 +16,15 @@ const settingLabels = [
 
 async function maintenanceCard(page: import("@playwright/test").Page) {
   return page
-    .getByRole("article")
+    .locator("details")
     .filter({ has: page.getByRole("heading", { name: "Bật chế độ bảo trì", exact: true }) });
 }
 
-async function expectMaintenanceRedirect(page: import("@playwright/test").Page, enabled: boolean) {
+async function expectMaintenanceRedirect(request: APIRequestContext, enabled: boolean) {
   await expect
     .poll(
       async () => {
-        const response = await page.request.get("/", { maxRedirects: 0 });
+        const response = await request.get("/", { maxRedirects: 0 });
         return response.status() === 307 && response.headers().location?.startsWith("/maintenance");
       },
       { timeout: 15_000 },
@@ -32,7 +32,7 @@ async function expectMaintenanceRedirect(page: import("@playwright/test").Page, 
     .toBe(enabled);
 }
 
-test("super admin manages runtime settings and maintenance mode", async ({ page }) => {
+test("super admin manages runtime settings and maintenance mode", async ({ page, request }) => {
   await signIn(page, "admin@demo.local", "/admin/settings");
   await expect(page.getByRole("heading", { name: "Cấu hình hệ thống" })).toBeVisible();
   await expect(page.getByRole("link", { name: "Cấu hình hệ thống", exact: true })).toBeVisible();
@@ -42,6 +42,7 @@ test("super admin manages runtime settings and maintenance mode", async ({ page 
   }
 
   const card = await maintenanceCard(page);
+  await card.locator(":scope > summary").click();
   const checkbox = card.getByRole("checkbox", { name: "Bật thiết lập này" });
   const saveButton = card.getByRole("button", { name: "Lưu thay đổi" });
 
@@ -49,7 +50,7 @@ test("super admin manages runtime settings and maintenance mode", async ({ page 
     await checkbox.check();
     await saveButton.click();
     await expect(card.getByText("Thay đổi đã được ghi nhận", { exact: false })).toBeVisible();
-    await expectMaintenanceRedirect(page, true);
+    await expectMaintenanceRedirect(request, true);
 
     const apiResponse = await page.request.get("/api/feedback", { maxRedirects: 0 });
     expect(apiResponse.status()).toBe(503);
@@ -61,9 +62,11 @@ test("super admin manages runtime settings and maintenance mode", async ({ page 
       fullPage: true,
     });
   } finally {
-    await checkbox.uncheck();
-    await saveButton.click();
-    await expectMaintenanceRedirect(page, false);
+    const restore = await page.request.patch("/api/admin/settings", {
+      data: { key: "maintenance.enabled", value: false },
+    });
+    expect(restore.ok()).toBe(true);
+    await expectMaintenanceRedirect(request, false);
   }
 });
 

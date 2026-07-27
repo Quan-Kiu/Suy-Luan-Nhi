@@ -22,7 +22,7 @@ test.describe("interaction state regressions", () => {
   test("keeps sign-in pending until a slow destination route commits", async ({ page }) => {
     await page.goto("/auth/sign-in?callbackUrl=%2Fprofiles");
     await page.getByLabel("Email").fill("parent@demo.local");
-    await page.getByLabel("Mật khẩu").fill(demoPassword);
+    await page.getByRole("textbox", { name: "Mật khẩu", exact: true }).fill(demoPassword);
 
     const snapshots: Array<{
       at: number;
@@ -58,9 +58,9 @@ test.describe("interaction state regressions", () => {
     });
 
     let routeStartedAt = 0;
-    await page.route("**/profiles**", async (route) => {
+    await page.route("**/auth/setup-pin**", async (route) => {
       const url = new URL(route.request().url());
-      if (url.pathname === "/profiles") {
+      if (url.pathname === "/auth/setup-pin") {
         routeStartedAt = Date.now();
         await new Promise((resolve) => setTimeout(resolve, 1_200));
       }

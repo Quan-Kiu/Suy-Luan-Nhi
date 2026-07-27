@@ -83,6 +83,7 @@ test("archiving a published mission removes it from the cached child map immedia
   const adminContext = await browser.newContext(contextOptions);
   const parentPage = await parentContext.newPage();
   const adminPage = await adminContext.newPage();
+  let archivedMissionId: string | null = null;
 
   try {
     await signIn(parentPage, "parent@demo.local");
@@ -95,6 +96,7 @@ test("archiving a published mission removes it from the cached child map immedia
 
     await signIn(adminPage, "admin@demo.local", "/admin/missions");
     await apiData(await adminPage.request.post(`/api/admin/missions/${mission.id}/archive`));
+    archivedMissionId = mission.id;
 
     const refreshedMap = await apiData<{
       worlds: Array<{ missions: Array<{ id: string }> }>;
@@ -103,6 +105,9 @@ test("archiving a published mission removes it from the cached child map immedia
       refreshedMap.worlds.flatMap((world) => world.missions).some((item) => item.id === mission.id),
     ).toBe(false);
   } finally {
+    if (archivedMissionId) {
+      await adminPage.request.post(`/api/admin/missions/${archivedMissionId}/restore`).catch(() => null);
+    }
     await parentContext.close();
     await adminContext.close();
   }

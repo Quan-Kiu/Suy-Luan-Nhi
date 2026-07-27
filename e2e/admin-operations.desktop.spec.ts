@@ -83,6 +83,7 @@ test("content admin creates taxonomy and world content through the CMS", async (
   await expect(page.getByRole("heading", { name: "Chủ đề nhiệm vụ", exact: true })).toBeVisible();
 
   const newWorld = page.locator("article").filter({ hasText: "Thêm chủ đề nhiệm vụ" });
+  await newWorld.locator(":scope > details > summary").click();
   await newWorld.getByPlaceholder("Ví dụ: Thám tử Quy luật").fill("Thế giới E2E");
   await newWorld.getByPlaceholder("Ví dụ: Quan sát thật tinh").fill("Kiểm thử vận hành");
   await newWorld
@@ -104,7 +105,9 @@ test("content admin creates taxonomy and world content through the CMS", async (
   ).toHaveValue("Thế giới E2E");
 
   await page.goto("/admin/taxonomy");
-  const newSkill = page.getByRole("region", { name: "Thêm kỹ năng hoặc thói quen" });
+  const newSkillPanel = page.locator("details").filter({ hasText: "Thêm kỹ năng mới" });
+  await newSkillPanel.locator(":scope > summary").click();
+  const newSkill = newSkillPanel.getByRole("region", { name: "Thêm kỹ năng hoặc thói quen" });
   await newSkill.getByPlaceholder("Ví dụ: Quan sát kỹ").fill("Tư duy E2E");
   await newSkill
     .getByPlaceholder("Ví dụ: Bé chú ý đến chi tiết và nhận ra tín hiệu quan trọng.")
@@ -121,6 +124,7 @@ test("content admin creates taxonomy and world content through the CMS", async (
   await page.goto("/admin/badges");
   await expect(page.getByRole("heading", { name: "Huy hiệu", exact: true })).toBeVisible();
   const newBadge = page.getByRole("region", { name: "Thêm huy hiệu mới" });
+  await newBadge.locator(":scope > details > summary").click();
   await newBadge.getByPlaceholder("Ví dụ: Người bạn Khu phố Xanh").fill("Huy hiệu E2E");
   await newBadge
     .getByPlaceholder("Giải thích bé nhận huy hiệu khi hoàn thành điều gì.")
@@ -142,6 +146,7 @@ test("content admin creates taxonomy and world content through the CMS", async (
 
   await page.goto("/admin/badges");
   const editableBadge = page.getByRole("article", { name: "Huy hiệu: Huy hiệu E2E" });
+  await editableBadge.locator(":scope > summary").click();
   await editableBadge.getByLabel("Cho phép chọn huy hiệu này trong nhiệm vụ mới").uncheck();
   await editableBadge.getByRole("button", { name: "Lưu thay đổi" }).click();
   await expect(page.getByText("Đã cập nhật huy hiệu")).toBeVisible();
@@ -203,10 +208,13 @@ test("resource editor creates technical URLs without asking ordinary editors to 
 
 test("super admin changes common settings without editing raw JSON", async ({ page }) => {
   await signIn(page, "admin@demo.local", "/admin/settings");
-  await expect(page.getByRole("heading", { name: "Cài đặt nâng cao", exact: true })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Cấu hình hệ thống", exact: true })).toBeVisible();
   await expect(
     page.getByText("Chỉ thay đổi khi bạn hiểu rõ cài đặt này ảnh hưởng đến phần nào của hệ thống."),
   ).toBeVisible();
+  const originalPolicies = await apiData<Record<string, unknown>>(
+    await page.request.get("/api/admin/media/policies"),
+  );
 
   const uploadPolicies = page.locator("section").filter({
     has: page.getByRole("heading", { name: "Giới hạn tải ảnh theo từng nội dung" }),
@@ -231,27 +239,27 @@ test("super admin changes common settings without editing raw JSON", async ({ pa
     await page.request.get("/api/admin/media/policies"),
   );
   expect(policies["mission-cover"]).toMatchObject({ maxSizeMb: 4, minWidth: 800 });
+  await apiData(
+    await page.request.patch("/api/admin/settings", {
+      data: { key: "media.imageUploadPolicies", value: originalPolicies },
+    }),
+  );
 
-  const create = page.locator("form").filter({ hasText: "Thêm cài đặt nâng cao" });
-  await create.getByLabel("Dạng cài đặt").selectOption("boolean");
-  await create.getByText("Thiết lập nâng cao").click();
-  await create.getByLabel("Mã cài đặt").fill("features.e2e-enabled");
-  await expect(create.getByLabel("Bật ngay sau khi tạo")).toBeChecked();
-  await create.getByRole("button", { name: "Thêm cài đặt" }).click();
-  await expect(page.getByText("Đã thêm cài đặt")).toBeVisible();
-
-  const setting = page.locator("article").filter({ hasText: "Features e2e enabled" });
+  const setting = page.locator("details").filter({
+    has: page.getByRole("heading", { name: "Cho phép gửi góp ý hệ thống", exact: true }),
+  });
   await expect(setting).toBeVisible();
-  await expect(setting.getByText("features.e2e-enabled")).toBeHidden();
+  await expect(setting.getByText("Mã cài đặt: features.feedbackEnabled")).toBeHidden();
+  await setting.locator(":scope > summary").click();
   await setting.getByText("Thông tin dành cho đội kỹ thuật").click();
-  await expect(setting.getByText("features.e2e-enabled")).toBeVisible();
+  await expect(setting.getByText("Mã cài đặt: features.feedbackEnabled")).toBeVisible();
   await setting.getByLabel("Bật thiết lập này").uncheck();
   await setting.getByRole("button", { name: "Lưu thay đổi" }).click();
   await expect(page.getByText("Đã lưu cài đặt")).toBeVisible();
 
   const response = await page.request.patch("/api/admin/settings", {
-    data: { key: "features.e2e-enabled", value: true },
+    data: { key: "features.feedbackEnabled", value: true },
   });
   const data = await apiData<{ key: string; value: boolean }>(response);
-  expect(data).toMatchObject({ key: "features.e2e-enabled", value: true });
+  expect(data).toMatchObject({ key: "features.feedbackEnabled", value: true });
 });

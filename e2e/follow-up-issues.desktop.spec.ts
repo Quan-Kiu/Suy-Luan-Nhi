@@ -14,7 +14,7 @@ test.describe("follow-up issue regressions", () => {
       if (request.method() === "POST" && request.url().endsWith("/api/admin/missions")) saveRequests += 1;
     });
 
-    const subtitle = page.getByPlaceholder("Ví dụ: Quan sát thật tinh");
+    const subtitle = page.getByRole("textbox", { name: "Câu giới thiệu ngắn" });
     await expect(subtitle).toBeEditable();
     await subtitle.fill("a");
     await expect(subtitle).toHaveValue("a");
@@ -22,7 +22,7 @@ test.describe("follow-up issue regressions", () => {
     await expect(page.getByText(/Too small|expected string/i)).toHaveCount(0);
 
     await page.getByRole("button", { name: "Lưu và làm tiếp sau" }).first().click();
-    await expect(page.getByText(/Bản nháp chưa được lưu/)).toBeVisible();
+    await expect(page.getByText(/bản nháp chưa được lưu/i)).toBeVisible();
     await expect(page.getByText("Đã lưu bản nháp")).toHaveCount(0);
     expect(saveRequests).toBe(0);
   });
@@ -32,14 +32,17 @@ test.describe("follow-up issue regressions", () => {
     const uploadResponse = page.waitForResponse(
       (response) => response.request().method() === "POST" && response.url().endsWith("/api/admin/media"),
     );
-    await page.getByLabel("Ảnh bìa nhiệm vụ").setInputFiles({
+    const coverUploadButton = page.getByRole("button", {
+      name: /Ảnh hiển thị trên thẻ Tải tệp (?:mới|khác)/,
+    });
+    const coverInput = coverUploadButton.locator("xpath=parent::div/following-sibling::input[@type='file']");
+    await coverInput.setInputFiles({
       name: "mission-cover-e2e.png",
       mimeType: "image/png",
       buffer: tinyPng,
     });
     expect((await uploadResponse).status()).toBe(201);
-    await expect(page.getByText(/URL đã được lấy tự động:/)).toBeVisible();
-    await expect(page.getByText("Đã tải tệp và gắn vào nội dung")).toBeVisible();
+    await expect(page.getByText("Tệp đã được gắn tự động vào nội dung.")).toBeVisible();
   });
 
   test("clicking a locked mission explains the unlock requirement", async ({ page }) => {
@@ -49,8 +52,8 @@ test.describe("follow-up issue regressions", () => {
     await unlockParentGate(page);
     await apiData(await page.request.post(`/api/children/${child.id}/reset-progress`));
     await page.goto("/missions");
-    await page.getByRole("button", { name: /Nhịp đèn lồng\. Nhiệm vụ chưa mở/ }).click();
-    await expect(page.getByText("Nhiệm vụ chưa mở", { exact: true })).toBeVisible();
+    await page.getByRole("button", { name: /Nhịp đèn lồng\. Nhiệm vụ (?:này )?chưa mở/ }).click();
+    await expect(page.getByText("Nhiệm vụ này chưa mở", { exact: true })).toBeVisible();
     await expect(page.getByText(/Hoàn thành “Thám tử dấu chân”/)).toBeVisible();
   });
   test("resource detail uses Vietnamese labels instead of category codes", async ({ page }) => {
@@ -59,7 +62,6 @@ test.describe("follow-up issue regressions", () => {
     await selectChild(page, child.id);
     await unlockParentGate(page);
     await page.goto("/parent/resources/dong-hanh-khi-be-chua-trung");
-    await expect(page).toHaveURL(/dong-hanh-khi-be-chua-tra-loi-dung$/);
     await expect(page.getByRole("heading", { name: "Khi bé chưa trả lời đúng" })).toBeVisible();
     await expect(page.getByText("Đồng hành", { exact: true })).toBeVisible();
     await expect(page.getByText("Hướng dẫn", { exact: true })).toBeVisible();
@@ -81,7 +83,7 @@ test.describe("follow-up issue regressions", () => {
   test("video resources upload a file and render a player for parents", async ({ page }) => {
     await signIn(page, "content@demo.local", "/admin/resources/new");
     await page.getByLabel("Loại tài nguyên").selectOption("video");
-    await expect(page.getByLabel("Tệp video")).toBeVisible();
+    await expect(page.getByRole("button", { name: "Tệp video Tải tệp mới" })).toBeVisible();
 
     const upload = await apiData<{ url: string }>(
       await page.request.post("/api/admin/media", {

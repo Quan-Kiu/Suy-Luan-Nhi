@@ -8,9 +8,11 @@ export async function signIn(page: Page, email: string, callbackUrl = "/profiles
   await page.getByLabel("Email").fill(email);
   await page.locator('input[name="password"]').fill(demoPassword);
   await page.getByRole("button", { name: "Đăng nhập", exact: true }).click();
-  await page.waitForURL(
-    (url) => !url.pathname.startsWith("/auth/sign-in") && !url.pathname.startsWith("/auth/setup-pin"),
+  const expectedPathname = new URL(callbackUrl, "http://127.0.0.1:3100").pathname;
+  await page.waitForURL((url) =>
+    [expectedPathname, "/auth/mfa/setup", "/auth/two-factor"].includes(url.pathname),
   );
+  await page.waitForLoadState("domcontentloaded");
 }
 
 export async function apiData<T>(response: APIResponse): Promise<T> {
