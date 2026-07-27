@@ -56,7 +56,7 @@ jobs:
           AUTH_REQUIRE_EMAIL_VERIFICATION: "true"
           BETTER_AUTH_SECRET: ci-production-like-secret-with-at-least-thirty-two-characters
         run: npm run build
-      - run: npx playwright install --with-deps chromium
+      - run: npx playwright install --with-deps chromium webkit
       - name: Run end-to-end tests
         env:
           E2E_SERVER_MODE: production
