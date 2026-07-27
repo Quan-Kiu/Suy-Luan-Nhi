@@ -327,7 +327,7 @@ export default async function Page({ searchParams }: { searchParams: Promise<Aud
                         {item.actorId ? <UserRound size={18} /> : <Bot size={18} />}
                       </span>
                       <div className="min-w-0">
-                        <p className="type-caption font-bold text-[#887b6c]">Người thực hiện</p>
+                        <p className="type-caption font-bold text-[#6f6558]">Người thực hiện</p>
                         <p className="type-label truncate font-black" title={actorLabel}>
                           {actorLabel}
                         </p>
