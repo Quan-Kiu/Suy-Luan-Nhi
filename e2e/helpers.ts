@@ -9,10 +9,10 @@ export async function signIn(page: Page, email: string, callbackUrl = "/profiles
   await page.locator('input[name="password"]').fill(demoPassword);
   await page.getByRole("button", { name: "Đăng nhập", exact: true }).click();
   const expectedPathname = new URL(callbackUrl, "http://127.0.0.1:3100").pathname;
-  await page.waitForURL((url) =>
-    [expectedPathname, "/auth/mfa/setup", "/auth/two-factor"].includes(url.pathname),
+  await page.waitForURL(
+    (url) => [expectedPathname, "/auth/mfa/setup", "/auth/two-factor"].includes(url.pathname),
+    { waitUntil: "domcontentloaded" },
   );
-  await page.waitForLoadState("domcontentloaded");
 }
 
 export async function apiData<T>(response: APIResponse): Promise<T> {
