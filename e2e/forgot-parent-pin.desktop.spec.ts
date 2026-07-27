@@ -1,16 +1,38 @@
 import { expect, test } from "@playwright/test";
+import { Pool } from "pg";
 
 const mailpitUrl = "http://127.0.0.1:8025";
 
-async function readLatestPinResetUrl(page: import("@playwright/test").Page, email: string) {
+const databaseUrl = process.env.E2E_DATABASE_URL ?? "postgresql://sln@127.0.0.1:54329/sln_e2e";
+const pool = new Pool({ connectionString: databaseUrl });
+let createdUserId: string | null = null;
+
+test.afterEach(async () => {
+  if (!createdUserId) return;
+  await pool.query('DELETE FROM "user" WHERE "id" = $1', [createdUserId]);
+  createdUserId = null;
+});
+
+test.afterAll(async () => {
+  await pool.end();
+});
+
+async function fetchMailpitJson<T>(path: string): Promise<T> {
+  const response = await fetch(`${mailpitUrl}${path}`);
+  if (!response.ok) {
+    throw new Error(`Mailpit request failed (${response.status}): ${await response.text()}`);
+  }
+  return (await response.json()) as T;
+}
+
+async function readLatestPinResetUrl(email: string) {
   let messageId = "";
   await expect
     .poll(
       async () => {
-        const response = await page.request.get(`${mailpitUrl}/api/v1/messages`);
-        const body = (await response.json()) as {
+        const body = await fetchMailpitJson<{
           messages: Array<{ ID: string; Subject: string; To: Array<{ Address: string }> }>;
-        };
+        }>("/api/v1/messages");
         const message = body.messages.find(
           (item) =>
             item.Subject === "Đặt lại mã PIN phụ huynh" &&
@@ -23,9 +45,7 @@ async function readLatestPinResetUrl(page: import("@playwright/test").Page, emai
     )
     .not.toBe("");
 
-  const detailResponse = await page.request.get(`${mailpitUrl}/api/v1/message/${messageId}`);
-  expect(detailResponse.ok()).toBe(true);
-  const detail = (await detailResponse.json()) as { Text: string };
+  const detail = await fetchMailpitJson<{ Text: string }>(`/api/v1/message/${messageId}`);
   const match = detail.Text.match(/https?:\/\/[^\s]+\/auth\/reset-pin\?token=[^\s]+/);
   expect(match?.[0]).toBeTruthy();
   return match![0];
@@ -42,8 +62,21 @@ test("parent can reset a forgotten PIN from a one-time email link", async ({ pag
   });
   expect(signUp.ok()).toBe(true);
 
+  const userResult = await pool.query<{ id: string }>(
+    'UPDATE "user" SET "email_verified" = true WHERE "email" = $1 RETURNING "id"',
+    [email],
+  );
+  createdUserId = userResult.rows[0]?.id ?? null;
+  expect(createdUserId).toBeTruthy();
+
+  await page.goto("/auth/sign-in?callbackUrl=%2Fprofiles");
+  await page.getByLabel("Email").fill(email);
+  await page.getByRole("textbox", { name: "Mật khẩu", exact: true }).fill(password);
+  await page.getByRole("button", { name: "Đăng nhập", exact: true }).click();
+  await expect(page).toHaveURL(/\/auth\/setup-pin/);
+
   const setup = await page.request.post("/api/parent/pin", { data: { pin: oldPin } });
-  expect(setup.ok()).toBe(true);
+  expect(setup.ok(), await setup.text()).toBe(true);
   await page.context().clearCookies({ name: "sln_parent_gate" });
 
   await page.goto("/parent");
@@ -53,7 +86,7 @@ test("parent can reset a forgotten PIN from a one-time email link", async ({ pag
   await page.getByRole("button", { name: "Gửi liên kết tạo PIN mới" }).click();
   await expect(page.getByText("Hãy kiểm tra hộp thư")).toBeVisible();
 
-  const resetUrl = await readLatestPinResetUrl(page, email);
+  const resetUrl = await readLatestPinResetUrl(email);
   await page.goto(resetUrl);
   await page.getByRole("textbox", { name: "Tạo mã PIN mới gồm 6 chữ số", exact: true }).fill(newPin);
   await page.getByRole("textbox", { name: "Nhập lại mã PIN mới", exact: true }).fill(newPin);

@@ -1,7 +1,5 @@
 import { expect, test, type Page } from "@playwright/test";
-import { unlockParentGate } from "./helpers";
-
-const password = "LocalDemo-2026!";
+import { signIn, unlockParentGate } from "./helpers";
 
 type ApiEnvelope<T> = { success: true; data: T; meta: { requestId: string } };
 
@@ -11,14 +9,6 @@ async function apiData<T>(response: { json(): Promise<unknown>; ok(): boolean })
   expect(body.success).toBe(true);
   expect(body.meta.requestId).toBeTruthy();
   return body.data;
-}
-
-async function signIn(page: Page, email: string, callbackUrl = "/profiles") {
-  await page.goto(`/auth/sign-in?callbackUrl=${encodeURIComponent(callbackUrl)}`);
-  await page.getByLabel("Email").fill(email);
-  await page.locator('input[name="password"]').fill(password);
-  await page.getByRole("button", { name: "Đăng nhập", exact: true }).click();
-  await page.waitForURL((url) => !url.pathname.startsWith("/auth/sign-in"));
 }
 
 async function signOutByClearingSession(page: Page) {
@@ -45,7 +35,8 @@ test("parent selects a real Child Profile, completes a DB mission and sees progr
   const selectResponse = await page.request.post(`/api/children/${child.id}/select`);
   expect(selectResponse.ok()).toBeTruthy();
 
-  await page.goto("/missions");
+  await page.goto("/missions", { waitUntil: "domcontentloaded" });
+  await expect(page).toHaveURL(/\/missions$/);
   await expect(page.getByRole("heading", { name: child.displayName, exact: true })).toBeVisible();
   await page.getByRole("link", { name: /Thám tử dấu chân/i }).click();
   await page.getByRole("button", { name: /Bắt đầu chơi/i }).click();
@@ -106,7 +97,9 @@ test("content admin submits an immutable version and reviewer publishes it", asy
   const approvedPanel = page.getByRole("tabpanel", { name: "Đã duyệt, chờ hiển thị" });
   const approvedLink = approvedPanel.getByRole("link", { name: /Thám tử dấu chân \(Bản sao\)/i });
   await expect(approvedLink).toContainText("Mở để hiển thị");
-  await approvedLink.click();
+  const approvedHref = await approvedLink.getAttribute("href");
+  expect(approvedHref).toMatch(/^\/admin\/reviews\//);
+  await page.goto(approvedHref!);
   await expect(page.getByRole("button", { name: /Cho bé xem ngay/i })).toBeVisible();
   await page.getByRole("button", { name: /Cho bé xem ngay/i }).click();
   await expect(page.getByText("Đang hiển thị", { exact: true })).toBeVisible();

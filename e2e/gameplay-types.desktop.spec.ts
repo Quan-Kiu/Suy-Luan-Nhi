@@ -21,6 +21,26 @@ async function finishMission(page: Page) {
   await expect(page).toHaveURL(/\/complete\//);
 }
 
+async function sortItems(page: Page, expectedLabels: string[]) {
+  for (let targetIndex = 0; targetIndex < expectedLabels.length; targetIndex += 1) {
+    const label = expectedLabels[targetIndex];
+    for (;;) {
+      const handles = page.locator('button[aria-label^="Kéo "][aria-label$=" để đổi vị trí"]');
+      await expect(handles).toHaveCount(expectedLabels.length);
+      const labels = await handles.evaluateAll((elements) =>
+        elements.map((element) => {
+          const ariaLabel = element.getAttribute("aria-label") ?? "";
+          return ariaLabel.slice("Kéo ".length, -" để đổi vị trí".length);
+        }),
+      );
+      const currentIndex = labels.indexOf(label);
+      expect(currentIndex, `Không tìm thấy mục sắp xếp ${label}`).toBeGreaterThanOrEqual(0);
+      if (currentIndex <= targetIndex) break;
+      await page.getByRole("button", { name: `Đưa ${label} lên` }).click();
+    }
+  }
+}
+
 test("all five gameplay question renderers submit and persist correct answers", async ({ page }) => {
   await signIn(page, "parent@demo.local");
   const child = await getDemoChild(page);
@@ -40,16 +60,7 @@ test("all five gameplay question renderers submit and persist correct answers", 
   await finishMission(page);
 
   await startMission(page, /Kệ đồ trong rừng/i);
-  const treehouseHandle = page.getByRole("button", { name: "Kéo Nhà cây để đổi vị trí" });
-  const backpackHandle = page.getByRole("button", { name: "Kéo Ba lô để đổi vị trí" });
-  const source = await treehouseHandle.boundingBox();
-  const target = await backpackHandle.boundingBox();
-  expect(source).toBeTruthy();
-  expect(target).toBeTruthy();
-  await page.mouse.move(source!.x + source!.width / 2, source!.y + source!.height / 2);
-  await page.mouse.down();
-  await page.mouse.move(target!.x + target!.width / 2, target!.y + target!.height / 2, { steps: 12 });
-  await page.mouse.up();
+  await sortItems(page, ["Kính lúp", "Ba lô", "Nhà cây"]);
   await submitCorrect(page, /Câu tiếp theo/i);
 
   await page.getByRole("button", { name: /^Sách\./ }).click();

@@ -201,6 +201,7 @@ export function AdminNavigation({ pathname, role, content, onNavigate, ariaLabel
                   <Link
                     key={item.href}
                     href={item.href}
+                    prefetch={item.href === "/admin/parent-access" ? false : undefined}
                     onClick={onNavigate}
                     aria-current={active ? "page" : undefined}
                     className={cn(

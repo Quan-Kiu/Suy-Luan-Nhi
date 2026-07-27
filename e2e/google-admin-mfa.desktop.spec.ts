@@ -40,6 +40,11 @@ function currentTotp(secret: string, now = Date.now()) {
 
 let credential: CredentialSnapshot | null = null;
 
+test.skip(
+  process.env.E2E_AUTH_STAFF_MFA_REQUIRED !== "true",
+  "Run with E2E_AUTH_STAFF_MFA_REQUIRED=true so the server enforces staff MFA.",
+);
+
 test.afterEach(async () => {
   if (!credential) return;
   await pool.query('DELETE FROM "two_factor" WHERE "user_id" = $1', [credential.userId]);

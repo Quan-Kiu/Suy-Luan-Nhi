@@ -57,7 +57,7 @@ export function BadgeManager({
               aria-label={`Huy hiệu: ${item.name}`}
               className={`group overflow-hidden rounded-2xl border bg-white shadow-sm ${item.active ? "" : "opacity-75"}`}
             >
-              <summary className="flex min-h-20 cursor-pointer list-none items-center gap-3 p-3 marker:hidden">
+              <summary className="flex min-h-20 cursor-pointer list-none items-center gap-3 px-3 py-2 marker:hidden">
                 <div className="relative size-14 shrink-0 overflow-hidden rounded-xl border bg-[#f5f0e6]">
                   {item.iconUrl ? (
                     <Image src={item.iconUrl} fill sizes="56px" alt="" className="object-contain p-1" />

@@ -1,11 +1,18 @@
 import { expect, test } from "@playwright/test";
-import { apiData, clearAuth, demoPassword, signIn, unlockParentGate } from "./helpers";
+import { apiData, clearAuth, demoParentPin, demoPassword, signIn, unlockParentGate } from "./helpers";
 
 const email = "privacy@demo.local";
 const password = demoPassword;
 
 test("family deletion request is parent-gated and super-admin anonymizes the account", async ({ page }) => {
-  await signIn(page, email);
+  await page.goto("/auth/sign-in?callbackUrl=%2Fprofiles");
+  await page.getByLabel("Email").fill(email);
+  await page.getByRole("textbox", { name: "Mật khẩu", exact: true }).fill(password);
+  await page.getByRole("button", { name: "Đăng nhập", exact: true }).click();
+  await expect(page).toHaveURL(/\/auth\/setup-pin/);
+  await page.getByRole("textbox", { name: "Tạo mã PIN 6 chữ số", exact: true }).fill(demoParentPin);
+  await page.getByRole("textbox", { name: "Nhập lại mã PIN", exact: true }).fill(demoParentPin);
+  await page.getByRole("button", { name: "Lưu mã PIN và tiếp tục" }).click();
   await expect(page).toHaveURL(/\/profiles$/);
 
   const child = await apiData<{ id: string }>(

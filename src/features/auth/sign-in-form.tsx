@@ -44,6 +44,7 @@ export function SignInForm({
   const requestedCallback = resolveSafeAuthCallbackPath(params.get("callbackUrl"));
   const oauthError = params.get("oauth") === "google" ? params.get("error") : null;
   const [verificationEmail, setVerificationEmail] = useState<string | null>(null);
+  const [navigationStarted, setNavigationStarted] = useState(false);
   const form = useForm<z.infer<typeof signInSchema>>({
     resolver: zodResolver(signInSchema),
     defaultValues: { email: "", password: "", rememberMe: true },
@@ -64,6 +65,7 @@ export function SignInForm({
     onSuccess: (data) => {
       if (data && "twoFactorRedirect" in data && data.twoFactorRedirect) return;
       if (data?.user.mustChangePassword) {
+        setNavigationStarted(true);
         navigation.push("/auth/change-temporary-password");
         return;
       }
@@ -74,6 +76,7 @@ export function SignInForm({
         : needsParentPinSetup
           ? buildParentPinSetupPath(destination)
           : destination;
+      setNavigationStarted(true);
       navigation.push(target);
     },
     onError: (error, values) => {
@@ -89,7 +92,7 @@ export function SignInForm({
   return (
     <>
       <HydrationSafeForm
-        busy={mutation.isPending || navigation.isPending}
+        busy={mutation.isPending || navigation.isPending || navigationStarted}
         fieldsetClassName="space-y-4"
         onSubmit={form.handleSubmit((values) => mutation.mutate(values))}
         noValidate
@@ -125,7 +128,7 @@ export function SignInForm({
         />
         <FormStatus status={errorMessage ? "error" : "idle"} message={errorMessage} />
         <SubmitButton
-          pending={mutation.isPending || navigation.isPending}
+          pending={mutation.isPending || navigation.isPending || navigationStarted}
           pendingLabel={contentText(content, "signIn.submitting", "Đang đăng nhập...")}
         >
           {contentText(content, "signIn.submit", "Đăng nhập")}
@@ -149,7 +152,7 @@ export function SignInForm({
         open={Boolean(verificationEmail)}
         email={verificationEmail ?? ""}
         callbackURL={requestedCallback ?? "/profiles"}
-        retryPending={mutation.isPending || navigation.isPending}
+        retryPending={mutation.isPending || navigation.isPending || navigationStarted}
         onClose={() => {
           setVerificationEmail(null);
           mutation.reset();

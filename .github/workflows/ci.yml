@@ -23,6 +23,11 @@ jobs:
           --health-interval 5s
           --health-timeout 5s
           --health-retries 20
+      mailpit:
+        image: axllent/mailpit:v1.30.0
+        ports:
+          - 1025:1025
+          - 8025:8025
 
     env:
       DATABASE_URL: postgresql://sln@127.0.0.1:5432/sln
@@ -56,9 +61,64 @@ jobs:
           AUTH_REQUIRE_EMAIL_VERIFICATION: "true"
           BETTER_AUTH_SECRET: ci-production-like-secret-with-at-least-thirty-two-characters
         run: npm run build
-      - run: npx playwright install --with-deps chromium
-      - name: Run end-to-end tests
+      - run: npx playwright install --with-deps chromium webkit
+      - name: Run desktop end-to-end tests
+        id: desktop_e2e
+        continue-on-error: true
         env:
           E2E_SERVER_MODE: production
-        run: npm run test:e2e
+        run: npx playwright test --project=desktop-chromium --workers=1
+      - name: Upload desktop E2E failure artifacts
+        if: steps.desktop_e2e.outcome == 'failure'
+        uses: actions/upload-artifact@v4
+        with:
+          name: desktop-e2e-failure
+          path: |
+            test-results
+            playwright-report
+          if-no-files-found: ignore
+      - name: Fail after desktop E2E artifact upload
+        if: steps.desktop_e2e.outcome == 'failure'
+        run: exit 1
+      - name: Run mobile Chromium end-to-end tests
+        id: mobile_chromium_e2e
+        continue-on-error: true
+        env:
+          E2E_SERVER_MODE: production
+        run: npx playwright test --project=mobile-chromium --workers=1
+      - name: Upload mobile Chromium E2E failure artifacts
+        if: steps.mobile_chromium_e2e.outcome == 'failure'
+        uses: actions/upload-artifact@v4
+        with:
+          name: mobile-chromium-e2e-failure
+          path: |
+            test-results
+            playwright-report
+          if-no-files-found: ignore
+      - name: Fail after mobile Chromium E2E artifact upload
+        if: steps.mobile_chromium_e2e.outcome == 'failure'
+        run: exit 1
+      - name: Run iOS WebKit end-to-end tests
+        id: ios_webkit_e2e
+        continue-on-error: true
+        env:
+          E2E_SERVER_MODE: production
+        run: npx playwright test --project=mobile-webkit-ios --workers=1
+      - name: Upload iOS WebKit E2E failure artifacts
+        if: steps.ios_webkit_e2e.outcome == 'failure'
+        uses: actions/upload-artifact@v4
+        with:
+          name: ios-webkit-e2e-failure
+          path: |
+            test-results
+            playwright-report
+          if-no-files-found: ignore
+      - name: Fail after iOS WebKit E2E artifact upload
+        if: steps.ios_webkit_e2e.outcome == 'failure'
+        run: exit 1
+      - name: Run staff MFA end-to-end test
+        env:
+          E2E_SERVER_MODE: production
+          E2E_AUTH_STAFF_MFA_REQUIRED: "true"
+        run: npx playwright test e2e/google-admin-mfa.desktop.spec.ts --project=desktop-chromium --workers=1
       - run: npm audit --audit-level=high

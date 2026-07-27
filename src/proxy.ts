@@ -53,7 +53,13 @@ async function isSignUpRequest(request: NextRequest) {
 
 export async function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
-  const settings = await getOperationalSystemSettings();
+  const socialCallbackProvider = getSocialCallbackProvider(pathname);
+  const settings = await getOperationalSystemSettings({
+    fresh:
+      isSocialAuthStartRequest(request) ||
+      Boolean(socialCallbackProvider) ||
+      pathname.startsWith("/api/auth/sign-up"),
+  });
   const shouldRelockParent = shouldRelockParentGate({
     pathname,
     hasGateCookie: Boolean(request.cookies.get(PARENT_GATE_COOKIE_NAME)),
@@ -65,7 +71,6 @@ export async function proxy(request: NextRequest) {
     return response;
   };
 
-  const socialCallbackProvider = getSocialCallbackProvider(pathname);
   if (
     !settings.features.socialLoginEnabled &&
     (isSocialAuthStartRequest(request) || socialCallbackProvider)

@@ -12,21 +12,19 @@ import { Card } from "@/components/ui";
 import { contentText, useContent } from "@/content/client";
 import { parentPinUnlockSchema, PARENT_PIN_MAX_LEGACY_LENGTH } from "@/domain/parent-pin";
 import { SwitchAccountButton } from "@/features/auth/switch-account-button";
-import { usePendingRouter } from "@/hooks/use-pending-router";
 
 const schema = z.object({ pin: parentPinUnlockSchema });
 type FormValues = z.infer<typeof schema>;
 
 export function ParentGateForm() {
   const content = useContent("parent");
-  const navigation = usePendingRouter();
   const form = useForm<FormValues>({
     resolver: zodResolver(schema),
     defaultValues: { pin: "" },
   });
   const mutation = useMutation({
     mutationFn: parentApi.unlock,
-    onSuccess: () => navigation.refresh(),
+    onSuccess: () => window.location.reload(),
   });
 
   return (
@@ -47,7 +45,7 @@ export function ParentGateForm() {
         </div>
       </div>
       <HydrationSafeForm
-        busy={mutation.isPending || navigation.isPending}
+        busy={mutation.isPending}
         fieldsetClassName="mt-5 space-y-3"
         onSubmit={form.handleSubmit((values) => mutation.mutate(values))}
         noValidate
@@ -78,7 +76,7 @@ export function ParentGateForm() {
         </div>
         <FormStatus status={mutation.isError ? "error" : "idle"} message={mutation.error?.message} />
         <SubmitButton
-          pending={mutation.isPending || navigation.isPending}
+          pending={mutation.isPending}
           pendingLabel={contentText(content, "gate.submitting", "Đang kiểm tra...")}
         >
           {contentText(content, "gate.submit", "Mở khu vực phụ huynh")}

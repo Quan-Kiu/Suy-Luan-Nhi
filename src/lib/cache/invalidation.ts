@@ -1,5 +1,6 @@
 import { revalidatePath, revalidateTag } from "next/cache";
 import { cacheTags } from "@/lib/cache/tags";
+import { clearOperationalSystemSettingsCache } from "@/modules/system-settings/runtime";
 
 const expireImmediately = { expire: 0 } as const;
 
@@ -47,6 +48,7 @@ export function invalidateTaxonomyCaches() {
 }
 
 export function invalidateSystemSettingsViews() {
+  clearOperationalSystemSettingsCache();
   revalidatePath("/", "layout");
 }
 export function invalidateAdminMediaViews() {
