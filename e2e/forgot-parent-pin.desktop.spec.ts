@@ -17,15 +17,22 @@ test.afterAll(async () => {
   await pool.end();
 });
 
-async function readLatestPinResetUrl(page: import("@playwright/test").Page, email: string) {
+async function fetchMailpitJson<T>(path: string): Promise<T> {
+  const response = await fetch(`${mailpitUrl}${path}`);
+  if (!response.ok) {
+    throw new Error(`Mailpit request failed (${response.status}): ${await response.text()}`);
+  }
+  return (await response.json()) as T;
+}
+
+async function readLatestPinResetUrl(email: string) {
   let messageId = "";
   await expect
     .poll(
       async () => {
-        const response = await page.request.get(`${mailpitUrl}/api/v1/messages`);
-        const body = (await response.json()) as {
+        const body = await fetchMailpitJson<{
           messages: Array<{ ID: string; Subject: string; To: Array<{ Address: string }> }>;
-        };
+        }>("/api/v1/messages");
         const message = body.messages.find(
           (item) =>
             item.Subject === "Đặt lại mã PIN phụ huynh" &&
@@ -38,9 +45,7 @@ async function readLatestPinResetUrl(page: import("@playwright/test").Page, emai
     )
     .not.toBe("");
 
-  const detailResponse = await page.request.get(`${mailpitUrl}/api/v1/message/${messageId}`);
-  expect(detailResponse.ok()).toBe(true);
-  const detail = (await detailResponse.json()) as { Text: string };
+  const detail = await fetchMailpitJson<{ Text: string }>(`/api/v1/message/${messageId}`);
   const match = detail.Text.match(/https?:\/\/[^\s]+\/auth\/reset-pin\?token=[^\s]+/);
   expect(match?.[0]).toBeTruthy();
   return match![0];
@@ -81,7 +86,7 @@ test("parent can reset a forgotten PIN from a one-time email link", async ({ pag
   await page.getByRole("button", { name: "Gửi liên kết tạo PIN mới" }).click();
   await expect(page.getByText("Hãy kiểm tra hộp thư")).toBeVisible();
 
-  const resetUrl = await readLatestPinResetUrl(page, email);
+  const resetUrl = await readLatestPinResetUrl(email);
   await page.goto(resetUrl);
   await page.getByRole("textbox", { name: "Tạo mã PIN mới gồm 6 chữ số", exact: true }).fill(newPin);
   await page.getByRole("textbox", { name: "Nhập lại mã PIN mới", exact: true }).fill(newPin);
