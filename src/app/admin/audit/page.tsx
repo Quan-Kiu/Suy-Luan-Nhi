@@ -11,7 +11,7 @@ import {
   X,
 } from "lucide-react";
 import Link from "next/link";
-import { requireStaff } from "@/auth/session";
+import { requirePermission } from "@/auth/session";
 import { auditActionLabels, friendlyLabel, resourceTypeLabels } from "@/features/admin/admin-labels";
 import { AdminPageHeader } from "@/features/admin/admin-page-header";
 import { listAuditLogs } from "@/modules/admin/operations";
@@ -121,7 +121,7 @@ function JsonPanel({ title, value }: { title: string; value: unknown }) {
 }
 
 export default async function Page({ searchParams }: { searchParams: Promise<AuditSearchParams> }) {
-  await requireStaff();
+  await requirePermission("audit.view");
   const filters = await searchParams;
   const requestedPageSize = parsePositiveInteger(filters.pageSize, defaultPageSize);
   const pageSize = pageSizeOptions.includes(requestedPageSize as (typeof pageSizeOptions)[number])

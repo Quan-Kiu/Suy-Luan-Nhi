@@ -23,9 +23,20 @@ const baseMember = {
   createdAt: new Date("2026-07-23T00:00:00.000Z"),
   parentProfileId: null,
   mustChangePassword: false,
+  deletedAt: null,
+  deletedBy: null,
+  deletionReason: null,
 } satisfies Pick<
   MemberItem,
-  "banned" | "twoFactorEnabled" | "emailVerified" | "createdAt" | "parentProfileId" | "mustChangePassword"
+  | "banned"
+  | "twoFactorEnabled"
+  | "emailVerified"
+  | "createdAt"
+  | "parentProfileId"
+  | "mustChangePassword"
+  | "deletedAt"
+  | "deletedBy"
+  | "deletionReason"
 >;
 
 const members: MemberItem[] = [
@@ -58,14 +69,30 @@ const members: MemberItem[] = [
   },
 ];
 
-function renderManager() {
+const trashedMembers: MemberItem[] = [
+  {
+    ...baseMember,
+    id: "trashed-parent",
+    name: "Phụ huynh đã xóa",
+    email: "trash@example.com",
+    role: "parent",
+    accountProviders: ["credential"],
+    parentProfileId: "trashed-parent-profile",
+    banned: true,
+    deletedAt: new Date("2026-07-27T08:00:00.000Z"),
+    deletedBy: "staff-google",
+    deletionReason: "Không còn sử dụng",
+  },
+];
+
+function renderManager(trash: MemberItem[] = []) {
   const queryClient = new QueryClient({
     defaultOptions: { queries: { retry: false }, mutations: { retry: false } },
   });
 
   return render(
     <QueryClientProvider client={queryClient}>
-      <MemberManager items={members} currentUserId="staff-google" />
+      <MemberManager items={members} trashedItems={trash} currentUserId="staff-google" />
     </QueryClientProvider>,
   );
 }
@@ -96,6 +123,20 @@ describe("MemberManager", () => {
     expect(within(parentPanel).getAllByText("Email & mật khẩu")).toHaveLength(4);
     expect(within(parentPanel).getAllByText("Google")).toHaveLength(2);
     expect(within(parentPanel).queryByText("staff@example.com")).not.toBeInTheDocument();
+  });
+
+  it("shows trashed parent accounts separately with restore and permanent-delete actions", async () => {
+    const user = userEvent.setup();
+    renderManager(trashedMembers);
+
+    const trashTab = screen.getByRole("tab", { name: "Thùng rác, 1 tài khoản" });
+    await user.click(trashTab);
+
+    const panel = screen.getByRole("tabpanel", { name: /Thùng rác/ });
+    expect(within(panel).getByText("trash@example.com")).toBeVisible();
+    expect(within(panel).getByText("Lý do: Không còn sử dụng")).toBeVisible();
+    expect(within(panel).getByRole("button", { name: "Khôi phục" })).toBeEnabled();
+    expect(within(panel).getByRole("button", { name: "Xóa vĩnh viễn" })).toBeEnabled();
   });
 
   it("supports arrow-key navigation between tabs", async () => {

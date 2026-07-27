@@ -15,6 +15,11 @@ export const user = pgTable("user", {
   banExpires: timestamp("ban_expires", { withTimezone: true }),
   twoFactorEnabled: boolean("two_factor_enabled").default(false).notNull(),
   mustChangePassword: boolean("must_change_password").default(false).notNull(),
+  deletedAt: timestamp("deleted_at", { withTimezone: true }),
+  deletedBy: text("deleted_by"),
+  deletionReason: text("deletion_reason"),
+  deletedPreviousBanned: boolean("deleted_previous_banned"),
+  deletedPreviousBanReason: text("deleted_previous_ban_reason"),
 });
 
 export const session = pgTable(

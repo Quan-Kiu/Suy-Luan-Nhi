@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
-import { requireRoles } from "@/auth/session";
+import { requirePermission } from "@/auth/session";
 import { ProductionMissionEditor } from "@/features/admin/production-mission-editor";
 import { getAdminMission, getAdminTaxonomy } from "@/modules/admin/mission-admin";
 import { getContentVariableDefinitions } from "@/modules/content/content-variables";
@@ -9,7 +9,7 @@ export const metadata: Metadata = {
 };
 
 export default async function Page({ params }: { params: Promise<{ missionId: string }> }) {
-  await requireRoles(["content_admin", "super_admin"]);
+  await requirePermission("missions.manage");
   const { missionId } = await params;
   const [mission, taxonomy, templateVariables] = await Promise.all([
     getAdminMission(missionId),

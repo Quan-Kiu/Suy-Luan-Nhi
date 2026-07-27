@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { ClipboardCheck } from "lucide-react";
-import { requireRoles } from "@/auth/session";
+import { requirePermission } from "@/auth/session";
 import { contentText } from "@/content/resolve";
 import { AdminPageHeader } from "@/features/admin/admin-page-header";
 import { ReviewWorkspace, type ReviewWorkspaceItem } from "@/features/admin/review-workspace";
@@ -12,7 +12,7 @@ export const metadata: Metadata = {
 };
 
 export default async function Page() {
-  await requireRoles(["reviewer", "super_admin"]);
+  await requirePermission("missions.review");
   const [items, content] = await Promise.all([getReviewWorkspaceItems(), getContentNamespace("admin")]);
   const workspaceItems: ReviewWorkspaceItem[] = items.map((item) => ({
     missionId: item.missionId,

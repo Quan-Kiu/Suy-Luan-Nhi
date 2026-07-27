@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { Settings } from "lucide-react";
-import { requireRoles } from "@/auth/session";
+import { requirePermission } from "@/auth/session";
 import { AdminPageHeader } from "@/features/admin/admin-page-header";
 import { ImageUploadPolicyManager } from "@/features/admin/image-upload-policy-manager";
 import { SystemSettingsManager } from "@/features/admin/system-settings-manager";
@@ -12,7 +12,7 @@ export const metadata: Metadata = {
 };
 
 export default async function Page() {
-  await requireRoles(["super_admin"]);
+  await requirePermission("settings.manage");
   const [items, imageUploadPolicies] = await Promise.all([
     getManagedSystemSettingsForDashboard(),
     getImageUploadPolicies(),

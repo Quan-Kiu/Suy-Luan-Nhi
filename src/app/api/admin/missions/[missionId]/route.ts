@@ -1,6 +1,6 @@
 import { apiJson } from "@/lib/api-response";
 import { invalidateAdminMissionViews } from "@/lib/cache/invalidation";
-import { requireApiRoles } from "@/auth/api";
+import { requireApiPermission } from "@/auth/api";
 import { adminMissionDraftSchema } from "@/modules/admin/schemas";
 import {
   missionTemplateIssueMessage,
@@ -13,7 +13,7 @@ import {
 } from "@/modules/admin/mission-admin";
 
 export async function GET(request: Request, { params }: { params: Promise<{ missionId: string }> }) {
-  const authResult = await requireApiRoles(request, ["content_admin", "reviewer", "super_admin"]);
+  const authResult = await requireApiPermission(request, "missions.view");
   if ("error" in authResult) return authResult.error;
   const { missionId } = await params;
   const mission = await getAdminMission(missionId);
@@ -21,7 +21,7 @@ export async function GET(request: Request, { params }: { params: Promise<{ miss
 }
 
 export async function PATCH(request: Request, { params }: { params: Promise<{ missionId: string }> }) {
-  const authResult = await requireApiRoles(request, ["content_admin", "super_admin"]);
+  const authResult = await requireApiPermission(request, "missions.manage");
   if ("error" in authResult) return authResult.error;
   const input = adminMissionDraftSchema.safeParse(await request.json().catch(() => null));
   if (!input.success) {

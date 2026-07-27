@@ -1,11 +1,11 @@
 import { apiJson } from "@/lib/api-response";
-import { requireApiRoles } from "@/auth/api";
+import { requireApiPermission } from "@/auth/api";
 import { listMedia, uploadMedia } from "@/modules/media/media";
 import { mediaCategories, type MediaCategory } from "@/domain/media";
 import { isMediaUploadError } from "@/modules/media/storage/errors";
 
 export async function GET(request: Request) {
-  const authResult = await requireApiRoles(request, ["content_admin", "reviewer", "super_admin"]);
+  const authResult = await requireApiPermission(request, "media.view");
   if ("error" in authResult) return authResult.error;
   const params = new URL(request.url).searchParams;
   const type = ["image", "audio", "video"].includes(params.get("type") ?? "")
@@ -31,7 +31,7 @@ export async function GET(request: Request) {
 }
 
 export async function POST(request: Request) {
-  const authResult = await requireApiRoles(request, ["content_admin", "super_admin"]);
+  const authResult = await requireApiPermission(request, "media.manage");
   if ("error" in authResult) return authResult.error;
   const form = await request.formData();
   const file = form.get("file");

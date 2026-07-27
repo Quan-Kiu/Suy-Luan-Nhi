@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { Languages } from "lucide-react";
 import type { ContentEntryListFilters } from "@/api/content";
-import { requireRoles } from "@/auth/session";
+import { requirePermission } from "@/auth/session";
 import { AdminPageHeader } from "@/features/admin/admin-page-header";
 import { ContentManager } from "@/features/admin/content-manager";
 import { contentValueTypes } from "@/domain/content-classification";
@@ -16,10 +16,7 @@ export default async function Page({
 }: {
   searchParams: Promise<Record<string, string | string[] | undefined>>;
 }) {
-  const [session, params] = await Promise.all([
-    requireRoles(["content_admin", "reviewer", "super_admin"]),
-    searchParams,
-  ]);
+  const [session, params] = await Promise.all([requirePermission("content.view"), searchParams]);
   const readParam = (key: string) => {
     const value = params[key];
     return Array.isArray(value) ? value[0] : value;

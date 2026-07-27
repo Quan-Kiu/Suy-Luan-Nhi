@@ -1,7 +1,17 @@
 import { describe, expect, it } from "vitest";
-import { isActiveBan, requiresStaffMfa, requiresStaffMfaChallenge } from "@/auth/access-policy";
+import {
+  isActiveBan,
+  isDeletedAccount,
+  requiresStaffMfa,
+  requiresStaffMfaChallenge,
+} from "@/auth/access-policy";
 
 describe("auth access policy", () => {
+  it("recognizes accounts moved to trash", () => {
+    expect(isDeletedAccount({ deletedAt: "2026-07-27T00:00:00.000Z" })).toBe(true);
+    expect(isDeletedAccount({ deletedAt: null })).toBe(false);
+  });
+
   it("treats permanent and future bans as active", () => {
     expect(isActiveBan({ banned: true, banExpires: null })).toBe(true);
     expect(

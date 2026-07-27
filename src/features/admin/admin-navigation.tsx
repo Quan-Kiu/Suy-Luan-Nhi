@@ -15,19 +15,13 @@ import {
   Settings,
   ShieldCheck,
   Tags,
-  Users,
 } from "lucide-react";
 import Link from "next/link";
-import type { AppRole } from "@/auth/roles";
+import { hasPermission, type PermissionKey } from "@/auth/permissions";
 import { contentText } from "@/content/resolve";
 import type { ContentDictionary } from "@/content/types";
-import { getPrimaryRole } from "@/features/admin/admin-role";
 import { cn } from "@/lib/utils";
 
-const allStaff: AppRole[] = ["content_admin", "reviewer", "super_admin"];
-const editors: AppRole[] = ["content_admin", "super_admin"];
-const reviewers: AppRole[] = ["reviewer", "super_admin"];
-const superAdmins: AppRole[] = ["super_admin"];
 const navGroups = [
   {
     labelKey: "navGroup.primary",
@@ -38,7 +32,7 @@ const navGroups = [
         labelKey: "nav.dashboard",
         fallback: "Tổng quan",
         icon: Gauge,
-        roles: allStaff,
+        permission: "admin.dashboard.view",
         exact: true,
       },
       {
@@ -46,21 +40,21 @@ const navGroups = [
         labelKey: "nav.parentArea",
         fallback: "Khu vực phụ huynh",
         icon: House,
-        roles: superAdmins,
+        permission: "parent_access.use",
       },
       {
         href: "/admin/missions",
         labelKey: "nav.missions",
         fallback: "Nhiệm vụ",
         icon: FileText,
-        roles: allStaff,
+        permission: "missions.view",
       },
       {
         href: "/admin/reviews",
         labelKey: "nav.reviews",
         fallback: "Duyệt nội dung",
         icon: ClipboardCheck,
-        roles: reviewers,
+        permission: "missions.review",
       },
     ],
   },
@@ -73,49 +67,49 @@ const navGroups = [
         labelKey: "nav.resources",
         fallback: "Gợi ý cho phụ huynh",
         icon: BookOpen,
-        roles: allStaff,
+        permission: "resources.view",
       },
       {
         href: "/admin/media",
         labelKey: "nav.media",
         fallback: "Thư viện",
         icon: ImageIcon,
-        roles: allStaff,
+        permission: "media.view",
       },
       {
         href: "/admin/content",
         labelKey: "nav.content",
         fallback: "Nội dung hiển thị",
         icon: Languages,
-        roles: allStaff,
+        permission: "content.view",
       },
       {
         href: "/admin/content-variables",
         labelKey: "nav.contentVariables",
         fallback: "Từ điển",
         icon: Braces,
-        roles: superAdmins,
+        permission: "content_variables.manage",
       },
       {
         href: "/admin/worlds",
         labelKey: "nav.worlds",
         fallback: "Chủ đề nhiệm vụ",
         icon: Layers3,
-        roles: editors,
+        permission: "worlds.manage",
       },
       {
         href: "/admin/badges",
         labelKey: "nav.badges",
         fallback: "Huy hiệu",
         icon: Award,
-        roles: editors,
+        permission: "badges.manage",
       },
       {
         href: "/admin/taxonomy",
         labelKey: "nav.taxonomy",
         fallback: "Nhóm tuổi & kỹ năng",
         icon: Tags,
-        roles: editors,
+        permission: "taxonomy.manage",
       },
     ],
   },
@@ -128,46 +122,57 @@ const navGroups = [
         labelKey: "nav.feedback",
         fallback: "Góp ý hệ thống",
         icon: MessageSquareText,
-        roles: allStaff,
+        permission: "feedback.view",
       },
       {
         href: "/admin/reports",
         labelKey: "nav.reports",
         fallback: "Tình hình sử dụng",
         icon: BarChart3,
-        roles: allStaff,
+        permission: "reports.view",
       },
       {
-        href: "/admin/members",
+        href: "/admin/access-control",
         labelKey: "nav.members",
-        fallback: "Thành viên & quyền",
-        icon: Users,
-        roles: superAdmins,
+        fallback: "Vai trò & thành viên",
+        icon: ShieldCheck,
+        permission: "access_control.view",
       },
       {
         href: "/admin/data-requests",
         labelKey: "nav.dataRequests",
         fallback: "Yêu cầu dữ liệu",
         icon: ShieldCheck,
-        roles: superAdmins,
+        permission: "data_requests.manage",
       },
       {
         href: "/admin/audit",
         labelKey: "nav.audit",
         fallback: "Lịch sử thay đổi",
         icon: Database,
-        roles: allStaff,
+        permission: "audit.view",
       },
       {
         href: "/admin/settings",
         labelKey: "nav.settings",
         fallback: "Cấu hình hệ thống",
         icon: Settings,
-        roles: superAdmins,
+        permission: "settings.manage",
       },
     ],
   },
-] as const;
+] as const satisfies ReadonlyArray<{
+  labelKey: string;
+  fallback: string;
+  items: ReadonlyArray<{
+    href: string;
+    labelKey: string;
+    fallback: string;
+    icon: typeof Gauge;
+    permission: PermissionKey;
+    exact?: boolean;
+  }>;
+}>;
 
 type Props = {
   pathname: string;
@@ -178,13 +183,11 @@ type Props = {
 };
 
 export function AdminNavigation({ pathname, role, content, onNavigate, ariaLabel }: Props) {
-  const primaryRole = getPrimaryRole(role);
   return (
     <nav aria-label={ariaLabel} className="space-y-4 pb-4">
       {navGroups.map((group) => {
-        const visibleItems = group.items.filter((item) => item.roles.includes(primaryRole));
+        const visibleItems = group.items.filter((item) => hasPermission(role, item.permission));
         if (!visibleItems.length) return null;
-
         return (
           <section key={group.labelKey}>
             <p className="type-overline mb-1.5 px-3 text-[#756b60]">
@@ -218,7 +221,6 @@ export function AdminNavigation({ pathname, role, content, onNavigate, ariaLabel
           </section>
         );
       })}
-
       <details className="type-caption rounded-xl bg-[#edf4df] text-[#587048]">
         <summary className="flex min-h-10 cursor-pointer list-none items-center gap-2 px-3 py-2 font-black marker:hidden">
           <ShieldCheck size={16} />

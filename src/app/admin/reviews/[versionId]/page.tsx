@@ -3,7 +3,7 @@ import { eq } from "drizzle-orm";
 import { ArrowLeft, ClipboardCheck } from "lucide-react";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { requireRoles } from "@/auth/session";
+import { requirePermission } from "@/auth/session";
 import { friendlyLabel, questionTypeLabels, safetyChecklistLabels } from "@/features/admin/admin-labels";
 import { AdminPageHeader } from "@/features/admin/admin-page-header";
 import { AdminQuestionPreview } from "@/features/admin/admin-question-preview";
@@ -19,7 +19,7 @@ export const metadata: Metadata = {
 };
 
 export default async function Page({ params }: { params: Promise<{ versionId: string }> }) {
-  await requireRoles(["reviewer", "super_admin"]);
+  await requirePermission("missions.review");
   const { versionId } = await params;
   const rows = await db
     .select({ version: missionVersions, mission: missions })

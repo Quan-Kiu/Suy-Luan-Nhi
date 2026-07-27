@@ -1,4 +1,4 @@
-import { requireApiRoles } from "@/auth/api";
+import { requireApiPermission } from "@/auth/api";
 import { apiJson } from "@/lib/api-response";
 import { invalidateAdminMissionViews } from "@/lib/cache/invalidation";
 import { submitMissionForReview } from "@/modules/admin/mission-admin";
@@ -7,7 +7,7 @@ export async function POST(
   request: Request,
   { params }: { params: Promise<{ missionId: string }> },
 ): Promise<Response> {
-  const authResult = await requireApiRoles(request, ["content_admin", "super_admin"]);
+  const authResult = await requireApiPermission(request, "missions.manage");
   if ("error" in authResult) {
     return (
       authResult.error ??

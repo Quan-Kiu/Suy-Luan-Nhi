@@ -169,6 +169,13 @@
       "when": 1784962542902,
       "tag": "0023_admin_account_reset",
       "breakpoints": true
+    },
+    {
+      "idx": 24,
+      "version": "7",
+      "when": 1785151343938,
+      "tag": "0024_access_control_member_trash",
+      "breakpoints": true
     }
   ]
 }

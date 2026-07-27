@@ -1,10 +1,10 @@
-import { requireApiRoles } from "@/auth/api";
+import { requireApiPermission } from "@/auth/api";
 import { apiJson } from "@/lib/api-response";
 import { updateSystemFeedbackSchema } from "@/domain/system-feedback";
 import { updateSystemFeedback } from "@/modules/system-feedback/system-feedback";
 
 export async function PATCH(request: Request, context: { params: Promise<{ feedbackId: string }> }) {
-  const authResult = await requireApiRoles(request, ["content_admin", "reviewer", "super_admin"]);
+  const authResult = await requireApiPermission(request, "feedback.manage");
   if ("error" in authResult) return authResult.error;
   const parsed = updateSystemFeedbackSchema.safeParse(await request.json());
   if (!parsed.success) {

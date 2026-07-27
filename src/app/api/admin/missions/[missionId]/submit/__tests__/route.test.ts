@@ -1,10 +1,10 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import { requireApiRoles } from "@/auth/api";
+import { requireApiPermission } from "@/auth/api";
 import { invalidateAdminMissionViews } from "@/lib/cache/invalidation";
 import { submitMissionForReview } from "@/modules/admin/mission-admin";
 import { POST } from "../route";
 
-vi.mock("@/auth/api", () => ({ requireApiRoles: vi.fn() }));
+vi.mock("@/auth/api", () => ({ requireApiPermission: vi.fn() }));
 vi.mock("@/lib/cache/invalidation", () => ({ invalidateAdminMissionViews: vi.fn() }));
 vi.mock("@/modules/admin/mission-admin", () => ({ submitMissionForReview: vi.fn() }));
 
@@ -16,9 +16,9 @@ const request = new Request(`http://localhost/api/admin/missions/${missionId}/su
 describe("POST /api/admin/missions/[missionId]/submit", () => {
   beforeEach(() => {
     vi.clearAllMocks();
-    vi.mocked(requireApiRoles).mockResolvedValue({
+    vi.mocked(requireApiPermission).mockResolvedValue({
       session: { user: { id: "actor-1" } },
-    } as Awaited<ReturnType<typeof requireApiRoles>>);
+    } as Awaited<ReturnType<typeof requireApiPermission>>);
   });
 
   it("returns a review-required error when referenced media is not approved", async () => {

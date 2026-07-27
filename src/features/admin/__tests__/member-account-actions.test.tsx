@@ -31,6 +31,9 @@ const baseItem: MemberItem = {
   accountProviders: ["credential"],
   parentProfileId: "parent-profile-1",
   mustChangePassword: false,
+  deletedAt: null,
+  deletedBy: null,
+  deletionReason: null,
 };
 
 beforeAll(() => {

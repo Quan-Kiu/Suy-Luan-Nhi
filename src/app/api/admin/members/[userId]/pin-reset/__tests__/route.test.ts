@@ -1,5 +1,5 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import { requireApiRoles } from "@/auth/api";
+import { requireApiPermission } from "@/auth/api";
 import {
   AdminAccountResetError,
   auditAdminAccountResetFailure,
@@ -7,7 +7,7 @@ import {
 } from "@/modules/admin/account-reset";
 import { POST } from "../route";
 
-vi.mock("@/auth/api", () => ({ requireApiRoles: vi.fn() }));
+vi.mock("@/auth/api", () => ({ requireApiPermission: vi.fn() }));
 vi.mock("@/modules/admin/account-reset", async (importOriginal) => {
   const actual = await importOriginal<typeof import("@/modules/admin/account-reset")>();
   return {
@@ -30,9 +30,9 @@ describe("POST /api/admin/members/[userId]/pin-reset", () => {
   beforeEach(() => {
     vi.clearAllMocks();
     vi.mocked(auditAdminAccountResetFailure).mockResolvedValue(undefined);
-    vi.mocked(requireApiRoles).mockResolvedValue({
+    vi.mocked(requireApiPermission).mockResolvedValue({
       session: { user: { id: "actor-user" } },
-    } as Awaited<ReturnType<typeof requireApiRoles>>);
+    } as Awaited<ReturnType<typeof requireApiPermission>>);
     vi.mocked(resetMemberParentPin).mockResolvedValue({ accepted: true, duplicate: false, mode: "clear" });
   });
 

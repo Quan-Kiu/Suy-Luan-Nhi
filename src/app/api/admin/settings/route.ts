@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { requireApiRoles } from "@/auth/api";
+import { requireApiPermission } from "@/auth/api";
 import { CONTENT_VARIABLES_SETTING_KEY, contentVariableDefinitionsSchema } from "@/domain/content-variables";
 import { imageUploadPoliciesSchema, mediaUploadPolicySettingKey } from "@/domain/media-upload-policy";
 import { getManagedSystemSettingDefinition, parseManagedSystemSetting } from "@/domain/system-settings";
@@ -10,7 +10,7 @@ import { setSystemSetting } from "@/modules/admin/operations";
 const schema = z.object({ key: z.string().regex(/^[A-Za-z0-9_.-]+$/), value: z.unknown() });
 
 export async function PATCH(request: Request) {
-  const authResult = await requireApiRoles(request, ["super_admin"]);
+  const authResult = await requireApiPermission(request, "settings.manage");
   if ("error" in authResult) return authResult.error;
 
   const input = schema.safeParse(await request.json().catch(() => null));

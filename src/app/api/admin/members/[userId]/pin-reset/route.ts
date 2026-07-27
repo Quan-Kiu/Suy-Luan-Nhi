@@ -1,4 +1,4 @@
-import { requireApiRoles } from "@/auth/api";
+import { requireApiPermission } from "@/auth/api";
 import { adminParentPinResetSchema } from "@/domain/admin-account-reset";
 import { apiJson } from "@/lib/api-response";
 import {
@@ -21,7 +21,7 @@ function errorStatus(error: AdminAccountResetError) {
 }
 
 export async function POST(request: Request, { params }: { params: Promise<{ userId: string }> }) {
-  const authResult = await requireApiRoles(request, ["super_admin"]);
+  const authResult = await requireApiPermission(request, "members.manage");
   if ("error" in authResult) return authResult.error;
 
   const context = requestContext(request);
