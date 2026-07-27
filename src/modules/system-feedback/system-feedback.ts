@@ -28,6 +28,10 @@ export async function listSystemFeedback(filters: SystemFeedbackListFilters = {}
         pagePath: systemFeedback.pagePath,
         pageTitle: systemFeedback.pageTitle,
         context: systemFeedback.context,
+        fingerprint: systemFeedback.fingerprint,
+        occurrenceCount: systemFeedback.occurrenceCount,
+        firstSeenAt: systemFeedback.firstSeenAt,
+        lastSeenAt: systemFeedback.lastSeenAt,
         status: systemFeedback.status,
         adminNote: systemFeedback.adminNote,
         handledBy: systemFeedback.handledBy,
@@ -89,6 +93,85 @@ export async function listSystemFeedback(filters: SystemFeedbackListFilters = {}
     pageSize,
     totalPages: Math.max(1, Math.ceil(total / pageSize)),
   };
+}
+
+export async function createOrAggregateAutomaticFeedback(input: {
+  fingerprint: string;
+  userId: string;
+  content: string;
+  pagePath: string;
+  pageTitle?: string;
+  context: Record<string, unknown>;
+}) {
+  const outcome = await db.transaction(async (tx) => {
+    await tx.execute(
+      sql`select pg_advisory_xact_lock(hashtext(${`sln:automatic-feedback:${input.fingerprint}`}))`,
+    );
+    const current = await tx.query.systemFeedback.findFirst({
+      where: eq(systemFeedback.fingerprint, input.fingerprint),
+    });
+    const now = new Date();
+    if (!current) {
+      const [created] = await tx
+        .insert(systemFeedback)
+        .values({
+          userId: input.userId,
+          content: input.content.trim(),
+          pagePath: input.pagePath,
+          pageTitle: input.pageTitle?.trim() || null,
+          context: input.context,
+          fingerprint: input.fingerprint,
+          occurrenceCount: 1,
+          firstSeenAt: now,
+          lastSeenAt: now,
+        })
+        .returning({ id: systemFeedback.id });
+      await tx.insert(auditLogs).values({
+        actorId: input.userId,
+        action: "system_feedback.automatic_created",
+        resourceType: "system_feedback",
+        resourceId: created.id,
+        metadata: { fingerprint: input.fingerprint.slice(0, 12), occurrenceCount: 1 },
+      });
+      return { id: created.id, duplicate: false, reopened: false };
+    }
+
+    const reopenAfterMs = 30 * 60 * 1000;
+    const finalStatus = current.status === "resolved" || current.status === "dismissed";
+    const reopened = finalStatus && now.getTime() - current.lastSeenAt.getTime() >= reopenAfterMs;
+    const [updated] = await tx
+      .update(systemFeedback)
+      .set({
+        userId: input.userId,
+        content: input.content.trim(),
+        pagePath: input.pagePath,
+        pageTitle: input.pageTitle?.trim() || null,
+        context: input.context,
+        occurrenceCount: sql`${systemFeedback.occurrenceCount} + 1`,
+        lastSeenAt: now,
+        updatedAt: now,
+        status: reopened ? "new" : current.status,
+        handledBy: reopened ? null : current.handledBy,
+        handledAt: reopened ? null : current.handledAt,
+      })
+      .where(eq(systemFeedback.id, current.id))
+      .returning({ id: systemFeedback.id, occurrenceCount: systemFeedback.occurrenceCount });
+    await tx.insert(auditLogs).values({
+      actorId: input.userId,
+      action: "system_feedback.automatic_aggregated",
+      resourceType: "system_feedback",
+      resourceId: current.id,
+      metadata: {
+        fingerprint: input.fingerprint.slice(0, 12),
+        occurrenceCount: updated.occurrenceCount,
+        reopened,
+      },
+    });
+    return { id: current.id, duplicate: true, reopened };
+  });
+
+  const result = await listSystemFeedback({ id: outcome.id, pageSize: 10 });
+  return { ...outcome, item: result.items[0] };
 }
 
 export async function createSystemFeedback(input: {

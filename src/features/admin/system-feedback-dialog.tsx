@@ -8,6 +8,7 @@ import {
   ImageIcon,
   LoaderCircle,
   MonitorSmartphone,
+  Repeat2,
   UserRound,
   X,
 } from "lucide-react";
@@ -123,6 +124,12 @@ function FeedbackDialogPanel({
               <span className="type-caption inline-flex items-center gap-1 font-bold text-[#786d60]">
                 <CalendarClock size={14} aria-hidden="true" /> {formatFeedbackTime(item.createdAt)}
               </span>
+              {item.occurrenceCount > 1 ? (
+                <span className="type-caption inline-flex items-center gap-1 rounded-full border border-violet-200 bg-violet-50 px-2.5 py-1 font-black text-violet-800">
+                  <Repeat2 size={14} aria-hidden="true" /> {item.occurrenceCount} lần · gần nhất{" "}
+                  {formatFeedbackTime(item.lastSeenAt)}
+                </span>
+              ) : null}
             </div>
             <h2 id={titleId} className="type-section-title mt-2 text-[#342f28]">
               {automaticContext

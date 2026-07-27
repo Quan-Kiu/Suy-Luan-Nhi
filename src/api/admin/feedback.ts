@@ -8,6 +8,10 @@ export type SystemFeedbackItem = {
   pagePath: string;
   pageTitle: string | null;
   context: Record<string, unknown>;
+  fingerprint: string | null;
+  occurrenceCount: number;
+  firstSeenAt: string;
+  lastSeenAt: string;
   status: SystemFeedbackStatus;
   adminNote: string | null;
   handledBy: string | null;

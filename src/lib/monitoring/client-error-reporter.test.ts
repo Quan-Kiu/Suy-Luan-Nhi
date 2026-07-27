@@ -1,9 +1,11 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import {
   addErrorBreadcrumb,
+  markClientErrorAsReported,
   reportApiFailure,
   reportClientError,
   setClientErrorReportingConsent,
+  wasClientErrorReported,
 } from "@/lib/monitoring/client-error-reporter";
 
 const runtimeKey = "__slnAutomaticErrorReportingRuntime";
@@ -14,6 +16,7 @@ function resetRuntime() {
 
 beforeEach(() => {
   resetRuntime();
+  window.localStorage.clear();
   vi.stubGlobal(
     "fetch",
     vi.fn(async () => new Response(JSON.stringify({ success: true }), { status: 201 })),
@@ -85,5 +88,20 @@ describe("client error reporter", () => {
     expect(payload.source).toBe("api_failure");
     expect(payload.error.details.path).toBe("/api/children");
     expect(payload.error.details.status).toBe(500);
+  });
+
+  it("deduplicates repeated API failures even when request IDs change", async () => {
+    setClientErrorReportingConsent(true);
+    reportApiFailure({ method: "PATCH", url: "/api/parent/settings", status: 500, requestId: "req-a" });
+    reportApiFailure({ method: "PATCH", url: "/api/parent/settings", status: 500, requestId: "req-b" });
+
+    await vi.waitFor(() => expect(fetch).toHaveBeenCalledTimes(1));
+  });
+
+  it("marks normalized API errors so unhandled rejection capture does not report them twice", () => {
+    const error = new Error("request failed");
+    expect(wasClientErrorReported(error)).toBe(false);
+    markClientErrorAsReported(error);
+    expect(wasClientErrorReported(error)).toBe(true);
   });
 });

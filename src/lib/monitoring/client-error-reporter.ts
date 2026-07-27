@@ -11,7 +11,9 @@ const consentEventName = "sln:error-reporting-consent";
 const reportEndpoint = "/api/error-reports";
 const maxBreadcrumbs = 20;
 const maxPendingReports = 3;
-const dedupeWindowMs = 15_000;
+const dedupeWindowMs = 5 * 60_000;
+const dedupeStorageKey = "sln:automatic-error-fingerprints";
+const reportedErrors = new WeakSet<object>();
 
 type ConsentState = "unknown" | "granted" | "denied";
 
@@ -82,29 +84,82 @@ export function addErrorBreadcrumb(
   }
 }
 
+export function markClientErrorAsReported(error: unknown) {
+  if ((typeof error === "object" && error !== null) || typeof error === "function") {
+    reportedErrors.add(error as object);
+  }
+}
+
+export function wasClientErrorReported(error: unknown) {
+  return (typeof error === "object" && error !== null) || typeof error === "function"
+    ? reportedErrors.has(error as object)
+    : false;
+}
+
 function reportFingerprint(report: AutomaticErrorReportInput) {
+  const details = report.error.details;
   return [
-    report.source,
     report.pagePath,
     report.error.name,
     report.error.message,
-    report.error.details.requestId,
+    report.error.digest,
+    details.method,
+    details.path,
+    details.status,
+    details.code,
   ]
-    .filter(Boolean)
-    .join("|");
+    .filter((value) => value !== undefined && value !== null && value !== "")
+    .join("|")
+    .toLowerCase();
+}
+
+function fingerprintHash(value: string) {
+  let hash = 2166136261;
+  for (let index = 0; index < value.length; index += 1) {
+    hash ^= value.charCodeAt(index);
+    hash = Math.imul(hash, 16777619);
+  }
+  return (hash >>> 0).toString(16);
+}
+
+function readPersistedFingerprints() {
+  if (typeof window === "undefined") return {} as Record<string, number>;
+  try {
+    const parsed = JSON.parse(window.localStorage.getItem(dedupeStorageKey) ?? "{}") as unknown;
+    if (!parsed || typeof parsed !== "object" || Array.isArray(parsed)) return {};
+    return Object.fromEntries(
+      Object.entries(parsed).filter((entry): entry is [string, number] => typeof entry[1] === "number"),
+    );
+  } catch {
+    return {};
+  }
+}
+
+function persistFingerprints(values: Record<string, number>) {
+  if (typeof window === "undefined") return;
+  try {
+    window.localStorage.setItem(dedupeStorageKey, JSON.stringify(values));
+  } catch {
+    // Storage may be unavailable in private browsing; in-memory dedupe remains active.
+  }
 }
 
 function shouldSendReport(report: AutomaticErrorReportInput) {
   const runtime = getRuntime();
   const now = Date.now();
-  const fingerprint = reportFingerprint(report);
-  const previous = runtime.recentFingerprints.get(fingerprint) ?? 0;
+  const fingerprint = fingerprintHash(reportFingerprint(report));
+  const persisted = readPersistedFingerprints();
+  const previous = Math.max(runtime.recentFingerprints.get(fingerprint) ?? 0, persisted[fingerprint] ?? 0);
   runtime.recentFingerprints.set(fingerprint, now);
+  persisted[fingerprint] = now;
 
   for (const [key, timestamp] of runtime.recentFingerprints) {
     if (now - timestamp > dedupeWindowMs * 4) runtime.recentFingerprints.delete(key);
   }
-
+  for (const [key, timestamp] of Object.entries(persisted)) {
+    if (now - timestamp > dedupeWindowMs * 4) delete persisted[key];
+  }
+  persistFingerprints(persisted);
   return now - previous > dedupeWindowMs;
 }
 
@@ -144,6 +199,7 @@ export function setClientErrorReportingConsent(enabled: boolean) {
     runtime.pendingReports = [];
     runtime.breadcrumbs = [];
     runtime.recentFingerprints.clear();
+    if (typeof window !== "undefined") window.localStorage.removeItem(dedupeStorageKey);
   } else {
     if (previousConsent === "denied") runtime.breadcrumbs = [];
     flushPendingReports();
@@ -312,6 +368,7 @@ function handleWindowError(event: ErrorEvent) {
 }
 
 function handleUnhandledRejection(event: PromiseRejectionEvent) {
+  if (wasClientErrorReported(event.reason)) return;
   reportClientError(event.reason, { source: "unhandled_rejection" });
 }
 

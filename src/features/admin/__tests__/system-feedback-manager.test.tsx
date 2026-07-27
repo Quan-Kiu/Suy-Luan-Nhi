@@ -18,6 +18,10 @@ function makeFeedback(id: string, overrides: Partial<SystemFeedbackItem> = {}): 
     pagePath: "/missions/demo",
     pageTitle: `Nhiệm vụ ${id}`,
     context: { viewportWidth: 390, viewportHeight: 844, captureMode: "auto" },
+    fingerprint: null,
+    occurrenceCount: 1,
+    firstSeenAt: "2026-07-21T10:00:00.000Z",
+    lastSeenAt: "2026-07-21T10:00:00.000Z",
     status: "new",
     adminNote: null,
     handledBy: null,
@@ -91,6 +95,27 @@ describe("SystemFeedbackManager", () => {
     expect(screen.getByTestId("feedback-column-scroll-new")).toHaveClass("overflow-y-auto");
     expect(screen.getByRole("article", { name: "Góp ý: Nhiệm vụ demo" })).toBeVisible();
     expect(screen.getByRole("button", { name: "Kéo góp ý Nhiệm vụ demo" })).toBeEnabled();
+  });
+
+  it("shows the aggregated occurrence count for repeated automatic errors", () => {
+    renderManager({
+      ...initialData,
+      new: page([
+        makeFeedback("feedback-repeat", {
+          pageTitle: "Báo cáo lỗi tự động",
+          occurrenceCount: 12,
+          lastSeenAt: "2026-07-27T10:30:00.000Z",
+          context: {
+            reportKind: "automatic_error",
+            source: "window_error",
+            error: { name: "Error", message: "Render failed", details: {} },
+            breadcrumbs: [],
+          },
+        }),
+      ]),
+    });
+
+    expect(screen.getByText("×12 lần")).toBeVisible();
   });
 
   it("loads the next page only for the column that reaches its end", async () => {

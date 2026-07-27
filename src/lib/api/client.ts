@@ -2,7 +2,11 @@ import axios, { AxiosError, type AxiosRequestConfig } from "axios";
 import { ApiRequestError } from "@/lib/api/error";
 import { isApiEnvelope, unwrapApiEnvelope } from "@/lib/api/envelope";
 import { redirectToSignInAfterUnauthorized } from "@/lib/api/unauthorized-redirect";
-import { addErrorBreadcrumb, reportApiFailure } from "@/lib/monitoring/client-error-reporter";
+import {
+  addErrorBreadcrumb,
+  markClientErrorAsReported,
+  reportApiFailure,
+} from "@/lib/monitoring/client-error-reporter";
 import { sanitizeRoutePath } from "@/domain/error-reporting";
 
 export const apiClient = axios.create({
@@ -39,27 +43,24 @@ apiClient.interceptors.response.use(
       requestId,
     });
     redirectToSignInAfterUnauthorized(status);
-    if (isApiEnvelope(body) && !body.success) {
-      return Promise.reject(
-        new ApiRequestError(
-          body.error.message,
-          body.error.code,
-          body.meta.requestId,
-          body.error.details,
-          status,
-        ),
-      );
-    }
-
-    return Promise.reject(
-      new ApiRequestError(
-        error.code === "ECONNABORTED" ? "Yêu cầu mất quá nhiều thời gian" : "Không thể kết nối máy chủ",
-        error.code ?? "NETWORK_ERROR",
-        error.response?.headers?.["x-request-id"],
-        body,
-        status,
-      ),
-    );
+    const normalizedError =
+      isApiEnvelope(body) && !body.success
+        ? new ApiRequestError(
+            body.error.message,
+            body.error.code,
+            body.meta.requestId,
+            body.error.details,
+            status,
+          )
+        : new ApiRequestError(
+            error.code === "ECONNABORTED" ? "Yêu cầu mất quá nhiều thời gian" : "Không thể kết nối máy chủ",
+            error.code ?? "NETWORK_ERROR",
+            error.response?.headers?.["x-request-id"],
+            body,
+            status,
+          );
+    markClientErrorAsReported(normalizedError);
+    return Promise.reject(normalizedError);
   },
 );
 
