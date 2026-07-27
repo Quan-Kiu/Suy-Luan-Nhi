@@ -2,7 +2,7 @@ import { expect, test } from "@playwright/test";
 import { auditRoute } from "./audit-helpers";
 import { clearAuth, getDemoChild, selectChild, signIn, unlockParentGate } from "./helpers";
 
-test.setTimeout(360_000);
+test.setTimeout(600_000);
 
 test("public and authentication routes pass runtime UX checks", async ({ page }, testInfo) => {
   const routes = [

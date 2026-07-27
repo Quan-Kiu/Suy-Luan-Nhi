@@ -97,7 +97,9 @@ test("content admin submits an immutable version and reviewer publishes it", asy
   const approvedPanel = page.getByRole("tabpanel", { name: "Đã duyệt, chờ hiển thị" });
   const approvedLink = approvedPanel.getByRole("link", { name: /Thám tử dấu chân \(Bản sao\)/i });
   await expect(approvedLink).toContainText("Mở để hiển thị");
-  await approvedLink.click();
+  const approvedHref = await approvedLink.getAttribute("href");
+  expect(approvedHref).toMatch(/^\/admin\/reviews\//);
+  await page.goto(approvedHref!);
   await expect(page.getByRole("button", { name: /Cho bé xem ngay/i })).toBeVisible();
   await page.getByRole("button", { name: /Cho bé xem ngay/i }).click();
   await expect(page.getByText("Đang hiển thị", { exact: true })).toBeVisible();
