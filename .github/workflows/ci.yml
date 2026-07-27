@@ -61,4 +61,9 @@ jobs:
         env:
           E2E_SERVER_MODE: production
         run: npm run test:e2e
+      - name: Run staff MFA end-to-end test
+        env:
+          E2E_SERVER_MODE: production
+          E2E_AUTH_STAFF_MFA_REQUIRED: "true"
+        run: npx playwright test e2e/google-admin-mfa.desktop.spec.ts --project=desktop-chromium --workers=1
       - run: npm audit --audit-level=high

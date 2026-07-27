@@ -32,7 +32,7 @@ test("Kenney sounds follow gameplay events", async ({ page }) => {
   await apiData(await page.request.post(`/api/children/${child.id}/reset-progress`));
 
   await page.goto("/missions");
-  await page.getByRole("button", { name: /Nhịp đèn lồng\. Nhiệm vụ chưa mở/ }).click();
+  await page.getByRole("button", { name: /Nhịp đèn lồng\. Nhiệm vụ (?:này )?chưa mở/ }).click();
   await expectSound(page, "mission-locked.ogg");
 
   await page.getByRole("link", { name: /Thám tử dấu chân/i }).click();
@@ -72,7 +72,7 @@ test("disabling sound in parent settings prevents playback", async ({ page }) =>
   await apiData(await page.request.post(`/api/children/${child.id}/reset-progress`));
 
   await page.goto("/parent/settings");
-  const soundToggle = page.getByLabel("Âm thanh tương tác");
+  const soundToggle = page.getByLabel("Âm thanh khi bấm và trả lời");
   await soundToggle.uncheck();
   const saveResponse = page.waitForResponse(
     (response) => response.request().method() === "PATCH" && response.url().endsWith("/api/parent/settings"),
@@ -80,16 +80,20 @@ test("disabling sound in parent settings prevents playback", async ({ page }) =>
   await page.getByRole("button", { name: "Lưu cài đặt" }).click();
   const savedEnvelope = (await (await saveResponse).json()) as {
     success: boolean;
-    data: { soundEnabled: boolean };
+    data: { updated: boolean };
   };
-  expect(savedEnvelope.success).toBe(true);
-  expect(savedEnvelope.data.soundEnabled).toBe(false);
+  expect(savedEnvelope).toMatchObject({ success: true, data: { updated: true } });
   await expect(page.getByText("Đã lưu cài đặt", { exact: true })).toBeVisible();
   await page.reload();
-  await expect(page.getByLabel("Âm thanh tương tác")).not.toBeChecked();
+  await expect(page.getByLabel("Âm thanh khi bấm và trả lời")).not.toBeChecked();
 
   await page.goto("/missions");
-  await page.getByRole("button", { name: /Nhịp đèn lồng\. Nhiệm vụ chưa mở/ }).click();
-  await expect(page.getByText("Nhiệm vụ chưa mở", { exact: true })).toBeVisible();
+  await page.getByRole("button", { name: /Nhịp đèn lồng\. Nhiệm vụ (?:này )?chưa mở/ }).click();
+  await expect(page.getByText("Nhiệm vụ này chưa mở", { exact: true })).toBeVisible();
   expect(await playedSounds(page)).toEqual([]);
+
+  const restoreResponse = await page.request.patch("/api/parent/settings", {
+    data: { effectsEnabled: true },
+  });
+  expect(restoreResponse.ok()).toBe(true);
 });

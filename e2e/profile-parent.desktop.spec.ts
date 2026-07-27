@@ -1,7 +1,22 @@
 import { expect, test } from "@playwright/test";
+import { Pool } from "pg";
 import { apiData, demoParentPin, getDemoChild, selectChild, signIn, unlockParentGate } from "./helpers";
 
 test.describe.configure({ mode: "serial" });
+
+const databaseUrl = process.env.E2E_DATABASE_URL ?? "postgresql://sln@127.0.0.1:54329/sln_e2e";
+const pool = new Pool({ connectionString: databaseUrl });
+let createdUserId: string | null = null;
+
+test.afterEach(async () => {
+  if (!createdUserId) return;
+  await pool.query('DELETE FROM "user" WHERE "id" = $1', [createdUserId]);
+  createdUserId = null;
+});
+
+test.afterAll(async () => {
+  await pool.end();
+});
 
 test("locked parent gate always allows signing out to another account", async ({ page }) => {
   await signIn(page, "parent@demo.local");
@@ -130,10 +145,23 @@ test("parent gate rejects a wrong PIN and exports family data", async ({ page })
 });
 
 test("parent without a PIN creates the first profile and sees it immediately", async ({ page }) => {
+  const email = `first-profile-${Date.now()}@example.com`;
+  const password = "LocalProfile-2026!";
+  const signUp = await page.request.post("/api/auth/sign-up/email", {
+    data: { name: "Phụ huynh hồ sơ đầu tiên", email, password },
+  });
+  expect(signUp.ok(), await signUp.text()).toBe(true);
+  const userResult = await pool.query<{ id: string }>(
+    'UPDATE "user" SET "email_verified" = true WHERE "email" = $1 RETURNING "id"',
+    [email],
+  );
+  createdUserId = userResult.rows[0]?.id ?? null;
+  expect(createdUserId).toBeTruthy();
+
   await page.setViewportSize({ width: 412, height: 915 });
   await page.goto("/auth/sign-in?callbackUrl=/profiles");
-  await page.getByLabel("Email").fill("privacy@demo.local");
-  await page.locator('input[name="password"]').fill("LocalDemo-2026!");
+  await page.getByLabel("Email").fill(email);
+  await page.locator('input[name="password"]').fill(password);
   await page.getByRole("button", { name: "Đăng nhập", exact: true }).click();
 
   await expect(page).toHaveURL(/\/auth\/setup-pin\?next=%2Fprofiles/);

@@ -1,7 +1,21 @@
 import { expect, test } from "@playwright/test";
+import { Pool } from "pg";
 import { apiData, getDemoChild, selectChild, signIn, unlockParentGate } from "./helpers";
 
 const password = "LocalDemo-2026!";
+const databaseUrl = process.env.E2E_DATABASE_URL ?? "postgresql://sln@127.0.0.1:54329/sln_e2e";
+const pool = new Pool({ connectionString: databaseUrl });
+let createdUserId: string | null = null;
+
+test.afterEach(async () => {
+  if (!createdUserId) return;
+  await pool.query('DELETE FROM "user" WHERE "id" = $1', [createdUserId]);
+  createdUserId = null;
+});
+
+test.afterAll(async () => {
+  await pool.end();
+});
 
 test("landing page exposes an accessible mobile navigation menu", async ({ page }) => {
   await page.goto("/");
@@ -69,12 +83,22 @@ test("admin logout settles the landing page as a guest even when session refetch
 test("PIN setup uses a fresh mobile document navigation after the security state changes", async ({
   page,
 }) => {
-  await page.goto("/auth/sign-up");
-  await page.getByLabel("Tên ba/mẹ").fill("Phụ huynh Mobile PIN");
-  await page.getByLabel("Email").fill("mobile-pin-navigation@demo.local");
-  await page.locator('input[name="password"]').fill(password);
-  await page.locator('input[name="confirmPassword"]').fill(password);
-  await page.getByRole("button", { name: "Tạo tài khoản ba mẹ" }).click();
+  const email = `mobile-pin-navigation-${Date.now()}@example.com`;
+  const signUp = await page.request.post("/api/auth/sign-up/email", {
+    data: { name: "Phụ huynh Mobile PIN", email, password },
+  });
+  expect(signUp.ok(), await signUp.text()).toBe(true);
+  const userResult = await pool.query<{ id: string }>(
+    'UPDATE "user" SET "email_verified" = true WHERE "email" = $1 RETURNING "id"',
+    [email],
+  );
+  createdUserId = userResult.rows[0]?.id ?? null;
+  expect(createdUserId).toBeTruthy();
+
+  await page.goto("/auth/sign-in?callbackUrl=%2Fonboarding");
+  await page.getByLabel("Email").fill(email);
+  await page.getByRole("textbox", { name: "Mật khẩu", exact: true }).fill(password);
+  await page.getByRole("button", { name: "Đăng nhập", exact: true }).click();
   await page.waitForURL((url) => url.pathname === "/auth/setup-pin");
 
   let staleRouterRequests = 0;
@@ -123,7 +147,10 @@ test("parent can log in, select a child and open the mission map on mobile", asy
   await page.getByRole("button", { name: "Đăng nhập", exact: true }).click();
   await page.waitForURL((url) => url.pathname === "/profiles");
 
-  await page.getByRole("button", { name: "Vào bản đồ", exact: true }).first().click();
+  const profileCard = page
+    .getByRole("heading", { name: "Bống", exact: true })
+    .locator("xpath=ancestor::*[.//button[normalize-space()='Vào bản đồ']][1]");
+  await profileCard.getByRole("button", { name: "Vào bản đồ", exact: true }).click();
   await page.waitForURL(/\/missions$/);
   await expect(page.getByRole("heading", { name: "Bống", exact: true })).toBeVisible();
 

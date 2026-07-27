@@ -13,6 +13,8 @@ const environment = [
   `E2E_DATABASE_URL='${databaseUrl}'`,
   `BETTER_AUTH_URL='${baseURL}'`,
   "BETTER_AUTH_SECRET='e2e-only-secret-with-more-than-thirty-two-characters'",
+  "GOOGLE_CLIENT_ID='e2e-google-client-id'",
+  "GOOGLE_CLIENT_SECRET='e2e-google-client-secret'",
   `AUTH_REQUIRE_EMAIL_VERIFICATION='${production ? "true" : "false"}'`,
   "AUTH_RATE_LIMIT_ENABLED='false'",
   `AUTH_STAFF_MFA_REQUIRED='${process.env.E2E_AUTH_STAFF_MFA_REQUIRED === "true" ? "true" : "false"}'`,

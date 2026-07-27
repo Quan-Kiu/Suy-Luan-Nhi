@@ -1,6 +1,21 @@
 import { expect, test } from "@playwright/test";
+import { Pool } from "pg";
 
 const mailpitUrl = "http://127.0.0.1:8025";
+
+const databaseUrl = process.env.E2E_DATABASE_URL ?? "postgresql://sln@127.0.0.1:54329/sln_e2e";
+const pool = new Pool({ connectionString: databaseUrl });
+let createdUserId: string | null = null;
+
+test.afterEach(async () => {
+  if (!createdUserId) return;
+  await pool.query('DELETE FROM "user" WHERE "id" = $1', [createdUserId]);
+  createdUserId = null;
+});
+
+test.afterAll(async () => {
+  await pool.end();
+});
 
 async function readLatestPinResetUrl(page: import("@playwright/test").Page, email: string) {
   let messageId = "";
@@ -42,8 +57,21 @@ test("parent can reset a forgotten PIN from a one-time email link", async ({ pag
   });
   expect(signUp.ok()).toBe(true);
 
+  const userResult = await pool.query<{ id: string }>(
+    'UPDATE "user" SET "email_verified" = true WHERE "email" = $1 RETURNING "id"',
+    [email],
+  );
+  createdUserId = userResult.rows[0]?.id ?? null;
+  expect(createdUserId).toBeTruthy();
+
+  await page.goto("/auth/sign-in?callbackUrl=%2Fprofiles");
+  await page.getByLabel("Email").fill(email);
+  await page.getByRole("textbox", { name: "Mật khẩu", exact: true }).fill(password);
+  await page.getByRole("button", { name: "Đăng nhập", exact: true }).click();
+  await expect(page).toHaveURL(/\/auth\/setup-pin/);
+
   const setup = await page.request.post("/api/parent/pin", { data: { pin: oldPin } });
-  expect(setup.ok()).toBe(true);
+  expect(setup.ok(), await setup.text()).toBe(true);
   await page.context().clearCookies({ name: "sln_parent_gate" });
 
   await page.goto("/parent");

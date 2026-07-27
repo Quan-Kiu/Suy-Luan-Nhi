@@ -87,9 +87,9 @@ async function auditPage(page: Page, route: AuditRoute, viewport: (typeof allVie
   page.on("console", onConsole);
   page.on("pageerror", onPageError);
 
-  await page.goto(route.path, { waitUntil: "domcontentloaded" });
-  await page.locator("#admin-main-content").waitFor({ state: "visible" });
-  await page.waitForLoadState("networkidle").catch(() => undefined);
+  await page.goto(route.path, { waitUntil: "domcontentloaded", timeout: 30_000 });
+  await page.locator("#admin-main-content").waitFor({ state: "visible", timeout: 15_000 });
+  await page.waitForLoadState("networkidle", { timeout: 3_000 }).catch(() => undefined);
   await page.waitForTimeout(100);
   const main = page.locator("#admin-main-content");
   await main.evaluate((element) => element.scrollTo({ top: 0, behavior: "instant" }));
