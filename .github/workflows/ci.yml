@@ -61,14 +61,41 @@ jobs:
         env:
           E2E_SERVER_MODE: production
         run: npx playwright test --project=desktop-chromium --workers=1
+      - name: Upload desktop E2E failure artifacts
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: desktop-e2e-failure
+          path: |
+            test-results
+            playwright-report
+          if-no-files-found: ignore
       - name: Run mobile Chromium end-to-end tests
         env:
           E2E_SERVER_MODE: production
         run: npx playwright test --project=mobile-chromium --workers=1
+      - name: Upload mobile Chromium E2E failure artifacts
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: mobile-chromium-e2e-failure
+          path: |
+            test-results
+            playwright-report
+          if-no-files-found: ignore
       - name: Run iOS WebKit end-to-end tests
         env:
           E2E_SERVER_MODE: production
         run: npx playwright test --project=mobile-webkit-ios --workers=1
+      - name: Upload iOS WebKit E2E failure artifacts
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: ios-webkit-e2e-failure
+          path: |
+            test-results
+            playwright-report
+          if-no-files-found: ignore
       - name: Run staff MFA end-to-end test
         env:
           E2E_SERVER_MODE: production
