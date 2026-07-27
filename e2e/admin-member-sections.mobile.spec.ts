@@ -46,7 +46,7 @@ test("member tabs and sign-in badges remain clear on mobile", async ({ page }) =
     ["google-reviewer-member-mobile", "google", reviewerAccount!.id],
   );
 
-  await page.goto("/admin/members");
+  await page.goto("/admin/access-control");
 
   const staffTab = page.getByRole("tab", { name: /Ban quản trị/ });
   const parentTab = page.getByRole("tab", { name: /Phụ huynh/ });

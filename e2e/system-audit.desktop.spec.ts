@@ -100,7 +100,7 @@ test("super-admin routes pass runtime UX checks", async ({ page }, testInfo) => 
   await signIn(page, "admin@demo.local", "/admin");
   const routes = [
     ["/admin", "desktop-super-admin-dashboard"],
-    ["/admin/members", "desktop-super-admin-members"],
+    ["/admin/access-control", "desktop-super-admin-access-control"],
     ["/admin/data-requests", "desktop-super-admin-data-requests"],
     ["/admin/settings", "desktop-super-admin-settings"],
     ["/admin/reviews", "desktop-super-admin-reviews"],
