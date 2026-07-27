@@ -1,5 +1,5 @@
 import { apiJson } from "@/lib/api-response";
-import { requireApiRoles } from "@/auth/api";
+import { requireApiPermission } from "@/auth/api";
 import { invalidateParentResources } from "@/lib/cache/invalidation";
 import {
   adminResourceSchema,
@@ -11,7 +11,7 @@ import {
 type Context = { params: Promise<{ resourceId: string }> };
 
 export async function GET(request: Request, context: Context) {
-  const authResult = await requireApiRoles(request, ["content_admin", "reviewer", "super_admin"]);
+  const authResult = await requireApiPermission(request, "resources.view");
   if ("error" in authResult) return authResult.error;
   const { resourceId } = await context.params;
   const resource = await getAdminResource(resourceId);
@@ -19,7 +19,7 @@ export async function GET(request: Request, context: Context) {
 }
 
 export async function PATCH(request: Request, context: Context) {
-  const authResult = await requireApiRoles(request, ["content_admin", "super_admin"]);
+  const authResult = await requireApiPermission(request, "resources.manage");
   if ("error" in authResult) return authResult.error;
   const input = adminResourceSchema.safeParse(await request.json().catch(() => null));
   if (!input.success) {
@@ -43,7 +43,7 @@ export async function PATCH(request: Request, context: Context) {
 }
 
 export async function DELETE(request: Request, context: Context) {
-  const authResult = await requireApiRoles(request, ["content_admin", "super_admin"]);
+  const authResult = await requireApiPermission(request, "resources.manage");
   if ("error" in authResult) return authResult.error;
   const { resourceId } = await context.params;
   const resource = await archiveAdminResource(resourceId, authResult.session.user.id);

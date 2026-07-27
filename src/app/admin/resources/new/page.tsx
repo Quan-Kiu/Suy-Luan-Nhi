@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { BookPlus } from "lucide-react";
-import { requireRoles } from "@/auth/session";
+import { requirePermission } from "@/auth/session";
 import { AdminPageHeader } from "@/features/admin/admin-page-header";
 import { ResourceEditorForm } from "@/features/admin/resource-editor-form";
 
@@ -9,7 +9,7 @@ export const metadata: Metadata = {
 };
 
 export default async function Page() {
-  await requireRoles(["content_admin", "super_admin"]);
+  await requirePermission("resources.manage");
   return (
     <div className="space-y-6">
       <AdminPageHeader

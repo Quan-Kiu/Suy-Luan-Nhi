@@ -1,9 +1,14 @@
-import { and, asc, desc, eq, gte, lt, sql } from "drizzle-orm";
+import { and, asc, desc, eq, gte, inArray, isNotNull, isNull, lt, sql } from "drizzle-orm";
 import { db } from "@/db/client";
 import { ageGroupCodes, type AgeGroup } from "@/domain/age-groups";
 import { missingWorldAgeGroups } from "@/domain/mission-publication";
 import { parseMissionSnapshot } from "@/modules/catalog/snapshot";
-import { assertMemberUpdatePolicy } from "@/modules/admin/member-policy";
+import {
+  assertMemberPermanentDeletePolicy,
+  assertMemberRestorePolicy,
+  assertMemberTrashPolicy,
+  assertMemberUpdatePolicy,
+} from "@/modules/admin/member-policy";
 import { clearOperationalSystemSettingsCache } from "@/modules/system-settings/runtime";
 import {
   ageGroups,
@@ -35,7 +40,10 @@ export async function getAdminDashboard() {
         .select({ status: missions.status, count: sql<number>`count(*)::int` })
         .from(missions)
         .groupBy(missions.status),
-      db.select({ count: sql<number>`count(*)::int` }).from(user),
+      db
+        .select({ count: sql<number>`count(*)::int` })
+        .from(user)
+        .where(isNull(user.deletedAt)),
       db
         .select({ count: sql<number>`count(*)::int` })
         .from(childProfiles)
@@ -111,38 +119,88 @@ export async function getAdminReports() {
   };
 }
 
-export async function listMembers() {
-  const [members, accountProviders] = await Promise.all([
-    db
-      .select({
-        id: user.id,
-        name: user.name,
-        email: user.email,
-        role: user.role,
-        banned: user.banned,
-        twoFactorEnabled: user.twoFactorEnabled,
-        mustChangePassword: user.mustChangePassword,
-        emailVerified: user.emailVerified,
-        createdAt: user.createdAt,
-        parentProfileId: parentProfiles.id,
-      })
-      .from(user)
-      .leftJoin(parentProfiles, eq(parentProfiles.userId, user.id))
-      .orderBy(desc(user.createdAt)),
-    db.select({ userId: account.userId, providerId: account.providerId }).from(account),
-  ]);
+type MemberListRow = {
+  id: string;
+  name: string;
+  email: string;
+  role: string;
+  banned: boolean;
+  twoFactorEnabled: boolean;
+  mustChangePassword: boolean;
+  emailVerified: boolean;
+  createdAt: Date;
+  parentProfileId: string | null;
+  deletedAt: Date | null;
+  deletedBy: string | null;
+  deletionReason: string | null;
+};
 
+async function attachAccountProviders(members: MemberListRow[]) {
+  const accountProviders = members.length
+    ? await db
+        .select({ userId: account.userId, providerId: account.providerId })
+        .from(account)
+        .where(
+          inArray(
+            account.userId,
+            members.map((member) => member.id),
+          ),
+        )
+    : [];
   const providersByUser = new Map<string, Set<string>>();
   for (const provider of accountProviders) {
     const providerIds = providersByUser.get(provider.userId) ?? new Set<string>();
     providerIds.add(provider.providerId);
     providersByUser.set(provider.userId, providerIds);
   }
-
   return members.map((member) => ({
     ...member,
     accountProviders: [...(providersByUser.get(member.id) ?? [])],
   }));
+}
+
+const memberSelection = {
+  id: user.id,
+  name: user.name,
+  email: user.email,
+  role: user.role,
+  banned: user.banned,
+  twoFactorEnabled: user.twoFactorEnabled,
+  mustChangePassword: user.mustChangePassword,
+  emailVerified: user.emailVerified,
+  createdAt: user.createdAt,
+  parentProfileId: parentProfiles.id,
+  deletedAt: user.deletedAt,
+  deletedBy: user.deletedBy,
+  deletionReason: user.deletionReason,
+};
+
+export async function listMembers() {
+  const members = await db
+    .select(memberSelection)
+    .from(user)
+    .leftJoin(parentProfiles, eq(parentProfiles.userId, user.id))
+    .where(isNull(user.deletedAt))
+    .orderBy(desc(user.createdAt));
+  return attachAccountProviders(members);
+}
+
+export async function listTrashedMembers() {
+  const members = await db
+    .select(memberSelection)
+    .from(user)
+    .leftJoin(parentProfiles, eq(parentProfiles.userId, user.id))
+    .where(isNotNull(user.deletedAt))
+    .orderBy(desc(user.deletedAt));
+  return attachAccountProviders(members);
+}
+
+async function countActiveSuperAdmins(tx: Parameters<Parameters<typeof db.transaction>[0]>[0]) {
+  const rows = await tx
+    .select({ count: sql<number>`count(*)::int` })
+    .from(user)
+    .where(and(eq(user.role, "super_admin"), eq(user.banned, false), isNull(user.deletedAt)));
+  return rows[0]?.count ?? 0;
 }
 
 export async function updateMember(
@@ -164,6 +222,7 @@ export async function updateMember(
       userId,
       currentRole: current.role,
       currentBanned: current.banned,
+      currentDeletedAt: current.deletedAt,
       nextRole,
       nextBanned,
       roleWasProvided: input.role !== undefined,
@@ -172,15 +231,14 @@ export async function updateMember(
     assertMemberUpdatePolicy(policyInput);
 
     const removesActiveSuperAdmin =
-      current.role === "super_admin" && !current.banned && (nextRole !== "super_admin" || nextBanned);
+      current.role === "super_admin" &&
+      !current.banned &&
+      !current.deletedAt &&
+      (nextRole !== "super_admin" || nextBanned);
     if (removesActiveSuperAdmin) {
-      const activeSuperAdmins = await tx
-        .select({ count: sql<number>`count(*)::int` })
-        .from(user)
-        .where(and(eq(user.role, "super_admin"), eq(user.banned, false)));
       assertMemberUpdatePolicy({
         ...policyInput,
-        activeSuperAdminCount: activeSuperAdmins[0]?.count ?? 0,
+        activeSuperAdminCount: await countActiveSuperAdmins(tx),
       });
     }
 
@@ -215,13 +273,122 @@ export async function updateMember(
         action: "session.revoked_by_ban",
         resourceType: "user_session",
         resourceId: userId,
-        metadata: {
-          revokedSessionCount: revokedSessions.length,
-          reason: updated.banReason,
-        },
+        metadata: { revokedSessionCount: revokedSessions.length, reason: updated.banReason },
       });
     }
     return updated;
+  });
+}
+
+export async function trashMember(actorId: string, userId: string, reason?: string) {
+  return db.transaction(async (tx) => {
+    await tx.execute(sql`select pg_advisory_xact_lock(hashtext('sln:member-policy'))`);
+    await tx.execute(sql`select pg_advisory_xact_lock(hashtext(${`sln:user-session:${userId}`}))`);
+    const current = await tx.query.user.findFirst({ where: eq(user.id, userId) });
+    if (!current) return null;
+
+    const policyInput = {
+      actorId,
+      userId,
+      currentRole: current.role,
+      currentBanned: current.banned,
+      currentDeletedAt: current.deletedAt,
+    };
+    assertMemberTrashPolicy(policyInput);
+    if (current.role === "super_admin" && !current.banned) {
+      assertMemberTrashPolicy({
+        ...policyInput,
+        activeSuperAdminCount: await countActiveSuperAdmins(tx),
+      });
+    }
+
+    const now = new Date();
+    const revokedSessions = await tx
+      .delete(session)
+      .where(eq(session.userId, userId))
+      .returning({ id: session.id });
+    const [updated] = await tx
+      .update(user)
+      .set({
+        deletedAt: now,
+        deletedBy: actorId,
+        deletionReason: reason?.trim() || "Đưa vào thùng rác bởi quản trị viên",
+        deletedPreviousBanned: current.banned,
+        deletedPreviousBanReason: current.banReason,
+        deletedPreviousBanExpires: current.banExpires,
+        banned: true,
+        banReason: "Tài khoản đang ở trong thùng rác",
+        banExpires: null,
+        updatedAt: now,
+      })
+      .where(eq(user.id, userId))
+      .returning();
+    await tx.insert(auditLogs).values({
+      actorId,
+      action: "member.trashed",
+      resourceType: "user",
+      resourceId: userId,
+      beforeState: { role: current.role, banned: current.banned, deletedAt: current.deletedAt },
+      afterState: { role: updated.role, banned: updated.banned, deletedAt: updated.deletedAt },
+      metadata: { reason: updated.deletionReason, revokedSessionCount: revokedSessions.length },
+    });
+    return updated;
+  });
+}
+
+export async function restoreMember(actorId: string, userId: string) {
+  return db.transaction(async (tx) => {
+    await tx.execute(sql`select pg_advisory_xact_lock(hashtext('sln:member-policy'))`);
+    const current = await tx.query.user.findFirst({ where: eq(user.id, userId) });
+    if (!current) return null;
+    assertMemberRestorePolicy({ currentDeletedAt: current.deletedAt });
+
+    const restoredBanned = current.deletedPreviousBanned ?? false;
+    const [updated] = await tx
+      .update(user)
+      .set({
+        deletedAt: null,
+        deletedBy: null,
+        deletionReason: null,
+        deletedPreviousBanned: null,
+        deletedPreviousBanReason: null,
+        deletedPreviousBanExpires: null,
+        banned: restoredBanned,
+        banReason: restoredBanned ? current.deletedPreviousBanReason : null,
+        banExpires: restoredBanned ? current.deletedPreviousBanExpires : null,
+        updatedAt: new Date(),
+      })
+      .where(eq(user.id, userId))
+      .returning();
+    await tx.insert(auditLogs).values({
+      actorId,
+      action: "member.restored",
+      resourceType: "user",
+      resourceId: userId,
+      beforeState: { role: current.role, deletedAt: current.deletedAt },
+      afterState: { role: updated.role, deletedAt: updated.deletedAt, banned: updated.banned },
+    });
+    return updated;
+  });
+}
+
+export async function permanentlyDeleteMember(actorId: string, userId: string) {
+  return db.transaction(async (tx) => {
+    await tx.execute(sql`select pg_advisory_xact_lock(hashtext('sln:member-policy'))`);
+    const current = await tx.query.user.findFirst({ where: eq(user.id, userId) });
+    if (!current) return null;
+    assertMemberPermanentDeletePolicy({ actorId, userId, currentDeletedAt: current.deletedAt });
+
+    await tx.insert(auditLogs).values({
+      actorId,
+      action: "member.permanently_deleted",
+      resourceType: "user",
+      resourceId: userId,
+      beforeState: { role: current.role, deletedAt: current.deletedAt, email: "[redacted]" },
+      metadata: { deletionReason: current.deletionReason },
+    });
+    const [deleted] = await tx.delete(user).where(eq(user.id, userId)).returning({ id: user.id });
+    return deleted ?? null;
   });
 }
 

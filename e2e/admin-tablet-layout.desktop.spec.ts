@@ -16,7 +16,7 @@ const routes = [
   "/admin/reports",
   "/admin/audit",
   "/admin/data-requests",
-  "/admin/members",
+  "/admin/access-control",
   "/admin/settings",
   "/admin/feedback",
 ] as const;

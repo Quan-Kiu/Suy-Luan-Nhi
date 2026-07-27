@@ -1,10 +1,10 @@
-import { requireApiRoles } from "@/auth/api";
+import { requireApiPermission } from "@/auth/api";
 import { apiJson } from "@/lib/api-response";
 import { invalidateTaxonomyCaches } from "@/lib/cache/invalidation";
 import { updateBadge, updateBadgeSchema } from "@/modules/admin/badge-admin";
 
 export async function PATCH(request: Request, { params }: { params: Promise<{ badgeId: string }> }) {
-  const authResult = await requireApiRoles(request, ["content_admin", "super_admin"]);
+  const authResult = await requireApiPermission(request, "badges.manage");
   if ("error" in authResult) return authResult.error;
   const parsed = updateBadgeSchema.safeParse(await request.json().catch(() => null));
   if (!parsed.success) return apiJson({ message: parsed.error.issues[0]?.message }, { status: 400 });

@@ -3,7 +3,7 @@ import { FileText, Plus } from "lucide-react";
 import Link from "next/link";
 import type { AdminMissionPage } from "@/api/admin/missions";
 import { hasRole } from "@/auth/roles";
-import { requireStaff } from "@/auth/session";
+import { requirePermission } from "@/auth/session";
 import { contentText } from "@/content/resolve";
 import { AdminPageHeader } from "@/features/admin/admin-page-header";
 import { MissionListWorkspace } from "@/features/admin/mission-list-workspace";
@@ -23,7 +23,7 @@ export const metadata: Metadata = {
 };
 
 export default async function Page({ searchParams }: { searchParams: Promise<SearchParams> }) {
-  const [rawFilters, session] = await Promise.all([searchParams, requireStaff()]);
+  const [rawFilters, session] = await Promise.all([searchParams, requirePermission("missions.view")]);
   const canEdit = hasRole(session.user.role, ["content_admin", "super_admin"]);
   const initialFilters = {
     status: rawFilters.status || undefined,

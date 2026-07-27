@@ -71,7 +71,7 @@ async function resolveRoutes(page: Page): Promise<AuditRoute[]> {
     { name: "taxonomy", path: "/admin/taxonomy" },
     { name: "feedback", path: "/admin/feedback" },
     { name: "reports", path: "/admin/reports" },
-    { name: "members", path: "/admin/members" },
+    { name: "access-control", path: "/admin/access-control" },
     { name: "data-requests", path: "/admin/data-requests" },
     { name: "audit", path: "/admin/audit" },
     { name: "settings", path: "/admin/settings" },

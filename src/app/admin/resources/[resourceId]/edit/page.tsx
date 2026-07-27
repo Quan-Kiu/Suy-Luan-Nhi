@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { FilePenLine } from "lucide-react";
 import { notFound } from "next/navigation";
-import { requireRoles } from "@/auth/session";
+import { requirePermission } from "@/auth/session";
 import { AdminPageHeader } from "@/features/admin/admin-page-header";
 import { ResourceEditorForm } from "@/features/admin/resource-editor-form";
 import { getAdminResource } from "@/modules/admin/resource-admin";
@@ -11,7 +11,7 @@ export const metadata: Metadata = {
 };
 
 export default async function Page({ params }: { params: Promise<{ resourceId: string }> }) {
-  await requireRoles(["content_admin", "super_admin"]);
+  await requirePermission("resources.manage");
   const { resourceId } = await params;
   const resource = await getAdminResource(resourceId);
   if (!resource) notFound();

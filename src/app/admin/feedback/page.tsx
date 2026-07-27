@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { MessageSquareText } from "lucide-react";
 import type { SystemFeedbackColumnsInitialData, SystemFeedbackPage } from "@/api/admin/feedback";
-import { requireStaff } from "@/auth/session";
+import { requirePermission } from "@/auth/session";
 import { systemFeedbackColumnPageSize, systemFeedbackStatuses } from "@/domain/system-feedback";
 import { AdminPageHeader } from "@/features/admin/admin-page-header";
 import { SystemFeedbackManager } from "@/features/admin/system-feedback-manager";
@@ -18,13 +18,15 @@ function serializeFeedbackPage(result: Awaited<ReturnType<typeof listSystemFeedb
       ...item,
       createdAt: item.createdAt.toISOString(),
       updatedAt: item.updatedAt.toISOString(),
+      firstSeenAt: item.firstSeenAt.toISOString(),
+      lastSeenAt: item.lastSeenAt.toISOString(),
       handledAt: item.handledAt?.toISOString() ?? null,
     })),
   };
 }
 
 export default async function Page() {
-  await requireStaff();
+  await requirePermission("feedback.view");
   const results = await Promise.all(
     systemFeedbackStatuses.map((status) =>
       listSystemFeedback({ status, page: 1, pageSize: systemFeedbackColumnPageSize }),

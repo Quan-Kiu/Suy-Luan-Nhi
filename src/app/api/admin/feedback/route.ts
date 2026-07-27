@@ -1,10 +1,10 @@
-import { requireApiRoles } from "@/auth/api";
+import { requireApiPermission } from "@/auth/api";
 import { apiJson } from "@/lib/api-response";
 import { systemFeedbackStatuses, type SystemFeedbackStatus } from "@/domain/system-feedback";
 import { listSystemFeedback } from "@/modules/system-feedback/system-feedback";
 
 export async function GET(request: Request) {
-  const authResult = await requireApiRoles(request, ["content_admin", "reviewer", "super_admin"]);
+  const authResult = await requireApiPermission(request, "feedback.view");
   if ("error" in authResult) return authResult.error;
   const params = new URL(request.url).searchParams;
   const rawStatus = params.get("status");

@@ -1,16 +1,16 @@
-import { requireApiRoles } from "@/auth/api";
+import { requireApiPermission } from "@/auth/api";
 import { apiJson } from "@/lib/api-response";
 import { invalidateTaxonomyCaches } from "@/lib/cache/invalidation";
 import { createBadge, createBadgeSchema, listBadges } from "@/modules/admin/badge-admin";
 
 export async function GET(request: Request) {
-  const authResult = await requireApiRoles(request, ["content_admin", "reviewer", "super_admin"]);
+  const authResult = await requireApiPermission(request, "badges.view");
   if ("error" in authResult) return authResult.error;
   return apiJson(await listBadges());
 }
 
 export async function POST(request: Request) {
-  const authResult = await requireApiRoles(request, ["content_admin", "super_admin"]);
+  const authResult = await requireApiPermission(request, "badges.manage");
   if ("error" in authResult) return authResult.error;
   const parsed = createBadgeSchema.safeParse(await request.json().catch(() => null));
   if (!parsed.success) return apiJson({ message: parsed.error.issues[0]?.message }, { status: 400 });

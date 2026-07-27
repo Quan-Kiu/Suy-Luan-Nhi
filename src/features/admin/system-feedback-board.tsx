@@ -23,6 +23,7 @@ import {
   LoaderCircle,
   MessageSquareText,
   RefreshCw,
+  Repeat2,
   UserRound,
 } from "lucide-react";
 import { useCallback, useEffect, useRef, useState } from "react";
@@ -125,8 +126,13 @@ function FeedbackCardContent({
             ) : null}
             <span className="inline-flex items-center gap-1">
               <CalendarClock size={13} aria-hidden="true" />
-              {formatFeedbackTime(item.createdAt)}
+              {formatFeedbackTime(item.occurrenceCount > 1 ? item.lastSeenAt : item.createdAt)}
             </span>
+            {item.occurrenceCount > 1 ? (
+              <span className="inline-flex items-center gap-1 rounded-full border border-violet-200 bg-violet-50 px-2 py-0.5 text-violet-800">
+                <Repeat2 size={12} aria-hidden="true" /> ×{item.occurrenceCount} lần
+              </span>
+            ) : null}
             {item.attachments.length ? (
               <span className="inline-flex items-center gap-1">
                 <ImageIcon size={13} aria-hidden="true" />

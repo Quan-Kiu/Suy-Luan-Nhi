@@ -47,7 +47,7 @@ test("admin mobile routes pass runtime UX checks", async ({ page }, testInfo) =>
 
   await clearAuth(page);
   await signIn(page, "admin@demo.local", "/admin");
-  await auditRoute(page, testInfo, "/admin/members", "mobile-super-admin-members");
+  await auditRoute(page, testInfo, "/admin/access-control", "mobile-super-admin-access-control");
   await auditRoute(page, testInfo, "/admin/reports", "mobile-super-admin-reports");
   await expect(page.locator("#admin-main-content")).toHaveAttribute("tabindex", "0");
   await auditRoute(page, testInfo, "/admin/settings", "mobile-super-admin-settings");

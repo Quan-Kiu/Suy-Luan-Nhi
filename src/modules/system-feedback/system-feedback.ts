@@ -3,6 +3,7 @@ import { db } from "@/db/client";
 import { auditLogs, mediaAssets, systemFeedback, systemFeedbackAttachments, user } from "@/db/schema";
 import type { SystemFeedbackStatus } from "@/domain/system-feedback";
 import { MediaValidationError } from "@/modules/media/storage/errors";
+import { automaticFeedbackReopenWindowMs } from "@/modules/system-feedback/automatic-feedback";
 import { deleteMedia, uploadMedia } from "@/modules/media/media";
 
 export type SystemFeedbackListFilters = {
@@ -28,6 +29,10 @@ export async function listSystemFeedback(filters: SystemFeedbackListFilters = {}
         pagePath: systemFeedback.pagePath,
         pageTitle: systemFeedback.pageTitle,
         context: systemFeedback.context,
+        fingerprint: systemFeedback.fingerprint,
+        occurrenceCount: systemFeedback.occurrenceCount,
+        firstSeenAt: systemFeedback.firstSeenAt,
+        lastSeenAt: systemFeedback.lastSeenAt,
         status: systemFeedback.status,
         adminNote: systemFeedback.adminNote,
         handledBy: systemFeedback.handledBy,
@@ -41,7 +46,7 @@ export async function listSystemFeedback(filters: SystemFeedbackListFilters = {}
       .from(systemFeedback)
       .leftJoin(user, eq(systemFeedback.userId, user.id))
       .where(where)
-      .orderBy(desc(systemFeedback.createdAt))
+      .orderBy(desc(systemFeedback.lastSeenAt), desc(systemFeedback.createdAt))
       .limit(pageSize)
       .offset((page - 1) * pageSize),
     db
@@ -89,6 +94,86 @@ export async function listSystemFeedback(filters: SystemFeedbackListFilters = {}
     pageSize,
     totalPages: Math.max(1, Math.ceil(total / pageSize)),
   };
+}
+
+export async function createOrAggregateAutomaticFeedback(input: {
+  fingerprint: string;
+  userId: string;
+  content: string;
+  pagePath: string;
+  pageTitle?: string;
+  context: Record<string, unknown>;
+}) {
+  const outcome = await db.transaction(async (tx) => {
+    await tx.execute(
+      sql`select pg_advisory_xact_lock(hashtext(${`sln:automatic-feedback:${input.fingerprint}`}))`,
+    );
+    const current = await tx.query.systemFeedback.findFirst({
+      where: eq(systemFeedback.fingerprint, input.fingerprint),
+    });
+    const now = new Date();
+    if (!current) {
+      const [created] = await tx
+        .insert(systemFeedback)
+        .values({
+          userId: input.userId,
+          content: input.content.trim(),
+          pagePath: input.pagePath,
+          pageTitle: input.pageTitle?.trim() || null,
+          context: input.context,
+          fingerprint: input.fingerprint,
+          occurrenceCount: 1,
+          firstSeenAt: now,
+          lastSeenAt: now,
+        })
+        .returning({ id: systemFeedback.id });
+      await tx.insert(auditLogs).values({
+        actorId: input.userId,
+        action: "system_feedback.automatic_created",
+        resourceType: "system_feedback",
+        resourceId: created.id,
+        metadata: { fingerprint: input.fingerprint.slice(0, 12), occurrenceCount: 1 },
+      });
+      return { id: created.id, duplicate: false, reopened: false };
+    }
+
+    const finalStatus = current.status === "resolved" || current.status === "dismissed";
+    const reopened =
+      finalStatus && now.getTime() - current.lastSeenAt.getTime() >= automaticFeedbackReopenWindowMs;
+    const [updated] = await tx
+      .update(systemFeedback)
+      .set({
+        userId: input.userId,
+        content: input.content.trim(),
+        pagePath: input.pagePath,
+        pageTitle: input.pageTitle?.trim() || null,
+        context: input.context,
+        occurrenceCount: sql`${systemFeedback.occurrenceCount} + 1`,
+        lastSeenAt: now,
+        updatedAt: now,
+        status: reopened ? "new" : current.status,
+        handledBy: reopened ? null : current.handledBy,
+        handledAt: reopened ? null : current.handledAt,
+      })
+      .where(eq(systemFeedback.id, current.id))
+      .returning({ id: systemFeedback.id, occurrenceCount: systemFeedback.occurrenceCount });
+    if (reopened) {
+      await tx.insert(auditLogs).values({
+        actorId: input.userId,
+        action: "system_feedback.automatic_reopened",
+        resourceType: "system_feedback",
+        resourceId: current.id,
+        metadata: {
+          fingerprint: input.fingerprint.slice(0, 12),
+          occurrenceCount: updated.occurrenceCount,
+        },
+      });
+    }
+    return { id: current.id, duplicate: true, reopened };
+  });
+
+  const result = await listSystemFeedback({ id: outcome.id, pageSize: 10 });
+  return { ...outcome, item: result.items[0] };
 }
 
 export async function createSystemFeedback(input: {

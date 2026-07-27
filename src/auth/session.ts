@@ -1,8 +1,14 @@
 import { cache } from "react";
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
-import { isActiveBan, requiresStaffMfa, requiresStaffMfaChallenge } from "@/auth/access-policy";
+import {
+  isActiveBan,
+  isDeletedAccount,
+  requiresStaffMfa,
+  requiresStaffMfaChallenge,
+} from "@/auth/access-policy";
 import { auth } from "@/auth/auth";
+import { hasPermission, type PermissionKey } from "@/auth/permissions";
 import { hasRole, type AppRole } from "@/auth/roles";
 import { env } from "@/config/env";
 import { isDatabaseUnavailable } from "@/lib/infrastructure";
@@ -18,6 +24,7 @@ export async function requireSession() {
     throw error;
   }
   if (!session) redirect("/auth/sign-in");
+  if (isDeletedAccount(session.user)) redirect("/auth/error?reason=deleted");
   if (isActiveBan(session.user)) redirect("/auth/error?reason=banned");
   if (session.user.mustChangePassword) redirect("/auth/change-temporary-password");
   return session;
@@ -26,6 +33,16 @@ export async function requireSession() {
 export async function requireRoles(roles: readonly AppRole[]) {
   const session = await requireSession();
   if (!hasRole(session.user.role, roles)) redirect("/auth/error?reason=forbidden");
+  if (env.AUTH_STAFF_MFA_REQUIRED && requiresStaffMfa(session.user)) redirect("/auth/mfa/setup");
+  if (env.AUTH_STAFF_MFA_REQUIRED && requiresStaffMfaChallenge(session.user, session.session)) {
+    redirect("/auth/two-factor");
+  }
+  return session;
+}
+
+export async function requirePermission(permission: PermissionKey) {
+  const session = await requireSession();
+  if (!hasPermission(session.user.role, permission)) redirect("/auth/error?reason=forbidden");
   if (env.AUTH_STAFF_MFA_REQUIRED && requiresStaffMfa(session.user)) redirect("/auth/mfa/setup");
   if (env.AUTH_STAFF_MFA_REQUIRED && requiresStaffMfaChallenge(session.user, session.session)) {
     redirect("/auth/two-factor");

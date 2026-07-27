@@ -10,6 +10,10 @@ describe("AdminNavigation", () => {
       "href",
       "/admin/parent-access",
     );
+    expect(screen.getByRole("link", { name: "Vai trò & thành viên" })).toHaveAttribute(
+      "href",
+      "/admin/access-control",
+    );
   });
 
   it("distinguishes the media library from the content dictionary", () => {
@@ -38,5 +42,6 @@ describe("AdminNavigation", () => {
     render(<AdminNavigation pathname="/admin" role="content_admin" content={{}} />);
 
     expect(screen.queryByRole("link", { name: "Khu vực phụ huynh" })).not.toBeInTheDocument();
+    expect(screen.queryByRole("link", { name: "Vai trò & thành viên" })).not.toBeInTheDocument();
   });
 });

@@ -1,7 +1,7 @@
 import { apiJson } from "@/lib/api-response";
 import { invalidateTaxonomyCaches } from "@/lib/cache/invalidation";
 import { z } from "zod";
-import { requireApiRoles } from "@/auth/api";
+import { requireApiPermission } from "@/auth/api";
 import { ageGroupCodes } from "@/domain/age-groups";
 import {
   updateWorld,
@@ -19,7 +19,7 @@ const schema = z.object({
   status: z.enum(["draft", "published", "archived"]).optional(),
 });
 export async function PATCH(request: Request, { params }: { params: Promise<{ worldId: string }> }) {
-  const authResult = await requireApiRoles(request, ["content_admin", "super_admin"]);
+  const authResult = await requireApiPermission(request, "worlds.manage");
   if ("error" in authResult) return authResult.error;
   const input = schema.safeParse(await request.json().catch(() => null));
   if (!input.success) return apiJson({ message: input.error.issues[0]?.message }, { status: 400 });

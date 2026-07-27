@@ -40,7 +40,10 @@ export const adminOperationsContentEntries = defineContent("admin", {
   "nav.worlds": { value: "Các chủ đề", description: "Điều hướng thế giới nhiệm vụ." },
   "nav.badges": { value: "Huy hiệu", description: "Điều hướng quản lý huy hiệu phần thưởng." },
   "nav.taxonomy": { value: "Nhóm tuổi & kỹ năng", description: "Điều hướng độ tuổi và kỹ năng." },
-  "nav.members": { value: "Tài khoản quản trị", description: "Điều hướng thành viên." },
+  "nav.members": {
+    value: "Vai trò & thành viên",
+    description: "Điều hướng đến ma trận quyền, phân vai trò và thùng rác tài khoản.",
+  },
   "nav.feedback": { value: "Góp ý hệ thống", description: "Điều hướng góp ý từ người dùng." },
   "nav.reports": { value: "Báo cáo sử dụng", description: "Điều hướng báo cáo." },
   "nav.dataRequests": { value: "Xuất và xóa dữ liệu", description: "Điều hướng yêu cầu dữ liệu." },

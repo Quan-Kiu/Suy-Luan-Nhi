@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { desc, eq } from "drizzle-orm";
 import { ShieldCheck } from "lucide-react";
-import { requireRoles } from "@/auth/session";
+import { requirePermission } from "@/auth/session";
 import { AdminPageHeader } from "@/features/admin/admin-page-header";
 import { DataRequestManager } from "@/features/admin/data-request-manager";
 import { db } from "@/db/client";
@@ -12,7 +12,7 @@ export const metadata: Metadata = {
 };
 
 export default async function Page() {
-  await requireRoles(["super_admin"]);
+  await requirePermission("data_requests.manage");
   const items = await db
     .select({
       id: dataRequests.id,

@@ -1,14 +1,14 @@
 import { apiJson } from "@/lib/api-response";
 import { invalidateAdminMissionViews } from "@/lib/cache/invalidation";
 import { z } from "zod";
-import { requireApiRoles } from "@/auth/api";
+import { requireApiPermission } from "@/auth/api";
 import { scheduleMissionVersion } from "@/modules/admin/mission-admin";
 const schema = z.object({ scheduledFor: z.string().datetime() });
 export async function POST(
   request: Request,
   { params }: { params: Promise<{ missionId: string; versionId: string }> },
 ) {
-  const authResult = await requireApiRoles(request, ["reviewer", "super_admin"]);
+  const authResult = await requireApiPermission(request, "missions.review");
   if ("error" in authResult) return authResult.error;
   const input = schema.safeParse(await request.json().catch(() => null));
   if (!input.success) return apiJson({ message: "Thời gian xuất bản chưa hợp lệ" }, { status: 400 });

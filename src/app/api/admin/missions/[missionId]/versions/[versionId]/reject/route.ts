@@ -1,13 +1,13 @@
 import { apiJson } from "@/lib/api-response";
 import { invalidateAdminMissionViews } from "@/lib/cache/invalidation";
-import { requireApiRoles } from "@/auth/api";
+import { requireApiPermission } from "@/auth/api";
 import { reviewRejectionSchema } from "@/modules/admin/schemas";
 import { rejectMissionVersion } from "@/modules/admin/mission-admin";
 export async function POST(
   request: Request,
   { params }: { params: Promise<{ missionId: string; versionId: string }> },
 ) {
-  const authResult = await requireApiRoles(request, ["reviewer", "super_admin"]);
+  const authResult = await requireApiPermission(request, "missions.review");
   if ("error" in authResult) return authResult.error;
   const input = reviewRejectionSchema.safeParse(await request.json().catch(() => null));
   if (!input.success) return apiJson({ message: input.error.issues[0]?.message }, { status: 400 });

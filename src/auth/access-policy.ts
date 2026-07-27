@@ -5,10 +5,15 @@ export type AuthAccessUser = {
   banned?: boolean | null;
   banExpires?: Date | string | null;
   twoFactorEnabled?: boolean | null;
+  deletedAt?: Date | string | null;
 };
 export type AuthAccessSession = {
   mfaVerifiedAt?: Date | string | null;
 };
+
+export function isDeletedAccount(user: AuthAccessUser) {
+  return Boolean(user.deletedAt);
+}
 
 export function isActiveBan(user: AuthAccessUser, now = new Date()) {
   if (!user.banned) return false;

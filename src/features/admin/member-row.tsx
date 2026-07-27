@@ -5,6 +5,7 @@ import { ShieldCheck, ShieldOff } from "lucide-react";
 import { toast } from "sonner";
 import { membersApi } from "@/api/admin/members";
 import { MemberAccountActions } from "@/features/admin/member-account-actions";
+import { MemberTrashActions } from "@/features/admin/member-trash-actions";
 import { getAccountMethods } from "@/features/admin/member-presentation";
 import { usePendingRouter } from "@/hooks/use-pending-router";
 
@@ -20,6 +21,9 @@ export type MemberItem = {
   accountProviders: string[];
   parentProfileId: string | null;
   mustChangePassword: boolean;
+  deletedAt: Date | null;
+  deletedBy: string | null;
+  deletionReason: string | null;
 };
 
 type UpdateInput = { payload: Record<string, unknown>; successMessage: string };
@@ -177,6 +181,7 @@ export function MemberRow({ item, currentUserId }: { item: MemberItem; currentUs
         <div className="grid gap-2">
           <AccessButton item={item} actions={actions} className="w-full justify-center" />
           <MemberAccountActions item={item} currentUserId={currentUserId} />
+          <MemberTrashActions item={item} mode="active" currentUserId={currentUserId} />
         </div>
       </td>
     </tr>
@@ -221,6 +226,7 @@ export function MemberCard({ item, currentUserId }: { item: MemberItem; currentU
       <div className="mt-4 grid gap-2 sm:grid-cols-2">
         <AccessButton item={item} actions={actions} className="w-full justify-center" />
         <MemberAccountActions item={item} currentUserId={currentUserId} />
+        <MemberTrashActions item={item} mode="active" currentUserId={currentUserId} />
       </div>
       <MutationError actions={actions} />
     </article>

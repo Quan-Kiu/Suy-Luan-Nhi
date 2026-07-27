@@ -2,10 +2,11 @@
 
 import { useState } from "react";
 import type { LucideIcon } from "lucide-react";
-import { ShieldCheck, UsersRound } from "lucide-react";
+import { ShieldCheck, Trash2, UsersRound } from "lucide-react";
 import { AdminTabPanel, AdminTabs } from "@/features/admin/admin-tabs";
 import { MemberCard, MemberRow, type MemberItem } from "@/features/admin/member-row";
 import { partitionMembersByAccess } from "@/features/admin/member-presentation";
+import { MemberTrashList } from "@/features/admin/member-trash-list";
 
 function MemberTable({ items, currentUserId }: { items: MemberItem[]; currentUserId: string }) {
   return (
@@ -44,7 +45,7 @@ function MemberTable({ items, currentUserId }: { items: MemberItem[]; currentUse
   );
 }
 
-type MemberTabKey = "staff" | "parents";
+type MemberTabKey = "staff" | "parents" | "trash";
 type MemberTab = {
   key: MemberTabKey;
   title: string;
@@ -54,7 +55,15 @@ type MemberTab = {
   icon: LucideIcon;
 };
 
-export function MemberManager({ items, currentUserId }: { items: MemberItem[]; currentUserId: string }) {
+export function MemberManager({
+  items,
+  trashedItems,
+  currentUserId,
+}: {
+  items: MemberItem[];
+  trashedItems: MemberItem[];
+  currentUserId: string;
+}) {
   const { staff, parents } = partitionMembersByAccess(items);
   const [activeTabKey, setActiveTabKey] = useState<MemberTabKey>("staff");
   const tabs: MemberTab[] = [
@@ -74,6 +83,14 @@ export function MemberManager({ items, currentUserId }: { items: MemberItem[]; c
       emptyMessage: "Chưa có tài khoản phụ huynh.",
       items: parents,
       icon: UsersRound,
+    },
+    {
+      key: "trash",
+      title: "Thùng rác",
+      description: "Tài khoản đã xóa mềm, không thể đăng nhập và có thể được khôi phục hoặc xóa vĩnh viễn.",
+      emptyMessage: "Thùng rác chưa có tài khoản nào.",
+      items: trashedItems,
+      icon: Trash2,
     },
   ];
   const activeTab = tabs.find((tab) => tab.key === activeTabKey) ?? tabs[0]!;
@@ -98,7 +115,9 @@ export function MemberManager({ items, currentUserId }: { items: MemberItem[]; c
         <div className="rounded-2xl border bg-[#fffdf8] px-4 py-3">
           <p className="type-supporting text-[#6f6558]">{activeTab.description}</p>
         </div>
-        {activeTab.items.length ? (
+        {activeTab.key === "trash" ? (
+          <MemberTrashList items={activeTab.items} currentUserId={currentUserId} />
+        ) : activeTab.items.length ? (
           <MemberTable items={activeTab.items} currentUserId={currentUserId} />
         ) : (
           <div className="rounded-2xl border border-dashed bg-white px-4 py-8 text-center">

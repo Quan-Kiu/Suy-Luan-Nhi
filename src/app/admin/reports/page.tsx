@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { BarChart3 } from "lucide-react";
-import { requireStaff } from "@/auth/session";
+import { requirePermission } from "@/auth/session";
 import { Card, Pill } from "@/components/ui";
 import { analyticsEventLabels, friendlyLabel, sessionStatusLabels } from "@/features/admin/admin-labels";
 import { AdminPageHeader } from "@/features/admin/admin-page-header";
@@ -11,7 +11,7 @@ export const metadata: Metadata = {
 };
 
 export default async function Page() {
-  await requireStaff();
+  await requirePermission("reports.view");
   const data = await getAdminReports();
   const accuracy = data.attempts.total ? Math.round((data.attempts.correct / data.attempts.total) * 100) : 0;
   return (

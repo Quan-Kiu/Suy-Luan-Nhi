@@ -5,7 +5,7 @@ import { APIError, createAuthMiddleware } from "better-auth/api";
 import { nextCookies } from "better-auth/next-js";
 import { twoFactor } from "better-auth/plugins";
 import { eq } from "drizzle-orm";
-import { isActiveBan } from "@/auth/access-policy";
+import { isActiveBan, isDeletedAccount } from "@/auth/access-policy";
 import { staffMfaSessionMarker } from "@/auth/staff-mfa-session-marker";
 import { authTranslations, resolveAuthLocale } from "@/auth/translations";
 import { googleAuthConfigured } from "@/config/auth-providers";
@@ -60,6 +60,11 @@ export const auth = betterAuth({
           const sessionUser = await db.query.user.findFirst({
             where: eq(userTable.id, session.userId),
           });
+          if (sessionUser && isDeletedAccount(sessionUser)) {
+            throw new APIError("FORBIDDEN", {
+              message: "Tài khoản đang ở trong thùng rác. Vui lòng liên hệ quản trị viên.",
+            });
+          }
           if (sessionUser && isActiveBan(sessionUser)) {
             throw new APIError("FORBIDDEN", {
               message: "Tài khoản đã bị tạm ngưng. Vui lòng liên hệ quản trị viên.",
@@ -114,6 +119,7 @@ export const auth = betterAuth({
       banReason: { type: "string", required: false, input: false },
       banExpires: { type: "date", required: false, input: false },
       mustChangePassword: { type: "boolean", required: false, defaultValue: false, input: false },
+      deletedAt: { type: "date", required: false, input: false },
     },
   },
   session: {
@@ -151,6 +157,11 @@ export const auth = betterAuth({
               const signInUser = await db.query.user.findFirst({
                 where: eq(userTable.email, email),
               });
+              if (signInUser && isDeletedAccount(signInUser)) {
+                throw new APIError("FORBIDDEN", {
+                  message: "Tài khoản đang ở trong thùng rác. Vui lòng liên hệ quản trị viên.",
+                });
+              }
               if (signInUser && isActiveBan(signInUser)) {
                 throw new APIError("FORBIDDEN", {
                   message: "Tài khoản đã bị tạm ngưng. Vui lòng liên hệ quản trị viên.",

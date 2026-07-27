@@ -28,6 +28,12 @@ export function invalidatePublishedCatalog() {
   revalidateTag(cacheTags.publishedCatalog, expireImmediately);
 }
 
+export function invalidateAdminMemberViews() {
+  revalidatePath("/admin");
+  revalidatePath("/admin/access-control");
+  revalidatePath("/admin/members");
+}
+
 export function invalidateAdminMissionViews(missionId?: string) {
   revalidatePath("/admin");
   revalidatePath("/admin/missions");

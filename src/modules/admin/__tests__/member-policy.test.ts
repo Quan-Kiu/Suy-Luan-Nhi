@@ -1,5 +1,11 @@
 import { describe, expect, it } from "vitest";
-import { assertMemberUpdatePolicy, MemberPolicyError } from "@/modules/admin/member-policy";
+import {
+  assertMemberPermanentDeletePolicy,
+  assertMemberRestorePolicy,
+  assertMemberTrashPolicy,
+  assertMemberUpdatePolicy,
+  MemberPolicyError,
+} from "@/modules/admin/member-policy";
 
 const base = {
   actorId: "actor",
@@ -80,5 +86,36 @@ describe("member security policy", () => {
         activeSuperAdminCount: 2,
       }),
     ).not.toThrow();
+  });
+
+  it("protects account trash and permanent deletion invariants", () => {
+    expectPolicyCode(
+      () =>
+        assertMemberTrashPolicy({
+          actorId: "same",
+          userId: "same",
+          currentRole: "parent",
+          currentBanned: false,
+          currentDeletedAt: null,
+        }),
+      "SELF_TRASH",
+    );
+    expectPolicyCode(
+      () =>
+        assertMemberTrashPolicy({
+          actorId: "actor",
+          userId: "target",
+          currentRole: "super_admin",
+          currentBanned: false,
+          currentDeletedAt: null,
+          activeSuperAdminCount: 1,
+        }),
+      "LAST_SUPER_ADMIN",
+    );
+    expectPolicyCode(
+      () => assertMemberPermanentDeletePolicy({ actorId: "actor", userId: "target", currentDeletedAt: null }),
+      "MEMBER_NOT_IN_TRASH",
+    );
+    expect(() => assertMemberRestorePolicy({ currentDeletedAt: new Date() })).not.toThrow();
   });
 });

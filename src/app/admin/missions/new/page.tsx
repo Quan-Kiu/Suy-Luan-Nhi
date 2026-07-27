@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { requireRoles } from "@/auth/session";
+import { requirePermission } from "@/auth/session";
 import { ProductionMissionEditor } from "@/features/admin/production-mission-editor";
 import { getAdminTaxonomy } from "@/modules/admin/mission-admin";
 import { getContentVariableDefinitions } from "@/modules/content/content-variables";
@@ -10,7 +10,7 @@ export const metadata: Metadata = {
 };
 
 export default async function Page() {
-  await requireRoles(["content_admin", "super_admin"]);
+  await requirePermission("missions.manage");
   const [taxonomy, templateVariables] = await Promise.all([
     getAdminTaxonomy(),
     getContentVariableDefinitions(),

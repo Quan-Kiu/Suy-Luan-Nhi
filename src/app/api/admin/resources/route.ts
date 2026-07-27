@@ -1,5 +1,5 @@
 import { apiJson } from "@/lib/api-response";
-import { requireApiRoles } from "@/auth/api";
+import { requireApiPermission } from "@/auth/api";
 import { ageGroupCodes, type AgeGroup } from "@/domain/age-groups";
 import {
   parentResourceCategories,
@@ -11,7 +11,7 @@ import { invalidateParentResources } from "@/lib/cache/invalidation";
 import { adminResourceSchema, createAdminResource, listAdminResources } from "@/modules/admin/resource-admin";
 
 export async function GET(request: Request) {
-  const authResult = await requireApiRoles(request, ["content_admin", "reviewer", "super_admin"]);
+  const authResult = await requireApiPermission(request, "resources.view");
   if ("error" in authResult) return authResult.error;
   const params = new URL(request.url).searchParams;
   const rawType = params.get("resourceType");
@@ -34,7 +34,7 @@ export async function GET(request: Request) {
   );
 }
 export async function POST(request: Request) {
-  const authResult = await requireApiRoles(request, ["content_admin", "super_admin"]);
+  const authResult = await requireApiPermission(request, "resources.manage");
   if ("error" in authResult) return authResult.error;
   const input = adminResourceSchema.safeParse(await request.json().catch(() => null));
   if (!input.success) {

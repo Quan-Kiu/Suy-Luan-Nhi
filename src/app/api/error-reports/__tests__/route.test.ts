@@ -4,7 +4,7 @@ const mocks = vi.hoisted(() => ({
   getApiSession: vi.fn(),
   findParent: vi.fn(),
   consumeRateLimit: vi.fn(),
-  createSystemFeedback: vi.fn(),
+  createOrAggregateAutomaticFeedback: vi.fn(),
 }));
 
 vi.mock("@/auth/api", () => ({ getApiSession: mocks.getApiSession }));
@@ -21,7 +21,7 @@ vi.mock("@/modules/system-feedback/error-reporting-rate-limit", () => ({
   consumeAutomaticErrorReportRateLimit: mocks.consumeRateLimit,
 }));
 vi.mock("@/modules/system-feedback/system-feedback", () => ({
-  createSystemFeedback: mocks.createSystemFeedback,
+  createOrAggregateAutomaticFeedback: mocks.createOrAggregateAutomaticFeedback,
 }));
 
 import { GET, POST } from "@/app/api/error-reports/route";
@@ -60,7 +60,11 @@ beforeEach(() => {
   mocks.getApiSession.mockResolvedValue(session);
   mocks.findParent.mockResolvedValue({ privacySettings: { errorReporting: true } });
   mocks.consumeRateLimit.mockResolvedValue({ allowed: true, maxRequests: 20, windowMinutes: 10 });
-  mocks.createSystemFeedback.mockResolvedValue({ id: "feedback-1" });
+  mocks.createOrAggregateAutomaticFeedback.mockResolvedValue({
+    duplicate: false,
+    reopened: false,
+    item: { id: "feedback-1", occurrenceCount: 1 },
+  });
 });
 
 describe("automatic error reports API", () => {
@@ -87,10 +91,10 @@ describe("automatic error reports API", () => {
 
     expect(response.status).toBe(403);
     expect(body.error.code).toBe("ERROR_REPORTING_DISABLED");
-    expect(mocks.createSystemFeedback).not.toHaveBeenCalled();
+    expect(mocks.createOrAggregateAutomaticFeedback).not.toHaveBeenCalled();
   });
 
-  it("stores an opted-in report in the existing developer feedback workflow", async () => {
+  it("stores an opted-in report in the developer feedback workflow", async () => {
     const response = await POST(
       new Request("https://example.test/api/error-reports", {
         method: "POST",
@@ -101,12 +105,18 @@ describe("automatic error reports API", () => {
     const body = await response.json();
 
     expect(response.status).toBe(201);
-    expect(body.data).toEqual({ id: "feedback-1", accepted: true });
-    expect(mocks.createSystemFeedback).toHaveBeenCalledWith(
+    expect(body.data).toEqual({
+      id: "feedback-1",
+      accepted: true,
+      duplicate: false,
+      reopened: false,
+      occurrenceCount: 1,
+    });
+    expect(mocks.createOrAggregateAutomaticFeedback).toHaveBeenCalledWith(
       expect.objectContaining({
         userId: "user-1",
         pagePath: "/parent/settings",
-        images: [],
+        fingerprint: expect.stringMatching(/^[a-f0-9]{32}$/),
         context: expect.objectContaining({
           reportKind: "automatic_error",
           source: "api_failure",
@@ -115,5 +125,30 @@ describe("automatic error reports API", () => {
         }),
       }),
     );
+  });
+
+  it("returns the existing feedback when the same fault is aggregated", async () => {
+    mocks.createOrAggregateAutomaticFeedback.mockResolvedValue({
+      duplicate: true,
+      reopened: false,
+      item: { id: "feedback-1", occurrenceCount: 7 },
+    });
+    const response = await POST(
+      new Request("https://example.test/api/error-reports", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(validReport()),
+      }),
+    );
+    const body = await response.json();
+
+    expect(response.status).toBe(200);
+    expect(body.data).toEqual({
+      id: "feedback-1",
+      accepted: true,
+      duplicate: true,
+      reopened: false,
+      occurrenceCount: 7,
+    });
   });
 });

@@ -585,6 +585,10 @@ export const systemFeedback = pgTable(
     pagePath: text("page_path").notNull(),
     pageTitle: text("page_title"),
     context: jsonb("context").$type<Record<string, unknown>>().default({}).notNull(),
+    fingerprint: text("fingerprint"),
+    occurrenceCount: integer("occurrence_count").default(1).notNull(),
+    firstSeenAt: timestamp("first_seen_at", { withTimezone: true }).defaultNow().notNull(),
+    lastSeenAt: timestamp("last_seen_at", { withTimezone: true }).defaultNow().notNull(),
     status: feedbackStatus("status").default("new").notNull(),
     adminNote: text("admin_note"),
     handledBy: text("handled_by").references(() => user.id, { onDelete: "set null" }),
@@ -595,6 +599,7 @@ export const systemFeedback = pgTable(
   (table) => [
     index("system_feedback_status_created_idx").on(table.status, table.createdAt),
     index("system_feedback_user_created_idx").on(table.userId, table.createdAt),
+    uniqueIndex("system_feedback_fingerprint_unique").on(table.fingerprint),
     check("system_feedback_content_length", sql`char_length(${table.content}) between 10 and 4000`),
   ],
 );

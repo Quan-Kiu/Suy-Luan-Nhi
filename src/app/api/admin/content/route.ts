@@ -1,7 +1,7 @@
 import { z } from "zod";
 import type { ContentValue } from "@/content/types";
 import { contentValueTypes, type ContentValueType } from "@/domain/content-classification";
-import { requireApiRoles } from "@/auth/api";
+import { requireApiPermission } from "@/auth/api";
 import { apiJson } from "@/lib/api-response";
 import { invalidateContentCache } from "@/lib/cache/invalidation";
 import { listContentEntries, resetContentEntry, upsertContentEntry } from "@/modules/content/content";
@@ -29,7 +29,7 @@ const updateSchema = identitySchema.extend({
   active: z.boolean().default(true),
 });
 export async function GET(request: Request) {
-  const authResult = await requireApiRoles(request, ["content_admin", "reviewer", "super_admin"]);
+  const authResult = await requireApiPermission(request, "content.view");
   if ("error" in authResult) return authResult.error;
   const params = new URL(request.url).searchParams;
   const rawValueType = params.get("valueType")?.trim();
@@ -50,7 +50,7 @@ export async function GET(request: Request) {
 }
 
 export async function PATCH(request: Request) {
-  const authResult = await requireApiRoles(request, ["content_admin", "super_admin"]);
+  const authResult = await requireApiPermission(request, "content.manage");
   if ("error" in authResult) return authResult.error;
   const input = updateSchema.safeParse(await request.json().catch(() => null));
   if (!input.success) {
@@ -69,7 +69,7 @@ export async function PATCH(request: Request) {
 }
 
 export async function DELETE(request: Request) {
-  const authResult = await requireApiRoles(request, ["content_admin", "super_admin"]);
+  const authResult = await requireApiPermission(request, "content.manage");
   if ("error" in authResult) return authResult.error;
   const input = identitySchema.safeParse(await request.json().catch(() => null));
   if (!input.success) {

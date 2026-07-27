@@ -5,7 +5,8 @@ import { parentProfiles } from "@/db/schema";
 import { automaticErrorReportSchema, redactErrorText } from "@/domain/error-reporting";
 import { apiJson } from "@/lib/api-response";
 import { consumeAutomaticErrorReportRateLimit } from "@/modules/system-feedback/error-reporting-rate-limit";
-import { createSystemFeedback } from "@/modules/system-feedback/system-feedback";
+import { createAutomaticFeedbackFingerprint } from "@/modules/system-feedback/automatic-feedback";
+import { createOrAggregateAutomaticFeedback } from "@/modules/system-feedback/system-feedback";
 
 async function readErrorReportingConsent(userId: string) {
   const parent = await db.query.parentProfiles.findFirst({
@@ -72,7 +73,9 @@ export async function POST(request: Request) {
   const summary = `[Báo cáo lỗi tự động] ${report.error.name}: ${report.error.message}`.slice(0, 4000);
 
   try {
-    const created = await createSystemFeedback({
+    const fingerprint = createAutomaticFeedbackFingerprint(report);
+    const result = await createOrAggregateAutomaticFeedback({
+      fingerprint,
       userId: session.user.id,
       content: summary,
       pagePath: report.pagePath,
@@ -88,9 +91,17 @@ export async function POST(request: Request) {
         userAgent,
         release,
       },
-      images: [],
     });
-    return apiJson({ id: created?.id ?? null, accepted: true }, { status: 201 });
+    return apiJson(
+      {
+        id: result.item?.id ?? null,
+        accepted: true,
+        duplicate: result.duplicate,
+        reopened: result.reopened,
+        occurrenceCount: result.item?.occurrenceCount ?? 1,
+      },
+      { status: result.duplicate ? 200 : 201 },
+    );
   } catch (error) {
     console.error("[api.automatic_error_report.create_failed]", error);
     return apiJson(

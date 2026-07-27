@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { Braces } from "lucide-react";
-import { requireRoles } from "@/auth/session";
+import { requirePermission } from "@/auth/session";
 import { AdminPageHeader } from "@/features/admin/admin-page-header";
 import { ContentVariableManager } from "@/features/admin/content-variable-manager";
 import { getContentVariableDefinitions } from "@/modules/content/content-variables";
@@ -10,7 +10,7 @@ export const metadata: Metadata = {
 };
 
 export default async function Page() {
-  await requireRoles(["super_admin"]);
+  await requirePermission("content_variables.manage");
   const variables = await getContentVariableDefinitions();
   return (
     <div className="space-y-6">

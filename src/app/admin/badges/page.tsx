@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { Award } from "lucide-react";
-import { requireRoles } from "@/auth/session";
+import { requirePermission } from "@/auth/session";
 import { db } from "@/db/client";
 import { skills } from "@/db/schema";
 import { AdminPageHeader } from "@/features/admin/admin-page-header";
@@ -13,7 +13,7 @@ export const metadata: Metadata = {
 };
 
 export default async function Page() {
-  await requireRoles(["content_admin", "super_admin"]);
+  await requirePermission("badges.manage");
   const [items, skillRows] = await Promise.all([
     listBadges(),
     db.select({ id: skills.id, title: skills.title }).from(skills).orderBy(asc(skills.title)),

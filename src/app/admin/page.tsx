@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { ArrowRight, BarChart3, ClipboardCheck, FilePlus2, ImageIcon, MonitorDot, Users } from "lucide-react";
 import Link from "next/link";
-import { requireStaff } from "@/auth/session";
+import { requirePermission } from "@/auth/session";
 import { Card, Pill } from "@/components/ui";
 import { contentText } from "@/content/resolve";
 import {
@@ -23,7 +23,7 @@ export default async function Page() {
   const [data, content, session] = await Promise.all([
     getAdminDashboard(),
     getContentNamespace("admin"),
-    requireStaff(),
+    requirePermission("admin.dashboard.view"),
   ]);
   const t = (key: string, fallback: string) => contentText(content, key, fallback);
   const role = getPrimaryRole(session.user.role);
