@@ -52,7 +52,7 @@ function ReviewCard({
           src={item.coverUrl}
           fill
           sizes="(max-width: 767px) calc(100vw - 2rem), (max-width: 1279px) 50vw, 33vw"
-          priority={index === 0}
+          loading={index === 0 ? "eager" : "lazy"}
           alt=""
           className="object-cover"
         />

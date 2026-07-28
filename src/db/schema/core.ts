@@ -121,7 +121,7 @@ export const childProfiles = pgTable(
   },
   (table) => [
     index("child_profiles_parent_idx").on(table.parentProfileId),
-    check("child_display_name_length", sql`char_length(${table.displayName}) between 1 and 20`),
+    check("child_display_name_length", sql`char_length(${table.displayName}) between 2 and 20`),
   ],
 );
 
@@ -526,6 +526,7 @@ export const parentResources = pgTable(
     mediaUrl: text("media_url"),
     status: contentStatus("status").default("draft").notNull(),
     sortOrder: integer("sort_order").default(0).notNull(),
+    revision: integer("revision").default(1).notNull(),
     publishedAt: timestamp("published_at", { withTimezone: true }),
     createdBy: text("created_by").references(() => user.id, { onDelete: "set null" }),
     updatedAt: timestamp("updated_at", { withTimezone: true }).defaultNow().notNull(),

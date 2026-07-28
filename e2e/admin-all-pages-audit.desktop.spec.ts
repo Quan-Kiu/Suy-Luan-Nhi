@@ -29,6 +29,7 @@ type AuditResult = {
   brokenImages: number;
   tinyTextCount: number;
   consoleErrors: string[];
+  consoleWarnings: string[];
   pageErrors: string[];
 };
 async function firstHref(page: Page, selector: string) {
@@ -79,9 +80,12 @@ async function resolveRoutes(page: Page): Promise<AuditRoute[]> {
 }
 async function auditPage(page: Page, route: AuditRoute, viewport: (typeof allViewports)[number]) {
   const consoleErrors: string[] = [];
+  const consoleWarnings: string[] = [];
   const pageErrors: string[] = [];
+  let captureLoadWarnings = true;
   const onConsole = (message: { type(): string; text(): string }) => {
     if (message.type() === "error") consoleErrors.push(message.text());
+    if (captureLoadWarnings && message.type() === "warning") consoleWarnings.push(message.text());
   };
   const onPageError = (error: Error) => pageErrors.push(error.message);
   page.on("console", onConsole);
@@ -139,6 +143,9 @@ async function auditPage(page: Page, route: AuditRoute, viewport: (typeof allVie
   });
   const prefix = `${viewport.name}-${route.name}`;
   await page.screenshot({ path: `${outputDir}/${prefix}-top.png`, fullPage: false });
+  // Bottom screenshots deliberately reveal lazy content after the initial render.
+  // Keep runtime errors active, but do not treat warnings caused only by the synthetic audit scroll as load warnings.
+  captureLoadWarnings = false;
   if (metrics.mainScrollHeight > metrics.mainClientHeight * 1.25) {
     await main.evaluate((element) => element.scrollTo({ top: element.scrollHeight, behavior: "instant" }));
     await page.waitForTimeout(100);
@@ -155,6 +162,7 @@ async function auditPage(page: Page, route: AuditRoute, viewport: (typeof allVie
     title: safeTitle,
     ...metrics,
     consoleErrors,
+    consoleWarnings,
     pageErrors,
   } satisfies AuditResult;
 }
@@ -186,6 +194,9 @@ test("capture and measure every admin page", async ({ page }) => {
     expect(result.mainHorizontalOverflow, `${result.viewport}/${result.route} main overflow`).toBe(false);
     expect(result.clippedControls, `${result.viewport}/${result.route} clipped controls`).toBe(0);
     expect(result.brokenImages, `${result.viewport}/${result.route} broken images`).toBe(0);
+    expect(result.tinyTextCount, `${result.viewport}/${result.route} text smaller than 12px`).toBe(0);
+    expect(result.consoleErrors, `${result.viewport}/${result.route} console errors`).toEqual([]);
+    expect(result.consoleWarnings, `${result.viewport}/${result.route} console warnings`).toEqual([]);
     expect(result.pageErrors, `${result.viewport}/${result.route} page errors`).toEqual([]);
   }
 });

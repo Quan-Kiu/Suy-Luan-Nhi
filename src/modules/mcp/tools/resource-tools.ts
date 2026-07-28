@@ -95,7 +95,7 @@ export function registerResourceTools(server: McpServer, context: SlnMcpContext)
         if (!current) throw new Error("Resource not found");
         if (dryRun) return { valid: true, dryRun: true, before: current, after: resource };
         assertMcpWritable(context);
-        return updateAdminResource(resourceId, resource, context.actor.id);
+        return updateAdminResource(resourceId, resource, context.actor.id, current.revision);
       }),
   );
 }

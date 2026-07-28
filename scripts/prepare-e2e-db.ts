@@ -5,9 +5,31 @@ import { Client } from "pg";
 const databaseUrl = process.env.E2E_DATABASE_URL ?? "postgresql://sln@127.0.0.1:54329/sln_e2e";
 const parsed = new URL(databaseUrl);
 const databaseName = parsed.pathname.slice(1);
+const databaseConnectAttempts = 40;
+const databaseConnectDelayMs = 500;
 
 if (!/(_e2e|_test)$/.test(databaseName)) {
   throw new Error(`Refusing to reset non-test database: ${databaseName}`);
+}
+
+function sleep(milliseconds: number) {
+  return new Promise((resolve) => setTimeout(resolve, milliseconds));
+}
+
+async function connectWithRetry(connectionString: string) {
+  let lastError: unknown;
+  for (let attempt = 1; attempt <= databaseConnectAttempts; attempt += 1) {
+    const client = new Client({ connectionString });
+    try {
+      await client.connect();
+      return client;
+    } catch (error) {
+      lastError = error;
+      await client.end().catch(() => undefined);
+      if (attempt < databaseConnectAttempts) await sleep(databaseConnectDelayMs);
+    }
+  }
+  throw lastError instanceof Error ? lastError : new Error("PostgreSQL did not become ready");
 }
 
 function run(command: string, args: string[]) {
@@ -22,8 +44,7 @@ function run(command: string, args: string[]) {
 async function main() {
   const adminUrl = new URL(databaseUrl);
   adminUrl.pathname = "/postgres";
-  const admin = new Client({ connectionString: adminUrl.toString() });
-  await admin.connect();
+  const admin = await connectWithRetry(adminUrl.toString());
   const exists = await admin.query("select 1 from pg_database where datname = $1", [databaseName]);
   if (!exists.rowCount) {
     const safeName = `"${databaseName.replaceAll('"', '""')}"`;
@@ -31,8 +52,7 @@ async function main() {
   }
   await admin.end();
 
-  const target = new Client({ connectionString: databaseUrl });
-  await target.connect();
+  const target = await connectWithRetry(databaseUrl);
   await target.query(
     "drop schema if exists public cascade; drop schema if exists drizzle cascade; create schema public",
   );

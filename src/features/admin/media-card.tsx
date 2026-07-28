@@ -26,12 +26,14 @@ export function MediaCard({
   canDelete,
   onUpdated,
   onDeleted,
+  eagerImage = false,
 }: {
   item: MediaItem;
   canReview: boolean;
   canDelete: boolean;
   onUpdated: (item: MediaItem) => void;
   onDeleted: (mediaId: string) => void;
+  eagerImage?: boolean;
 }) {
   const content = useContent("admin");
   const queryClient = useQueryClient();
@@ -98,6 +100,7 @@ export function MediaCard({
             src={item.url}
             fill
             sizes="(min-width: 1280px) 25vw, (min-width: 640px) 50vw, 100vw"
+            loading={eagerImage ? "eager" : "lazy"}
             alt={item.altText}
             className="object-contain"
           />

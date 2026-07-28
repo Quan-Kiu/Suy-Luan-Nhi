@@ -47,6 +47,7 @@ export function MissionEditorPreview({
               src={coverUrl || "/assets/cards/mission-thumb-footprint-detective.png"}
               fill
               sizes="(min-width: 1280px) 360px, 100vw"
+              loading="eager"
               alt={contentText(content, "missionEditor.previewAlt", "Ảnh bìa nhiệm vụ")}
               className="object-cover"
             />

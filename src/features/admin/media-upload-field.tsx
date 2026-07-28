@@ -27,6 +27,7 @@ type Props = {
   error?: string;
   compact?: boolean;
   previewFit?: "cover" | "contain";
+  eagerPreview?: boolean;
 };
 
 const defaultAccept = "image/png,image/jpeg,image/webp,image/gif,image/avif";
@@ -42,11 +43,13 @@ function Preview({
   label,
   fit,
   compact,
+  eager,
 }: {
   url: string;
   label: string;
   fit: "cover" | "contain";
   compact: boolean;
+  eager: boolean;
 }) {
   const kind = previewKind(url);
   const heightClass = compact ? "h-24" : "h-32";
@@ -71,6 +74,7 @@ function Preview({
         src={url}
         fill
         sizes="(min-width: 1280px) 520px, 100vw"
+        loading={eager ? "eager" : "lazy"}
         alt={label}
         className={fit === "cover" ? "object-cover" : "object-contain p-2"}
       />
@@ -89,6 +93,7 @@ export function MediaUploadField({
   error,
   compact = false,
   previewFit = "contain",
+  eagerPreview = false,
 }: Props) {
   const inputId = useId();
   const [libraryOpen, setLibraryOpen] = useState(false);
@@ -132,7 +137,15 @@ export function MediaUploadField({
           {description}
         </p>
       </div>
-      {value ? <Preview url={value} label={altText || label} fit={previewFit} compact={compact} /> : null}
+      {value ? (
+        <Preview
+          url={value}
+          label={altText || label}
+          fit={previewFit}
+          compact={compact}
+          eager={eagerPreview}
+        />
+      ) : null}
       <div className="grid gap-2 sm:grid-cols-2">
         <button
           type="button"

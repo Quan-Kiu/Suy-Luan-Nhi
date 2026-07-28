@@ -73,7 +73,7 @@ export function ResourceListWorkspace({
     placeholderData: keepPreviousData,
   });
   const archiveMutation = useMutation({
-    mutationFn: (resourceId: string) => adminResourcesApi.archive(resourceId),
+    mutationFn: (resource: AdminResourceItem) => adminResourcesApi.archive(resource.id, resource.revision),
     onSuccess: async () => {
       setArchiveTarget(null);
       await queryClient.invalidateQueries({ queryKey: queryKeys.admin.resources });
@@ -239,7 +239,7 @@ export function ResourceListWorkspace({
             </label>
           </div>
           <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4">
-            {data.items.map((item) => (
+            {data.items.map((item, index) => (
               <article
                 key={item.id}
                 className="flex h-full flex-col overflow-hidden rounded-2xl border bg-white shadow-sm"
@@ -250,6 +250,7 @@ export function ResourceListWorkspace({
                       src={item.coverUrl}
                       fill
                       sizes="(min-width:1536px) 25vw, (min-width:1280px) 33vw, 50vw"
+                      loading={index === 0 ? "eager" : "lazy"}
                       alt=""
                       className="object-cover"
                     />
@@ -349,8 +350,12 @@ export function ResourceListWorkspace({
         pendingLabel="Đang lưu trữ..."
         tone="warning"
         pending={archiveMutation.isPending}
-        onClose={() => setArchiveTarget(null)}
-        onConfirm={() => archiveTarget && archiveMutation.mutate(archiveTarget.id)}
+        errorMessage={archiveMutation.error?.message}
+        onClose={() => {
+          archiveMutation.reset();
+          setArchiveTarget(null);
+        }}
+        onConfirm={() => archiveTarget && archiveMutation.mutate(archiveTarget)}
       />
     </div>
   );

@@ -17,11 +17,12 @@ export type AdminResourceItem = {
   mediaUrl: string | null;
   status: AdminResourceStatus;
   sortOrder: number;
+  revision: number;
   publishedAt: string | Date | null;
   updatedAt: string | Date;
 };
 
-export type AdminResourceInput = Omit<AdminResourceItem, "id" | "publishedAt" | "updatedAt"> & {
+export type AdminResourceInput = Omit<AdminResourceItem, "id" | "revision" | "publishedAt" | "updatedAt"> & {
   coverUrl: string;
 };
 
@@ -46,20 +47,25 @@ export const adminResourcesApi = {
   list(filters: AdminResourceFilters = {}) {
     return apiRequest<AdminResourcePage>({ url: "/api/admin/resources", method: "GET", params: filters });
   },
+  get(resourceId: string) {
+    return apiRequest<AdminResourceItem>({ url: `/api/admin/resources/${resourceId}`, method: "GET" });
+  },
   create(input: AdminResourceInput) {
     return apiRequest<AdminResourceItem>({ url: "/api/admin/resources", method: "POST", data: input });
   },
-  update(resourceId: string, input: AdminResourceInput) {
+  update(resourceId: string, input: AdminResourceInput, expectedRevision: number) {
     return apiRequest<AdminResourceItem>({
       url: `/api/admin/resources/${resourceId}`,
       method: "PATCH",
       data: input,
+      headers: { "x-resource-revision": String(expectedRevision) },
     });
   },
-  archive(resourceId: string) {
+  archive(resourceId: string, expectedRevision: number) {
     return apiRequest<AdminResourceItem>({
       url: `/api/admin/resources/${resourceId}`,
       method: "DELETE",
+      headers: { "x-resource-revision": String(expectedRevision) },
     });
   },
 };

@@ -258,7 +258,7 @@ export function MediaLibrary({ initialData, canReview, canUpload, canDelete }: P
           </div>
 
           <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
-            {data.items.map((item) => (
+            {data.items.map((item, index) => (
               <MediaCard
                 key={item.id}
                 item={item}
@@ -266,6 +266,7 @@ export function MediaLibrary({ initialData, canReview, canUpload, canDelete }: P
                 canDelete={canDelete}
                 onUpdated={updateMedia}
                 onDeleted={removeMedia}
+                eagerImage={index === 0}
               />
             ))}
           </div>

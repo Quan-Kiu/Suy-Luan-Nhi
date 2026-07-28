@@ -1,4 +1,8 @@
 import type { NextConfig } from "next";
+import path from "node:path";
+import { fileURLToPath } from "node:url";
+
+const projectRoot = path.dirname(fileURLToPath(import.meta.url));
 
 const remotePatterns: NonNullable<NonNullable<NextConfig["images"]>["remotePatterns"]> = [];
 if (process.env.S3_PUBLIC_BASE_URL) {
@@ -32,9 +36,11 @@ const securityHeaders = [
 const nextConfig: NextConfig = {
   distDir: process.env.NEXT_DIST_DIR ?? ".next",
   output: "standalone",
+  outputFileTracingRoot: projectRoot,
   poweredByHeader: false,
   compress: true,
   images: { remotePatterns },
+  turbopack: { root: projectRoot },
   experimental: {
     serverActions: { bodySizeLimit: "2mb" },
     staleTimes: { dynamic: 60 },

@@ -3,6 +3,8 @@ import { requireApiPermission } from "@/auth/api";
 import { ageGroupCodes, type AgeGroup } from "@/domain/age-groups";
 import {
   parentResourceCategories,
+  parentResourceErrorCodes,
+  parentResourceErrorMessages,
   parentResourceTypes,
   type ParentResourceCategory,
   type ParentResourceType,
@@ -40,8 +42,8 @@ export async function POST(request: Request) {
   if (!input.success) {
     return apiJson(
       {
-        code: "RESOURCE_VALIDATION_FAILED",
-        message: input.error.issues[0]?.message ?? "Tài nguyên chưa hợp lệ",
+        code: parentResourceErrorCodes.validationFailed,
+        message: input.error.issues[0]?.message ?? parentResourceErrorMessages.validationFailed,
         issues: input.error.flatten(),
       },
       { status: 400 },
@@ -53,7 +55,13 @@ export async function POST(request: Request) {
     return apiJson(resource, { status: 201 });
   } catch (error) {
     if (error instanceof Error && error.message.includes("unique")) {
-      return apiJson({ message: "Mã đường dẫn tài nguyên đã tồn tại" }, { status: 409 });
+      return apiJson(
+        {
+          code: parentResourceErrorCodes.slugConflict,
+          message: parentResourceErrorMessages.slugConflict,
+        },
+        { status: 409 },
+      );
     }
     throw error;
   }

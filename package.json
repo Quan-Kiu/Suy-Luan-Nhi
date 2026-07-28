@@ -21,7 +21,7 @@
     "db:seed": "node --conditions=react-server --import tsx src/db/seed.ts",
     "db:reset": "tsx scripts/reset-db.ts",
     "auth:schema": "auth generate --config src/auth/auth.ts --output src/db/schema/auth.generated.ts --yes",
-    "test:integration": "RUN_DB_TESTS=true vitest run src/modules/gameplay/__tests__/session.integration.test.ts",
+    "test:integration": "node scripts/run-integration-tests.mjs",
     "infra:up": "docker compose up -d",
     "infra:down": "docker compose down",
     "db:bootstrap": "npm run infra:up && npm run db:migrate && npm run db:seed",

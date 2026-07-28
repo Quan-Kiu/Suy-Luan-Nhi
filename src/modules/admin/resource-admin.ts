@@ -110,6 +110,18 @@ export async function getAdminResource(resourceId: string) {
   return resource ? normalizeResource(resource) : null;
 }
 
+export class ResourceRevisionConflictError extends Error {
+  readonly currentRevision: number;
+  readonly currentUpdatedAt: Date;
+
+  constructor(currentRevision: number, currentUpdatedAt: Date) {
+    super("Parent resource was updated by another editor");
+    this.name = "ResourceRevisionConflictError";
+    this.currentRevision = currentRevision;
+    this.currentUpdatedAt = currentUpdatedAt;
+  }
+}
+
 function publishedAtForStatus(status: AdminResourceInput["status"], current?: Date | null) {
   if (status === "published") return current ?? new Date();
   return null;
@@ -134,18 +146,40 @@ export async function createAdminResource(input: AdminResourceInput, actorId: st
   return normalizeResource(resource);
 }
 
-export async function updateAdminResource(resourceId: string, input: AdminResourceInput, actorId: string) {
+async function latestResourceRevision(resourceId: string, fallback: AdminResourceRecord) {
+  const [latest] = await db
+    .select({ revision: parentResources.revision, updatedAt: parentResources.updatedAt })
+    .from(parentResources)
+    .where(eq(parentResources.id, resourceId))
+    .limit(1);
+  return latest ?? { revision: fallback.revision, updatedAt: fallback.updatedAt };
+}
+
+export async function updateAdminResource(
+  resourceId: string,
+  input: AdminResourceInput,
+  actorId: string,
+  expectedRevision: number,
+) {
   const current = await getAdminResource(resourceId);
   if (!current) return null;
+  if (!Number.isInteger(expectedRevision) || expectedRevision < 1) {
+    throw new ResourceRevisionConflictError(current.revision, current.updatedAt);
+  }
   const [resource] = await db
     .update(parentResources)
     .set({
       ...input,
+      revision: sql`${parentResources.revision} + 1`,
       publishedAt: publishedAtForStatus(input.status, current.publishedAt),
       updatedAt: new Date(),
     })
-    .where(eq(parentResources.id, resourceId))
+    .where(and(eq(parentResources.id, resourceId), eq(parentResources.revision, expectedRevision)))
     .returning();
+  if (!resource) {
+    const latest = await latestResourceRevision(resourceId, current);
+    throw new ResourceRevisionConflictError(latest.revision, latest.updatedAt);
+  }
   await db.insert(auditLogs).values({
     actorId,
     action: "parent_resource.updated",
@@ -157,14 +191,26 @@ export async function updateAdminResource(resourceId: string, input: AdminResour
   return normalizeResource(resource);
 }
 
-export async function archiveAdminResource(resourceId: string, actorId: string) {
+export async function archiveAdminResource(resourceId: string, actorId: string, expectedRevision: number) {
   const current = await getAdminResource(resourceId);
   if (!current) return null;
+  if (!Number.isInteger(expectedRevision) || expectedRevision < 1) {
+    throw new ResourceRevisionConflictError(current.revision, current.updatedAt);
+  }
   const [resource] = await db
     .update(parentResources)
-    .set({ status: "archived", publishedAt: null, updatedAt: new Date() })
-    .where(eq(parentResources.id, resourceId))
+    .set({
+      status: "archived",
+      revision: sql`${parentResources.revision} + 1`,
+      publishedAt: null,
+      updatedAt: new Date(),
+    })
+    .where(and(eq(parentResources.id, resourceId), eq(parentResources.revision, expectedRevision)))
     .returning();
+  if (!resource) {
+    const latest = await latestResourceRevision(resourceId, current);
+    throw new ResourceRevisionConflictError(latest.revision, latest.updatedAt);
+  }
   await db.insert(auditLogs).values({
     actorId,
     action: "parent_resource.archived",

@@ -4,6 +4,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { Save } from "lucide-react";
 import { useForm, useWatch } from "react-hook-form";
+import { useState } from "react";
 import { toast } from "sonner";
 import { z } from "zod";
 import { adminResourcesApi, type AdminResourceInput, type AdminResourceItem } from "@/api/admin/resources";
@@ -13,11 +14,13 @@ import { MediaUploadField } from "@/features/admin/media-upload-field";
 import {
   parentResourceCategories,
   parentResourceCategoryLabels,
+  parentResourceErrorCodes,
   parentResourceTypes,
   parentResourceTypeLabels,
 } from "@/domain/parent-resources";
 import { useHydrated } from "@/hooks/use-hydrated";
 import { usePendingRouter } from "@/hooks/use-pending-router";
+import { ApiRequestError } from "@/lib/api/error";
 import { queryKeys } from "@/lib/query/keys";
 import { createSlug } from "@/lib/slug";
 
@@ -81,10 +84,26 @@ function toFormValues(resource?: AdminResourceItem | null): FormValues {
   };
 }
 
+type ResourceConflictDetails = {
+  currentRevision: number;
+  currentUpdatedAt: string;
+};
+
+function getResourceConflictDetails(error: unknown): ResourceConflictDetails | null {
+  if (!(error instanceof ApiRequestError) || error.code !== parentResourceErrorCodes.editConflict)
+    return null;
+  if (!error.details || typeof error.details !== "object") return null;
+  const details = error.details as Record<string, unknown>;
+  return typeof details.currentRevision === "number" && typeof details.currentUpdatedAt === "string"
+    ? { currentRevision: details.currentRevision, currentUpdatedAt: details.currentUpdatedAt }
+    : null;
+}
+
 export function ResourceEditorForm({ resource }: { resource?: AdminResourceItem | null }) {
   const navigation = usePendingRouter();
   const queryClient = useQueryClient();
   const interactive = useHydrated();
+  const [currentRevision, setCurrentRevision] = useState(resource?.revision ?? 0);
   const form = useForm<FormValues>({
     resolver: zodResolver(schema),
     defaultValues: toFormValues(resource),
@@ -95,12 +114,28 @@ export function ResourceEditorForm({ resource }: { resource?: AdminResourceItem 
         ...values,
         mediaUrl: values.resourceType === "video" ? values.mediaUrl : null,
       };
-      return resource ? adminResourcesApi.update(resource.id, input) : adminResourcesApi.create(input);
+      return resource
+        ? adminResourcesApi.update(resource.id, input, currentRevision)
+        : adminResourcesApi.create(input);
     },
     onSuccess: async (saved) => {
+      setCurrentRevision(saved.revision);
+      form.reset(toFormValues(saved));
       await queryClient.invalidateQueries({ queryKey: queryKeys.admin.resources });
       toast.success(saved.status === "published" ? "Bài viết đã được hiển thị" : "Đã lưu bài viết");
-      navigation.push(`/admin/resources/${saved.id}/edit`);
+      if (!resource) navigation.push(`/admin/resources/${saved.id}/edit`);
+    },
+  });
+  const reloadMutation = useMutation({
+    mutationFn: () => {
+      if (!resource) throw new Error("Không thể tải lại tài nguyên chưa được tạo");
+      return adminResourcesApi.get(resource.id);
+    },
+    onSuccess: (latest) => {
+      setCurrentRevision(latest.revision);
+      form.reset(toFormValues(latest));
+      mutation.reset();
+      toast.success("Đã tải phiên bản mới nhất");
     },
   });
   const title = useWatch({ control: form.control, name: "title" });
@@ -108,6 +143,7 @@ export function ResourceEditorForm({ resource }: { resource?: AdminResourceItem 
   const mediaUrl = useWatch({ control: form.control, name: "mediaUrl" });
   const resourceType = useWatch({ control: form.control, name: "resourceType" });
   const selectedAgeGroups = useWatch({ control: form.control, name: "ageGroups" });
+  const conflict = getResourceConflictDetails(mutation.error);
   function toggleAgeGroup(ageGroup: AgeGroup) {
     const next = selectedAgeGroups.includes(ageGroup)
       ? selectedAgeGroups.filter((item) => item !== ageGroup)
@@ -149,6 +185,7 @@ export function ResourceEditorForm({ resource }: { resource?: AdminResourceItem 
                 }
                 category="resource-cover"
                 previewFit="cover"
+                eagerPreview
                 altText={title || "Ảnh bìa tài nguyên"}
                 error={form.formState.errors.coverUrl?.message}
               />
@@ -281,7 +318,28 @@ export function ResourceEditorForm({ resource }: { resource?: AdminResourceItem 
               </p>
             ) : null}
           </section>
-          <FormStatus status={mutation.isError ? "error" : "idle"} message={mutation.error?.message} />
+          {conflict ? (
+            <div role="alert" className="rounded-2xl border border-amber-300 bg-amber-50 p-4 text-amber-950">
+              <p className="type-label font-black">Bài viết vừa được cập nhật ở nơi khác</p>
+              <p className="type-supporting mt-1">
+                Phiên bản hiện tại là {conflict.currentRevision}, cập nhật lúc{" "}
+                {new Date(conflict.currentUpdatedAt).toLocaleString("vi-VN")}. Tải lại sẽ bỏ các thay đổi chưa
+                lưu trên màn hình này.
+              </p>
+              <button
+                type="button"
+                disabled={reloadMutation.isPending}
+                onClick={() => reloadMutation.mutate()}
+                className="type-action mt-3 inline-flex min-h-10 items-center justify-center rounded-xl border border-amber-400 bg-white px-4 font-black disabled:opacity-60"
+              >
+                {reloadMutation.isPending ? "Đang tải..." : "Tải phiên bản mới nhất"}
+              </button>
+            </div>
+          ) : null}
+          <FormStatus
+            status={mutation.isError && !conflict ? "error" : reloadMutation.isError ? "error" : "idle"}
+            message={!conflict ? (mutation.error?.message ?? reloadMutation.error?.message) : undefined}
+          />
           <SubmitButton pending={mutation.isPending || navigation.isPending} pendingLabel="Đang lưu...">
             <Save size={18} className="mr-2 inline" />
             {resource ? "Lưu thay đổi" : "Tạo bài đăng"}

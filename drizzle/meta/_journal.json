@@ -197,6 +197,13 @@
       "when": 1785162942758,
       "tag": "0027_access_role_crud",
       "breakpoints": true
+    },
+    {
+      "idx": 28,
+      "version": "7",
+      "when": 1785219856658,
+      "tag": "0028_production_hardening_p0",
+      "breakpoints": true
     }
   ]
 }

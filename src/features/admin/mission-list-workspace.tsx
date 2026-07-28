@@ -303,7 +303,7 @@ export function MissionListWorkspace({ initialData, initialFilters, worlds, canE
                           src={item.coverUrl}
                           fill
                           sizes="(max-width: 767px) calc(100vw - 2rem), 1px"
-                          priority={index === 0}
+                          loading={index === 0 ? "eager" : "lazy"}
                           alt=""
                           className={cn("object-cover", archived && "opacity-75 grayscale-[35%]")}
                         />
@@ -353,8 +353,14 @@ export function MissionListWorkspace({ initialData, initialFilters, worlds, canE
                   </tr>
                 </thead>
                 <tbody>
-                  {data.items.map((item) => (
-                    <MissionTableRow key={item.id} item={item} canEdit={canEdit} content={content} />
+                  {data.items.map((item, index) => (
+                    <MissionTableRow
+                      key={item.id}
+                      item={item}
+                      canEdit={canEdit}
+                      content={content}
+                      eagerImage={index === 0}
+                    />
                   ))}
                 </tbody>
               </table>
@@ -427,10 +433,12 @@ function MissionTableRow({
   item,
   canEdit,
   content,
+  eagerImage,
 }: {
   item: AdminMissionListItem;
   canEdit: boolean;
   content: ContentDictionary;
+  eagerImage: boolean;
 }) {
   const archived = item.status === "archived";
   return (
@@ -448,6 +456,7 @@ function MissionTableRow({
               src={item.coverUrl}
               fill
               sizes="68px"
+              loading={eagerImage ? "eager" : "lazy"}
               alt=""
               className={cn("object-cover", archived && "opacity-75 grayscale-[35%]")}
             />
