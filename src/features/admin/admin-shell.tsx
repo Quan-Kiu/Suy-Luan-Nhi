@@ -6,9 +6,12 @@ import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
+import { cn } from "@/lib/utils";
 import { contentText, useContent } from "@/content/client";
 import { AdminNavigation } from "@/features/admin/admin-navigation";
 import { useSignOutNavigation } from "@/features/auth/use-sign-out-navigation";
+
+const MISSION_EDITOR_ROUTE_PATTERN = /^\/admin\/missions\/(?:new|[^/]+\/edit)$/;
 
 export function AdminShell({
   children,
@@ -28,6 +31,7 @@ export function AdminShell({
   const signOutFlow = useSignOutNavigation("/");
   const [menuOpen, setMenuOpen] = useState(false);
   const displayedRoleLabel = roleLabel ?? role;
+  const usesFullHeightContent = MISSION_EDITOR_ROUTE_PATTERN.test(pathname);
 
   useEffect(() => {
     function closeOnEscape(event: KeyboardEvent) {
@@ -162,7 +166,14 @@ export function AdminShell({
           aria-label={contentText(content, "shell.mainContent", "Nội dung quản trị")}
           className="min-h-0 min-w-0 scrollbar-thin overflow-x-hidden overflow-y-auto overscroll-contain p-4 pb-[max(1rem,var(--safe-area-bottom))] outline-none focus-visible:ring-2 focus-visible:ring-[#d86a24] focus-visible:ring-inset sm:p-5 lg:p-6"
         >
-          <div className="mx-auto h-full min-h-0 w-full max-w-[1680px]">{children}</div>
+          <div
+            className={cn(
+              "mx-auto w-full max-w-[1680px]",
+              usesFullHeightContent ? "h-full min-h-0" : "min-h-full",
+            )}
+          >
+            {children}
+          </div>
         </main>
       </div>
     </div>

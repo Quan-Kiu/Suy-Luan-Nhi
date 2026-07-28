@@ -136,3 +136,39 @@ test("mission editor keeps the existing page scroll below the desktop breakpoint
   });
   await expect(page.getByRole("button", { name: "Gửi để kiểm tra" })).toBeInViewport();
 });
+
+test("admin pages keep bottom breathing room after scrolling to the last section", async ({ page }) => {
+  await page.setViewportSize({ width: 1650, height: 600 });
+  await signIn(page, "content@demo.local", "/admin/taxonomy");
+  await expect(page.getByRole("heading", { name: "Nhóm tuổi và kỹ năng" })).toBeVisible();
+
+  const main = page.locator("#admin-main-content");
+  const addSkillCard = page.locator("details").filter({ hasText: "Thêm kỹ năng mới" });
+
+  await main.evaluate((element) => {
+    element.scrollTop = element.scrollHeight;
+  });
+  await expect(addSkillCard).toBeInViewport();
+
+  const layout = await page.evaluate(() => {
+    const mainElement = document.querySelector<HTMLElement>("#admin-main-content")!;
+    const contentElement = mainElement.firstElementChild as HTMLElement;
+    const mainRect = mainElement.getBoundingClientRect();
+    const contentRect = contentElement.getBoundingClientRect();
+
+    return {
+      paddingBottom: Number.parseFloat(getComputedStyle(mainElement).paddingBottom),
+      contentBottomGap: mainRect.bottom - contentRect.bottom,
+      mainScrollTop: mainElement.scrollTop,
+      mainMaxScrollTop: mainElement.scrollHeight - mainElement.clientHeight,
+    };
+  });
+  const lastSectionBottomGap = await addSkillCard.evaluate((element) => {
+    const mainElement = document.querySelector<HTMLElement>("#admin-main-content")!;
+    return mainElement.getBoundingClientRect().bottom - element.getBoundingClientRect().bottom;
+  });
+
+  expect(layout.mainScrollTop).toBeCloseTo(layout.mainMaxScrollTop, 0);
+  expect(layout.contentBottomGap).toBeGreaterThanOrEqual(layout.paddingBottom - 1);
+  expect(lastSectionBottomGap).toBeGreaterThanOrEqual(layout.paddingBottom - 1);
+});
