@@ -323,6 +323,97 @@ export const parentContentEntries = defineContent("parent", {
   "settings.save": { value: "Lưu cài đặt", description: "Nhãn lưu cài đặt." },
   "settings.saving": { value: "Đang lưu...", description: "Nhãn khi đang lưu cài đặt." },
   "settings.saved": { value: "Đã lưu cài đặt", description: "Thông báo lưu cài đặt thành công." },
+  "settings.security.eyebrow": { value: "Bảo mật tài khoản", description: "Nhãn mở đầu trung tâm bảo mật." },
+  "settings.security.title": {
+    value: "Tài khoản và thiết bị đăng nhập",
+    description: "Tiêu đề trung tâm bảo mật tài khoản.",
+  },
+  "settings.security.description": {
+    value: "Kiểm tra các thiết bị đang đăng nhập và đăng xuất ngay những phiên ba/mẹ không nhận ra.",
+    description: "Mô tả trung tâm bảo mật tài khoản.",
+  },
+  "settings.security.revokeOthers": {
+    value: "Đăng xuất thiết bị khác",
+    description: "Nút mở xác nhận đăng xuất các phiên khác.",
+  },
+  "settings.security.sessionRevoked": {
+    value: "Đã đăng xuất thiết bị",
+    description: "Thông báo thu hồi một phiên.",
+  },
+  "settings.security.othersRevoked": {
+    value: "Đã đăng xuất các thiết bị khác",
+    description: "Thông báo thu hồi các phiên khác.",
+  },
+  "settings.security.emailVerified": {
+    value: "Email đã xác minh",
+    description: "Trạng thái email đã xác minh.",
+  },
+  "settings.security.emailPending": {
+    value: "Email chưa xác minh",
+    description: "Trạng thái email chưa xác minh.",
+  },
+  "settings.security.twoFactorOn": {
+    value: "Đã bật xác thực hai lớp",
+    description: "Trạng thái xác thực hai lớp đã bật.",
+  },
+  "settings.security.twoFactorOff": {
+    value: "Chưa bật xác thực hai lớp",
+    description: "Trạng thái xác thực hai lớp chưa bật.",
+  },
+  "settings.security.signInMethods": {
+    value: "Cách đăng nhập",
+    description: "Nhãn các phương thức đăng nhập.",
+  },
+  "settings.security.signInMethodsUnknown": {
+    value: "Chưa xác định được cách đăng nhập.",
+    description: "Thông báo khi chưa đọc được phương thức đăng nhập.",
+  },
+  "settings.security.accountCreatedAt": {
+    value: "Tạo tài khoản lúc {time}",
+    description: "Thời điểm tạo tài khoản.",
+  },
+  "settings.security.sessionsTitle": {
+    value: "Thiết bị đang đăng nhập",
+    description: "Tiêu đề danh sách phiên đăng nhập.",
+  },
+  "settings.security.sessionCount": {
+    value: "{count} phiên còn hiệu lực. Hệ thống không lưu vị trí chính xác của thiết bị.",
+    description: "Số phiên đăng nhập đang còn hiệu lực.",
+  },
+  "settings.security.currentSession": { value: "Phiên hiện tại", description: "Nhãn phiên đang dùng." },
+  "settings.security.updatedAt": {
+    value: "Cập nhật gần nhất: {time}",
+    description: "Thời gian cập nhật phiên gần nhất.",
+  },
+  "settings.security.expiresAt": { value: "Hết hạn: {time}", description: "Thời gian hết hạn của phiên." },
+  "settings.security.ipAddress": { value: "IP: {value}", description: "Địa chỉ IP của phiên." },
+  "settings.security.unknown": { value: "Chưa xác định", description: "Giá trị kỹ thuật chưa xác định." },
+  "settings.security.revokeSession": { value: "Đăng xuất", description: "Nút đăng xuất một phiên." },
+  "settings.security.revokeTitle": {
+    value: "Đăng xuất thiết bị này?",
+    description: "Tiêu đề xác nhận một phiên.",
+  },
+  "settings.security.revokeDescription": {
+    value: "{browser} trên {operatingSystem} sẽ phải đăng nhập lại.",
+    description: "Mô tả xác nhận đăng xuất một phiên.",
+  },
+  "settings.security.revokeConfirm": {
+    value: "Đăng xuất thiết bị",
+    description: "Nút xác nhận đăng xuất một phiên.",
+  },
+  "settings.security.revokeOthersTitle": {
+    value: "Đăng xuất tất cả thiết bị khác?",
+    description: "Tiêu đề xác nhận đăng xuất các phiên khác.",
+  },
+  "settings.security.revokeOthersDescription": {
+    value: "Phiên đang dùng vẫn được giữ lại. Tất cả thiết bị khác sẽ phải đăng nhập lại.",
+    description: "Mô tả xác nhận đăng xuất các phiên khác.",
+  },
+  "settings.security.revokeOthersConfirm": {
+    value: "Đăng xuất tất cả",
+    description: "Nút xác nhận đăng xuất các phiên khác.",
+  },
+  "settings.security.revoking": { value: "Đang đăng xuất...", description: "Trạng thái đang thu hồi phiên." },
   "settings.dataTitle": { value: "Dữ liệu gia đình", description: "Tiêu đề nhóm dữ liệu gia đình." },
   "settings.export": { value: "Tạo bản sao dữ liệu", description: "Nhãn xuất dữ liệu." },
   "settings.exportReady": {

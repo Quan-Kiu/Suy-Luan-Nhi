@@ -18,6 +18,9 @@ export const queryKeys = {
   feedback: {
     uploadConfig: ["feedback", "upload-config"] as const,
   },
+  account: {
+    security: ["account", "security"] as const,
+  },
   parent: {
     dashboard: ["parent", "dashboard"] as const,
     settings: ["parent", "settings"] as const,
