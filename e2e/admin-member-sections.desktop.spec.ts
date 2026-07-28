@@ -46,7 +46,7 @@ test("member management uses tabs and identifies Google accounts", async ({ page
     ["google-reviewer-member-ui", "google", reviewerAccount!.id],
   );
 
-  await page.goto("/admin/access-control");
+  await page.goto("/admin/access-control?tab=members");
 
   const staffTab = page.getByRole("tab", { name: /Ban quản trị/ });
   const parentTab = page.getByRole("tab", { name: /Phụ huynh/ });
