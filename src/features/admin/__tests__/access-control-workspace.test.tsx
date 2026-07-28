@@ -79,6 +79,23 @@ describe("AccessControlWorkspace", () => {
     expect(screen.queryByRole("heading", { name: "Role hệ thống" })).not.toBeInTheDocument();
   });
 
+  it("keeps expanded role details within an independently scrollable region", async () => {
+    const user = userEvent.setup();
+    queryTab = "roles";
+    renderWorkspace();
+
+    const roleHeading = screen.getByRole("heading", { name: "Quản trị viên" });
+    const summary = roleHeading.closest("summary");
+    expect(summary).not.toBeNull();
+    await user.click(summary!);
+
+    const region = screen.getByRole("region", { name: "Danh sách quyền của Quản trị viên" });
+    expect(region).toHaveAttribute("tabindex", "0");
+    expect(region).toHaveClass("scrollbar-thin", "overflow-y-auto", "overscroll-contain");
+    expect(region.style.maxHeight).toBe("min(65dvh, 48rem)");
+    expect(summary!.closest("details")?.parentElement).toHaveClass("items-start");
+  });
+
   it("does not expose member data without member-management permission", () => {
     queryTab = "members";
     const queryClient = new QueryClient();

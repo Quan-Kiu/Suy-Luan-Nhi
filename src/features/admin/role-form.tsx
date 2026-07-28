@@ -97,7 +97,7 @@ export function RoleForm({ mode, initial }: { mode: "create" | "edit"; initial: 
             if (!items.length) return null;
             return (
               <section key={group}>
-                <h3 className="type-label text-[#5e554a]">{groupLabels[group]}</h3>
+                <h3 className="type-card-title text-[#5e554a]">{groupLabels[group]}</h3>
                 <div className="mt-2 space-y-2">
                   {items.map((permission) => (
                     <label

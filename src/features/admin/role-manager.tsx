@@ -2,14 +2,42 @@
 
 import { useMutation } from "@tanstack/react-query";
 import { ChevronDown, LockKeyhole, Plus, Trash2, UserRoundCog } from "lucide-react";
-import { useState } from "react";
+import { useState, type CSSProperties, type ReactNode } from "react";
 import { toast } from "sonner";
 import { rolesApi } from "@/api/admin/roles";
 import { ConfirmDialog } from "@/components/confirm-dialog";
 import { RoleForm } from "@/features/admin/role-form";
 import { RolePermissionSummary } from "@/features/admin/role-permission-summary";
 import { usePendingRouter } from "@/hooks/use-pending-router";
+import { cn } from "@/lib/utils";
 import type { AccessRoleItem } from "@/modules/admin/access-roles";
+
+const roleDetailsScrollStyle: CSSProperties = { maxHeight: "min(65dvh, 48rem)" };
+
+function RoleDetailsScrollRegion({
+  ariaLabel,
+  children,
+  className,
+}: {
+  ariaLabel: string;
+  children: ReactNode;
+  className?: string;
+}) {
+  return (
+    <div
+      role="region"
+      aria-label={ariaLabel}
+      tabIndex={0}
+      style={roleDetailsScrollStyle}
+      className={cn(
+        "scrollbar-thin [scrollbar-gutter:stable] overflow-y-auto overscroll-contain outline-none [-webkit-overflow-scrolling:touch] focus-visible:ring-2 focus-visible:ring-[#d86a24] focus-visible:ring-inset",
+        className,
+      )}
+    >
+      {children}
+    </div>
+  );
+}
 
 function CustomRoleCard({ role, canManage }: { role: AccessRoleItem; canManage: boolean }) {
   const navigation = usePendingRouter();
@@ -23,7 +51,7 @@ function CustomRoleCard({ role, canManage }: { role: AccessRoleItem; canManage: 
     },
   });
   return (
-    <details className="group overflow-hidden rounded-2xl border bg-white shadow-sm">
+    <details className="group min-w-0 self-start overflow-hidden rounded-2xl border bg-white shadow-sm">
       <summary className="flex min-h-20 cursor-pointer list-none items-center gap-3 px-4 py-3 marker:hidden">
         <span className="grid size-11 shrink-0 place-items-center rounded-xl bg-[#fff0df] text-[#b9470d]">
           <UserRoundCog size={21} />
@@ -42,7 +70,10 @@ function CustomRoleCard({ role, canManage }: { role: AccessRoleItem; canManage: 
         </div>
         <ChevronDown size={19} className="shrink-0 transition group-open:rotate-180" />
       </summary>
-      <div className="space-y-4 border-t border-[#eadfc9] p-4">
+      <RoleDetailsScrollRegion
+        ariaLabel={`Chi tiết role ${role.name}`}
+        className="space-y-4 border-t border-[#eadfc9] p-4"
+      >
         {canManage ? (
           <RoleForm
             mode="edit"
@@ -71,7 +102,7 @@ function CustomRoleCard({ role, canManage }: { role: AccessRoleItem; canManage: 
             Cần chuyển {role.memberCount} thành viên sang role khác trước khi xóa.
           </p>
         ) : null}
-      </div>
+      </RoleDetailsScrollRegion>
       <ConfirmDialog
         open={confirmOpen}
         title={`Xóa role ${role.name}?`}
@@ -108,9 +139,12 @@ export function RoleManager({ roles, canManage }: { roles: AccessRoleItem[]; can
             </div>
             <ChevronDown size={19} className="transition group-open:rotate-180" />
           </summary>
-          <div className="border-t border-[#eadfc9] p-4">
+          <RoleDetailsScrollRegion
+            ariaLabel="Biểu mẫu thêm role tùy chỉnh"
+            className="border-t border-[#eadfc9] p-4"
+          >
             <RoleForm mode="create" initial={{ key: "", name: "", description: "", permissions: [] }} />
-          </div>
+          </RoleDetailsScrollRegion>
         </details>
       ) : null}
 
@@ -123,7 +157,7 @@ export function RoleManager({ roles, canManage }: { roles: AccessRoleItem[]; can
             Có {customRoles.length} role tùy chỉnh có thể gán cho thành viên.
           </p>
         </div>
-        <div className="grid gap-3 xl:grid-cols-2">
+        <div className="grid items-start gap-3 xl:grid-cols-2">
           {customRoles.map((role) => (
             <CustomRoleCard key={role.key} role={role} canManage={canManage} />
           ))}
@@ -144,9 +178,12 @@ export function RoleManager({ roles, canManage }: { roles: AccessRoleItem[]; can
             Các role lõi được khóa để bảo vệ luồng gia đình và quyền quản trị cao nhất.
           </p>
         </div>
-        <div className="grid gap-3 xl:grid-cols-2">
+        <div className="grid items-start gap-3 xl:grid-cols-2">
           {systemRoles.map((role) => (
-            <details key={role.key} className="group overflow-hidden rounded-2xl border bg-white shadow-sm">
+            <details
+              key={role.key}
+              className="group min-w-0 self-start overflow-hidden rounded-2xl border bg-white shadow-sm"
+            >
               <summary className="flex min-h-20 cursor-pointer list-none items-center gap-3 px-4 py-3 marker:hidden">
                 <span className="grid size-11 shrink-0 place-items-center rounded-xl bg-[#edf4df] text-[#587048]">
                   <LockKeyhole size={21} />
@@ -168,9 +205,12 @@ export function RoleManager({ roles, canManage }: { roles: AccessRoleItem[]; can
                 </div>
                 <ChevronDown size={19} className="shrink-0 transition group-open:rotate-180" />
               </summary>
-              <div className="border-t border-[#eadfc9] p-4">
+              <RoleDetailsScrollRegion
+                ariaLabel={`Danh sách quyền của ${role.name}`}
+                className="border-t border-[#eadfc9] p-4"
+              >
                 <RolePermissionSummary permissions={role.permissions} />
-              </div>
+              </RoleDetailsScrollRegion>
             </details>
           ))}
         </div>

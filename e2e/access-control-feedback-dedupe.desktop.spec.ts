@@ -93,6 +93,23 @@ test("super admin can inspect role routes, trash a parent, revoke sessions, and 
     const superAdminRole = page.locator("details", { hasText: "Quản trị viên" });
     await expect(superAdminRole.getByRole("heading", { name: "Quản trị viên", exact: true })).toBeVisible();
     await openDetails(superAdminRole);
+    const permissionRegion = superAdminRole.getByRole("region", {
+      name: "Danh sách quyền của Quản trị viên",
+    });
+    await expect(permissionRegion).toBeVisible();
+    const scrollMetrics = await permissionRegion.evaluate((element) => ({
+      clientHeight: element.clientHeight,
+      maxHeight: (element as HTMLElement).style.maxHeight,
+      overflowY: getComputedStyle(element).overflowY,
+      scrollHeight: element.scrollHeight,
+    }));
+    expect(scrollMetrics.maxHeight).toBe("min(65dvh, 48rem)");
+    expect(scrollMetrics.overflowY).toBe("auto");
+    expect(scrollMetrics.scrollHeight).toBeGreaterThan(scrollMetrics.clientHeight);
+    await permissionRegion.evaluate((element) => {
+      element.scrollTop = element.scrollHeight;
+    });
+    expect(await permissionRegion.evaluate((element) => element.scrollTop)).toBeGreaterThan(0);
     await expect(superAdminRole.getByText("/api/admin/members/**", { exact: true })).toBeVisible();
 
     await switchAccessTab(page, "members", /Thành viên/);
