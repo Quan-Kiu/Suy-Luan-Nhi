@@ -19,6 +19,34 @@ export type ReleaseNote = {
 
 export const releaseNotes = [
   {
+    version: "2026.07.28",
+    title: "Bảo mật tài khoản rõ ràng hơn",
+    summary:
+      "Ba mẹ có thể kiểm tra các thiết bị đang đăng nhập và chủ động đăng xuất phiên không còn sử dụng.",
+    publishedAt: "2026-07-28T15:00:00+07:00",
+    announcement: true,
+    items: [
+      {
+        kind: "security",
+        title: "Kiểm tra thiết bị đang đăng nhập",
+        description:
+          "Trang cài đặt hiển thị trình duyệt, hệ điều hành, địa chỉ IP và thời hạn của từng phiên đăng nhập.",
+      },
+      {
+        kind: "security",
+        title: "Đăng xuất thiết bị lạ",
+        description:
+          "Ba mẹ có thể đăng xuất một thiết bị hoặc tất cả thiết bị khác mà không làm gián đoạn phiên đang dùng.",
+      },
+      {
+        kind: "improvement",
+        title: "Thông tin bảo mật dễ hiểu hơn",
+        description:
+          "Trạng thái xác minh email, xác thực hai lớp và cách đăng nhập được trình bày cùng một nơi.",
+      },
+    ],
+  },
+  {
     version: "2026.07.24",
     title: "Các thay đổi mới nhất",
     summary:

@@ -31,6 +31,6 @@ describe("release notes catalog", () => {
   });
 
   it("returns the current catalog release as the latest published entry", () => {
-    expect(getLatestPublishedReleaseNote(new Date("2026-07-24T12:00:00+07:00"))?.version).toBe("2026.07.24");
+    expect(getLatestPublishedReleaseNote(new Date("2026-07-28T16:00:00+07:00"))?.version).toBe("2026.07.28");
   });
 });
