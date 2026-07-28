@@ -1,4 +1,4 @@
-import { expect, test } from "@playwright/test";
+import { expect, test, type Locator, type Page } from "@playwright/test";
 import { Pool } from "pg";
 import { clearAuth, signIn } from "./helpers";
 
@@ -6,6 +6,19 @@ const baseURL = "http://127.0.0.1:3100";
 const databaseUrl = process.env.E2E_DATABASE_URL ?? "postgresql://sln@127.0.0.1:54329/sln_e2e";
 const pool = new Pool({ connectionString: databaseUrl });
 const createdFeedbackPaths = new Set<string>();
+const createdRoleKeys = new Set<string>();
+
+async function switchAccessTab(page: Page, tab: "roles" | "members", label: RegExp) {
+  await page.getByRole("tab", { name: label }).click();
+  await expect(page).toHaveURL(new RegExp(`[?&]tab=${tab}(?:&|$)`));
+  await expect(page.getByRole("tab", { name: label })).toHaveAttribute("aria-selected", "true");
+}
+
+async function openDetails(details: Locator) {
+  const open = await details.evaluate((element) => (element as HTMLDetailsElement).open);
+  if (!open) await details.locator("summary").click();
+  await expect(details).toHaveAttribute("open", "");
+}
 
 async function restoreTargetParent() {
   await pool.query(
@@ -29,6 +42,13 @@ async function restoreTargetParent() {
 
 test.afterEach(async () => {
   await restoreTargetParent();
+  await pool.query(
+    `update "user" set "role" = 'reviewer', "access_role_key" = null, "updated_at" = now() where "email" = 'reviewer@demo.local'`,
+  );
+  if (createdRoleKeys.size) {
+    await pool.query('delete from "access_roles" where "key" = any($1::text[])', [[...createdRoleKeys]]);
+    createdRoleKeys.clear();
+  }
   await pool.query(`
     update "parent_profiles" profile
     set "privacy_settings" = jsonb_set(
@@ -57,6 +77,7 @@ test("super admin can inspect role routes, trash a parent, revoke sessions, and 
   page,
   browser,
 }) => {
+  test.setTimeout(90_000);
   const parentContext = await browser.newContext({
     baseURL,
     extraHTTPHeaders: { origin: baseURL },
@@ -69,9 +90,12 @@ test("super admin can inspect role routes, trash a parent, revoke sessions, and 
 
     await signIn(page, "admin@demo.local", "/admin/access-control");
     await expect(page.getByRole("heading", { name: "Vai trò & thành viên", exact: true })).toBeVisible();
-    await expect(page.getByRole("heading", { name: "Quản trị viên", exact: true })).toBeVisible();
-    await expect(page.getByText("/api/admin/members/**", { exact: true })).toBeVisible();
+    const superAdminRole = page.locator("details", { hasText: "Quản trị viên" });
+    await expect(superAdminRole.getByRole("heading", { name: "Quản trị viên", exact: true })).toBeVisible();
+    await openDetails(superAdminRole);
+    await expect(superAdminRole.getByText("/api/admin/members/**", { exact: true })).toBeVisible();
 
+    await switchAccessTab(page, "members", /Thành viên/);
     const parentTab = page.getByRole("tab", { name: /Phụ huynh/ });
     await parentTab.click();
     const parentPanel = page.getByRole("tabpanel", { name: /Phụ huynh/ });
@@ -100,6 +124,90 @@ test("super admin can inspect role routes, trash a parent, revoke sessions, and 
   } finally {
     await parentContext.close();
   }
+});
+
+test("super admin can create, edit, assign, unassign, and delete a custom role", async ({
+  page,
+  browser,
+}) => {
+  const suffix = Date.now().toString(36);
+  const roleKey = `e2e_support_${suffix}`;
+  const roleName = `Hỗ trợ E2E ${suffix}`;
+  const updatedName = `Điều phối E2E ${suffix}`;
+  createdRoleKeys.add(roleKey);
+
+  await signIn(page, "admin@demo.local", "/admin/access-control?tab=roles");
+  await expect(page.getByRole("tab", { name: /Vai trò/ })).toHaveAttribute("aria-selected", "true");
+
+  const createPanel = page.locator("details", { hasText: "Thêm role tùy chỉnh" });
+  await createPanel.locator("summary").click();
+  await createPanel.getByLabel("Tên role").fill(roleName);
+  await createPanel.getByLabel("Mã role").fill(roleKey);
+  await createPanel
+    .getByLabel("Mô tả phạm vi trách nhiệm")
+    .fill("Theo dõi báo cáo và tiếp nhận góp ý hệ thống trong kiểm thử E2E.");
+  await createPanel.getByRole("checkbox", { name: /Xem báo cáo sử dụng/ }).check();
+  await createPanel.getByRole("checkbox", { name: /Xem góp ý hệ thống/ }).check();
+  await createPanel.getByRole("button", { name: "Thêm role" }).click();
+  await expect(page.getByText("Đã thêm role", { exact: true })).toBeVisible();
+
+  let roleCard = page.locator("details", { hasText: roleKey });
+  await expect(roleCard.getByRole("heading", { name: roleName, exact: true })).toBeVisible();
+  await openDetails(roleCard);
+  await roleCard.getByLabel("Tên role").fill(updatedName);
+  await roleCard.getByRole("button", { name: "Lưu thay đổi" }).click();
+  await expect(page.getByText("Đã cập nhật role", { exact: true })).toBeVisible();
+  await expect(page.getByRole("heading", { name: updatedName, exact: true })).toBeVisible();
+
+  await switchAccessTab(page, "members", /Thành viên/);
+  const staffPanel = page.getByRole("tabpanel", { name: /Ban quản trị/ });
+  const reviewerRow = staffPanel.locator("tr", { hasText: "reviewer@demo.local" });
+  const reviewerRoleSelect = reviewerRow.getByLabel("Vai trò của Reviewer Demo");
+  await reviewerRoleSelect.selectOption(roleKey);
+  await expect(reviewerRoleSelect).toHaveValue(roleKey);
+  await expect(page.getByText("Đã cập nhật vai trò", { exact: true }).last()).toBeVisible();
+
+  const customRoleContext = await browser.newContext({
+    baseURL,
+    extraHTTPHeaders: { origin: baseURL },
+  });
+  try {
+    const customRolePage = await customRoleContext.newPage();
+    await signIn(customRolePage, "reviewer@demo.local", "/admin/reports");
+    await expect(customRolePage).toHaveURL(/\/admin\/reports$/);
+    await expect(customRolePage.getByRole("heading", { name: "Báo cáo sử dụng", exact: true })).toBeVisible();
+    await expect(customRolePage.getByText(updatedName, { exact: true })).toBeVisible();
+    await expect(customRolePage.getByRole("link", { name: "Báo cáo sử dụng", exact: true })).toBeVisible();
+    await expect(customRolePage.getByRole("link", { name: "Nhiệm vụ", exact: true })).toHaveCount(0);
+    await customRolePage.goto("/admin/access-control");
+    await expect(customRolePage).toHaveURL(/\/auth\/error\?reason=forbidden/);
+  } finally {
+    await customRoleContext.close();
+  }
+
+  await switchAccessTab(page, "roles", /Vai trò/);
+  roleCard = page.locator("details", { hasText: roleKey });
+  await expect(roleCard.getByText(/^3 quyền · 1 thành viên$/)).toBeVisible();
+  await openDetails(roleCard);
+  await expect(roleCard.getByRole("button", { name: "Xóa role" })).toBeDisabled();
+
+  await switchAccessTab(page, "members", /Thành viên/);
+  const refreshedStaffPanel = page.getByRole("tabpanel", { name: /Ban quản trị/ });
+  const refreshedReviewerRow = refreshedStaffPanel.locator("tr", { hasText: "reviewer@demo.local" });
+  const refreshedReviewerRoleSelect = refreshedReviewerRow.getByLabel("Vai trò của Reviewer Demo");
+  await refreshedReviewerRoleSelect.selectOption("reviewer");
+  await expect(refreshedReviewerRoleSelect).toHaveValue("reviewer");
+  await expect(page.getByText("Đã cập nhật vai trò", { exact: true }).last()).toBeVisible();
+
+  await switchAccessTab(page, "roles", /Vai trò/);
+  roleCard = page.locator("details", { hasText: roleKey });
+  await openDetails(roleCard);
+  await roleCard.getByRole("button", { name: "Xóa role" }).click();
+  const confirmation = page.getByRole("alertdialog", { name: new RegExp(`Xóa role ${updatedName}`) });
+  await confirmation.getByRole("button", { name: "Xóa role" }).click();
+  await expect(page.getByText("Đã xóa role", { exact: true })).toBeVisible();
+  await expect(page.locator("details", { hasText: roleKey })).toHaveCount(0);
+  createdRoleKeys.delete(roleKey);
 });
 
 test("automatic reports with volatile request details aggregate into one feedback card", async ({ page }) => {

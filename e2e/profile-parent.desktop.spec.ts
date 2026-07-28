@@ -99,8 +99,21 @@ test("parent moves a child profile to trash, restores it and deletes it permanen
     .click();
   await expect(page.getByText("Mít Đã Sửa", { exact: true })).toHaveCount(0);
 
-  const children = await apiData<Array<{ displayName: string }>>(await page.request.get("/api/children"));
-  expect(children.some((child) => child.displayName === "Mít Đã Sửa")).toBe(false);
+  await expect
+    .poll(
+      async () => {
+        try {
+          const children = await apiData<Array<{ displayName: string }>>(
+            await page.request.get("/api/children"),
+          );
+          return children.some((child) => child.displayName === "Mít Đã Sửa");
+        } catch {
+          return null;
+        }
+      },
+      { timeout: 10_000 },
+    )
+    .toBe(false);
 });
 
 test("parent gate rejects a wrong PIN and exports family data", async ({ page }) => {

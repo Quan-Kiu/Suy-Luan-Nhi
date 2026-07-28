@@ -5,7 +5,7 @@ import {
   roleDefinitions,
   type PermissionGroup,
 } from "@/auth/permissions";
-import { appRoleSchema } from "@/auth/roles";
+import { systemRoleSchema } from "@/auth/roles";
 
 const groupLabels: Record<PermissionGroup, string> = {
   family: "Gia đình",
@@ -35,7 +35,7 @@ export function RoleAccessOverview() {
       </div>
 
       <div className="grid gap-4 xl:grid-cols-2">
-        {appRoleSchema.options.map((role) => {
+        {systemRoleSchema.options.map((role) => {
           const definition = roleDefinitions[role];
           const permissions = getPermissionsForRole(role).map(getPermissionDefinition);
           const grouped = Object.entries(

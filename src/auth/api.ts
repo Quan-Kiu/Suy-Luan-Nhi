@@ -6,7 +6,8 @@ import {
   requiresStaffMfaChallenge,
 } from "@/auth/access-policy";
 import { auth } from "@/auth/auth";
-import { hasPermission, type PermissionKey } from "@/auth/permissions";
+import type { PermissionKey } from "@/auth/permissions";
+import { hasEffectivePermission } from "@/auth/effective-access";
 import { hasRole, type AppRole } from "@/auth/roles";
 import { env } from "@/config/env";
 
@@ -92,7 +93,7 @@ export async function requireApiRoles(request: Request, roles: readonly AppRole[
 export async function requireApiPermission(request: Request, permission: PermissionKey) {
   const authResult = await requireApiSession(request);
   if ("error" in authResult) return authResult;
-  if (!hasPermission(authResult.session.user.role, permission)) {
+  if (!(await hasEffectivePermission(authResult.session.user, permission))) {
     return {
       error: apiJson({ message: "Không có quyền thực hiện thao tác này" }, { status: 403 }),
     } as const;

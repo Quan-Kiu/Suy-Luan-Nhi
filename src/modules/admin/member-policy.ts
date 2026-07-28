@@ -21,7 +21,9 @@ export type MemberPolicyInput = {
   currentRole: string;
   currentBanned: boolean;
   currentDeletedAt?: Date | null;
+  currentRoleKey?: string;
   nextRole: string;
+  nextRoleKey?: string;
   nextBanned: boolean;
   roleWasProvided: boolean;
   banWasRequested: boolean;
@@ -59,7 +61,9 @@ export function assertMemberUpdatePolicy(input: MemberPolicyInput) {
       "Tài khoản đang ở trong thùng rác. Hãy khôi phục trước khi thay đổi quyền.",
     );
   }
-  if (input.actorId === input.userId && input.roleWasProvided && input.nextRole !== input.currentRole) {
+  const currentRoleIdentity = input.currentRoleKey ?? input.currentRole;
+  const nextRoleIdentity = input.nextRoleKey ?? input.nextRole;
+  if (input.actorId === input.userId && input.roleWasProvided && nextRoleIdentity !== currentRoleIdentity) {
     throw new MemberPolicyError(
       "SELF_ROLE_CHANGE",
       "Không thể tự thay đổi vai trò của tài khoản đang sử dụng",

@@ -8,23 +8,26 @@ import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 import { contentText, useContent } from "@/content/client";
 import { AdminNavigation } from "@/features/admin/admin-navigation";
-import { getRoleLabel } from "@/features/admin/admin-role";
 import { useSignOutNavigation } from "@/features/auth/use-sign-out-navigation";
 
 export function AdminShell({
   children,
   userName,
   role,
+  roleLabel,
+  permissions,
 }: {
   children: React.ReactNode;
   userName: string;
   role: string;
+  roleLabel?: string;
+  permissions?: readonly import("@/auth/permissions").PermissionKey[];
 }) {
   const content = useContent("admin");
   const pathname = usePathname();
   const signOutFlow = useSignOutNavigation("/");
   const [menuOpen, setMenuOpen] = useState(false);
-  const roleLabel = getRoleLabel(role);
+  const displayedRoleLabel = roleLabel ?? role;
 
   useEffect(() => {
     function closeOnEscape(event: KeyboardEvent) {
@@ -102,7 +105,7 @@ export function AdminShell({
         <div className="flex items-center gap-3">
           <span className="type-caption hidden text-right sm:block">
             <strong className="block">{userName}</strong>
-            <span className="text-[#806d54]">{roleLabel}</span>
+            <span className="text-[#806d54]">{displayedRoleLabel}</span>
           </span>
           <button
             type="button"
@@ -139,6 +142,7 @@ export function AdminShell({
               <AdminNavigation
                 pathname={pathname}
                 role={role}
+                permissions={permissions}
                 content={content}
                 ariaLabel="Điều hướng quản trị mobile"
                 onNavigate={() => setMenuOpen(false)}
@@ -150,7 +154,7 @@ export function AdminShell({
 
       <div className="grid min-h-0 min-w-0 xl:grid-cols-[248px_minmax(0,1fr)]">
         <aside className="hidden min-h-0 min-w-0 scrollbar-thin overflow-x-hidden overflow-y-auto overscroll-contain border-r bg-white px-3 py-4 xl:block">
-          <AdminNavigation pathname={pathname} role={role} content={content} />
+          <AdminNavigation pathname={pathname} role={role} permissions={permissions} content={content} />
         </aside>
         <main
           id="admin-main-content"

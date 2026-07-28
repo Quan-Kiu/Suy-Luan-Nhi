@@ -54,6 +54,23 @@ describe("member security policy", () => {
     );
   });
 
+  it("blocks switching the current account between custom roles", () => {
+    expectPolicyCode(
+      () =>
+        assertMemberUpdatePolicy({
+          ...base,
+          actorId: "same",
+          userId: "same",
+          currentRole: "custom_staff",
+          currentRoleKey: "operations_manager",
+          nextRole: "custom_staff",
+          nextRoleKey: "support_manager",
+          roleWasProvided: true,
+        }),
+      "SELF_ROLE_CHANGE",
+    );
+  });
+
   it("protects the final active super admin", () => {
     expectPolicyCode(
       () =>

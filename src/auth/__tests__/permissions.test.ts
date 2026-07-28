@@ -1,5 +1,10 @@
 import { describe, expect, it } from "vitest";
-import { getPermissionsForRole, hasPermission, permissionDefinitions } from "@/auth/permissions";
+import {
+  expandPermissions,
+  getPermissionsForRole,
+  hasPermission,
+  permissionDefinitions,
+} from "@/auth/permissions";
 
 describe("role permission registry", () => {
   it("keeps editor and reviewer duties separated", () => {
@@ -14,6 +19,12 @@ describe("role permission registry", () => {
     expect(hasPermission("super_admin", "content_variables.manage")).toBe(true);
     expect(hasPermission("content_admin", "access_control.view")).toBe(false);
     expect(hasPermission("content_admin", "content_variables.manage")).toBe(false);
+  });
+
+  it("adds required view permissions for custom management grants", () => {
+    expect(expandPermissions(["roles.manage"])).toEqual(["access_control.view", "roles.manage"]);
+    expect(expandPermissions(["members.manage"])).toEqual(["access_control.view", "members.manage"]);
+    expect(expandPermissions(["missions.manage"])).toEqual(["missions.view", "missions.manage"]);
   });
 
   it("documents every assigned permission with at least one route", () => {

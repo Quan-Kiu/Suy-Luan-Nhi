@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { BookOpen, Plus } from "lucide-react";
 import Link from "next/link";
-import { hasRole } from "@/auth/roles";
+import { hasEffectivePermission } from "@/auth/effective-access";
 import { requirePermission } from "@/auth/session";
 import { AdminPageHeader } from "@/features/admin/admin-page-header";
 import { ResourceListWorkspace } from "@/features/admin/resource-list-workspace";
@@ -24,7 +24,7 @@ export default async function Page({
   searchParams: Promise<Record<string, string | string[] | undefined>>;
 }) {
   const [session, params] = await Promise.all([requirePermission("resources.view"), searchParams]);
-  const canEdit = hasRole(session.user.role, ["content_admin", "super_admin"]);
+  const canEdit = await hasEffectivePermission(session.user, "resources.manage");
   const readParam = (key: string) => {
     const value = params[key];
     return Array.isArray(value) ? value[0] : value;

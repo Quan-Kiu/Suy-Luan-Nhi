@@ -1,27 +1,41 @@
 import { relations } from "drizzle-orm";
-import { bigint, boolean, index, integer, pgTable, text, timestamp } from "drizzle-orm/pg-core";
+import { bigint, boolean, index, integer, jsonb, pgTable, text, timestamp } from "drizzle-orm/pg-core";
 
-export const user = pgTable("user", {
-  id: text("id").primaryKey(),
+export const accessRoles = pgTable("access_roles", {
+  key: text("key").primaryKey(),
   name: text("name").notNull(),
-  email: text("email").notNull().unique(),
-  emailVerified: boolean("email_verified").default(false).notNull(),
-  image: text("image"),
+  description: text("description").notNull(),
+  permissions: jsonb("permissions").$type<string[]>().default([]).notNull(),
   createdAt: timestamp("created_at", { withTimezone: true }).defaultNow().notNull(),
   updatedAt: timestamp("updated_at", { withTimezone: true }).defaultNow().notNull(),
-  role: text("role").default("parent").notNull(),
-  banned: boolean("banned").default(false).notNull(),
-  banReason: text("ban_reason"),
-  banExpires: timestamp("ban_expires", { withTimezone: true }),
-  twoFactorEnabled: boolean("two_factor_enabled").default(false).notNull(),
-  mustChangePassword: boolean("must_change_password").default(false).notNull(),
-  deletedAt: timestamp("deleted_at", { withTimezone: true }),
-  deletedBy: text("deleted_by"),
-  deletionReason: text("deletion_reason"),
-  deletedPreviousBanned: boolean("deleted_previous_banned"),
-  deletedPreviousBanReason: text("deleted_previous_ban_reason"),
-  deletedPreviousBanExpires: timestamp("deleted_previous_ban_expires", { withTimezone: true }),
 });
+
+export const user = pgTable(
+  "user",
+  {
+    id: text("id").primaryKey(),
+    name: text("name").notNull(),
+    email: text("email").notNull().unique(),
+    emailVerified: boolean("email_verified").default(false).notNull(),
+    image: text("image"),
+    createdAt: timestamp("created_at", { withTimezone: true }).defaultNow().notNull(),
+    updatedAt: timestamp("updated_at", { withTimezone: true }).defaultNow().notNull(),
+    role: text("role").default("parent").notNull(),
+    accessRoleKey: text("access_role_key").references(() => accessRoles.key, { onDelete: "restrict" }),
+    banned: boolean("banned").default(false).notNull(),
+    banReason: text("ban_reason"),
+    banExpires: timestamp("ban_expires", { withTimezone: true }),
+    twoFactorEnabled: boolean("two_factor_enabled").default(false).notNull(),
+    mustChangePassword: boolean("must_change_password").default(false).notNull(),
+    deletedAt: timestamp("deleted_at", { withTimezone: true }),
+    deletedBy: text("deleted_by"),
+    deletionReason: text("deletion_reason"),
+    deletedPreviousBanned: boolean("deleted_previous_banned"),
+    deletedPreviousBanReason: text("deleted_previous_ban_reason"),
+    deletedPreviousBanExpires: timestamp("deleted_previous_ban_expires", { withTimezone: true }),
+  },
+  (table) => [index("user_access_role_key_idx").on(table.accessRoleKey)],
+);
 
 export const session = pgTable(
   "session",

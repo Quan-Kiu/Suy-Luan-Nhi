@@ -176,17 +176,20 @@ const navGroups = [
 
 type Props = {
   pathname: string;
-  role: unknown;
+  role?: unknown;
+  permissions?: readonly PermissionKey[];
   content: ContentDictionary;
   onNavigate?: () => void;
   ariaLabel?: string;
 };
 
-export function AdminNavigation({ pathname, role, content, onNavigate, ariaLabel }: Props) {
+export function AdminNavigation({ pathname, role, permissions, content, onNavigate, ariaLabel }: Props) {
   return (
     <nav aria-label={ariaLabel} className="space-y-4 pb-4">
       {navGroups.map((group) => {
-        const visibleItems = group.items.filter((item) => hasPermission(role, item.permission));
+        const visibleItems = group.items.filter((item) =>
+          permissions ? permissions.includes(item.permission) : hasPermission(role, item.permission),
+        );
         if (!visibleItems.length) return null;
         return (
           <section key={group.labelKey}>

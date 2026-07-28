@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { ImageIcon } from "lucide-react";
-import { hasRole } from "@/auth/roles";
+import { hasEffectivePermission } from "@/auth/effective-access";
 import { requirePermission } from "@/auth/session";
 import { AdminPageHeader } from "@/features/admin/admin-page-header";
 import { MediaLibrary } from "@/features/admin/media-library";
@@ -12,7 +12,11 @@ export const metadata: Metadata = {
 
 export default async function Page() {
   const session = await requirePermission("media.view");
-  const result = await listMedia({ page: 1, pageSize: 16 });
+  const [result, canReview, canManage] = await Promise.all([
+    listMedia({ page: 1, pageSize: 16 }),
+    hasEffectivePermission(session.user, "media.review"),
+    hasEffectivePermission(session.user, "media.manage"),
+  ]);
   const initialData = {
     ...result,
     items: result.items.map((item) => ({ ...item, createdAt: item.createdAt.toISOString() })),
@@ -27,9 +31,9 @@ export default async function Page() {
       />
       <MediaLibrary
         initialData={initialData}
-        canReview={hasRole(session.user.role, ["reviewer", "super_admin"])}
-        canUpload={hasRole(session.user.role, ["content_admin", "super_admin"])}
-        canDelete={hasRole(session.user.role, ["content_admin", "super_admin"])}
+        canReview={canReview}
+        canUpload={canManage}
+        canDelete={canManage}
       />
     </div>
   );

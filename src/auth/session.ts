@@ -8,7 +8,8 @@ import {
   requiresStaffMfaChallenge,
 } from "@/auth/access-policy";
 import { auth } from "@/auth/auth";
-import { hasPermission, type PermissionKey } from "@/auth/permissions";
+import type { PermissionKey } from "@/auth/permissions";
+import { hasEffectivePermission } from "@/auth/effective-access";
 import { hasRole, type AppRole } from "@/auth/roles";
 import { env } from "@/config/env";
 import { isDatabaseUnavailable } from "@/lib/infrastructure";
@@ -42,7 +43,7 @@ export async function requireRoles(roles: readonly AppRole[]) {
 
 export async function requirePermission(permission: PermissionKey) {
   const session = await requireSession();
-  if (!hasPermission(session.user.role, permission)) redirect("/auth/error?reason=forbidden");
+  if (!(await hasEffectivePermission(session.user, permission))) redirect("/auth/error?reason=forbidden");
   if (env.AUTH_STAFF_MFA_REQUIRED && requiresStaffMfa(session.user)) redirect("/auth/mfa/setup");
   if (env.AUTH_STAFF_MFA_REQUIRED && requiresStaffMfaChallenge(session.user, session.session)) {
     redirect("/auth/two-factor");
