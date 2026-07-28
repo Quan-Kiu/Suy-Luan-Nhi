@@ -162,8 +162,10 @@ test("super admin can create, edit, assign, unassign, and delete a custom role",
   await switchAccessTab(page, "members", /Thành viên/);
   const staffPanel = page.getByRole("tabpanel", { name: /Ban quản trị/ });
   const reviewerRow = staffPanel.locator("tr", { hasText: "reviewer@demo.local" });
-  await reviewerRow.getByLabel("Vai trò của Reviewer Demo").selectOption(roleKey);
-  await expect(page.getByText("Đã cập nhật vai trò", { exact: true })).toBeVisible();
+  const reviewerRoleSelect = reviewerRow.getByLabel("Vai trò của Reviewer Demo");
+  await reviewerRoleSelect.selectOption(roleKey);
+  await expect(reviewerRoleSelect).toHaveValue(roleKey);
+  await expect(page.getByText("Đã cập nhật vai trò", { exact: true }).last()).toBeVisible();
 
   const customRoleContext = await browser.newContext({
     baseURL,
@@ -192,8 +194,10 @@ test("super admin can create, edit, assign, unassign, and delete a custom role",
   await switchAccessTab(page, "members", /Thành viên/);
   const refreshedStaffPanel = page.getByRole("tabpanel", { name: /Ban quản trị/ });
   const refreshedReviewerRow = refreshedStaffPanel.locator("tr", { hasText: "reviewer@demo.local" });
-  await refreshedReviewerRow.getByLabel("Vai trò của Reviewer Demo").selectOption("reviewer");
-  await expect(page.getByText("Đã cập nhật vai trò", { exact: true })).toBeVisible();
+  const refreshedReviewerRoleSelect = refreshedReviewerRow.getByLabel("Vai trò của Reviewer Demo");
+  await refreshedReviewerRoleSelect.selectOption("reviewer");
+  await expect(refreshedReviewerRoleSelect).toHaveValue("reviewer");
+  await expect(page.getByText("Đã cập nhật vai trò", { exact: true }).last()).toBeVisible();
 
   await switchAccessTab(page, "roles", /Vai trò/);
   roleCard = page.locator("details", { hasText: roleKey });
