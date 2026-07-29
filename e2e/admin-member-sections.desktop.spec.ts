@@ -59,9 +59,9 @@ test("member management uses tabs and identifies Google accounts", async ({ page
   await expect(reviewerRow.getByText("Google", { exact: true })).toBeVisible();
   await expect(reviewerRow.getByText("Email & mật khẩu", { exact: true })).toHaveCount(0);
   await reviewerRow.getByText("Thao tác tài khoản", { exact: true }).click();
-  await expect(reviewerRow.getByRole("button", { name: "Đặt lại mật khẩu" })).toBeDisabled();
+  await expect(reviewerRow.getByRole("menuitem", { name: "Đặt lại mật khẩu" })).toBeDisabled();
   await expect(reviewerRow.getByText(/Google-only quản lý mật khẩu/)).toBeVisible();
-  await expect(reviewerRow.getByRole("button", { name: "Đặt lại mã PIN" })).toBeDisabled();
+  await expect(reviewerRow.getByRole("menuitem", { name: "Đặt lại mã PIN" })).toBeDisabled();
   await expect(page.getByRole("tabpanel", { name: /Phụ huynh/ })).toHaveCount(0);
 
   await parentTab.click();
@@ -74,7 +74,7 @@ test("member management uses tabs and identifies Google accounts", async ({ page
   await expect(parentRow.getByText("Email & mật khẩu", { exact: true })).toBeVisible();
   await expect(parentRow.getByText("Google", { exact: true })).toHaveCount(0);
   await parentRow.getByText("Thao tác tài khoản", { exact: true }).click();
-  await parentRow.getByRole("button", { name: "Đặt lại mật khẩu" }).click();
+  await parentRow.getByRole("menuitem", { name: "Đặt lại mật khẩu" }).click();
   await expect(page.getByRole("dialog", { name: /Đặt lại mật khẩu/ })).toBeVisible();
   await expect(page.getByText("Gửi liên kết qua email", { exact: true })).toBeVisible();
   await page.getByRole("button", { name: "Đóng hộp thoại" }).click();

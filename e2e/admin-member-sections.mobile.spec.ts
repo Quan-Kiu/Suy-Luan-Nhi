@@ -58,8 +58,16 @@ test("member tabs and sign-in badges remain clear on mobile", async ({ page }) =
   const reviewerCard = staffPanel.locator("article", { hasText: "reviewer@demo.local" });
   await expect(reviewerCard).toBeVisible();
   await expect(reviewerCard.getByText("Google", { exact: true })).toBeVisible();
+  const cardHeightBeforeMenu = await reviewerCard.evaluate(
+    (element) => element.getBoundingClientRect().height,
+  );
   await reviewerCard.getByText("Thao tác tài khoản", { exact: true }).click();
-  await expect(reviewerCard.getByRole("button", { name: "Đặt lại mật khẩu" })).toBeDisabled();
+  const cardHeightAfterMenu = await reviewerCard.evaluate(
+    (element) => element.getBoundingClientRect().height,
+  );
+  expect(Math.abs(cardHeightAfterMenu - cardHeightBeforeMenu)).toBeLessThan(1);
+  await expect(reviewerCard.getByRole("menu", { name: /Thao tác tài khoản của/ })).toBeVisible();
+  await expect(reviewerCard.getByRole("menuitem", { name: "Đặt lại mật khẩu" })).toBeDisabled();
   await expect(reviewerCard.getByText(/Google-only quản lý mật khẩu/)).toBeVisible();
 
   await parentTab.click();
@@ -68,7 +76,7 @@ test("member tabs and sign-in badges remain clear on mobile", async ({ page }) =
   await expect(parentCard).toBeVisible();
   await expect(parentCard.getByText("Email & mật khẩu", { exact: true })).toBeVisible();
   await parentCard.getByText("Thao tác tài khoản", { exact: true }).click();
-  await parentCard.getByRole("button", { name: "Đặt lại mã PIN" }).click();
+  await parentCard.getByRole("menuitem", { name: "Đặt lại mã PIN" }).click();
   await expect(page.getByRole("dialog", { name: /Đặt lại mã PIN/ })).toBeVisible();
   await expect(page.getByText("Xóa mã PIN hiện tại", { exact: true })).toBeVisible();
   await page.getByRole("button", { name: "Đóng hộp thoại" }).click();

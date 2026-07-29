@@ -72,12 +72,27 @@ describe("MemberAccountActions", () => {
     });
   });
 
+  it("opens account actions as an overlay menu", async () => {
+    const user = userEvent.setup();
+    renderActions();
+
+    const trigger = screen.getByRole("button", { name: "Thao tác tài khoản" });
+    await user.click(trigger);
+
+    expect(trigger).toHaveAttribute("aria-expanded", "true");
+    expect(screen.getByRole("menu", { name: /Thao tác tài khoản của/ })).toHaveClass("fixed");
+
+    await user.keyboard("{Escape}");
+    expect(trigger).toHaveAttribute("aria-expanded", "false");
+    await waitFor(() => expect(trigger).toHaveFocus());
+  });
+
   it("sets a temporary password through a confirmed dialog", async () => {
     const user = userEvent.setup();
     renderActions();
 
     await user.click(screen.getByText("Thao tác tài khoản"));
-    await user.click(screen.getByRole("button", { name: "Đặt lại mật khẩu" }));
+    await user.click(screen.getByRole("menuitem", { name: "Đặt lại mật khẩu" }));
     expect(screen.getByRole("dialog", { name: /Đặt lại mật khẩu/ })).toBeInTheDocument();
 
     await user.click(screen.getByText("Đặt mật khẩu tạm thời"));
@@ -103,7 +118,7 @@ describe("MemberAccountActions", () => {
     renderActions();
 
     await user.click(screen.getByText("Thao tác tài khoản"));
-    await user.click(screen.getByRole("button", { name: "Đặt lại mật khẩu" }));
+    await user.click(screen.getByRole("menuitem", { name: "Đặt lại mật khẩu" }));
     await user.click(screen.getByRole("button", { name: "Gửi liên kết" }));
 
     expect(await screen.findByRole("alert")).toHaveTextContent("Tài khoản không hỗ trợ mật khẩu");
@@ -120,9 +135,9 @@ describe("MemberAccountActions", () => {
     });
 
     await user.click(screen.getByText("Thao tác tài khoản"));
-    expect(screen.getByRole("button", { name: "Đặt lại mật khẩu" })).toBeDisabled();
+    expect(screen.getByRole("menuitem", { name: "Đặt lại mật khẩu" })).toBeDisabled();
     expect(screen.getByText("Tài khoản Google-only quản lý mật khẩu qua Google.")).toBeInTheDocument();
-    expect(screen.getByRole("button", { name: "Đặt lại mã PIN" })).toBeDisabled();
+    expect(screen.getByRole("menuitem", { name: "Đặt lại mã PIN" })).toBeDisabled();
     expect(screen.getByText(/Chỉ tài khoản phụ huynh/)).toBeInTheDocument();
   });
 
@@ -131,8 +146,8 @@ describe("MemberAccountActions", () => {
     renderActions(baseItem, baseItem.id);
 
     await user.click(screen.getByText("Thao tác tài khoản"));
-    expect(screen.getByRole("button", { name: "Đặt lại mật khẩu" })).toBeDisabled();
-    expect(screen.getByRole("button", { name: "Đặt lại mã PIN" })).toBeDisabled();
+    expect(screen.getByRole("menuitem", { name: "Đặt lại mật khẩu" })).toBeDisabled();
+    expect(screen.getByRole("menuitem", { name: "Đặt lại mã PIN" })).toBeDisabled();
     expect(screen.getAllByText(/Không thể tự đặt lại/)).toHaveLength(2);
   });
 });

@@ -3,7 +3,7 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation } from "@tanstack/react-query";
 import { ChevronDown, KeyRound, LoaderCircle, LockKeyhole, X } from "lucide-react";
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useId, useLayoutEffect, useRef, useState } from "react";
 import { useForm, useWatch } from "react-hook-form";
 import { toast } from "sonner";
 import { z } from "zod";
@@ -366,8 +366,45 @@ function PinResetDialog({ item, open, onClose }: { item: MemberItem; open: boole
   );
 }
 
+const ACCOUNT_MENU_VIEWPORT_GAP = 8;
+const ACCOUNT_MENU_MIN_WIDTH = 256;
+const ACCOUNT_MENU_ESTIMATED_HEIGHT = 144;
+
+type AccountMenuPosition = {
+  top: number;
+  left: number;
+  width: number;
+};
+
+function resolveAccountMenuPosition(triggerRect: DOMRect, menuHeight: number): AccountMenuPosition {
+  const maxWidth = Math.max(window.innerWidth - ACCOUNT_MENU_VIEWPORT_GAP * 2, 0);
+  const width = Math.min(Math.max(triggerRect.width, ACCOUNT_MENU_MIN_WIDTH), maxWidth);
+  const maxLeft = Math.max(window.innerWidth - width - ACCOUNT_MENU_VIEWPORT_GAP, ACCOUNT_MENU_VIEWPORT_GAP);
+  const left = Math.min(Math.max(triggerRect.left, ACCOUNT_MENU_VIEWPORT_GAP), maxLeft);
+  const spaceBelow = window.innerHeight - triggerRect.bottom - ACCOUNT_MENU_VIEWPORT_GAP;
+  const openAbove = spaceBelow < menuHeight && triggerRect.top > spaceBelow;
+  const requestedTop = openAbove
+    ? triggerRect.top - menuHeight - ACCOUNT_MENU_VIEWPORT_GAP
+    : triggerRect.bottom + ACCOUNT_MENU_VIEWPORT_GAP;
+  const maxTop = Math.max(
+    window.innerHeight - menuHeight - ACCOUNT_MENU_VIEWPORT_GAP,
+    ACCOUNT_MENU_VIEWPORT_GAP,
+  );
+
+  return {
+    top: Math.min(Math.max(requestedTop, ACCOUNT_MENU_VIEWPORT_GAP), maxTop),
+    left,
+    width,
+  };
+}
+
 export function MemberAccountActions({ item, currentUserId }: { item: MemberItem; currentUserId: string }) {
   const [dialog, setDialog] = useState<"password" | "pin" | null>(null);
+  const [menuOpen, setMenuOpen] = useState(false);
+  const [menuPosition, setMenuPosition] = useState<AccountMenuPosition | null>(null);
+  const triggerRef = useRef<HTMLButtonElement>(null);
+  const menuRef = useRef<HTMLDivElement>(null);
+  const menuId = useId();
   const self = item.id === currentUserId;
   const hasCredential = item.accountProviders.includes("credential");
   const passwordDisabled = self || !hasCredential;
@@ -383,41 +420,167 @@ export function MemberAccountActions({ item, currentUserId }: { item: MemberItem
       ? "Chỉ tài khoản phụ huynh có hồ sơ gia đình mới có mã PIN."
       : null;
 
+  const updateMenuPosition = useCallback(() => {
+    const trigger = triggerRef.current;
+    if (!trigger) return;
+    const menuHeight = menuRef.current?.offsetHeight ?? ACCOUNT_MENU_ESTIMATED_HEIGHT;
+    setMenuPosition(resolveAccountMenuPosition(trigger.getBoundingClientRect(), menuHeight));
+  }, []);
+
+  const closeMenu = useCallback((restoreFocus = false) => {
+    setMenuOpen(false);
+    if (restoreFocus) {
+      requestAnimationFrame(() => triggerRef.current?.focus());
+    }
+  }, []);
+
+  const toggleMenu = () => {
+    if (menuOpen) {
+      closeMenu();
+      return;
+    }
+    const trigger = triggerRef.current;
+    if (trigger) {
+      setMenuPosition(
+        resolveAccountMenuPosition(trigger.getBoundingClientRect(), ACCOUNT_MENU_ESTIMATED_HEIGHT),
+      );
+    }
+    setMenuOpen(true);
+  };
+
+  useLayoutEffect(() => {
+    if (!menuOpen) return;
+    updateMenuPosition();
+    const frame = requestAnimationFrame(updateMenuPosition);
+    window.addEventListener("resize", updateMenuPosition);
+    window.addEventListener("scroll", updateMenuPosition, true);
+    return () => {
+      cancelAnimationFrame(frame);
+      window.removeEventListener("resize", updateMenuPosition);
+      window.removeEventListener("scroll", updateMenuPosition, true);
+    };
+  }, [menuOpen, updateMenuPosition]);
+
+  useEffect(() => {
+    if (!menuOpen) return;
+    const frame = requestAnimationFrame(() => {
+      menuRef.current?.querySelector<HTMLButtonElement>('button[role="menuitem"]:not(:disabled)')?.focus();
+    });
+    const handlePointerDown = (event: PointerEvent) => {
+      const target = event.target as Node;
+      if (!triggerRef.current?.contains(target) && !menuRef.current?.contains(target)) {
+        closeMenu();
+      }
+    };
+    const handleFocusIn = (event: FocusEvent) => {
+      const target = event.target as Node;
+      if (!triggerRef.current?.contains(target) && !menuRef.current?.contains(target)) {
+        closeMenu();
+      }
+    };
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "Escape") {
+        event.preventDefault();
+        closeMenu(true);
+      }
+    };
+    document.addEventListener("pointerdown", handlePointerDown);
+    document.addEventListener("focusin", handleFocusIn);
+    document.addEventListener("keydown", handleKeyDown);
+    return () => {
+      cancelAnimationFrame(frame);
+      document.removeEventListener("pointerdown", handlePointerDown);
+      document.removeEventListener("focusin", handleFocusIn);
+      document.removeEventListener("keydown", handleKeyDown);
+    };
+  }, [closeMenu, menuOpen]);
+
+  const handleMenuKeyDown = (event: React.KeyboardEvent<HTMLDivElement>) => {
+    if (!["ArrowDown", "ArrowUp", "Home", "End"].includes(event.key)) return;
+    const items = Array.from(
+      menuRef.current?.querySelectorAll<HTMLButtonElement>('button[role="menuitem"]:not(:disabled)') ?? [],
+    );
+    if (items.length === 0) return;
+    event.preventDefault();
+    const currentIndex = items.indexOf(document.activeElement as HTMLButtonElement);
+    const nextIndex =
+      event.key === "Home"
+        ? 0
+        : event.key === "End"
+          ? items.length - 1
+          : event.key === "ArrowDown"
+            ? (currentIndex + 1 + items.length) % items.length
+            : (currentIndex - 1 + items.length) % items.length;
+    items[nextIndex]?.focus();
+  };
+
   return (
     <>
-      <details className="relative">
-        <summary className="type-action flex min-h-10 cursor-pointer list-none items-center justify-center gap-2 rounded-xl border bg-white px-3 py-2 text-[#493f34] marker:content-none">
+      <div className="relative">
+        <button
+          ref={triggerRef}
+          type="button"
+          aria-haspopup="menu"
+          aria-expanded={menuOpen}
+          aria-controls={menuOpen ? menuId : undefined}
+          onClick={toggleMenu}
+          onKeyDown={(event) => {
+            if (event.key === "ArrowDown") {
+              event.preventDefault();
+              if (!menuOpen) toggleMenu();
+            }
+          }}
+          className="type-action flex min-h-10 w-full cursor-pointer items-center justify-center gap-2 rounded-xl border bg-white px-3 py-2 text-[#493f34]"
+        >
           <KeyRound size={16} aria-hidden="true" />
           Thao tác tài khoản
-          <ChevronDown size={15} aria-hidden="true" />
-        </summary>
-        <div className="mt-2 w-full min-w-64 rounded-2xl border border-[#e3d5bf] bg-white p-2 shadow-lg">
-          <button
-            type="button"
-            disabled={passwordDisabled}
-            onClick={(event) => {
-              event.currentTarget.closest("details")?.removeAttribute("open");
-              setDialog("password");
-            }}
-            className="type-label flex min-h-11 w-full items-center gap-2 rounded-xl px-3 text-left hover:bg-[#fff7ec] disabled:cursor-not-allowed disabled:opacity-45"
+          <ChevronDown
+            size={15}
+            aria-hidden="true"
+            className={`transition-transform ${menuOpen ? "rotate-180" : ""}`}
+          />
+        </button>
+        {menuOpen ? (
+          <div
+            ref={menuRef}
+            id={menuId}
+            role="menu"
+            aria-label={`Thao tác tài khoản của ${item.name}`}
+            onKeyDown={handleMenuKeyDown}
+            style={menuPosition ?? { visibility: "hidden" }}
+            className="fixed z-[100] max-h-[calc(100dvh-1rem)] overflow-y-auto rounded-2xl border border-[#e3d5bf] bg-white p-2 shadow-lg"
           >
-            <LockKeyhole size={17} /> Đặt lại mật khẩu
-          </button>
-          {passwordReason ? <p className="type-caption px-3 pb-2 text-[#806d54]">{passwordReason}</p> : null}
-          <button
-            type="button"
-            disabled={pinDisabled}
-            onClick={(event) => {
-              event.currentTarget.closest("details")?.removeAttribute("open");
-              setDialog("pin");
-            }}
-            className="type-label flex min-h-11 w-full items-center gap-2 rounded-xl px-3 text-left hover:bg-[#fff7ec] disabled:cursor-not-allowed disabled:opacity-45"
-          >
-            <KeyRound size={17} /> Đặt lại mã PIN
-          </button>
-          {pinReason ? <p className="type-caption px-3 pb-2 text-[#806d54]">{pinReason}</p> : null}
-        </div>
-      </details>
+            <button
+              type="button"
+              role="menuitem"
+              disabled={passwordDisabled}
+              onClick={() => {
+                closeMenu();
+                setDialog("password");
+              }}
+              className="type-label flex min-h-11 w-full items-center gap-2 rounded-xl px-3 text-left hover:bg-[#fff7ec] disabled:cursor-not-allowed disabled:opacity-45"
+            >
+              <LockKeyhole size={17} /> Đặt lại mật khẩu
+            </button>
+            {passwordReason ? (
+              <p className="type-caption px-3 pb-2 text-[#806d54]">{passwordReason}</p>
+            ) : null}
+            <button
+              type="button"
+              role="menuitem"
+              disabled={pinDisabled}
+              onClick={() => {
+                closeMenu();
+                setDialog("pin");
+              }}
+              className="type-label flex min-h-11 w-full items-center gap-2 rounded-xl px-3 text-left hover:bg-[#fff7ec] disabled:cursor-not-allowed disabled:opacity-45"
+            >
+              <KeyRound size={17} /> Đặt lại mã PIN
+            </button>
+            {pinReason ? <p className="type-caption px-3 pb-2 text-[#806d54]">{pinReason}</p> : null}
+          </div>
+        ) : null}
+      </div>
       <PasswordResetDialog item={item} open={dialog === "password"} onClose={() => setDialog(null)} />
       <PinResetDialog item={item} open={dialog === "pin"} onClose={() => setDialog(null)} />
     </>
