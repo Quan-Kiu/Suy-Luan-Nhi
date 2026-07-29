@@ -251,7 +251,7 @@ export function GlobalFeedbackWidget() {
           type="button"
           onClick={openDialog}
           aria-label={contentText(common, "feedback.open", "Gửi góp ý về trang này")}
-          className="safe-area-floating-action fixed z-[55] inline-flex min-h-11 cursor-pointer items-center gap-2 rounded-full border border-[#e4cfaa] bg-white px-3.5 font-black text-[#8f3a0c] shadow-[0_10px_30px_rgba(71,45,17,0.22)] transition hover:-translate-y-0.5 hover:bg-[#fff7eb]"
+          className="safe-area-floating-action fixed z-[55] inline-flex min-h-11 min-w-11 cursor-pointer items-center justify-center gap-2 rounded-l-full rounded-r-none border border-r-0 border-[#e4cfaa] bg-white px-3 font-black text-[#8f3a0c] shadow-[0_10px_30px_rgba(71,45,17,0.22)] transition hover:-translate-y-0.5 hover:bg-[#fff7eb] sm:rounded-full sm:border-r sm:px-3.5"
         >
           <MessageSquarePlus size={19} />
           <span className="hidden sm:inline">{contentText(common, "feedback.button", "Góp ý")}</span>

@@ -1,8 +1,12 @@
 import { mkdir, writeFile } from "node:fs/promises";
 import { expect, test, type Page } from "@playwright/test";
+import { applyVisualEvidenceStyles } from "./audit-helpers";
 import { apiData, signIn } from "./helpers";
 
-const outputDir = ".verification/admin-all-pages-audit";
+const auditRunId = process.env.UI_AUDIT_RUN_ID?.trim();
+const outputDir = auditRunId
+  ? `.verification/uiux-audit-${auditRunId}/admin-all-pages`
+  : ".verification/admin-all-pages-audit";
 const allViewports = [
   { name: "desktop", width: 1600, height: 900 },
   { name: "tablet", width: 1024, height: 768 },
@@ -94,6 +98,7 @@ async function auditPage(page: Page, route: AuditRoute, viewport: (typeof allVie
   await page.goto(route.path, { waitUntil: "domcontentloaded", timeout: 30_000 });
   await page.locator("#admin-main-content").waitFor({ state: "visible", timeout: 15_000 });
   await page.waitForLoadState("networkidle", { timeout: 3_000 }).catch(() => undefined);
+  await applyVisualEvidenceStyles(page);
   await page.waitForTimeout(100);
   const main = page.locator("#admin-main-content");
   await main.evaluate((element) => element.scrollTo({ top: 0, behavior: "instant" }));

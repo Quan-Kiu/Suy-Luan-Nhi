@@ -1,9 +1,25 @@
-import { writeFile } from "node:fs/promises";
+import { mkdir, writeFile } from "node:fs/promises";
 import path from "node:path";
 import { expect, type Page, type TestInfo } from "@playwright/test";
 import axe from "axe-core";
 
-const evidenceRoot = path.join(process.cwd(), ".verification/deep-review-2026-07-18/screenshots");
+const auditRunId = process.env.UI_AUDIT_RUN_ID?.trim() || new Date().toISOString().slice(0, 10);
+const evidenceRoot = path.join(process.cwd(), ".verification", `uiux-audit-${auditRunId}`, "screenshots");
+const visualEvidenceStyles = `
+  nextjs-portal { display: none !important; }
+  html { scroll-behavior: auto !important; }
+  *, *::before, *::after {
+    animation-delay: 0s !important;
+    animation-duration: 0.01s !important;
+    caret-color: transparent !important;
+    transition-delay: 0s !important;
+    transition-duration: 0.01s !important;
+  }
+`;
+
+export async function applyVisualEvidenceStyles(page: Page) {
+  await page.addStyleTag({ content: visualEvidenceStyles }).catch(() => undefined);
+}
 
 function evidenceSlug(value: string) {
   return value
@@ -17,6 +33,27 @@ type AuditOptions = {
   waitForNetworkIdle?: boolean;
 };
 
+async function preparePageForScreenshot(page: Page) {
+  await applyVisualEvidenceStyles(page);
+  const viewport = page.viewportSize();
+  if (!viewport) return;
+
+  const documentHeight = await page.evaluate(() => document.documentElement.scrollHeight);
+  const maxScrollY = Math.max(0, documentHeight - viewport.height);
+  const scrollStep = Math.max(360, Math.floor(viewport.height * 0.75));
+
+  for (let y = 0; y <= maxScrollY; y += scrollStep) {
+    await page.evaluate((scrollY) => window.scrollTo({ top: scrollY, behavior: "instant" }), y);
+    await page.waitForTimeout(40);
+  }
+  if (maxScrollY > 0) {
+    await page.evaluate((scrollY) => window.scrollTo({ top: scrollY, behavior: "instant" }), maxScrollY);
+    await page.waitForTimeout(60);
+  }
+  await page.evaluate(() => window.scrollTo({ top: 0, behavior: "instant" }));
+  await page.waitForTimeout(100);
+}
+
 export async function auditRoute(
   page: Page,
   testInfo: TestInfo,
@@ -28,6 +65,7 @@ export async function auditRoute(
   const pageErrors: string[] = [];
   const serverErrors: string[] = [];
   const failedRequests: string[] = [];
+  const startedAt = Date.now();
 
   const onConsole = (message: { type(): string; text(): string }) => {
     if (message.type() === "error") consoleErrors.push(message.text());
@@ -92,10 +130,13 @@ export async function auditRoute(
     (violation) => violation.impact === "critical" || violation.impact === "serious",
   );
 
+  await mkdir(evidenceRoot, { recursive: true });
   let screenshotMode: "full-page" | "viewport" | "failed" | "skipped" = "skipped";
+  let documentHeight = await page.evaluate(() => document.documentElement.scrollHeight);
   if (options.screenshot !== false) {
+    await preparePageForScreenshot(page);
+    documentHeight = await page.evaluate(() => document.documentElement.scrollHeight);
     const screenshotPath = path.join(evidenceRoot, `${evidenceSlug(name)}.png`);
-    const documentHeight = await page.evaluate(() => document.documentElement.scrollHeight);
     try {
       const fullPage = documentHeight <= 10_000;
       await page.screenshot({ path: screenshotPath, fullPage });
@@ -114,6 +155,8 @@ export async function auditRoute(
     route,
     url: page.url(),
     viewport: page.viewportSize(),
+    documentHeight,
+    durationMs: Date.now() - startedAt,
     screenshotMode,
     consoleErrors,
     pageErrors,

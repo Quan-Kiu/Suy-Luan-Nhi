@@ -11,6 +11,14 @@ const intentionallyLocalMutations = new Map<string, string>([
     "Completes the active authentication flow, updates the current session-backed user state, and redirects without a cached read model.",
   ],
   [
+    "account/security/sessions/[sessionId]/route.ts",
+    "Session security is read directly from the database; revocation returns the refreshed overview and the account-security query cache is replaced from that response.",
+  ],
+  [
+    "account/security/sessions/revoke-others/route.ts",
+    "Session security is read directly from the database; bulk revocation returns the refreshed overview and the account-security query cache is replaced from that response.",
+  ],
+  [
     "admin/members/[userId]/password-reset/route.ts",
     "Member credentials are read dynamically; the admin workspace refreshes after temporary-password changes and email requests do not mutate a cached list.",
   ],

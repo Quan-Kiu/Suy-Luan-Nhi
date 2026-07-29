@@ -14,7 +14,16 @@ test("public and authentication routes pass runtime UX checks", async ({ page },
     ["/auth/error?reason=forbidden", "desktop-auth-forbidden"],
   ] as const;
 
-  for (const [route, name] of routes) await auditRoute(page, testInfo, route, name);
+  for (const [route, name] of routes) {
+    await auditRoute(page, testInfo, route, name);
+    if (route === "/") {
+      await expect(page.getByRole("heading", { name: "Ba mẹ tạo hồ sơ cho bé" }).locator("..")).toHaveCSS(
+        "opacity",
+        "1",
+      );
+      await expect(page.locator("#safe article").first()).toHaveCSS("opacity", "1");
+    }
+  }
 });
 
 test("parent and child routes pass runtime UX checks", async ({ page }, testInfo) => {
@@ -25,6 +34,7 @@ test("parent and child routes pass runtime UX checks", async ({ page }, testInfo
   await auditRoute(page, testInfo, "/profiles", "desktop-parent-profiles");
   await auditRoute(page, testInfo, "/onboarding", "desktop-parent-create-child");
   await auditRoute(page, testInfo, "/missions", "desktop-child-mission-map");
+  await expect(page.locator("[data-mission-card]").first()).toHaveCSS("opacity", "1");
 
   const missionHref = await page.locator('a[href^="/missions/"]').first().getAttribute("href");
   expect(missionHref).toBeTruthy();

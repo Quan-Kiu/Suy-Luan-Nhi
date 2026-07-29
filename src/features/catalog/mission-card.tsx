@@ -12,13 +12,11 @@ export function MissionCard({
   mission,
   themeClassName,
   priority,
-  index,
   content,
 }: {
   mission: MissionMapMission;
   themeClassName: string;
   priority: boolean;
-  index: number;
   content: ContentDictionary;
 }) {
   const actionLabel = mission.completed
@@ -30,24 +28,16 @@ export function MissionCard({
         : contentText(content, "mission.locked", "Hoàn thành nhiệm vụ trước");
 
   const card = (
-    <motion.div
-      data-mission-card
-      className="h-full"
-      initial={{ opacity: 0, y: 14 }}
-      whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true, amount: 0.2 }}
-      transition={{ delay: Math.min(index * 0.05, 0.2) }}
-      whileHover={mission.unlocked ? { y: -4 } : undefined}
-    >
+    <motion.div data-mission-card className="h-full" whileHover={mission.unlocked ? { y: -4 } : undefined}>
       <Card
-        className={`relative flex h-full min-h-[284px] flex-col overflow-hidden border-2 p-2 ${themeClassName} ${!mission.unlocked ? "grayscale-[.4]" : ""}`}
+        className={`relative flex h-full min-h-[284px] flex-col overflow-hidden border-2 p-2 ${themeClassName}`}
       >
         <div className="relative h-36 shrink-0 overflow-hidden rounded-[20px]">
           <Image
             src={mission.coverUrl}
             fill
             alt={mission.title}
-            className="object-cover"
+            className={`object-cover ${!mission.unlocked ? "opacity-70 grayscale-[.4]" : ""}`}
             sizes="220px"
             priority={priority}
           />

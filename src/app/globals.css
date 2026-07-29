@@ -300,7 +300,7 @@ a {
 }
 
 .safe-area-floating-action {
-  right: max(1rem, var(--safe-area-right));
+  right: max(0rem, var(--safe-area-right));
   bottom: calc(6rem + var(--safe-area-bottom));
 }
 

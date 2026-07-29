@@ -141,9 +141,6 @@ export default async function HomePage() {
                 <motion.li
                   key={step.number}
                   className="relative rounded-[30px] border border-[#d9e6c6] bg-white/90 p-6 text-left shadow-[0_16px_40px_rgba(75,101,49,.08)]"
-                  initial={{ opacity: 0, y: 16 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true, amount: 0.25 }}
                   whileHover={{ y: -4 }}
                 >
                   <div className="flex items-center justify-between gap-4">
@@ -182,9 +179,6 @@ export default async function HomePage() {
             <motion.article
               key={card.title}
               className="rounded-[30px] border border-[#eadfc9] bg-white/90 p-6 text-center shadow-[0_16px_40px_rgba(95,67,31,.08)]"
-              initial={{ opacity: 0, y: 16 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true, amount: 0.25 }}
               whileHover={{ y: -4 }}
             >
               <Image

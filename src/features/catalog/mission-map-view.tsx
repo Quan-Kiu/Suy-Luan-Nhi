@@ -17,13 +17,7 @@ export function MissionMapView({ data, content }: { data: MissionMapData; conten
   return (
     <div className="space-y-7">
       {data.worlds.map((world, worldIndex) => (
-        <motion.section
-          key={world.id}
-          className={!world.unlocked ? "opacity-70" : undefined}
-          initial={{ opacity: 0, y: 18 }}
-          whileInView={{ opacity: world.unlocked ? 1 : 0.7, y: 0 }}
-          viewport={{ once: true, amount: 0.1 }}
-        >
+        <motion.section key={world.id}>
           <div className="mb-3 flex items-end justify-between gap-3">
             <div>
               <p className="type-overline font-black tracking-widest text-[#d17c14] uppercase">
@@ -56,7 +50,6 @@ export function MissionMapView({ data, content }: { data: MissionMapData; conten
                 mission={mission}
                 themeClassName={themes[world.theme] ?? themes.green}
                 priority={worldIndex === 0 && missionIndex < 3}
-                index={missionIndex}
                 content={content}
               />
             ))}
