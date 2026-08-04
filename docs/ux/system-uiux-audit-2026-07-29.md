@@ -47,8 +47,16 @@ Final evidence is written to `.verification/uiux-audit-2026-07-29-final/`.
 - Data ownership audit: 59 mutation routes, with 38 explicit invalidations and 21 documented intentionally local mutations.
 - The test runner skipped 27 integration tests whose database-specific opt-in environment was not enabled; the Playwright matrix used the isolated E2E PostgreSQL database and passed separately.
 
+## Production follow-up — 2026-08-04
+
+- Direct Chromium measurements against the Vercel deployment showed healthy public performance. Three cold-context landing runs produced median LCP values of about 1.43 s on desktop and 1.02 s on mobile; median CLS was 0.024 on desktop and 0 on mobile. Public/authentication route spot checks remained below about 1.1 s LCP in this lab.
+- The global feedback trigger previously pulled the complete form, screenshot capture helpers, attachment tooling, and image annotator into the initial route JavaScript. The trigger now stays lightweight, the feedback dialog loads on first use, and the annotator loads only when an attachment is edited.
+- The production-build landing entry changed from 22 initial JavaScript chunks / 1,469 KiB raw to 20 chunks / 1,397 KiB raw, a 72 KiB reduction (about 4.9%). Bundle inspection confirms the feedback capture and annotator markers are absent from all initial landing chunks.
+- Next.js 16 image hints were migrated from the deprecated `priority` prop to `preload` for the same known above-the-fold/LCP images, preserving loading intent while matching the installed framework API.
+- `npm run check` passed again after the follow-up: formatting, lint, type checking, typography and data-consistency audits, 325 unit tests, and the optimized production build.
+- Authenticated Playwright was not rerun on `quan-server` because its current user cannot access the Docker socket and no local PostgreSQL service is available. The earlier full E2E matrix remains the latest authenticated browser evidence; this follow-up did not weaken the gate or alter host permissions to bypass that infrastructure constraint.
+
 ## Deferred review items
 
-- Validate production Web Vitals with real network and CDN behavior; development-server timings are useful for regressions but are not production performance measurements.
-- Continue decomposing the largest feature components only when a functional task touches them; file size alone is not sufficient justification for a risky system-wide rewrite.
+- Continue decomposing large feature components only when a functional or measured performance task justifies it; file size alone is not sufficient reason for a risky system-wide rewrite.
 - Add visual-diff baselines after the product team confirms the current appearance as the approved reference.
