@@ -27,7 +27,7 @@ export default async function Page({ params }: { params: Promise<{ sessionId: st
           src="/assets/scenes/scene-mission-complete-celebration.png"
           width={760}
           height={760}
-          priority
+          preload
           alt={contentText(content, "completion.imageAlt", "Bé và Bống ăn mừng hoàn thành nhiệm vụ")}
           className="h-[390px] w-full object-cover"
         />

@@ -109,7 +109,7 @@ export default async function HomePage() {
           <Image
             src={assets.hero}
             fill
-            priority
+            preload
             alt="Bé thám tử và chú chó Bống khám phá bản đồ trong lều"
             className="relative object-contain drop-shadow-2xl"
             sizes="(max-width: 1024px) 100vw, 52vw"

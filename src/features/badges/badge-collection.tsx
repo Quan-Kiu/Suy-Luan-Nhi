@@ -136,7 +136,7 @@ export function BadgeCollection({
                     <Image
                       src={latestBadge.iconUrl}
                       fill
-                      priority
+                      preload
                       sizes="112px"
                       alt=""
                       className="relative object-contain drop-shadow-[0_10px_12px_rgba(101,67,20,0.22)] transition group-hover:-translate-y-1 group-hover:scale-105"

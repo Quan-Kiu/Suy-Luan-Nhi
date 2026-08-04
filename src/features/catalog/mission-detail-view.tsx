@@ -38,7 +38,7 @@ export function MissionDetailView({
             src={data.mission.coverUrl}
             width={760}
             height={500}
-            priority
+            preload
             alt={title}
             className="block h-72 w-full object-cover"
           />

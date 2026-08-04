@@ -11,12 +11,12 @@ import type { MissionMapMission } from "@/features/catalog/mission-map-types";
 export function MissionCard({
   mission,
   themeClassName,
-  priority,
+  preload,
   content,
 }: {
   mission: MissionMapMission;
   themeClassName: string;
-  priority: boolean;
+  preload: boolean;
   content: ContentDictionary;
 }) {
   const actionLabel = mission.completed
@@ -39,7 +39,7 @@ export function MissionCard({
             alt={mission.title}
             className={`object-cover ${!mission.unlocked ? "opacity-70 grayscale-[.4]" : ""}`}
             sizes="220px"
-            priority={priority}
+            preload={preload}
           />
           {mission.completed ? (
             <span className="absolute top-2 right-2 grid size-9 place-items-center rounded-full bg-white text-green-700">

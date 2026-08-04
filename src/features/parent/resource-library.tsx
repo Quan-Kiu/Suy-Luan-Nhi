@@ -134,7 +134,7 @@ export function ResourceLibrary({ initialData }: { initialData: ParentResourcePa
                       src={item.coverUrl}
                       fill
                       sizes="(max-width: 767px) 100vw, 33vw"
-                      priority={index < 3}
+                      preload={index < 3}
                       alt=""
                       className="object-cover"
                     />

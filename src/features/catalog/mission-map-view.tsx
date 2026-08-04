@@ -49,7 +49,7 @@ export function MissionMapView({ data, content }: { data: MissionMapData; conten
                 key={mission.id}
                 mission={mission}
                 themeClassName={themes[world.theme] ?? themes.green}
-                priority={worldIndex === 0 && missionIndex < 3}
+                preload={worldIndex === 0 && missionIndex < 3}
                 content={content}
               />
             ))}

@@ -34,7 +34,7 @@ export function ProfilesPageContent({
           src="/assets/scenes/scene-profile-dog-treehouse.png"
           width={260}
           height={170}
-          priority
+          preload
           alt={contentText(content, "list.imageAlt", "Bống bên nhà cây")}
           className="mx-auto h-36 w-56 rounded-[26px] object-cover"
         />
