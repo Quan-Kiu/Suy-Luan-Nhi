@@ -73,7 +73,7 @@ describe("GlobalFeedbackWidget", () => {
 
     await user.click(await screen.findByRole("button", { name: "Gửi góp ý về trang này" }));
 
-    const dialog = screen.getByRole("dialog");
+    const dialog = await screen.findByRole("dialog");
     const header = dialog.querySelector<HTMLElement>("[data-feedback-header]");
     const scrollRegion = dialog.querySelector<HTMLElement>("[data-feedback-scroll-region]");
     const actions = dialog.querySelector<HTMLElement>("[data-feedback-actions]");
@@ -170,7 +170,7 @@ describe("GlobalFeedbackWidget", () => {
 
     await user.click(await screen.findByRole("button", { name: "Đánh dấu ảnh 1" }));
 
-    expect(screen.getByRole("dialog", { name: "Vẽ vào khu vực cần chúng tôi chú ý" })).toBeVisible();
+    expect(await screen.findByRole("dialog", { name: "Vẽ vào khu vực cần chúng tôi chú ý" })).toBeVisible();
     expect(screen.getByRole("button", { name: "Hoàn tác nét vẽ" })).toBeDisabled();
     expect(screen.getByRole("button", { name: "Lưu ảnh đã đánh dấu" })).toBeDisabled();
   });
